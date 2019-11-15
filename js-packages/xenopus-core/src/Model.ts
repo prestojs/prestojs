@@ -8,6 +8,10 @@ export default class Model {
         labelPlural: 'NOT SET',
     };
 
+    public get _meta() {
+        return Object.getPrototypeOf(this).constructor._meta;
+    }
+
     /**
      * Get the defined fields for this model. Any property not starting with an underscore
      * and that is an instance of Field is considered a field.

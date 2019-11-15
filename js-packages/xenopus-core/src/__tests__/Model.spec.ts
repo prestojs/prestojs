@@ -33,3 +33,42 @@ test('Model._fields returns defined fields', () => {
     });
     expect(record2._fields).toEqual(B._fields);
 });
+
+test('Model._fields supports _meta', () => {
+    class A extends Model {
+        static _meta = {
+            label: 'A',
+            labelPlural: "A's",
+        };
+    }
+
+    const record1 = new A();
+    expect(A._meta).toEqual({
+        label: 'A',
+        labelPlural: "A's",
+    });
+    expect(record1._meta).toEqual(A._meta);
+
+    class B extends A {}
+
+    const record2 = new B();
+    expect(B._meta).toEqual({
+        label: 'A',
+        labelPlural: "A's",
+    });
+    expect(record2._meta).toEqual(B._meta);
+
+    class C extends B {
+        static _meta = {
+            label: 'C',
+            labelPlural: "C's",
+        };
+    }
+
+    const record3 = new C();
+    expect(C._meta).toEqual({
+        label: 'C',
+        labelPlural: "C's",
+    });
+    expect(record3._meta).toEqual(C._meta);
+});
