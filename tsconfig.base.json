@@ -7,18 +7,30 @@
     "lib": ["esnext", "dom"],
     "baseUrl": ".",
     "paths": {
-      "@xenopus/core/*": ["./js-packages/@xenopus/core/src/*"],
-      "@xenopus/generator/*": ["./js-packages/@xenopus/generator/src/*"]
+      "@xenopus/viewmodel/*": ["./js-packages/@xenopus/viewmodel/src/*"],
+      "@xenopus/codegen/*": ["./js-packages/@xenopus/codegen/src/*"],
+      "@xenopus/ui/*": ["./js-packages/@xenopus/ui/src/*"],
+      "@xenopus/ui-antd/*": ["./js-packages/@xenopus/ui-antd/src/*"],
+      "@xenopus/final-form/*": ["./js-packages/@xenopus/final-form/src/*"]
     }
   },
 
   // Seems that you have to explicitly specify this in each extended config anyway
   "references": [
     {
-      "path": "./js-packages/@xenopus/core/tsconfig.json"
+      "path": "./js-packages/@xenopus/viewmodel/tsconfig.json"
     },
     {
-      "path": "./js-packages/@xenopus/generator/tsconfig.json"
+      "path": "./js-packages/@xenopus/codegen/tsconfig.json"
+    },
+    {
+      "path": "./js-packages/@xenopus/ui/tsconfig.json"
+    },
+    {
+      "path": "./js-packages/@xenopus/ui-antd/tsconfig.json"
+    },
+    {
+      "path": "./js-packages/@xenopus/final-form/tsconfig.json"
     }
   ],
 

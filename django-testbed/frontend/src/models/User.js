@@ -1,4 +1,4 @@
-import { Model } from '@xenopus/core';
+import { Model } from '@xenopus/viewmodel';
 
 export default class User extends Model {
     static _meta = {

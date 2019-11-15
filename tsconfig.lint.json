@@ -11,10 +11,19 @@
   },
   "references": [
     {
-      "path": "./js-packages/@xenopus/core/tsconfig.lint.json"
+      "path": "./js-packages/@xenopus/viewmodel/tsconfig.lint.json"
     },
     {
-      "path": "./js-packages/@xenopus/generator/tsconfig.lint.json"
+      "path": "./js-packages/@xenopus/codegen/tsconfig.lint.json"
+    },
+    {
+      "path": "./js-packages/@xenopus/ui/tsconfig.json"
+    },
+    {
+      "path": "./js-packages/@xenopus/ui-antd/tsconfig.json"
+    },
+    {
+      "path": "./js-packages/@xenopus/final-form/tsconfig.json"
     }
   ]
 }

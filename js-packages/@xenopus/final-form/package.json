@@ -1,0 +1,25 @@
+{
+  "name": "@xenopus/final-form",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "typings": "build/module/index.d.ts",
+  "module": "build/module/index.js",
+  "scripts": {
+    "build:declaration": "tsc --project tsconfig.json",
+    "build": "BABEL_ENV=build babel src --root-mode upward --out-dir build/module --source-maps --extensions .ts,.tsx --delete-dir-on-start",
+    "build:watch": "yarn build --watch",
+    "dev": "yarn build:watch",
+    "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
+  },
+  "peerDependencies": {
+    "@xenopus/ui": "^0.0.1",
+    "@xenopus/viewmodel": "^0.0.1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "typescript": "^3.7.2"
+  }
+}

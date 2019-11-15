@@ -8,7 +8,10 @@
   },
   "references": [
     {
-      "path": "../core/tsconfig.json"
+      "path": "../viewmodel/tsconfig.json"
+    },
+    {
+      "path": "../ui/tsconfig.json"
     }
   ],
 

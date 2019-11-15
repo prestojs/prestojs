@@ -1,5 +1,5 @@
 {
-  "name": "@xenopus/generator",
+  "name": "@xenopus/codegen",
   "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
-    "@xenopus/core": "^0.0.1"
+    "@xenopus/viewmodel": "^0.0.1"
   },
   "dependencies": {
     "lodash": "^4.17.15"
