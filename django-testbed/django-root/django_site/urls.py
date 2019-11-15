@@ -1,0 +1,58 @@
+from allianceutils.api.permissions import SimpleDjangoObjectPermissions
+from authtools.views import LoginView
+from authtools.views import LogoutView
+from django.conf import settings
+from django.conf.urls import include
+from django.conf.urls import url
+from django.conf.urls.static import static
+from rest_framework.permissions import BasePermission
+from rest_framework.routers import APIRootView
+
+import django_site.views
+
+urlpatterns = []
+
+if "silk" in settings.INSTALLED_APPS:
+    urlpatterns += [url(r"^silk/", include("silk.urls", namespace="silk"))]
+
+if settings.DEBUG:
+    # SimpleDjangoObjectPermissions causes the BrowsableAPIRenderer to fail
+    # (permission_required not set) so remove it in dev.
+    # This's a weird place to patch this but can't find another that works.
+    APIRootView.permission_classes = [
+        x
+        for x in APIRootView.permission_classes
+        if not issubclass(x, SimpleDjangoObjectPermissions)
+    ]
+else:
+
+    class NoEntryForAnyone(BasePermission):
+        def has_permission(self, request, view):
+            return False
+
+    APIRootView.permission_classes = (NoEntryForAnyone,)
+
+# Serve the SPA under a sub-directory to future proof against potential conflicts
+# (eg. for SEO purposes, integration with a CMS etc).
+
+urlpatterns += [
+    url(r"^logout/$", LogoutView.as_view(), name="logout"),
+    # see https://django-authtools.readthedocs.io/en/latest/views.html for other auth-related urls
+    # you probably want to include (eg password change, password reset)
+    url(
+        r"^.*",
+        django_site.views.FrontendView.as_view(basename="app", entry_point="app",),
+    ),
+    url(r"^hijack/", include("hijack.urls", namespace="hijack")),
+    url(r"^xenopus_frog/", include("xenopus_frog.urls")),
+]
+
+# Serve media files in development (note: this is a no-op when DEBUG=False)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if "debug_toolbar" in settings.INSTALLED_APPS:
+    import debug_toolbar
+
+    urlpatterns += [
+        url(r"^__debug__/", include(debug_toolbar.urls)),
+    ]

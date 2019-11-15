@@ -1,0 +1,10 @@
+# Heroku process configuration
+
+# nginx + gunicorn (recommended)
+web: bin/start-nginx gunicorn --config gunicorn_config_heroku.py --bind unix:///tmp/wsgi-app.socket wsgi:application
+
+# waitress + whitenoise (simpler but more server load)
+#web: cd django-root && waitress-serve --port=$PORT wsgi:application
+
+#
+release: cd django-root && ./manage.py migrate --noinput

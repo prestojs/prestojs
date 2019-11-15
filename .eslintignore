@@ -1,1 +1,2 @@
 js-packages/**/build/*
+django-testbed/frontend/webpack.*

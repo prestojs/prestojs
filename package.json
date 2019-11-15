@@ -6,7 +6,8 @@
   "license": "MIT",
   "private": true,
   "workspaces": [
-    "js-packages/@xenopus/*"
+    "js-packages/@xenopus/*",
+    "django-testbed"
   ],
   "scripts": {
     "lint": "eslint js-packages --ext .js,.ts",
@@ -14,6 +15,7 @@
     "clean": "lerna run clean",
     "prebuild": "lerna run clean",
     "test": "jest",
+    "dev": "lerna run --parallel 'dev'",
     "build": "lerna run --parallel 'build'",
     "build:watch": "lerna run --parallel 'build:watch'",
     "build:declarations": "tsc -b"
@@ -25,6 +27,9 @@
     "@typescript-eslint/parser": "^2.7.0",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.16.0",
     "husky": "^3.0.9",
     "jest": "^24.9.0",
     "lerna": "^3.18.4",
@@ -45,18 +50,10 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn check-types && lint-staged"
+      "pre-commit": "yarn check-types && lint-staged",
+      "pre-push": "LINT_PUSH=1 ./bin/lint/lint-general.py",
+      "commit-msg": "./bin/lint/git-commit-msg $HUSKY_GIT_PARAMS",
+      "prepare-commit-msg": "./bin/lint/git-prepare-commit-msg $HUSKY_GIT_PARAMS"
     }
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "eslint --fix",
-      "prettier --write",
-      "git add"
-    ],
-    "*.{less,json}": [
-      "prettier --write",
-      "git add"
-    ]
   }
 }

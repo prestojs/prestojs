@@ -1,0 +1,73 @@
+#!/bin/bash -e
+set -o pipefail
+#
+# Called to alter the default commit message
+#
+
+source "$(dirname "${BASH_SOURCE[0]}")/common.inc"
+
+
+# An example hook script to prepare the commit log message.
+# Called by "git commit" with the name of the file that has the
+# commit message, followed by the description of the commit
+# message's source.  The hook's purpose is to edit the commit
+# message file.  If the hook fails with a non-zero status,
+# the commit is aborted.
+
+commit_file="$1"
+commit_type="$2"
+commit_branch="$3"
+
+cleanup() {
+	[[ ! -e "$commit_file_tmp" ]] || rm "$commit_file_tmp"
+}
+trap cleanup EXIT
+
+case "$commit_type,$commit_branch" in
+	message,)
+		# git commit [ -m | -F ]
+		;;
+	merge,)
+		# a commit that is a merge
+		# TODO: Remove origin/ links
+		;;
+	commit,HEAD)
+		# git commit [ --amend | -c | -C ]
+		;;
+	squash,)
+		# squash from git rebase
+		;;
+	template,|,)
+		# commit with -t, commit.template config option or no options
+		# there is a default commit.complate set, so this is the default for a 'regular' commit
+		if ! head -n 1 "$commit_file" | egrep '^$' >/dev/null ; then
+			echo "Detected non-default commit template; not altering" >&2
+			exit 0
+		fi
+		commit_file_tmp=$( mktemp )
+		{ cat <<-END
+
+
+				# Example first commit line:
+				#
+				# feature: add great foo
+				# ^        ^
+				# |        |
+				# |        +-> Summary in present tense.
+				# |
+				# +-------> Type: $commit_categories
+				#
+				# The following categories can contain no summary: $commit_categories_bare
+				#
+				# Follow with dot points if exposition is necessary
+				#
+				#
+			END
+			tail -n +2 "$commit_file" ;
+		} > "$commit_file_tmp"
+		mv "$commit_file_tmp" "$commit_file"
+		;;
+	*)
+		fail 'Unrecognised prepare-commit-msg commit arguments:' "$0" "$@"
+esac
+

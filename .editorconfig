@@ -1,0 +1,25 @@
+# editorconfig.org
+
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{html,scss,yml,less}]
+indent_style = space
+indent_size = 2
+
+[*.{js,py,json}]
+indent_style = space
+indent_size = 4
+
+[*.{inc,sh}]
+indent_style = tab
+
+[git-hooks/**]
+indent_style = tab

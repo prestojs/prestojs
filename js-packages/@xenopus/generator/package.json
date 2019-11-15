@@ -9,6 +9,7 @@
     "build:declaration": "tsc --project tsconfig.json",
     "build": "BABEL_ENV=build babel src --root-mode upward --out-dir build/module --source-maps --extensions .ts,.tsx --delete-dir-on-start",
     "build:watch": "yarn build --watch",
+    "dev": "yarn build:watch",
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {

@@ -1,0 +1,29 @@
+#!/bin/bash -e
+set -o pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/common.inc"
+
+IFS=$'\n'
+files=( $( git diff --cached --name-only --diff-filter=ACM ) )
+unset IFS
+
+"$repo_dir/bin/lint.sh" "${files[@]}"
+
+for file in "${files[@]}" ; do
+	if [[ $file =~ (SECRET_KEY) ]] ; then
+		echo "Secret keys should not be committed: ${file}" >&2
+		exit 1
+	fi
+done
+
+if egrep --ignore-case --files-with-matches -- '-----BEGIN (DSA|RSA|RSA1|ECDSA|ED25519) PRIVATE KEY-----' "${files[@]}" >&2 ; then
+	echo "SSH private keys should not be committed" >&2
+	exit 1
+fi
+
+# This is not perfect, but it should catch the most obvious violations
+# (AWS secret keys should be 40 chars, this should also catch accidental truncations)
+if egrep --ignore-case --files-with-matches -- '^\s*aws_?secret_?access_?key\s*=[[:space:]"'"'"']*[a-z0-9/+]{30}' "${files[@]}" >&2 ; then
+	echo "AWS secret keys should not be committed" >&2
+	exit 1
+fi

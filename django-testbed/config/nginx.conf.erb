@@ -1,0 +1,138 @@
+daemon off;
+#Heroku dynos have at least 4 cores.
+worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
+
+events {
+    use epoll;
+    accept_mutex on;
+    worker_connections 1024;
+}
+
+http {
+    gzip on;
+    gzip_comp_level 3;
+    gzip_min_length 512;
+    gzip_types
+        application/atom_xml
+        application/javascript
+        application/json
+        application/pdf
+        application/rss+xml
+        application/x-javascript
+        application/xml
+        application/xml+rss
+        application/xhtml+xml
+        application/vnd.ms-fontobject
+        application/x-font-ttf
+        application/x-font-opentype
+        application/x-font-truetype
+        font/eot
+        font/opentype
+        font/otf
+        image/svg+xml
+        image/vnd.microsoft.icon
+        image/x-icon
+        text/css
+        text/javascript
+        text/plain
+        text/xml;
+    # text/html is implicit
+    # woff, jpg, gif, png are already compressed
+    # PDF *can* be compressed but mostly isn't so we include it
+
+
+
+
+    # add Vary: Content-Encoding header
+    gzip_vary on;
+
+    # gzip everything
+    gzip_proxied any;
+
+    # default is to only gzip http 1.1 requests
+    gzip_http_version 1.0;
+
+    server_tokens off;
+
+    log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
+
+    # uncomment these if you want nginx logs to go to disk
+    # beware that this may cause your dyno to run out of disk space though since there is no log rotation!
+    # note that bin/start-nginx also tails these logs to stdout so don't use both settings
+
+    #access_log logs/nginx/access.log l2met;
+    #error_log logs/nginx/error.log info;
+
+    access_log /dev/stdout l2met;
+    error_log stderr;
+
+    include mime.types;
+    default_type application/octet-stream;
+    sendfile on;
+
+    # Must read the body in 10 seconds.
+    client_body_timeout 10s;
+    client_max_body_size 24M;
+
+    upstream app_server {
+        server unix:/tmp/wsgi-app.socket fail_timeout=0;
+    }
+
+    server {
+        listen <%= ENV["PORT"] %>;
+        server_name _;
+        keepalive_timeout 5;
+
+        # Force redirect to https if on http.
+        # Typically this would be done from a server block listening to port 80, however on Heroku we sit behind a gateway
+        # that terminates HTTPS and we get told what port to listen to.
+
+        # nginx has no else directive, does not allow multiple conditions in if directive, nor nested if directives
+        # so we use this structure to work out if https is not valid and what method is being used
+        set $https_test_method other;
+        if ($request_method = GET) {
+            set $https_test_method get;
+        }
+
+        if ($http_x_forwarded_proto != 'https') {
+            set $https_test "${https_test_method}_fail";
+        }
+
+        if ($https_test = get_fail) {
+            return 301 https://$host$request_uri;
+        }
+        if ($https_test = other_fail) {
+            return 307 https://$host$request_uri;
+        }
+
+        location = /favicon.ico {
+            root assets/;
+        }
+
+        location /assets/ {
+            alias assets/;
+            autoindex off;
+            add_header Vary Accept-Encoding;
+
+            # https://www.nginx.com/resources/admin-guide/serving-static-content/#tcp_nopush
+            # tcp_nopush on;
+
+            # You can turn on far-future expiry headers if you do one of:
+            #  - have webpack build files include chunk hashes
+            #  - use allianceutils.ContentHashWebpackLoader or TimestampWebpackLoader
+            #  - use ManifestStaticFileStorage to insert file hashes into the filename
+            #location /assets/dist/ {
+            #   expires max;
+            #   #expires 90d;
+            #   #access_log off;
+            #}
+        }
+
+        location / {
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_pass http://app_server;
+        }
+    }
+}
