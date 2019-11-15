@@ -16,7 +16,7 @@ module.exports = {
         },
     },
     moduleFileExtensions: ['ts', 'tsx', 'js'],
-    modulePathIgnorePatterns: ['build'],
+    modulePathIgnorePatterns: [],
     notify: true,
     notifyMode: 'always',
     roots: ['<rootDir>js-packages'],

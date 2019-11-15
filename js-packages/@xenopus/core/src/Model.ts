@@ -2,6 +2,11 @@ import Field from './fields/Field';
 
 type FieldsMapping = { [key: string]: Field<any> };
 
+interface ModelMeta {
+    label: string;
+    labelPlural: string;
+}
+
 /**
  * Base Model class for any model in the system. This should be extended and have relevant fields and _meta
  * set on it:
@@ -19,12 +24,12 @@ type FieldsMapping = { [key: string]: Field<any> };
  * ```
  */
 export default class Model {
-    public static _meta = {
+    public static _meta: ModelMeta = {
         label: 'NOT SET',
         labelPlural: 'NOT SET',
     };
 
-    public get _meta() {
+    public get _meta(): ModelMeta {
         return Object.getPrototypeOf(this).constructor._meta;
     }
 

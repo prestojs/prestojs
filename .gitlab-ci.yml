@@ -1,0 +1,65 @@
+# For a better understanding of what this file is and how to modify it, see
+#
+# https://alliancesoftware.atlassian.net/wiki/display/TEC/End-to-End+CI+Testing
+#
+# All lines starting with # is treated as comment in yaml.
+# set your variables here
+variables:
+  PYTHON_VERSION: py37
+cache:
+  key: global
+  paths:
+    - ci-cache
+
+before_script:
+  - time source gitlab-ci-init-python.inc
+
+image: alliance/python
+
+stages:
+  - install
+  - test-pre-build
+
+install:node_modules:
+  stage: install
+  script:
+    - time yarn
+    - date
+    - echo 'Success'
+  artifacts:
+    name: node_modules
+    paths:
+      - node_modules
+    expire_in: '4 hours'
+
+lint:
+  stage: test-pre-build
+  dependencies:
+    - install:node_modules
+  script:
+    - yarn lint
+    - echo 'Success'
+
+check-types:
+  stage: test-pre-build
+  dependencies:
+    - install:node_modules
+  script:
+    - yarn check-types
+    - echo 'Success'
+
+test-frontend-unit:
+  stage: test-pre-build
+  dependencies:
+    - install:node_modules
+  script:
+    - yarn test
+    - echo 'Success'
+
+build:
+  stage: test-pre-build
+  dependencies:
+    - install:node_modules
+  script:
+    - time yarn build
+    - echo 'Success'
