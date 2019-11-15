@@ -1,0 +1,32 @@
+*.mwb.bak
+*.pyc
+
+.DS_Store
+.idea
+.tox
+
+SECRET_KEY
+
+# Third party packages
+node_modules
+
+# dev files
+venv/
+build/
+
+# Media files
+assets/
+media/
+
+# Log files
+log/
+npm-debug.log
+yarn-error.log
+tsconfig.tsbuildinfo
+
+# Ipython noteboots
+.ipynb_checkpoints
+*.ipynb
+
+# Temp files
+django-root/temp/*

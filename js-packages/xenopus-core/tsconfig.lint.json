@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.lint.json",
+
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo"
+  },
+
+  "include": ["src/**/*"],
+  "exclude": ["*/__tests__/**/*"]
+}

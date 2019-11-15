@@ -1,0 +1,58 @@
+{
+  "name": "xenopus",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Dave Coates <david.coates@alliancesoftware.com.au>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "js-packages/*"
+  ],
+  "scripts": {
+    "lint": "eslint js-packages --ext .js,.ts",
+    "clean": "lerna run clean",
+    "prebuild": "lerna run clean",
+    "test": "jest",
+    "build": "lerna run --parallel 'build'",
+    "build:watch": "lerna run --parallel 'build:watch'",
+    "build:declarations": "tsc -b"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.23",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
+    "@typescript-eslint/parser": "^2.7.0",
+    "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.5.0",
+    "husky": "^3.0.9",
+    "jest": "^24.9.0",
+    "lerna": "^3.18.4",
+    "lint-staged": "^9.4.3",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.1.0"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.2",
+    "@babel/plugin-proposal-class-properties": "^7.7.0",
+    "@babel/plugin-proposal-numeric-separator": "^7.2.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/preset-typescript": "^7.7.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsc -b tsconfig.lint.json && lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.{less,json}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}

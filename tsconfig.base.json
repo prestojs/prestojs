@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["esnext", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@xenopus/core/*": ["./js-packages/xenopus-core/src/*"],
+      "@xenopus/generator/*": ["./js-packages/xenopus-generator/src/*"]
+    }
+  },
+
+  // Seems that you have to explicitly specify this in each extended config anyway
+  "references": [
+    {
+      "path": "./js-packages/xenopus-core/tsconfig.json"
+    },
+    {
+      "path": "./js-packages/xenopus-generator/tsconfig.json"
+    }
+  ],
+
+  "files": []
+}

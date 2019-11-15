@@ -1,0 +1,20 @@
+{
+  // This config used just for typechecking as a lint command (ie. no output)
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // If noEmit is used can't get incremental compilation. Instead we set outdir to /tmp.
+    // Without this _every_ lint call will be slow and as we call this on commit would be
+    // very annoying
+    // https://github.com/microsoft/TypeScript/issues/30661
+    // "noEmit": true
+    "outDir": "/tmp/tsc-output"
+  },
+  "references": [
+    {
+      "path": "./js-packages/xenopus-core/tsconfig.lint.json"
+    },
+    {
+      "path": "./js-packages/xenopus-generator/tsconfig.lint.json"
+    }
+  ]
+}
