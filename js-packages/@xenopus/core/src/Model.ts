@@ -2,6 +2,22 @@ import Field from './fields/Field';
 
 type FieldsMapping = { [key: string]: Field<any> };
 
+/**
+ * Base Model class for any model in the system. This should be extended and have relevant fields and _meta
+ * set on it:
+ *
+ * ```js
+ * class User extends Model {
+ *     static _meta {
+ *         label: 'User',
+ *         labelPlural: 'Users',
+ *     };
+ *
+ *     static firstName = new CharField({...});
+ *     static lastName = new CharField({...});
+ * }
+ * ```
+ */
 export default class Model {
     public static _meta = {
         label: 'NOT SET',

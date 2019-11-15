@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.lint.json",
+  "extends": "../../../tsconfig.lint.json",
 
   "compilerOptions": {
     "composite": true,
@@ -8,7 +8,7 @@
   },
   "references": [
     {
-      "path": "../xenopus-core/tsconfig.lint.json"
+      "path": "../core/tsconfig.lint.json"
     }
   ],
 

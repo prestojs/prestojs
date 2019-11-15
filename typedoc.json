@@ -1,0 +1,20 @@
+{
+  "links": [
+    {
+      "label": "Guides",
+      "url": "TODO"
+    }
+  ],
+  "target": "es6",
+  "name": "Xenopus",
+  "theme": "./node_modules/typedoc-neo-theme/bin/default",
+  "mode": "modules",
+  "out": "docs_generated",
+  "ignoreCompilerErrors": "false",
+  "preserveConstEnums": "true",
+  "exclude": "*.spec.ts",
+  "external-modulemap": ".*packages/(@xenopus/[^/]+)/.*",
+  "stripInternal": "false",
+  "stripExternal": "true",
+  "tsconfig": "./tsconfig.json"
+}

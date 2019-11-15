@@ -11,10 +11,10 @@
   },
   "references": [
     {
-      "path": "./js-packages/xenopus-core/tsconfig.lint.json"
+      "path": "./js-packages/@xenopus/core/tsconfig.lint.json"
     },
     {
-      "path": "./js-packages/xenopus-generator/tsconfig.lint.json"
+      "path": "./js-packages/@xenopus/generator/tsconfig.lint.json"
     }
   ]
 }

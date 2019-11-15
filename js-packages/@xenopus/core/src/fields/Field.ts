@@ -13,7 +13,12 @@ interface Props<T> {
     readOnly?: boolean;
     writeOnly?: boolean;
 }
+
+/**
+ * Base Field
+ */
 export default class Field<T> {
+    /** Is this field required when saving a record? */
     public required: boolean;
     public name: string;
     public label: string;
