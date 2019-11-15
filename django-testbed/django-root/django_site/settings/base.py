@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     "rest_framework",
     "rules.apps.AutodiscoverRulesConfig",
     "webpack_loader",
+    "xenopus_viewmodels_drf",
     # core django
     "django.contrib.admin",
     "django.contrib.auth",
