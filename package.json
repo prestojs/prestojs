@@ -12,12 +12,12 @@
   "scripts": {
     "lint": "eslint js-packages --ext .js,.ts",
     "check-types": "tsc -b tsconfig.lint.json",
-    "clean": "lerna run clean",
+    "clean": "lerna run clean --ignore django-testbed",
     "prebuild": "lerna run clean",
     "test": "jest",
     "dev": "lerna run --parallel 'dev'",
-    "build": "lerna run --parallel 'build'",
-    "build:watch": "lerna run --parallel 'build:watch'",
+    "build": "lerna run --parallel 'build' --ignore django-testbed",
+    "build:watch": "lerna run --parallel 'build:watch' --ignore django-testbed",
     "build:declarations": "tsc -b"
   },
   "devDependencies": {

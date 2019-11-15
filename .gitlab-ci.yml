@@ -5,7 +5,8 @@
 # All lines starting with # is treated as comment in yaml.
 # set your variables here
 variables:
-  PYTHON_VERSION: py37
+  DJANGO_SETTINGS_MODULE: django_site.settings.ci
+
 cache:
   key: global
   paths:
@@ -19,6 +20,22 @@ image: alliance/python
 stages:
   - install
   - test-pre-build
+
+install:virtualenv:
+  stage: install
+  script:
+    # gitlab-ci doesn't support absolute paths to artifacts so we
+    # create a virtualenv here in the working directory
+    - test "$VIRTUAL_ENV" = "" || deactivate
+    - time bin/init-dev-virtualenv.sh --no-dev --no-pyenv --no-input venv
+    - source venv/bin/activate
+    - date
+    - echo 'Success'
+  artifacts:
+    name: virtualenv
+    paths:
+      - venv
+    expire_in: '4 hours'
 
 install:node_modules:
   stage: install
@@ -62,4 +79,16 @@ build:
     - install:node_modules
   script:
     - time yarn build
+    - echo 'Success'
+
+test:python:
+  stage: test-pre-build
+  dependencies:
+    - install:virtualenv
+  services:
+    - postgres:9.5
+  script:
+    - time pip install -r requirements/dev.txt
+    - time bin/run-tests-django.sh
+    - date
     - echo 'Success'
