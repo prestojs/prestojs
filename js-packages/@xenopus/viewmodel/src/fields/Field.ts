@@ -69,4 +69,9 @@ export default class Field<T> {
         }
         return Promise.resolve(this._defaultValue);
     }
+
+    toString(): string {
+        const className = this.constructor.name;
+        return `${className}({ name: "${this.name}" })`;
+    }
 }
