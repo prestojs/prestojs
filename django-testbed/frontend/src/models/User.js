@@ -6,5 +6,10 @@ export default class User extends ModelView {
         labelPlural: 'Users',
     };
 
-    static age = new NumberField({ name: 'age', label: 'Age' });
+    static age = new NumberField({
+        name: 'age',
+        label: 'Age',
+        required: true,
+        helpText: 'Users age in years',
+    });
 }

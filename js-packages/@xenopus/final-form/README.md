@@ -9,20 +9,22 @@ TODO: Review/expand this once interface settled
 
 ```js
 import React from 'react';
-import { ModelViewForm } from '@xenopus/final-form';
+import { Form } from '@xenopus/final-form';
 
 function UserForm(onSubmit) {
     return (
-        <ModelViewForm onSubmit={onSubmit}>
-            <label>
-                First Name <ModelViewForm.Field field={User.fields.firstName} />
-            </label>
-            <label>
-                Last Name
-                <ModelViewForm.Field field={User.fields.lastName} />
-            </label>
+        <Form onSubmit={onSubmit}>
+            <Form.Item field={User.fields.firstName} />
+            <Form.Item field={User.fields.lastName} />
+            <Form.Item field={User.fields.email} />
+            <Form.Item field={User.fields.email} name="emailConfirmation" label="Confirm Email" />
+            <Form.Item>
+                <Form.Field name="signUpNewsletter">
+                    {({ input }) => <Checkbox {...input}>Sign up to newsletter?</Checkbox>}
+                </Form.Field>
+            </Form.Item>
             <button type="submit">Submit</button>
-        </ModelViewForm>
+        </Form>
     );
 }
 ```
