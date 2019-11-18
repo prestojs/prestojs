@@ -1,13 +1,16 @@
 /**
- * Utility to type a class of specified type, eg.
+ * Utility to type a generic class type, eg.
+ *
+ * NOTE: If not dealing with generics just use `typeof <class>` instead
  *
  * ```js
- * class Base {}
- * class Concrete extends Base {}
- * function factory(a: Class<Base>): Base {
- *     return new a();
+ * class Base<T> {
+ *   value?: T;
  * }
- *
+ * class Concrete<T> extends Base<T> {}
+ * function factory<T>(a: Class<Base<T>>): Base<T> {
+ *   return new a();
+ * }
  * factory(Concrete);
  * ```
  */
