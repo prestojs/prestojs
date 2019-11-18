@@ -4,7 +4,8 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./build/module",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "jsx": "react"
   },
   "references": [
     {

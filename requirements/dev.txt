@@ -1,6 +1,9 @@
 # Local development dependencies go here
 -r base.txt
 
+# code formatting
+black
+
 # django dev tools
 django-debug-toolbar
 # Until https://github.com/jazzband/django-silk/commit/5bf4c4975b60d26fa873c8dbd265ddc1144e3328 goes live need to use old version

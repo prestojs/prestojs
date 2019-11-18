@@ -1,4 +1,5 @@
 module.exports = {
+    setupFilesAfterEnv: ['jest-dom/extend-expect', 'react-testing-library/cleanup-after-each'],
     clearMocks: true,
     coverageDirectory: 'coverage',
     coverageReporters: ['text', 'clover'],
@@ -15,8 +16,13 @@ module.exports = {
             extends: './babel.config.js',
         },
     },
+    moduleDirectories: ['node_modules'],
     moduleFileExtensions: ['ts', 'tsx', 'js'],
     modulePathIgnorePatterns: [],
+    moduleNameMapper: {
+        '@xenopus/([^/]+)$': '<rootDir>js-packages/@xenopus/$1/src',
+        '@xenopus/([^/]+)(/.+)$': '<rootDir>js-packages/@xenopus/$1/src$2',
+    },
     notify: true,
     notifyMode: 'always',
     roots: ['<rootDir>js-packages'],

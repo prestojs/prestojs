@@ -53,8 +53,15 @@ lint:
   stage: test-pre-build
   dependencies:
     - install:node_modules
+    - install:virtualenv
+  services:
+    - postgres:9.5
   script:
-    - yarn lint
+    - echo 'Success'
+    - time pip install -r requirements/dev.txt
+    - time bin/lint.py
+    - ( cd django-testbed/django-root && ./manage.py makemigrations --check --dry-run ) || { echo 'Missing migrations!'; false; }
+    - date
     - echo 'Success'
 
 check-types:
