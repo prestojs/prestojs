@@ -2,7 +2,7 @@ import Field from './fields/Field';
 
 type FieldsMapping = { [key: string]: Field<any> };
 
-interface ModelMeta {
+interface ModelViewMeta {
     label: string;
     labelPlural: string;
 }
@@ -23,13 +23,15 @@ interface ModelMeta {
  * }
  * ```
  */
-export default class Model {
-    public static _meta: ModelMeta = {
+export default class ModelView {
+    public static _meta: ModelViewMeta = {
+        // Static label for a single one of these
         label: 'NOT SET',
+        // Static label for an indeterminate number (eg. "people")
         labelPlural: 'NOT SET',
     };
 
-    public get _meta(): ModelMeta {
+    public get _meta(): ModelViewMeta {
         return Object.getPrototypeOf(this).constructor._meta;
     }
 

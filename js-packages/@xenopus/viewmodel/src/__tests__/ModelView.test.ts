@@ -1,8 +1,8 @@
-import Model from '../Model';
+import ModelView from '../ModelView';
 import Field from '../fields/Field';
 
-test('Model._fields returns defined fields', () => {
-    class A extends Model {
+test('ModelView._fields returns defined fields', () => {
+    class A extends ModelView {
         static firstName = new Field({ name: 'firstName', label: 'First Name' });
         static lastName = new Field({ name: 'lastName', label: 'Last Name' });
     }
@@ -34,8 +34,8 @@ test('Model._fields returns defined fields', () => {
     expect(record2._fields).toEqual(B._fields);
 });
 
-test('Model._fields supports _meta', () => {
-    class A extends Model {
+test('ModelView._fields supports _meta', () => {
+    class A extends ModelView {
         static _meta = {
             label: 'A',
             labelPlural: "A's",

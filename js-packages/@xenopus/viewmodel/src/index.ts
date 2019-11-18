@@ -1,2 +1,2 @@
-export { default as Model } from './Model';
+export { default as ModelView } from './ModelView';
 export { default as Field } from './fields/Field';
