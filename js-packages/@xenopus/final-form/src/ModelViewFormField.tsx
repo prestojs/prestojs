@@ -5,7 +5,15 @@ import { Field, FieldProps } from 'react-final-form';
 
 type ModelViewFormFieldProps = FieldProps<any, any> & { name: string };
 
-export default function ModelViewForm({
+/**
+ * Wrapper around Field from react-final-form that determines the widget to use based on the field.
+ *
+ * Must be used within a `ModelViewForm`.
+ *
+ * If `component`, `render` or `children` are passed they will be used instead of selecting a widget
+ * based on the field type.
+ */
+export default function ModelViewFormField({
     name,
     ...formProps
 }: ModelViewFormFieldProps): React.ReactElement {

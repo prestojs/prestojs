@@ -5,6 +5,12 @@ import ModelViewFormField from './ModelViewFormField';
 
 type ModelViewFormProps = FormProps & { modelView: typeof ModelView };
 
+/**
+ * Wrapper around Form from react-final-form that allows you to use ModelViewForm.Field within it to
+ * automatically determine the widget to use.
+ *
+ * TODO: Interface likely to change; expand this once settled
+ */
 export default function ModelViewForm({
     modelView,
     ...rest
