@@ -1,3 +1,10 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { pathsToModuleNameMapper } = require('ts-jest/utils');
+// In the following statement, replace `./tsconfig` with the path to your `tsconfig` file
+// which contains the path mapping (ie the `compilerOptions.paths` option):
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { compilerOptions } = require('./tsconfig.base');
+
 module.exports = {
     setupFilesAfterEnv: ['jest-dom/extend-expect', 'react-testing-library/cleanup-after-each'],
     clearMocks: true,
@@ -14,15 +21,16 @@ module.exports = {
     globals: {
         'ts-jest': {
             extends: './babel.config.js',
+            diagnostics: {
+                warnOnly: true,
+            },
         },
     },
+
     moduleDirectories: ['node_modules'],
     moduleFileExtensions: ['ts', 'tsx', 'js'],
     modulePathIgnorePatterns: [],
-    moduleNameMapper: {
-        '@xenopus/([^/]+)$': '<rootDir>js-packages/@xenopus/$1/src',
-        '@xenopus/([^/]+)(/.+)$': '<rootDir>js-packages/@xenopus/$1/src$2',
-    },
+    moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
     notify: true,
     notifyMode: 'always',
     roots: ['<rootDir>js-packages'],

@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react';
-import Field from '@xenopus/viewmodel/fields/Field';
+import { Field } from '@xenopus/viewmodel';
 import FieldWidget from './FieldWidget';
 
 export const UiContext = React.createContext(null);

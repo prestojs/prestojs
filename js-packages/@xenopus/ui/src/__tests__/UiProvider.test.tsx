@@ -1,4 +1,4 @@
-import Field from '@xenopus/viewmodel/fields/Field';
+import { Field } from '@xenopus/viewmodel';
 import React from 'react';
 import { render } from '@testing-library/react';
 
@@ -13,7 +13,7 @@ function FieldWrapper({ field }): React.ReactElement {
     const input = {
         name: field.name,
         value: 1,
-        onChange: (value: any): any => {},
+        onChange: (): any => {},
         onBlur: (): any => {},
         onFocus: (): any => {},
     };
@@ -32,10 +32,10 @@ test('useUi should warn if no provider', () => {
 });
 
 test('UiProvider should provide widget', () => {
-    function DefaultWidget(props: WidgetProps<any, any>): React.ReactElement {
+    function DefaultWidget(): React.ReactElement {
         return <>default_widget</>;
     }
-    function SpecialWidget(props: WidgetProps<any, any>): React.ReactElement {
+    function SpecialWidget(): React.ReactElement {
         return <>special_widget</>;
     }
     function getWidget<T>(field): FieldWidget<T, any> {
@@ -60,13 +60,13 @@ test('UiProvider should provide widget', () => {
 });
 
 test('UiProvider should support nested providers', () => {
-    function DefaultWidget(props: WidgetProps<any, any>): React.ReactElement {
+    function DefaultWidget(): React.ReactElement {
         return <>default_widget</>;
     }
-    function SpecialWidget(props: WidgetProps<any, any>): React.ReactElement {
+    function SpecialWidget(): React.ReactElement {
         return <>special_widget</>;
     }
-    function NestedWidget(props: WidgetProps<any, any>): React.ReactElement {
+    function NestedWidget(): React.ReactElement {
         return <>nested_widget</>;
     }
     function getWidgetOuter<T>(field): FieldWidget<T, any> {

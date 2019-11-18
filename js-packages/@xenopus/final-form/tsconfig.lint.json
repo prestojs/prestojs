@@ -11,7 +11,7 @@
       "path": "../viewmodel/tsconfig.lint.json"
     },
     {
-      "path": "../ui/tsconfig.json"
+      "path": "../ui/tsconfig.lint.json"
     }
   ],
 
