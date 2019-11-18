@@ -4,7 +4,9 @@ import FieldWidget from './FieldWidget';
 
 export const UiContext = React.createContext(null);
 
-type GetWidgetForField = <T>(field: Field<T>) => FieldWidget | null;
+type GetWidgetForField = <FieldValue, T extends HTMLElement>(
+    field: Field<FieldValue>
+) => FieldWidget<FieldValue, T> | null;
 
 export interface UiContextValue {
     getWidgetForField: GetWidgetForField;
@@ -37,7 +39,9 @@ export default function UiProvider(props: Props): React.ReactElement {
     const { getWidgetForField: parentGetWidgetForField = null } = context || {};
     const providedContext = useMemo(
         () => ({
-            getWidgetForField<T>(field: Field<T>): FieldWidget | null {
+            getWidgetForField<FieldValue, T extends HTMLElement>(
+                field: Field<FieldValue>
+            ): FieldWidget<FieldValue, T> | null {
                 const widget = getWidgetForField(field);
                 if (!widget) {
                     if (!parentGetWidgetForField) {

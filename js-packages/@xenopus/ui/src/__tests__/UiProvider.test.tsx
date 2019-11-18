@@ -6,6 +6,20 @@ import FieldWidget, { WidgetProps } from '../FieldWidget';
 import useUi from '../useUi';
 import UiProvider from '../UiProvider';
 
+function FieldWrapper({ field }): React.ReactElement {
+    const { getWidgetForField } = useUi();
+
+    const Widget = getWidgetForField(field);
+    const input = {
+        name: field.name,
+        value: 1,
+        onChange: (value: any): any => {},
+        onBlur: (): any => {},
+        onFocus: (): any => {},
+    };
+    return <Widget input={input} meta={{}} />;
+}
+
 test('useUi should warn if no provider', () => {
     // Supress error logs. Even though we catch it below React with log errors out.
     const mockError = jest.spyOn(global.console, 'error').mockImplementation(() => {});
@@ -18,26 +32,18 @@ test('useUi should warn if no provider', () => {
 });
 
 test('UiProvider should provide widget', () => {
-    function DefaultWidget(props: WidgetProps): React.ReactElement {
+    function DefaultWidget(props: WidgetProps<any, any>): React.ReactElement {
         return <>default_widget</>;
     }
-    function SpecialWidget(props: WidgetProps): React.ReactElement {
+    function SpecialWidget(props: WidgetProps<any, any>): React.ReactElement {
         return <>special_widget</>;
     }
-    function getWidget(field): FieldWidget {
+    function getWidget<T>(field): FieldWidget<T, any> {
         if (field.name === 'special') {
             return SpecialWidget;
         }
         return DefaultWidget;
     }
-    function FieldWrapper({ field }): React.ReactElement {
-        const { getWidgetForField } = useUi();
-
-        const Widget = getWidgetForField(field);
-
-        return <Widget value={1} onChange={(value: any): any => {}} />;
-    }
-
     function TestWrapper({ field }): React.ReactElement {
         return (
             <UiProvider getWidgetForField={getWidget}>
@@ -54,16 +60,16 @@ test('UiProvider should provide widget', () => {
 });
 
 test('UiProvider should support nested providers', () => {
-    function DefaultWidget(props: WidgetProps): React.ReactElement {
+    function DefaultWidget(props: WidgetProps<any, any>): React.ReactElement {
         return <>default_widget</>;
     }
-    function SpecialWidget(props: WidgetProps): React.ReactElement {
+    function SpecialWidget(props: WidgetProps<any, any>): React.ReactElement {
         return <>special_widget</>;
     }
-    function NestedWidget(props: WidgetProps): React.ReactElement {
+    function NestedWidget(props: WidgetProps<any, any>): React.ReactElement {
         return <>nested_widget</>;
     }
-    function getWidgetOuter(field): FieldWidget {
+    function getWidgetOuter<T>(field): FieldWidget<T, any> {
         if (field.name === 'special') {
             return SpecialWidget;
         }
@@ -72,18 +78,11 @@ test('UiProvider should support nested providers', () => {
         }
         return DefaultWidget;
     }
-    function getWidgetInner(field): FieldWidget {
+    function getWidgetInner<T>(field): FieldWidget<T, any> {
         if (field.name === 'inner') {
             return NestedWidget;
         }
         return null;
-    }
-    function FieldWrapper({ field }): React.ReactElement {
-        const { getWidgetForField } = useUi();
-
-        const Widget = getWidgetForField(field);
-
-        return <Widget value={1} onChange={(value: any): any => {}} />;
     }
 
     function TestWrapper({ field }): React.ReactElement {
