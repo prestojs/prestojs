@@ -1,10 +1,26 @@
 import React from 'react';
 
-export interface WidgetProps {
-    value: any;
-    onChange: (valueOrEvent: any) => any;
+// TODO: Based on final-form currently without much thought
+interface InputProps<FieldValue, T extends HTMLElement> {
+    name: string;
+    onBlur: (event?: React.FocusEvent<T>) => void;
+    onChange: (event: React.ChangeEvent<T> | any) => void;
+    onFocus: (event?: React.FocusEvent<T>) => void;
+    type?: string;
+    value: FieldValue;
+    checked?: boolean;
+    multiple?: boolean;
 }
 
-type FieldWidget = React.ComponentType<WidgetProps> | string;
+export interface WidgetProps<FieldValue, T extends HTMLElement> {
+    input: InputProps<FieldValue, T>;
+    meta: {};
+}
+
+type FieldWidget<FieldValue, T extends HTMLElement> =
+    | React.ComponentType<WidgetProps<FieldValue, T>>
+    | 'input'
+    | 'select'
+    | 'textarea';
 
 export default FieldWidget;

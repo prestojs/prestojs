@@ -4,9 +4,11 @@ import { Class } from '@xenopus/viewmodel';
 
 import NumberWidget from './widgets/NumberWidget';
 
-const mapping = new Map<Class<Field<any>>, FieldWidget>([[NumberField, NumberWidget]]);
+const mapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([[NumberField, NumberWidget]]);
 
-export default function getWidgetForField<T>(field: Field<T>): FieldWidget | null {
+export default function getWidgetForField<FieldValue, T extends HTMLElement>(
+    field: Field<FieldValue>
+): FieldWidget<FieldValue, T> | null {
     // Couldn't work out what to type this as so field.constructor was accepted
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
