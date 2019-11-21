@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { UiProvider } from '@xenopus/ui';
 import { NumberField, ModelView } from '@xenopus/viewmodel';
+import { Form } from 'react-final-form';
 
 import ModelViewForm from '../ModelViewForm';
 
@@ -26,16 +27,16 @@ test('ModelViewFormField should provide default widget when none specified', () 
     function TestWrapper(props): React.ReactElement {
         return (
             <UiProvider getWidgetForField={getWidgetForField}>
-                <ModelViewForm modelView={User} onSubmit={jest.fn()}>
+                <Form onSubmit={jest.fn()}>
                     {({ handleSubmit }): React.ReactElement => (
                         <form onSubmit={handleSubmit}>
                             <label>
                                 Age
-                                <ModelViewForm.Field name="age" {...props} />
+                                <ModelViewForm.Field field={User.age} {...props} />
                             </label>
                         </form>
                     )}
-                </ModelViewForm>
+                </Form>
             </UiProvider>
         );
     }

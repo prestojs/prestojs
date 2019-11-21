@@ -13,19 +13,15 @@ import { ModelViewForm } from '@xenopus/final-form';
 
 function UserForm(onSubmit) {
     return (
-        <ModelViewForm modelView={User} onSubmit={onSubmit}>
-            {({ handleSubmit }) => (
-                <form onSubmit={handleSubmit}>
-                    <label>
-                        First Name <ModelViewForm.Field name="firstName" />
-                    </label>
-                    <label>
-                        Last Name
-                        <ModelViewForm.Field name="Last Name" />
-                    </label>
-                    <button type="submit">Submit</button>
-                </form>
-            )}
+        <ModelViewForm onSubmit={onSubmit}>
+            <label>
+                First Name <ModelViewForm.Field field={User.fields.firstName} />
+            </label>
+            <label>
+                Last Name
+                <ModelViewForm.Field field={User.fields.lastName} />
+            </label>
+            <button type="submit">Submit</button>
         </ModelViewForm>
     );
 }

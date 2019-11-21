@@ -12,7 +12,7 @@ function getWidgetForField(field) {
 function FieldWrapper({ field }) {
     return (
         <label>
-            {field.label} <ModelViewForm.Field name={field.name} />
+            {field.label} <ModelViewForm.Field field={field} />
         </label>
     );
 }
@@ -23,13 +23,9 @@ export default function App() {
             {User._meta.label} / {User._meta.labelPlural}
             <hr />
             {/* eslint-disable-next-line no-console */}
-            <ModelViewForm modelView={User} onSubmit={data => console.log(data)}>
-                {({ handleSubmit }) => (
-                    <form onSubmit={handleSubmit}>
-                        <FieldWrapper field={User.age} />
-                        <button type="submit">Submit</button>
-                    </form>
-                )}
+            <ModelViewForm onSubmit={data => console.log(data)} initialValues={{ age: 5 }}>
+                <FieldWrapper field={User.age} />
+                <button type="submit">Submit</button>
             </ModelViewForm>
         </UiProvider>
     );

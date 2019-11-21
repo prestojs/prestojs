@@ -1,9 +1,11 @@
 import React from 'react';
 import { useUi } from '@xenopus/ui';
-import { useModelView } from '@xenopus/viewmodel';
-import { Field, FieldProps } from 'react-final-form';
+import { Field } from '@xenopus/viewmodel';
+import { Field as FinalFormField, FieldProps } from 'react-final-form';
 
-type ModelViewFormFieldProps = FieldProps<any, any> & { name: string };
+type ModelViewFormFieldProps<T> =
+    | FieldProps<any, any>
+    | (Omit<FieldProps<any, any>, 'name'> & { field: Field<T> });
 
 /**
  * Wrapper around Field from react-final-form that determines the widget to use based on the field.
@@ -13,23 +15,25 @@ type ModelViewFormFieldProps = FieldProps<any, any> & { name: string };
  * If `component`, `render` or `children` are passed they will be used instead of selecting a widget
  * based on the field type.
  */
-export default function ModelViewFormField({
-    name,
+export default function ModelViewFormField<T>({
+    field,
     ...formProps
-}: ModelViewFormFieldProps): React.ReactElement {
-    const { modelView } = useModelView();
+}: ModelViewFormFieldProps<T>): React.ReactElement {
     const { getWidgetForField } = useUi();
     const requireModelWidget = !formProps.component && !formProps.render && !formProps.children;
     if (requireModelWidget) {
-        const field = modelView._fields[name];
         if (!field) {
             throw new Error(
-                `Field ${name} not found on model ${modelView}. Known fields are: ${Object.keys(
-                    modelView._fields
-                ).join(', ')}`
+                "You must specify one of 'component', 'children', 'render' or 'field'. " +
+                    "ModelViewFormField works in one of two modes. If you specify 'component', 'render' or " +
+                    "'children' then you control rendering entirely. Otherwise you can specify 'field' and " +
+                    'the component to use will be inferred from the field type.'
             );
+        }
+        if (!formProps.name) {
+            formProps.name = field.name;
         }
         formProps.component = getWidgetForField(field);
     }
-    return <Field name={name} {...formProps} />;
+    return <FinalFormField name={name} {...formProps} />;
 }

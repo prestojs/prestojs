@@ -55,4 +55,11 @@ export default class ModelView {
                 return acc;
             }, {});
     }
+
+    /**
+     * Return data as object to pass as initial values to a form
+     */
+    serializeToForm(): {} {
+        throw new Error('Not implemented. Pending changes to support data on ModelView.');
+    }
 }
