@@ -26,7 +26,7 @@ module.exports = {
     notify: true,
     notifyMode: 'always',
     roots: ['<rootDir>js-packages'],
-    testMatch: ['**/__tests__/*.+(ts|tsx|js)', '**/*.test.+(ts|tsx|js)'],
+    testMatch: ['**/src/**/__tests__/*.+(ts|tsx|js)', '**/src/**/*.test.+(ts|tsx|js)'],
     transform: {
         '^.+\\.(ts|tsx)$': 'ts-jest',
     },

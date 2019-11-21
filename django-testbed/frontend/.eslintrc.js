@@ -21,6 +21,8 @@ module.exports = {
             'error',
             { ignore: ['.*\\.(scss|less|css)\\?no-css-modules', '@xenopus/*'] },
         ],
+        // This config is for our testbed project - don't force us to create prop-types there
+        'react/prop-types': 0,
         'import/extensions': ['error', { ignore: ['@xenopus/*'] }],
         'import/no-restricted-paths': [
             'error',
