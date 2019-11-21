@@ -3,7 +3,7 @@ import { render, fireEvent } from '@testing-library/react';
 import { UiProvider } from '@xenopus/ui';
 import { NumberField, ModelView, Field } from '@xenopus/viewmodel';
 
-import ModelViewForm from '../ModelViewForm';
+import Form from '../Form';
 
 class User extends ModelView {
     static _meta = {
@@ -27,13 +27,13 @@ test('ModelViewForm should accept renderable children rather than function', () 
     const onSubmit = jest.fn();
     const { getByText, getByLabelText } = render(
         <UiProvider getWidgetForField={getWidgetForField}>
-            <ModelViewForm onSubmit={onSubmit}>
+            <Form onSubmit={onSubmit}>
                 <label>
                     Age
-                    <ModelViewForm.Field field={User.age} />
+                    <Form.Field field={User.age} />
                 </label>
                 <button type="submit">Submit</button>
-            </ModelViewForm>
+            </Form>
         </UiProvider>
     );
     const ageInput = getByLabelText('Age');
@@ -51,17 +51,17 @@ test('ModelViewForm should accept a function as children', () => {
     const onSubmit = jest.fn();
     const { getByText, getByLabelText } = render(
         <UiProvider getWidgetForField={getWidgetForField}>
-            <ModelViewForm onSubmit={onSubmit}>
+            <Form onSubmit={onSubmit}>
                 {({ handleSubmit }): React.ReactElement => (
                     <form onSubmit={handleSubmit}>
                         <label>
                             Email
-                            <ModelViewForm.Field field={User.email} />
+                            <Form.Field field={User.email} />
                         </label>
                         <button type="submit">Submit</button>
                     </form>
                 )}
-            </ModelViewForm>
+            </Form>
         </UiProvider>
     );
     const emailInput = getByLabelText('Email');

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ModelView } from '@xenopus/viewmodel';
-import { Form, FormProps } from 'react-final-form';
-import ModelViewFormField from './ModelViewFormField';
+import { Form as FinalForm, FormProps } from 'react-final-form';
+import FormField from './FormField';
 
 type ModelViewFormProps<FormValues = object> = FormProps<FormValues> & {
     initialValues?: FormValues | ModelView;
@@ -16,7 +16,7 @@ type ModelViewFormProps<FormValues = object> = FormProps<FormValues> & {
  *    handleSubmit. Most the time this is the same thing so you optionally just pass through renderable
  *    children and the form will be created implicitly for you.
  */
-export default function ModelViewForm({
+export default function Form({
     initialValues,
     children,
     ...rest
@@ -31,10 +31,10 @@ export default function ModelViewForm({
         );
     }
     return (
-        <Form {...rest} initialValues={initialValues}>
+        <FinalForm {...rest} initialValues={initialValues}>
             {children}
-        </Form>
+        </FinalForm>
     );
 }
 
-ModelViewForm.Field = ModelViewFormField;
+Form.Field = FormField;

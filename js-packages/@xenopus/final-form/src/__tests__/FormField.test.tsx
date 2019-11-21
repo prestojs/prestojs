@@ -2,9 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { UiProvider } from '@xenopus/ui';
 import { NumberField, ModelView } from '@xenopus/viewmodel';
-import { Form } from 'react-final-form';
-
-import ModelViewForm from '../ModelViewForm';
+import Form from '../Form';
 
 class User extends ModelView {
     static _meta = {
@@ -32,7 +30,7 @@ test('ModelViewFormField should provide default widget when none specified', () 
                         <form onSubmit={handleSubmit}>
                             <label>
                                 Age
-                                <ModelViewForm.Field field={User.age} {...props} />
+                                <Form.Field field={User.age} {...props} />
                             </label>
                         </form>
                     )}
