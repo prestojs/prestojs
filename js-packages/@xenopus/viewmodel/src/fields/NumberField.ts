@@ -1,5 +1,10 @@
 import Field from './Field';
 
+/**
+ * Base class for numeric fields
+ *
+ * Other numeric fields (IntegerField, DecimalField, FloatField...) will extend this.
+ */
 export default class NumberField extends Field<number> {
     parse(value: any): number {
         // Don't force empty string, null or undefined to a number (which would be 0) -
