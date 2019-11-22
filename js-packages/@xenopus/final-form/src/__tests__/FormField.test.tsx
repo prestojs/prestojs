@@ -21,7 +21,7 @@ function getWidgetForField(): typeof Widget {
     return Widget;
 }
 
-test('ModelViewFormField should provide default widget when none specified', () => {
+test('FormField should provide default widget when none specified', () => {
     function TestWrapper(props): React.ReactElement {
         return (
             <UiProvider getWidgetForField={getWidgetForField}>
