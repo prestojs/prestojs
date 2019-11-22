@@ -67,10 +67,11 @@
     "webpack-dev-server": "^3.1.9"
   },
   "dependencies": {
-    "@xenopus/viewmodel": "*",
     "@alliance-software/webpack-dev-utils": "^0.4.0",
-    "core-js": "^3.2.1",
+    "@xenopus/viewmodel": "*",
+    "antd": "^3.25.2",
     "classnames": "^2.2.6",
+    "core-js": "^3.2.1",
     "file-loader": "^3.0.1",
     "history": "^4.7.2",
     "invariant": "^2.2.4",

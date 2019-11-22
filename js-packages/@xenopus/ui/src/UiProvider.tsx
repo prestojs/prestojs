@@ -8,8 +8,15 @@ type GetWidgetForField = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
 ) => FieldWidget<FieldValue, T> | null;
 
+export interface FormItemProps {
+    required: boolean;
+    help?: React.ReactNode;
+    label?: React.ReactNode;
+}
+
 export interface UiContextValue {
     getWidgetForField: GetWidgetForField;
+    formItemComponent: React.ComponentType<FormItemProps>;
 }
 
 type Props = {
@@ -24,7 +31,12 @@ type Props = {
      *
      * @param field The specific field instance for a model
      */
-    getWidgetForField: GetWidgetForField;
+    getWidgetForField?: GetWidgetForField;
+    /**
+     * A component to use to render items in a form. This is the component that will be rendered by
+     * Form.Item.
+     */
+    formItemComponent?: React.ComponentType<FormItemProps>;
 };
 
 /**
@@ -34,11 +46,12 @@ type Props = {
  * TODO: Add formatters, eg. getFormatterForField
  */
 export default function UiProvider(props: Props): React.ReactElement {
-    const { children, getWidgetForField } = props;
+    const { children, getWidgetForField, formItemComponent } = props;
     const context = useContext(UiContext);
     const { getWidgetForField: parentGetWidgetForField = null } = context || {};
     const providedContext = useMemo(
         () => ({
+            formItemComponent,
             getWidgetForField<FieldValue, T extends HTMLElement>(
                 field: Field<FieldValue>
             ): FieldWidget<FieldValue, T> | null {
@@ -54,7 +67,7 @@ export default function UiProvider(props: Props): React.ReactElement {
                 return widget;
             },
         }),
-        [parentGetWidgetForField, getWidgetForField]
+        [formItemComponent, getWidgetForField, parentGetWidgetForField]
     );
     return <UiContext.Provider value={providedContext}>{children}</UiContext.Provider>;
 }

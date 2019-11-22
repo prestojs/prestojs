@@ -2,6 +2,7 @@ import React from 'react';
 import { ModelView } from '@xenopus/viewmodel';
 import { Form as FinalForm, FormProps } from 'react-final-form';
 import FormField from './FormField';
+import FormItem from './FormItem';
 
 type ModelViewFormProps<FormValues = object> = FormProps<FormValues> & {
     initialValues?: FormValues | ModelView;
@@ -38,3 +39,4 @@ export default function Form({
 }
 
 Form.Field = FormField;
+Form.Item = FormItem;

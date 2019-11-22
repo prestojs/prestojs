@@ -62,4 +62,8 @@ export default class ModelView {
     serializeToForm(): {} {
         throw new Error('Not implemented. Pending changes to support data on ModelView.');
     }
+
+    static toString(): string {
+        return this.name;
+    }
 }
