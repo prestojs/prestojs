@@ -6,13 +6,13 @@ import { NumberField, ModelView, Field } from '@xenopus/viewmodel';
 import Form from '../Form';
 
 class User extends ModelView {
-    static _meta = {
-        label: 'User',
-        labelPlural: 'Users',
-    };
+    static label = 'User';
+    static labelPlural = 'Users';
 
-    static age = new NumberField({ name: 'age', label: 'Age' });
-    static email = new Field({ name: 'email', label: 'Email' });
+    static fields = {
+        age: new NumberField({ name: 'age', label: 'Age' }),
+        email: new Field({ name: 'email', label: 'Email' }),
+    };
 }
 
 function Widget({ input }): React.ReactElement {
@@ -30,7 +30,7 @@ test('ModelViewForm should accept renderable children rather than function', () 
             <Form onSubmit={onSubmit}>
                 <label>
                     Age
-                    <Form.Field field={User.age} />
+                    <Form.Field field={User.fields.age} />
                 </label>
                 <button type="submit">Submit</button>
             </Form>
@@ -56,7 +56,7 @@ test('ModelViewForm should accept a function as children', () => {
                     <form onSubmit={handleSubmit}>
                         <label>
                             Email
-                            <Form.Field field={User.email} />
+                            <Form.Field field={User.fields.email} />
                         </label>
                         <button type="submit">Submit</button>
                     </form>

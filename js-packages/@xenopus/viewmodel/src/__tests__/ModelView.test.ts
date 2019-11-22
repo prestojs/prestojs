@@ -1,74 +1,134 @@
 import ModelView from '../ModelView';
 import Field from '../fields/Field';
 
-test('ModelView._fields returns defined fields', () => {
-    class A extends ModelView {
-        static firstName = new Field({ name: 'firstName', label: 'First Name' });
-        static lastName = new Field({ name: 'lastName', label: 'Last Name' });
-    }
+test('ModelView._model returns class', () => {
+    class A extends ModelView {}
 
-    const record1 = new A();
-    expect(record1._fields).toEqual({
-        firstName: A.firstName,
-        lastName: A.lastName,
-    });
-    // Static or non-static should be the same
-    expect(record1._fields).toEqual(A._fields);
-
-    class B extends A {
-        static lastName = new Field({ name: 'lastName', label: 'Last Name' });
-        static phone = new Field({ name: 'phone', label: 'Phone' });
-    }
-
-    const record2 = new B();
-    // Should be same field as not overridden
-    expect(record2._fields.firstName).toBe(A.firstName);
-    // Should be different field as IS overridden
-    expect(record2._fields.lastName).not.toBe(A.lastName);
-    // Should include extra fields added
-    expect(record2._fields).toEqual({
-        firstName: B.firstName,
-        lastName: B.lastName,
-        phone: B.phone,
-    });
-    expect(record2._fields).toEqual(B._fields);
-});
-
-test('ModelView._fields supports _meta', () => {
-    class A extends ModelView {
-        static _meta = {
-            label: 'A',
-            labelPlural: "A's",
-        };
-    }
-
-    const record1 = new A();
-    expect(A._meta).toEqual({
-        label: 'A',
-        labelPlural: "A's",
-    });
-    expect(record1._meta).toEqual(A._meta);
+    const record1 = new A({});
+    expect(record1._model).toEqual(A);
 
     class B extends A {}
 
-    const record2 = new B();
-    expect(B._meta).toEqual({
-        label: 'A',
-        labelPlural: "A's",
-    });
-    expect(record2._meta).toEqual(B._meta);
+    const record2 = new B({});
+    expect(record2._model).toEqual(B);
+});
 
-    class C extends B {
-        static _meta = {
-            label: 'C',
-            labelPlural: "C's",
+test('ModelView._pk should validate primary key fields exist', () => {
+    class A extends ModelView {}
+
+    const record1 = new A({});
+    expect(() => record1._pk).toThrow(/A has 'pkFieldName' set to 'id' but/);
+
+    class B extends ModelView {
+        static pkFieldName = ['id1', 'id2'];
+    }
+
+    const record2 = new B({});
+    expect(() => record2._pk).toThrow(
+        /B has 'pkFieldName' set to 'id1, id2' but the fields 'id1, id2'/
+    );
+
+    class C extends ModelView {
+        static pkFieldName = ['id1', 'id2'];
+        static fields = {
+            id1: new Field({ name: 'id1', label: 'Id' }),
         };
     }
 
-    const record3 = new C();
-    expect(C._meta).toEqual({
-        label: 'C',
-        labelPlural: "C's",
-    });
-    expect(record3._meta).toEqual(C._meta);
+    const record3 = new C({});
+    expect(() => record3._pk).toThrow(/C has 'pkFieldName' set to 'id1, id2' but the field 'id2'/);
+});
+
+test('ModelView._pk should return primary key', () => {
+    class A extends ModelView {
+        static fields = {
+            id: new Field({ name: 'id', label: 'Id' }),
+        };
+    }
+
+    const record1 = new A({ id: 1 });
+    expect(record1._pk).toBe(1);
+
+    class B extends ModelView {
+        static pkFieldName = ['id1', 'id2'];
+        static fields = {
+            id1: new Field({ name: 'id1', label: 'Id' }),
+            id2: new Field({ name: 'id2', label: 'Id' }),
+        };
+    }
+
+    const record2 = new B({ id1: 1, id2: 2 });
+    expect(record2._pk).toEqual([1, 2]);
+});
+
+test('_assigned fields should be based on passed data', () => {
+    class A extends ModelView {
+        static fields = {
+            id: new Field({ name: 'id', label: 'Id' }),
+            name: new Field({ name: 'name', label: 'Name' }),
+            email: new Field({ name: 'email', label: 'Email' }),
+        };
+    }
+
+    let record = new A({ id: 1 });
+    expect(record._assignedFields).toEqual(['id']);
+
+    record = new A({ id: 1, name: 'Dave' });
+    expect(record._assignedFields).toEqual(['id', 'name']);
+    record = new A({ id: 1, name: 'Dave', email: 'a@b.com' });
+    expect(record._assignedFields).toEqual(['email', 'id', 'name']);
+});
+
+test('toJS() should be return assigned data', () => {
+    class A extends ModelView {
+        static fields = {
+            id: new Field({ name: 'id', label: 'Id' }),
+            name: new Field({ name: 'name', label: 'Name' }),
+            email: new Field({ name: 'email', label: 'Email' }),
+        };
+    }
+
+    let record = new A({ id: 1 });
+    expect(record.toJS()).toEqual({ id: 1 });
+
+    record = new A({ id: 1, name: 'Dave' });
+    expect(record.toJS()).toEqual({ id: 1, name: 'Dave' });
+    record = new A({ id: 1, name: 'Dave', email: 'a@b.com' });
+    expect(record.toJS()).toEqual({ id: 1, name: 'Dave', email: 'a@b.com' });
+});
+
+test('toJS() should support custom field behaviour', () => {
+    class LowerField extends Field<string> {
+        toJS(value: any): string {
+            return value.toString().toLowerCase();
+        }
+    }
+    class A extends ModelView {
+        static fields = {
+            id: new Field({ name: 'id', label: 'Id' }),
+            name: new Field({ name: 'name', label: 'Name' }),
+            email: new LowerField({ name: 'email', label: 'Email' }),
+        };
+    }
+
+    const record = new A({ id: 1, name: 'Dave', email: 'A@B.COM' });
+    expect(record.toJS()).toEqual({ id: 1, name: 'Dave', email: 'a@b.com' });
+});
+
+test('ViewModel should use normalize() from field', () => {
+    class LowerField extends Field<string> {
+        normalize(value: any): string {
+            return value.toString().toLowerCase();
+        }
+    }
+    class A extends ModelView {
+        static fields = {
+            id: new Field({ name: 'id', label: 'Id' }),
+            name: new Field({ name: 'name', label: 'Name' }),
+            email: new LowerField({ name: 'email', label: 'Email' }),
+        };
+    }
+
+    const record = new A({ id: 1, name: 'Dave', email: 'A@B.COM' });
+    expect(record.email).toBe('a@b.com');
 });
