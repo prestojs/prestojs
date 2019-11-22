@@ -23,7 +23,7 @@ export type CompoundPrimaryKey = PrimaryKey[];
  * }
  * ```
  */
-export default class ModelView {
+export default class ViewModel {
     // Name of the primary key field for this this ViewModel (or fields for compound keys)
     static pkFieldName: string | string[] = 'id';
     static label: string;
@@ -35,7 +35,7 @@ export default class ModelView {
     // Field<any>
     [fieldName: string]: any;
 
-    public get _model(): typeof ModelView {
+    public get _model(): typeof ViewModel {
         return Object.getPrototypeOf(this).constructor;
     }
 
@@ -113,7 +113,7 @@ export default class ModelView {
      * Return data as object to pass as initial values to a form
      */
     serializeToForm(): {} {
-        throw new Error('Not implemented. Pending changes to support data on ModelView.');
+        throw new Error('Not implemented. Pending changes to support data on ViewModel.');
     }
 
     static toString(): string {

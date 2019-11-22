@@ -1,6 +1,6 @@
-import { ModelView, NumberField } from '@xenopus/viewmodel';
+import { ViewModel, NumberField } from '@xenopus/viewmodel';
 
-export default class User extends ModelView {
+export default class User extends ViewModel {
     static label = 'User';
     static labelPlural = 'Users';
 

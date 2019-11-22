@@ -1,7 +1,7 @@
 # React Final Form Integration
 
 Integration with [react-final-form](https://github.com/final-form/react-final-form) that fills out
-the widget to use based on a ModelView field.
+the widget to use based on a ViewModel field.
 
 TODO: Review/expand this once interface settled
 

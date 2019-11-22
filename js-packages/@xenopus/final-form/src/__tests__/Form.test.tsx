@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { UiProvider } from '@xenopus/ui';
-import { NumberField, ModelView, Field } from '@xenopus/viewmodel';
+import { NumberField, ViewModel, Field } from '@xenopus/viewmodel';
 
 import Form from '../Form';
 
-class User extends ModelView {
+class User extends ViewModel {
     static label = 'User';
     static labelPlural = 'Users';
 
@@ -23,7 +23,7 @@ function getWidgetForField(): typeof Widget {
     return Widget;
 }
 
-test('ModelViewForm should accept renderable children rather than function', () => {
+test('ViewModelForm should accept renderable children rather than function', () => {
     const onSubmit = jest.fn();
     const { getByText, getByLabelText } = render(
         <UiProvider getWidgetForField={getWidgetForField}>
@@ -47,7 +47,7 @@ test('ModelViewForm should accept renderable children rather than function', () 
     );
 });
 
-test('ModelViewForm should accept a function as children', () => {
+test('ViewModelForm should accept a function as children', () => {
     const onSubmit = jest.fn();
     const { getByText, getByLabelText } = render(
         <UiProvider getWidgetForField={getWidgetForField}>
