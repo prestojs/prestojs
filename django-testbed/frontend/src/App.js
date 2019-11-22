@@ -20,13 +20,13 @@ export default function App() {
     };
     return (
         <UiProvider getWidgetForField={getWidgetForField} formItemComponent={FormItemWrapper}>
-            {User._meta.label} / {User._meta.labelPlural}
+            {User.label} / {User.labelPlural}
             <hr />
             {/* eslint-disable-next-line no-console */}
             <Form modelView={User} onSubmit={data => console.log(data)}>
                 {({ handleSubmit }) => (
                     <AntForm onSubmit={handleSubmit} layout="horizontal" {...formItemLayout}>
-                        <Form.Item field={User.age} />
+                        <Form.Item field={User.fields.age} />
                         <Form.Item label="Not A Real Field">
                             <Form.Field
                                 name="notARealField"

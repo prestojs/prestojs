@@ -1,16 +1,16 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { UiProvider } from '@xenopus/ui';
-import { NumberField, ModelView } from '@xenopus/viewmodel';
+import { NumberField, ModelView, Field } from '@xenopus/viewmodel';
 import Form from '../Form';
 
 class User extends ModelView {
-    static _meta = {
-        label: 'User',
-        labelPlural: 'Users',
-    };
+    static label = 'User';
+    static labelPlural = 'Users';
 
-    static age = new NumberField({ name: 'age', label: 'Age' });
+    static fields = {
+        age: new NumberField({ name: 'age', label: 'Age' }),
+    };
 }
 
 function Widget({ input }): React.ReactElement {
@@ -30,7 +30,7 @@ test('FormField should provide default widget when none specified', () => {
                         <form onSubmit={handleSubmit}>
                             <label>
                                 Age
-                                <Form.Field field={User.age} {...props} />
+                                <Form.Field field={User.fields.age} {...props} />
                             </label>
                         </form>
                     )}

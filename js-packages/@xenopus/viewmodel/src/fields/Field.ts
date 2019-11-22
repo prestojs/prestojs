@@ -89,6 +89,44 @@ export default class Field<T> {
     }
 
     /**
+     * Normalize a value passed into a ViewModel constructor. This could do things like extract the id of a nested
+     * relation and only store that, eg.
+     *
+     * TODO: Do we need to handle things like normalizing to multiple fields? eg. In the example below setting the
+     * id to addressId and relation to address
+     *
+     * ```js
+     * // This might become
+     * {
+     *     name: 'Sam',
+     *     address: {
+     *         id: 5,
+     *         formatted: '3 Somewhere Road, Some Place',
+     *     },
+     * }
+     * // ...this
+     * {
+     *     name: 'Same',
+     *     address: 5,
+     * }
+     * ```
+     *
+     * @param value
+     */
+    public normalize(value: any): T {
+        return value;
+    }
+
+    /**
+     * Convert value to plain JS representation useful for things like passing to a form or posting to
+     * a backend API
+     * @param value
+     */
+    toJS(value: T): string | number | null | {} {
+        return value;
+    }
+
+    /**
      * Get the default value for this field. Note that this returns a promise that resolve to the default value
      * as some default values may need to resolve data from a backend.
      */
