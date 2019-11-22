@@ -23,7 +23,7 @@ export default function App() {
             {User.label} / {User.labelPlural}
             <hr />
             {/* eslint-disable-next-line no-console */}
-            <Form modelView={User} onSubmit={data => console.log(data)}>
+            <Form onSubmit={data => console.log(data)}>
                 {({ handleSubmit }) => (
                     <AntForm onSubmit={handleSubmit} layout="horizontal" {...formItemLayout}>
                         <Form.Item field={User.fields.age} />

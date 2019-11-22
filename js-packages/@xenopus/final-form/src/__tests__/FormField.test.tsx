@@ -1,10 +1,10 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { UiProvider } from '@xenopus/ui';
-import { NumberField, ModelView, Field } from '@xenopus/viewmodel';
+import { NumberField, ViewModel, Field } from '@xenopus/viewmodel';
 import Form from '../Form';
 
-class User extends ModelView {
+class User extends ViewModel {
     static label = 'User';
     static labelPlural = 'Users';
 

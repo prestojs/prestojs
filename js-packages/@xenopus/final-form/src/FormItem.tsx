@@ -29,7 +29,7 @@ type FormItemProps<T> = FormItemPropsNoField | FormItemPropsWithField<T>;
 /**
  * Wrapper around Field from react-final-form that determines the widget to use based on the field.
  *
- * Must be used within a `ModelViewForm`.
+ * Must be used within a `ViewModelForm`.
  *
  * If `component`, `render` or `children` are passed they will be used instead of selecting a widget
  * based on the field type.
@@ -68,7 +68,7 @@ export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement
     const { formItemComponent: InnerFormItem } = useUi();
     if (!InnerFormItem) {
         throw new Error(
-            `formItemComponent must be specified in UiProvider in order to use ModelViewForm.Item`
+            `formItemComponent must be specified in UiProvider in order to use Form.Item`
         );
     }
     const { fieldProps, field, ...rest } = props;

@@ -1,8 +1,8 @@
-import ModelView from '../ModelView';
+import ViewModel from '../ViewModel';
 import Field from '../fields/Field';
 
-test('ModelView._model returns class', () => {
-    class A extends ModelView {}
+test('ViewModel._model returns class', () => {
+    class A extends ViewModel {}
 
     const record1 = new A({});
     expect(record1._model).toEqual(A);
@@ -13,13 +13,13 @@ test('ModelView._model returns class', () => {
     expect(record2._model).toEqual(B);
 });
 
-test('ModelView._pk should validate primary key fields exist', () => {
-    class A extends ModelView {}
+test('ViewModel._pk should validate primary key fields exist', () => {
+    class A extends ViewModel {}
 
     const record1 = new A({});
     expect(() => record1._pk).toThrow(/A has 'pkFieldName' set to 'id' but/);
 
-    class B extends ModelView {
+    class B extends ViewModel {
         static pkFieldName = ['id1', 'id2'];
     }
 
@@ -28,7 +28,7 @@ test('ModelView._pk should validate primary key fields exist', () => {
         /B has 'pkFieldName' set to 'id1, id2' but the fields 'id1, id2'/
     );
 
-    class C extends ModelView {
+    class C extends ViewModel {
         static pkFieldName = ['id1', 'id2'];
         static fields = {
             id1: new Field({ name: 'id1', label: 'Id' }),
@@ -39,8 +39,8 @@ test('ModelView._pk should validate primary key fields exist', () => {
     expect(() => record3._pk).toThrow(/C has 'pkFieldName' set to 'id1, id2' but the field 'id2'/);
 });
 
-test('ModelView._pk should return primary key', () => {
-    class A extends ModelView {
+test('ViewModel._pk should return primary key', () => {
+    class A extends ViewModel {
         static fields = {
             id: new Field({ name: 'id', label: 'Id' }),
         };
@@ -49,7 +49,7 @@ test('ModelView._pk should return primary key', () => {
     const record1 = new A({ id: 1 });
     expect(record1._pk).toBe(1);
 
-    class B extends ModelView {
+    class B extends ViewModel {
         static pkFieldName = ['id1', 'id2'];
         static fields = {
             id1: new Field({ name: 'id1', label: 'Id' }),
@@ -62,7 +62,7 @@ test('ModelView._pk should return primary key', () => {
 });
 
 test('_assigned fields should be based on passed data', () => {
-    class A extends ModelView {
+    class A extends ViewModel {
         static fields = {
             id: new Field({ name: 'id', label: 'Id' }),
             name: new Field({ name: 'name', label: 'Name' }),
@@ -80,7 +80,7 @@ test('_assigned fields should be based on passed data', () => {
 });
 
 test('toJS() should be return assigned data', () => {
-    class A extends ModelView {
+    class A extends ViewModel {
         static fields = {
             id: new Field({ name: 'id', label: 'Id' }),
             name: new Field({ name: 'name', label: 'Name' }),
@@ -103,7 +103,7 @@ test('toJS() should support custom field behaviour', () => {
             return value.toString().toLowerCase();
         }
     }
-    class A extends ModelView {
+    class A extends ViewModel {
         static fields = {
             id: new Field({ name: 'id', label: 'Id' }),
             name: new Field({ name: 'name', label: 'Name' }),
@@ -121,7 +121,7 @@ test('ViewModel should use normalize() from field', () => {
             return value.toString().toLowerCase();
         }
     }
-    class A extends ModelView {
+    class A extends ViewModel {
         static fields = {
             id: new Field({ name: 'id', label: 'Id' }),
             name: new Field({ name: 'name', label: 'Name' }),
