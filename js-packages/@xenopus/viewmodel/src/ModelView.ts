@@ -11,12 +11,14 @@ export type CompoundPrimaryKey = PrimaryKey[];
  *
  * ```js
  * class User extends ViewModel {
+ *     static pkFieldName = 'userId';
  *     static label = 'User';
  *     static labelPlural = 'Users';
  *
  *     static fields = {
- *         firstName: new CharField({...}),
- *         lastName: new CharField({...}),
+ *         userId: new IntegerField({ name: 'userId', label: 'User ID' })
+ *         firstName: new CharField({ name: 'firstName', label: 'First Name' }),
+ *         lastName: new CharField({ name: 'lastName', label: 'Last Name' }),
  *     };
  * }
  * ```
