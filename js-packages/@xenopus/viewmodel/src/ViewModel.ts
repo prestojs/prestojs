@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import Field from './fields/Field';
 
 type FieldsMapping = { [key: string]: Field<any> };
@@ -129,5 +130,29 @@ export default class ViewModel {
             data[fieldName] = this._model.fields[fieldName].toJS(value);
         }
         return data;
+    }
+
+    /**
+     * Compares two records to see if they are equivalent.
+     *
+     * - If the ViewModel is different then the records are always considered different
+     * - If the records were initialised with a different set of fields then they are
+     *   considered different even if the common fields are the same and other fields are
+     *   all null
+     */
+    public isEqual(record: ViewModel): boolean {
+        if (record._model !== this._model) {
+            return false;
+        }
+        if (!isEqual(record._assignedFields, this._assignedFields)) {
+            return false;
+        }
+        for (const fieldName of this._assignedFields) {
+            const field = this._model.fields[fieldName];
+            if (!field.isEqual(this[fieldName], record[fieldName])) {
+                return false;
+            }
+        }
+        return true;
     }
 }

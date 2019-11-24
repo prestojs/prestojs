@@ -141,4 +141,13 @@ export default class Field<T> {
         const className = this.constructor.name;
         return `${className}({ name: "${this.name}" })`;
     }
+
+    /**
+     * Should two values be considered equal?
+     *
+     * This is used when determining if two records are equal (see ViewModel.isEqual)
+     */
+    public isEqual(value1: T, value2: T): boolean {
+        return value1 === value2;
+    }
 }
