@@ -132,3 +132,49 @@ test('ViewModel should use normalize() from field', () => {
     const record = new A({ id: 1, name: 'Dave', email: 'A@B.COM' });
     expect(record.email).toBe('a@b.com');
 });
+
+test('Should be able to compare if two records are equal', () => {
+    class TestDateField extends Field<Date> {
+        isEqual(value1: Date, value2: Date): boolean {
+            return value1.getTime() === value2.getTime();
+        }
+    }
+    class A extends ViewModel {
+        static fields = {
+            id: new Field({ name: 'id', label: 'Id' }),
+            name: new Field({ name: 'name', label: 'Name' }),
+            email: new Field({ name: 'email', label: 'Email' }),
+            createdAt: new TestDateField({ name: 'createdAt', label: 'Created At' }),
+        };
+    }
+
+    expect(new A({ id: 1 }).isEqual(new A({ id: 1 }))).toBe(true);
+    expect(new A({ id: 1 }).isEqual(new A({ id: 1, name: null }))).toBe(false);
+    expect(new A({ id: 1, name: null }).isEqual(new A({ id: 1, name: null }))).toBe(true);
+    expect(
+        new A({ id: 1, createdAt: new Date('2019-11-20 18:30') }).isEqual(
+            new A({ id: 1, createdAt: new Date('2019-11-20 18:30') })
+        )
+    ).toBe(true);
+    expect(
+        new A({ id: 1, createdAt: new Date('2019-11-20 18:30') }).isEqual(
+            new A({ id: 1, createdAt: new Date('2019-11-20 18:31') })
+        )
+    ).toBe(false);
+    expect(new A({}).isEqual(new A({}))).toBe(true);
+
+    class B extends ViewModel {
+        static fields = {
+            id: new Field({ name: 'id', label: 'Id' }),
+            name: new Field({ name: 'name', label: 'Name' }),
+            email: new Field({ name: 'email', label: 'Email' }),
+            createdAt: new TestDateField({ name: 'createdAt', label: 'Created At' }),
+        };
+    }
+    const data = {
+        id: 1,
+        name: 'John',
+        email: 'a@b.com',
+    };
+    expect(new A(data).isEqual(new B(data))).toBe(false);
+});
