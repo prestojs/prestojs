@@ -38,6 +38,7 @@ function sortPairsOnCounter(a: [string, number], b: [string, number]): number {
 }
 
 type ChangeListener<T> = (previous?: T, next?: T) => void;
+type MultiChangeListener<T> = (previous?: (T | null)[], next?: (T | null)[]) => void;
 type ChangeListenerUnsubscribe = () => void;
 
 /**
@@ -118,6 +119,12 @@ class RecordCache<T extends ViewModel> {
                     // below.
                     const fieldNames = this.reverseCacheKey(key);
                     before = before.record.clone(fieldNames);
+                }
+                if (before === value) {
+                    return null;
+                }
+                if (before && value && before.isEqual(value)) {
+                    return null;
                 }
                 if (value === null) {
                     ret = this.cache.delete(key);
@@ -293,6 +300,31 @@ export default class ViewModelCache<T extends ViewModel> {
         recordCache.add(record);
     }
 
+    isAddingList = false;
+    onAddingListDone?: () => void;
+
+    /**
+     * Add a list of records. Use this in place of manually calling
+     * add() on each record individually so that listeners only get
+     * notified once of the change to the list rather than for
+     * each record in the list.
+     */
+    addList(record: T[]): void {
+        this.isAddingList = true;
+        try {
+            record.forEach(record => this.add(record));
+            this.isAddingList = false;
+            if (this.onAddingListDone) {
+                this.onAddingListDone();
+                this.onAddingListDone = null;
+            }
+        } catch (e) {
+            this.onAddingListDone = null;
+            this.isAddingList = false;
+            throw e;
+        }
+    }
+
     /**
      * Get a record with the specified `fieldNames` set from the cache
      *
@@ -367,5 +399,47 @@ export default class ViewModelCache<T extends ViewModel> {
         }
         const recordCache = this.cache.get(pkKey);
         return recordCache.addListener(fieldNames, listener);
+    }
+
+    // TODO: This could probably be part of the above interface; if `pk` is an array
+    // do what this does. Currently CompoundPrimaryKey is an array; I'd like to change
+    // this to an object. Once that is done we can differentiate between a compound key
+    // and an array of pks.
+    addListenerList(
+        pks: (PrimaryKey | CompoundPrimaryKey)[],
+        fieldNames: string[],
+        listener: MultiChangeListener<T>
+    ): ChangeListenerUnsubscribe {
+        let previous = pks.map(pk => this.get(pk, fieldNames));
+        const cb = (): void => {
+            const next = pks.map(pk => this.get(pk, fieldNames));
+            if (this.isAddingList) {
+                // When we are adding a list of records we wait until it finishes before
+                // notifying the listener. We need to cache the value of 'previous'
+                // at the time the first change is detected and pass that through once
+                // the list has been added.
+                if (!this.onAddingListDone) {
+                    const firstPrevious = previous;
+                    this.onAddingListDone = (): void => {
+                        listener(
+                            firstPrevious,
+                            pks.map(pk => this.get(pk, fieldNames))
+                        );
+                    };
+                }
+            } else {
+                listener(previous, next);
+            }
+            previous = [...next];
+        };
+        const unsubscribes = pks.map((pk, index) =>
+            this.addListener(pk, fieldNames, (previous, next) => {
+                cb();
+            })
+        );
+
+        return (): void => {
+            unsubscribes.forEach(cb => cb());
+        };
     }
 }
