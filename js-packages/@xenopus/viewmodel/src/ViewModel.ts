@@ -1,3 +1,4 @@
+import ViewModelCache from '@xenopus/viewmodel/ViewModelCache';
 import isEqual from 'lodash/isEqual';
 import Field from './fields/Field';
 
@@ -30,6 +31,23 @@ export default class ViewModel {
     static label: string;
     static labelPlural: string;
     static fields: FieldsMapping = {};
+
+    private static __cache: Map<typeof ViewModel, ViewModelCache<ViewModel>> = new Map();
+    public static get cache(): ViewModelCache<ViewModel> {
+        // This is a getter so we can instantiate cache on each ViewModel independently without
+        // having to have the descendant create the cache
+        if (!this.__cache.has(this)) {
+            this.__cache.set(this, new ViewModelCache());
+        }
+        return this.__cache.get(this);
+    }
+
+    public static set cache(value: ViewModelCache<ViewModel>) {
+        if (!(value instanceof ViewModelCache)) {
+            throw new Error(`cache class must extend ViewModelCache. See ${this.name}.cache`);
+        }
+        this.__cache.set(this, value);
+    }
 
     // TODO: What's a better way to type the actual fields? Can't use [fieldName: string]: Field<any> here because
     // then all the other properties have to match that type (eg. _model below will have an error as no assignable to
@@ -154,5 +172,40 @@ export default class ViewModel {
             }
         }
         return true;
+    }
+
+    /**
+     * Clone this record, optionally with only a subset of the fields
+     */
+    public clone(fieldNames?: string[]): this {
+        const missingFieldNames = fieldNames
+            ? fieldNames.filter(fieldName => !this._assignedFields.includes(fieldName))
+            : [];
+        if (missingFieldNames.length > 0) {
+            throw new Error(
+                `Can't clone ${this._model.name} with fields ${fieldNames.join(
+                    ', '
+                )} as only these fields are set: ${this._assignedFields.join(
+                    ', '
+                )}. Missing fields: ${missingFieldNames.join(', ')}`
+            );
+        }
+        if (!fieldNames) {
+            fieldNames = this._assignedFields;
+        }
+
+        const data = {};
+        for (const fieldName of fieldNames) {
+            // TODO: Unclear to me if this needs to call a method on the Field on not. Revisit this.
+            data[fieldName] = this[fieldName];
+        }
+
+        // I don't know how to type this, error is:
+        // TS2322: Type 'ViewModel' is not assignable to type 'this'.
+        // 'ViewModel' is assignable to the constraint of type 'this', but 'this' could be instantiated with a different subtype of constraint 'ViewModel'.
+        // I could type return as `ViewModel` but then usages of it will be wrong (eg. clone() will be from a more general ViewModel to a specific implementation)
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        return new this._model(data);
     }
 }

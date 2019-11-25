@@ -178,3 +178,39 @@ test('Should be able to compare if two records are equal', () => {
     };
     expect(new A(data).isEqual(new B(data))).toBe(false);
 });
+
+test('should clone a ViewModel record', () => {
+    class A extends ViewModel {
+        static fields = {
+            id: new Field({ name: 'id', label: 'Id' }),
+            name: new Field({ name: 'name', label: 'Name' }),
+            email: new Field({ name: 'email', label: 'Email' }),
+        };
+    }
+
+    const record1 = new A({
+        id: 1,
+        name: 'bob',
+        email: 'a@b',
+    });
+    const cloneFull = record1.clone();
+    expect(cloneFull).not.toBe(record1);
+    expect(cloneFull._assignedFields).toEqual(['email', 'id', 'name']);
+    expect(cloneFull.isEqual(record1)).toBe(true);
+
+    const cloneName = record1.clone(['id', 'name']);
+    expect(cloneName._assignedFields).toEqual(['id', 'name']);
+    expect(cloneName.toJS()).toEqual({
+        id: 1,
+        name: 'bob',
+    });
+
+    // Cloning a partial record should result in a partial record
+    const clone2 = cloneName.clone();
+    expect(clone2).not.toBe(cloneName);
+    expect(clone2._assignedFields).toEqual(['id', 'name']);
+    expect(clone2.toJS()).toEqual({
+        id: 1,
+        name: 'bob',
+    });
+});
