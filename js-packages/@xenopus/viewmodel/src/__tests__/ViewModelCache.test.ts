@@ -1,5 +1,5 @@
 import Field from '../fields/Field';
-import { recordIsEqual } from '../testUtils';
+import { recordEqualTo } from '../../../../../js-testing/matchers';
 import ViewModel from '../ViewModel';
 import ViewModelCache from '../ViewModelCache';
 
@@ -37,6 +37,7 @@ test('should support custom cache', () => {
     expect(() => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         class TestBad extends ViewModel {
             static cache = new MyInvalidCache();
         }
@@ -234,15 +235,15 @@ test('should support retrieving multiple records', () => {
     Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
 
     expect(Test1.cache.getList([2, 3, 4], ['id', 'firstName', 'email'])).toEqual([
-        recordIsEqual({ id: 2, firstName: 'Bob', email: 'bob@b.com' }),
+        recordEqualTo({ id: 2, firstName: 'Bob', email: 'bob@b.com' }),
         null,
-        recordIsEqual({ id: 4, firstName: 'Sam', email: 'sam@b.com' }),
+        recordEqualTo({ id: 4, firstName: 'Sam', email: 'sam@b.com' }),
     ]);
 
     expect(Test1.cache.getList([2, 3, 4], ['id', 'email'])).toEqual([
-        recordIsEqual({ id: 2, email: 'bob@b.com' }),
-        recordIsEqual({ id: 3, email: 'jack@b.com' }),
-        recordIsEqual({ id: 4, email: 'sam@b.com' }),
+        recordEqualTo({ id: 2, email: 'bob@b.com' }),
+        recordEqualTo({ id: 3, email: 'jack@b.com' }),
+        recordEqualTo({ id: 4, email: 'sam@b.com' }),
     ]);
 });
 
@@ -260,7 +261,7 @@ test('should notify listeners on add, change, delete', () => {
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     expect(cb1).toHaveBeenCalledWith(
         null,
-        recordIsEqual({
+        recordEqualTo({
             id: 2,
             firstName: 'Bob',
         })
@@ -272,11 +273,11 @@ test('should notify listeners on add, change, delete', () => {
     expect(cb1).not.toHaveBeenCalled();
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bobby', email: 'bob@b.com' }));
     expect(cb1).toHaveBeenCalledWith(
-        recordIsEqual({
+        recordEqualTo({
             id: 2,
             firstName: 'Bob',
         }),
-        recordIsEqual({
+        recordEqualTo({
             id: 2,
             firstName: 'Bobby',
         })
@@ -284,7 +285,7 @@ test('should notify listeners on add, change, delete', () => {
     cb1.mockReset();
     Test1.cache.delete(2, ['id', 'firstName']);
     expect(cb1).toHaveBeenCalledWith(
-        recordIsEqual({
+        recordEqualTo({
             id: 2,
             firstName: 'Bobby',
         }),
@@ -302,14 +303,14 @@ test('should notify listeners on add, change, delete', () => {
 
     Test1.cache.delete(12);
     expect(cb2).toHaveBeenCalledWith(
-        recordIsEqual({
+        recordEqualTo({
             id: 12,
             email: 'samwise@b.com',
         }),
         null
     );
     expect(cb3).toHaveBeenCalledWith(
-        recordIsEqual({
+        recordEqualTo({
             id: 12,
             firstName: 'Samwise',
             email: 'samwise@b.com',
