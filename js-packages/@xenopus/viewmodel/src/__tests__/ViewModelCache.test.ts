@@ -245,3 +245,75 @@ test('should support retrieving multiple records', () => {
         recordIsEqual({ id: 4, email: 'sam@b.com' }),
     ]);
 });
+
+test('should notify listeners on add, change, delete', () => {
+    class Test1 extends ViewModel {
+        static fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+    const cb1 = jest.fn();
+    Test1.cache.addListener(2, ['id', 'firstName'], cb1);
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
+    expect(cb1).toHaveBeenCalledWith(
+        null,
+        recordIsEqual({
+            id: 2,
+            firstName: 'Bob',
+        })
+    );
+    cb1.mockReset();
+    Test1.cache.add(new Test1({ id: 3, lastName: 'Jack', email: 'jack@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+    Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bobby', email: 'bob@b.com' }));
+    expect(cb1).toHaveBeenCalledWith(
+        recordIsEqual({
+            id: 2,
+            firstName: 'Bob',
+        }),
+        recordIsEqual({
+            id: 2,
+            firstName: 'Bobby',
+        })
+    );
+    cb1.mockReset();
+    Test1.cache.delete(2, ['id', 'firstName']);
+    expect(cb1).toHaveBeenCalledWith(
+        recordIsEqual({
+            id: 2,
+            firstName: 'Bobby',
+        }),
+        null
+    );
+    const cb2 = jest.fn();
+    Test1.cache.addListener(12, ['id', 'email'], cb2);
+    const cb3 = jest.fn();
+    Test1.cache.addListener(12, ['id', 'firstName', 'email'], cb3);
+    Test1.cache.add(new Test1({ id: 12, firstName: 'Samwise', email: 'samwise@b.com' }));
+
+    // We don't care about the addition notifications
+    cb2.mockReset();
+    cb3.mockReset();
+
+    Test1.cache.delete(12);
+    expect(cb2).toHaveBeenCalledWith(
+        recordIsEqual({
+            id: 12,
+            email: 'samwise@b.com',
+        }),
+        null
+    );
+    expect(cb3).toHaveBeenCalledWith(
+        recordIsEqual({
+            id: 12,
+            firstName: 'Samwise',
+            email: 'samwise@b.com',
+        }),
+        null
+    );
+});

@@ -37,6 +37,9 @@ function sortPairsOnCounter(a: [string, number], b: [string, number]): number {
     return 0;
 }
 
+type ChangeListener<T> = (previous?: T, next?: T) => void;
+type ChangeListenerUnsubscribe = () => void;
+
 /**
  * A cache for a single record as identified by it's primary key. This caches the
  * different record instances for all the different possible permutations of fields
@@ -63,11 +66,13 @@ function sortPairsOnCounter(a: [string, number], b: [string, number]): number {
  **/
 class RecordCache<T extends ViewModel> {
     cache: Map<FieldNameCacheKey, T | RecordPointer<T>>;
+    cacheListeners: Map<FieldNameCacheKey, ChangeListener<T>[]>;
     latestRecords: { [fieldsKey: string]: number };
     counter = 0;
 
     constructor() {
         this.cache = new Map();
+        this.cacheListeners = new Map();
         this.latestRecords = {};
     }
 
@@ -78,6 +83,58 @@ class RecordCache<T extends ViewModel> {
         const f = [...fieldNames];
         f.sort();
         return f.join('⁞');
+    }
+
+    /**
+     * Take a cache key generated with `getCacheKey` and return the list of fields
+     */
+    private reverseCacheKey(fieldsKey: string): string[] {
+        return fieldsKey.split('⁞');
+    }
+
+    /**
+     * Set a value for the specified key notifying any listeners
+     */
+    private setValueForKey(
+        key,
+        value: T | RecordPointer<T> | null
+    ): Map<string, T | RecordPointer<T>> {
+        let before = this.cache.get(key) || null;
+        let ret;
+
+        if (this.cacheListeners.has(key)) {
+            if (value instanceof RecordPointer) {
+                // If we have a listener on a key but it's currently a pointer we
+                // need to clone it to a real record so we can pass it through to
+                // the callbacks.
+                const fieldNames = this.reverseCacheKey(key);
+                const record = value.record.clone(fieldNames);
+                return this.setValueForKey(key, record);
+            } else {
+                if (before instanceof RecordPointer) {
+                    // If the previous value was a pointer we need to create a record for it
+                    // to pass through as the previous value. We don't need to cache it
+                    // anywhere as it represents the previous value - the new value is set
+                    // below.
+                    const fieldNames = this.reverseCacheKey(key);
+                    before = before.record.clone(fieldNames);
+                }
+                if (value === null) {
+                    ret = this.cache.delete(key);
+                } else {
+                    ret = this.cache.set(key, value);
+                }
+                // Can't workout what I need to do here to get it to typecheck. Doesn't like
+                // RecordPointer<T> but check above should ensure before is always type T
+                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // @ts-ignore
+                this.cacheListeners.get(key).forEach(cb => cb(before, value));
+            }
+        } else {
+            ret = this.cache.set(key, value);
+        }
+
+        return ret;
     }
 
     /**
@@ -93,13 +150,13 @@ class RecordCache<T extends ViewModel> {
         const fieldsKey = this.getCacheKey(fieldNames);
         this.latestRecords[fieldsKey] = this.counter++;
         const pointer = new RecordPointer(record);
-        for (const [key, r] of this.cache.entries()) {
-            const f = r instanceof RecordPointer ? r.record._assignedFields : r._assignedFields;
+        for (const key of [...this.cache.keys(), ...this.cacheListeners.keys()]) {
+            const f = this.reverseCacheKey(key);
             if (isSubset(f, fieldNames)) {
-                this.cache.set(key, pointer);
+                this.setValueForKey(key, pointer);
             }
         }
-        return this.cache.set(fieldsKey, record);
+        return this.setValueForKey(fieldsKey, record);
     }
 
     /**
@@ -122,7 +179,7 @@ class RecordCache<T extends ViewModel> {
                     // it so that we maintain object equality if you fetch
                     // this entry from the cache multiple times
                     const newRecord = record.clone(fieldNames);
-                    this.cache.set(fieldsKey, newRecord);
+                    this.setValueForKey(fieldsKey, newRecord);
                     return newRecord;
                 }
             }
@@ -134,7 +191,7 @@ class RecordCache<T extends ViewModel> {
             // If a pointer to a record with a superset of fields exists then
             // clone that record with just the fields requested.
             const record = recordOrPointer.record.clone(fieldNames);
-            this.cache.set(fieldsKey, record);
+            this.setValueForKey(fieldsKey, record);
             return record;
         }
         return recordOrPointer;
@@ -145,14 +202,42 @@ class RecordCache<T extends ViewModel> {
      *
      * Returns true if anything was deleted otherwise false
      */
-    delete(fieldNames: string[]): boolean {
+    delete(fieldNames?: string[]): boolean {
+        if (!fieldNames) {
+            for (const key of this.cache.keys()) {
+                this.setValueForKey(key, null);
+                delete this.latestRecords[key];
+            }
+            return true;
+        }
         const fieldsKey = this.getCacheKey(fieldNames);
         if (!this.cache.has(fieldsKey)) {
             return false;
         }
-        this.cache.delete(fieldsKey);
+        this.setValueForKey(fieldsKey, null);
         delete this.latestRecords[fieldsKey];
         return true;
+    }
+
+    /**
+     * Add a listener for any changes, additions or deletions for the specified field names
+     * @param fieldNames field names to listen to any changes for
+     * @param listener Function to call with any changes
+     */
+    addListener(fieldNames: string[], listener: ChangeListener<T>): ChangeListenerUnsubscribe {
+        const fieldsKey = this.getCacheKey(fieldNames);
+        if (!this.cacheListeners.has(fieldsKey)) {
+            this.cacheListeners.set(fieldsKey, []);
+        }
+        const listeners = this.cacheListeners.get(fieldsKey);
+        listeners.push(listener);
+        return (): void => {
+            const index = listeners.indexOf(listener);
+
+            if (index !== -1) {
+                listeners.splice(index, 1);
+            }
+        };
     }
 }
 
@@ -260,11 +345,27 @@ export default class ViewModelCache<T extends ViewModel> {
         if (!this.cache.has(pkKey)) {
             return false;
         }
-        if (!fieldNames) {
-            this.cache.delete(pkKey);
-            return true;
-        }
         const recordCache = this.cache.get(pkKey);
         return recordCache.delete(fieldNames);
+    }
+
+    /**
+     * Add a listener for any changes, additions or deletions for the record identified by
+     * `pk` for the field names `fieldNames`
+     * @param pk Primary key that identifies the record to listen to changes/additions/deletions to
+     * @param fieldNames Field names to listen to changes/additions/deletions to
+     * @param listener Function to call with any changes
+     */
+    addListener(
+        pk: PrimaryKey | CompoundPrimaryKey,
+        fieldNames: string[],
+        listener: ChangeListener<T>
+    ): ChangeListenerUnsubscribe {
+        const pkKey = this.getPkCacheKey(pk);
+        if (!this.cache.has(pkKey)) {
+            this.cache.set(pkKey, new RecordCache());
+        }
+        const recordCache = this.cache.get(pkKey);
+        return recordCache.addListener(fieldNames, listener);
     }
 }
