@@ -1,4 +1,4 @@
-interface Props<T> {
+export interface Props<T> {
     required?: boolean;
     name: string;
     label: string;
