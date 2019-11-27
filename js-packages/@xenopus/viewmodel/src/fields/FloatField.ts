@@ -8,7 +8,7 @@ import NumberField from './NumberField';
  * See also: DecimalField
  */
 export default class FloatField extends NumberField<number> {
-    parse(value: any): number {
+    parse(value: any): number | null {
         // Don't force empty string, null or undefined to a number (which would be 0) -
         // force them both to be null to represent no value set.
         if (value === '' || value == null) {

@@ -1,4 +1,4 @@
-import Field from './Field';
+import NullableBooleanField from '@xenopus/viewmodel/fields/NullableBooleanField';
 
 /**
  * Field for Boolean type values. Null count as False for this field.
@@ -7,7 +7,7 @@ import Field from './Field';
  *
  * See also: NullableBooleanField.
  */
-export default class BooleanField extends Field<boolean> {
+export default class BooleanField extends NullableBooleanField {
     parse(value: any): boolean {
         return !!value;
     }

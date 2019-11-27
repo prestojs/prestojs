@@ -1,7 +1,7 @@
 import NumberField from './NumberField';
 
 export default class IntegerField extends NumberField<number> {
-    parse(value: any): number {
+    parse(value: any): number | null {
         if (value === '' || value == null) {
             return null;
         }

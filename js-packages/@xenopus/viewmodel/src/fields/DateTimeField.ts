@@ -9,7 +9,7 @@ import Field from './Field';
  * Invalid datetimes are treated as Null.
  */
 export default class DateTimeField extends Field<Date> {
-    parse(value: any): Date {
+    parse(value: any): Date | null {
         if (Number.isNaN(Date.parse(value))) {
             return null;
         }

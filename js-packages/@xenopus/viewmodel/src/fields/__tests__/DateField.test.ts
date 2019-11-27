@@ -6,8 +6,8 @@ test('DateField parse values correctly', () => {
     expect(field.parse(null)).toBe(null);
     expect(field.parse(undefined)).toBe(null);
 
-    expect(field.parse('2019-11-11').toISOString()).toBe('2019-11-11T00:00:00.000Z');
+    expect((field.parse('2019-11-11') as Date).toISOString()).toBe('2019-11-11T00:00:00.000Z');
 
     const now = new Date();
-    expect(field.parse(now).toISOString()).toBe(now.toISOString());
+    expect((field.parse(now) as Date).toISOString()).toBe(now.toISOString());
 });

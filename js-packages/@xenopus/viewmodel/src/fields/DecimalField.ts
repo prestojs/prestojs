@@ -10,7 +10,7 @@ import NumberField from './NumberField';
  * See also: FloatField
  */
 export default class DecimalField extends NumberField<string> {
-    parse(value: any): string {
+    parse(value: any): string | null {
         if (value === '' || value == null) {
             // treat empty string as null
             return null;
