@@ -13,8 +13,15 @@ export type CompoundPrimaryKey = PrimaryKey[];
  *
  * ```js
  * class User extends ViewModel {
+ *     // Optional; default cache is usually sufficient
+ *     static cache = new MyCustomCache();
+ *
+ *     // Default pkFieldName is 'id'; if you have a different pk specify here
  *     static pkFieldName = 'userId';
+ *
+ *     // Used to describe a single user
  *     static label = 'User';
+ *     // User to describe an indeterminate number of users
  *     static labelPlural = 'Users';
  *
  *     static fields = {

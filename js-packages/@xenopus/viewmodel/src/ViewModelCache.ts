@@ -84,7 +84,9 @@ class RecordCache<T extends ViewModel> {
      * Add a record to the cache based on the fields that are set on it.
      *
      * This will also update any cached entries for records that contain only
-     * a subset of the fields set on `record.
+     * a subset of the fields set on `record. Note that this does not update
+     * a superset of fields, ie. updating fields (a,b) won't update a record
+     * that contains (a,b,c)
      */
     add(record: T): Map<string, T | RecordPointer<T>> {
         const fieldNames = record._assignedFields;
