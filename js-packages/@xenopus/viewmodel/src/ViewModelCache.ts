@@ -103,7 +103,7 @@ class RecordCache<T extends ViewModel> {
     private setValueForKey(
         key,
         value: T | RecordPointer<T> | null
-    ): Map<string, T | RecordPointer<T>> {
+    ): Map<string, T | RecordPointer<T>> | null {
         let before = this.cache.get(key) || null;
         let ret;
 
@@ -142,7 +142,11 @@ class RecordCache<T extends ViewModel> {
                 this.cacheListeners.get(key).forEach(cb => cb(before, value));
             }
         } else {
-            ret = this.cache.set(key, value);
+            if (value === null) {
+                ret = this.cache.delete(key);
+            } else {
+                ret = this.cache.set(key, value);
+            }
         }
 
         return ret;
@@ -156,7 +160,7 @@ class RecordCache<T extends ViewModel> {
      * a superset of fields, ie. updating fields (a,b) won't update a record
      * that contains (a,b,c)
      */
-    add(record: T): Map<string, T | RecordPointer<T>> {
+    add(record: T): Map<string, T | RecordPointer<T>> | null {
         const fieldNames = record._assignedFields;
         const fieldsKey = this.getCacheKey(fieldNames);
         this.latestRecords[fieldsKey] = this.counter++;
@@ -182,6 +186,13 @@ class RecordCache<T extends ViewModel> {
             pairs.sort(sortPairsOnCounter);
             for (const [key] of pairs) {
                 let record = this.cache.get(key);
+                if (!record) {
+                    // This is certainly a bug (this check is also to appease typescript)
+                    console.error(
+                        'Value for key ${key} is missing in cache but exists in latestRecords. This is a bug.'
+                    );
+                    continue;
+                }
                 if (record instanceof RecordPointer) {
                     record = record.record;
                 }
@@ -205,7 +216,7 @@ class RecordCache<T extends ViewModel> {
             this.setValueForKey(fieldsKey, record);
             return record;
         }
-        return recordOrPointer;
+        return recordOrPointer || null;
     }
 
     /**
@@ -237,16 +248,19 @@ class RecordCache<T extends ViewModel> {
      */
     addListener(fieldNames: string[], listener: ChangeListener<T>): ChangeListenerUnsubscribe {
         const fieldsKey = this.getCacheKey(fieldNames);
-        if (!this.cacheListeners.has(fieldsKey)) {
-            this.cacheListeners.set(fieldsKey, []);
+        let listeners = this.cacheListeners.get(fieldsKey);
+        if (!listeners) {
+            listeners = [];
+            this.cacheListeners.set(fieldsKey, listeners);
         }
-        const listeners = this.cacheListeners.get(fieldsKey);
         listeners.push(listener);
         return (): void => {
-            const index = listeners.indexOf(listener);
+            if (listeners) {
+                const index = listeners.indexOf(listener);
 
-            if (index !== -1) {
-                listeners.splice(index, 1);
+                if (index !== -1) {
+                    listeners.splice(index, 1);
+                }
             }
         };
     }
@@ -359,15 +373,16 @@ export default class ViewModelCache<T extends ViewModel> {
             throw new Error('_assignedFields not set on record; cannot be cached');
         }
         const pkKey = this.getPkCacheKey(record._pk);
-        if (!this.cache.has(pkKey)) {
-            this.cache.set(pkKey, new RecordCache());
+        let recordCache = this.cache.get(pkKey);
+        if (!recordCache) {
+            recordCache = new RecordCache();
+            this.cache.set(pkKey, recordCache);
         }
-        const recordCache = this.cache.get(pkKey);
         recordCache.add(record);
     }
 
     isAddingList = false;
-    onAddingListDone?: () => void;
+    onAddingListDone?: null | (() => void);
 
     /**
      * Add a list of records. Use this in place of manually calling
@@ -401,10 +416,10 @@ export default class ViewModelCache<T extends ViewModel> {
      */
     get(pk: PrimaryKey | CompoundPrimaryKey, fieldNames: string[]): T | null {
         const pkKey = this.getPkCacheKey(pk);
-        if (!this.cache.has(pkKey)) {
+        const recordCache = this.cache.get(pkKey);
+        if (!recordCache) {
             return null;
         }
-        const recordCache = this.cache.get(pkKey);
         return recordCache.get(fieldNames);
     }
 
@@ -419,8 +434,8 @@ export default class ViewModelCache<T extends ViewModel> {
      * @returns an array of the cached records. Any records not found will be in
      * the array as a null value
      */
-    getList(pks: (PrimaryKey | CompoundPrimaryKey)[], fieldNames: string[]): T[] {
-        const records = [];
+    getList(pks: (PrimaryKey | CompoundPrimaryKey)[], fieldNames: string[]): (T | null)[] {
+        const records: (T | null)[] = [];
         for (const pk of pks) {
             records.push(this.get(pk, fieldNames));
         }
@@ -440,10 +455,10 @@ export default class ViewModelCache<T extends ViewModel> {
      */
     delete(pk: PrimaryKey | CompoundPrimaryKey, fieldNames?: string[]): boolean {
         const pkKey = this.getPkCacheKey(pk);
-        if (!this.cache.has(pkKey)) {
+        const recordCache = this.cache.get(pkKey);
+        if (!recordCache) {
             return false;
         }
-        const recordCache = this.cache.get(pkKey);
         return recordCache.delete(fieldNames);
     }
 
@@ -460,10 +475,11 @@ export default class ViewModelCache<T extends ViewModel> {
         listener: ChangeListener<T>
     ): ChangeListenerUnsubscribe {
         const pkKey = this.getPkCacheKey(pk);
-        if (!this.cache.has(pkKey)) {
-            this.cache.set(pkKey, new RecordCache());
+        let recordCache = this.cache.get(pkKey);
+        if (!recordCache) {
+            recordCache = new RecordCache();
+            this.cache.set(pkKey, recordCache);
         }
-        const recordCache = this.cache.get(pkKey);
         return recordCache.addListener(fieldNames, listener);
     }
 

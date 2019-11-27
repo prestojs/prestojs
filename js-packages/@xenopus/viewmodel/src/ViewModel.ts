@@ -43,10 +43,12 @@ export default class ViewModel {
     public static get cache(): ViewModelCache<ViewModel> {
         // This is a getter so we can instantiate cache on each ViewModel independently without
         // having to have the descendant create the cache
-        if (!this.__cache.has(this)) {
-            this.__cache.set(this, new ViewModelCache());
+        let cache = this.__cache.get(this);
+        if (!cache) {
+            cache = new ViewModelCache();
+            this.__cache.set(this, cache);
         }
-        return this.__cache.get(this);
+        return cache;
     }
 
     public static set cache(value: ViewModelCache<ViewModel>) {
@@ -112,7 +114,7 @@ export default class ViewModel {
 
     constructor(data: {}) {
         // TODO: Should partial fields be identified by absence of key?
-        const assignedFields = [];
+        const assignedFields: string[] = [];
         const fields = this._model.fields;
         for (const key of Object.keys(data)) {
             const value = data[key];
@@ -192,7 +194,7 @@ export default class ViewModel {
         const missingFieldNames = fieldNames
             ? fieldNames.filter(fieldName => !this._assignedFields.includes(fieldName))
             : [];
-        if (missingFieldNames.length > 0) {
+        if (fieldNames && missingFieldNames.length > 0) {
             throw new Error(
                 `Can't clone ${this._model.name} with fields ${fieldNames.join(
                     ', '

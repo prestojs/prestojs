@@ -2,9 +2,11 @@ import React, { useContext, useMemo } from 'react';
 import { Field } from '@xenopus/viewmodel';
 import FieldWidget from './FieldWidget';
 
-export const UiContext = React.createContext(null);
-
 type GetWidgetForField = <FieldValue, T extends HTMLElement>(
+    field: Field<FieldValue>
+) => FieldWidget<FieldValue, T>;
+
+type GetWidgetForFieldWithNull = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
 ) => FieldWidget<FieldValue, T> | null;
 
@@ -15,9 +17,21 @@ export interface FormItemProps {
 }
 
 export interface UiContextValue {
-    getWidgetForField: GetWidgetForField;
-    formItemComponent: React.ComponentType<FormItemProps>;
+    // Technically if you use this at the top level then it will always return a widget
+    // or throw an error. It's only when you use it nested within another provider that
+    // it can return null. I don't know if it's possible to type that... So useUi is
+    // typed to return TopLevelUiContextValue instead (see useUi for more)
+    getWidgetForField: GetWidgetForFieldWithNull;
+    formItemComponent?: React.ComponentType<FormItemProps>;
 }
+
+export interface TopLevelUiContextValue {
+    // See comments above on UiContextValue
+    getWidgetForField: GetWidgetForField;
+    formItemComponent?: React.ComponentType<FormItemProps>;
+}
+
+export const UiContext = React.createContext<UiContextValue | null>(null);
 
 type Props = {
     /**
@@ -31,7 +45,7 @@ type Props = {
      *
      * @param field The specific field instance for a model
      */
-    getWidgetForField?: GetWidgetForField;
+    getWidgetForField?: GetWidgetForFieldWithNull;
     /**
      * A component to use to render items in a form. This is the component that will be rendered by
      * Form.Item.
@@ -48,14 +62,19 @@ type Props = {
 export default function UiProvider(props: Props): React.ReactElement {
     const { children, getWidgetForField, formItemComponent } = props;
     const context = useContext(UiContext);
-    const { getWidgetForField: parentGetWidgetForField = null } = context || {};
+    const { getWidgetForField: parentGetWidgetForField = null } = context || {
+        getWidgetForField: null,
+    };
     const providedContext = useMemo(
         () => ({
             formItemComponent,
             getWidgetForField<FieldValue, T extends HTMLElement>(
                 field: Field<FieldValue>
             ): FieldWidget<FieldValue, T> | null {
-                const widget = getWidgetForField(field);
+                let widget: FieldWidget<FieldValue, T> | null = null;
+                if (getWidgetForField) {
+                    widget = getWidgetForField(field);
+                }
                 if (!widget) {
                     if (!parentGetWidgetForField) {
                         throw new Error(

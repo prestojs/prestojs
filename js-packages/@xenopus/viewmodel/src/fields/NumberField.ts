@@ -6,7 +6,7 @@ import Field from './Field';
  * Other numeric fields (IntegerField, DecimalField, FloatField...) will extend this.
  */
 export default class NumberField extends Field<number> {
-    parse(value: any): number {
+    parse(value: any): number | null {
         // Don't force empty string, null or undefined to a number (which would be 0) -
         // force them both to be null to represent no value set.
         if (value === '' || value == null) {
