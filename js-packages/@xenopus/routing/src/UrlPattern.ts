@@ -1,0 +1,64 @@
+import qs from 'qs';
+import { pathToRegexp, compile, PathFunction, Key } from 'path-to-regexp';
+
+export interface ResolveOptions {
+    query?: {};
+}
+
+/**
+ * Allows definition of URL as a pattern with ability to resolve it to a URL by performing argument replacement
+ *
+ * Patterns are defined using the [path-to-regexp](https://github.com/pillarjs/path-to-regexp) library
+ *
+ * Usage:
+ *
+ * ```js
+ * const url = new UrlPattern('/users/:id/'),
+ * url.resolve({ id: 5 });
+ * // /users/5/
+ * url.resolve({ id: 5 }, { query: { showAddresses: true }});
+ * // /users/5/?showAddresses=true
+ * ```
+ */
+export default class UrlPattern {
+    pattern: string;
+    validArgNames: string[];
+    requiredArgNames: string[];
+    toPath: PathFunction;
+    keys: Key[];
+
+    constructor(pattern: string) {
+        this.keys = [];
+        pathToRegexp(pattern, this.keys);
+        this.validArgNames = this.keys.map(key => key.name.toString());
+        this.requiredArgNames = this.keys
+            .filter(key => !key.modifier.includes('?'))
+            .map(key => key.name.toString());
+        this.pattern = pattern;
+        this.toPath = compile(pattern);
+    }
+
+    resolve(kwargs: {} = {}, { query }: ResolveOptions = {}): string {
+        if (kwargs) {
+            const invalidArgs = Object.keys(kwargs).filter(
+                arg => !this.validArgNames.includes(arg)
+            );
+            if (invalidArgs.length) {
+                throw new Error(
+                    `Invalid arguments supplied: ${invalidArgs.join(
+                        ', '
+                    )}. Valid options are: ${this.validArgNames.join(', ')}`
+                );
+            }
+        }
+        const missingArgs = this.requiredArgNames.filter(argName => !(argName in kwargs));
+        if (missingArgs.length) {
+            throw new Error(`Missing required arguments: ${missingArgs.join(', ')}.`);
+        }
+        let url = this.toPath(kwargs);
+        if (query) {
+            url = `${url}?${qs.stringify(query)}`;
+        }
+        return url;
+    }
+}
