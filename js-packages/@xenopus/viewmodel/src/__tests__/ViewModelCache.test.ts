@@ -1,5 +1,5 @@
 import Field from '../fields/Field';
-import { recordIsEqual } from '../testUtils';
+import { recordEqualTo } from '../../../../../js-testing/matchers';
 import ViewModel from '../ViewModel';
 import ViewModelCache from '../ViewModelCache';
 
@@ -37,6 +37,7 @@ test('should support custom cache', () => {
     expect(() => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         class TestBad extends ViewModel {
             static cache = new MyInvalidCache();
         }
@@ -234,14 +235,164 @@ test('should support retrieving multiple records', () => {
     Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
 
     expect(Test1.cache.getList([2, 3, 4], ['id', 'firstName', 'email'])).toEqual([
-        recordIsEqual({ id: 2, firstName: 'Bob', email: 'bob@b.com' }),
+        recordEqualTo({ id: 2, firstName: 'Bob', email: 'bob@b.com' }),
         null,
-        recordIsEqual({ id: 4, firstName: 'Sam', email: 'sam@b.com' }),
+        recordEqualTo({ id: 4, firstName: 'Sam', email: 'sam@b.com' }),
     ]);
 
     expect(Test1.cache.getList([2, 3, 4], ['id', 'email'])).toEqual([
-        recordIsEqual({ id: 2, email: 'bob@b.com' }),
-        recordIsEqual({ id: 3, email: 'jack@b.com' }),
-        recordIsEqual({ id: 4, email: 'sam@b.com' }),
+        recordEqualTo({ id: 2, email: 'bob@b.com' }),
+        recordEqualTo({ id: 3, email: 'jack@b.com' }),
+        recordEqualTo({ id: 4, email: 'sam@b.com' }),
     ]);
+});
+
+test('should notify listeners on add, change, delete', () => {
+    class Test1 extends ViewModel {
+        static fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+    const cb1 = jest.fn();
+    Test1.cache.addListener(2, ['id', 'firstName'], cb1);
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
+    expect(cb1).toHaveBeenCalledWith(
+        null,
+        recordEqualTo({
+            id: 2,
+            firstName: 'Bob',
+        })
+    );
+    cb1.mockReset();
+    Test1.cache.add(new Test1({ id: 3, lastName: 'Jack', email: 'jack@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+    Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bobby', email: 'bob@b.com' }));
+    expect(cb1).toHaveBeenCalledWith(
+        recordEqualTo({
+            id: 2,
+            firstName: 'Bob',
+        }),
+        recordEqualTo({
+            id: 2,
+            firstName: 'Bobby',
+        })
+    );
+    cb1.mockReset();
+    Test1.cache.delete(2, ['id', 'firstName']);
+    expect(cb1).toHaveBeenCalledWith(
+        recordEqualTo({
+            id: 2,
+            firstName: 'Bobby',
+        }),
+        null
+    );
+    const cb2 = jest.fn();
+    Test1.cache.addListener(12, ['id', 'email'], cb2);
+    const cb3 = jest.fn();
+    Test1.cache.addListener(12, ['id', 'firstName', 'email'], cb3);
+    Test1.cache.add(new Test1({ id: 12, firstName: 'Samwise', email: 'samwise@b.com' }));
+
+    // We don't care about the addition notifications
+    cb2.mockReset();
+    cb3.mockReset();
+
+    Test1.cache.delete(12);
+    expect(cb2).toHaveBeenCalledWith(
+        recordEqualTo({
+            id: 12,
+            email: 'samwise@b.com',
+        }),
+        null
+    );
+    expect(cb3).toHaveBeenCalledWith(
+        recordEqualTo({
+            id: 12,
+            firstName: 'Samwise',
+            email: 'samwise@b.com',
+        }),
+        null
+    );
+});
+
+test('should not notify if identical record added', () => {
+    class Test1 extends ViewModel {
+        static fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+
+    const cb1 = jest.fn();
+    Test1.cache.addListener(2, ['id', 'firstName', 'email'], cb1);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    Test1.cache.add(record1);
+    expect(cb1).toHaveBeenCalledWith(null, record1);
+    cb1.mockReset();
+    // Adding same record should be ignored
+    Test1.cache.add(record1);
+    expect(cb1).not.toHaveBeenCalled();
+    // Adding same record even if strict equality fails should be ignored
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+});
+
+test('should support listening to multiple pks', () => {
+    class Test1 extends ViewModel {
+        static fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+    const cb1 = jest.fn();
+    const unsubscribe = Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    Test1.cache.add(record1);
+    expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, null, null]);
+    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
+    Test1.cache.add(record2);
+    expect(cb1).toHaveBeenCalledWith([record1, null, null], [record1, record2, null]);
+    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
+    Test1.cache.add(record3);
+    expect(cb1).toHaveBeenCalledWith([record1, record2, null], [record1, record2, record3]);
+    const record1Updated = new Test1({ id: 2, firstName: 'Bobby', email: 'bob@b.com' });
+    Test1.cache.add(record1Updated);
+    expect(cb1).toHaveBeenCalledWith(
+        [record1, record2, record3],
+        [record1Updated, record2, record3]
+    );
+
+    // Make sure unsubscribe works
+    cb1.mockReset();
+    unsubscribe();
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bobby', email: 'bobby@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+});
+
+test('should support listening to multiple pks, batch notifications', () => {
+    class Test1 extends ViewModel {
+        static fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+
+    const cb1 = jest.fn();
+    const unsubscribe = Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
+    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
+    Test1.cache.addList([record1, record2, record3]);
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
 });

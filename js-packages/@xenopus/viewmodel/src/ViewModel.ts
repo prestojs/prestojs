@@ -142,8 +142,12 @@ export default class ViewModel {
         throw new Error('Not implemented. Pending changes to support data on ViewModel.');
     }
 
-    static toString(): string {
+    public static toString(): string {
         return this.name;
+    }
+
+    public toString(): string {
+        return `${this._model.name}(${JSON.stringify(this.toJS(), null, 2)})`;
     }
 
     /**

@@ -6,7 +6,11 @@ const { pathsToModuleNameMapper } = require('ts-jest/utils');
 const { compilerOptions } = require('./tsconfig.base');
 
 module.exports = {
-    setupFilesAfterEnv: ['jest-dom/extend-expect', 'react-testing-library/cleanup-after-each'],
+    setupFilesAfterEnv: [
+        'jest-dom/extend-expect',
+        'react-testing-library/cleanup-after-each',
+        '<rootDir>js-testing/setupTests.ts',
+    ],
     clearMocks: true,
     coverageDirectory: 'coverage',
     coverageReporters: ['text', 'clover'],
