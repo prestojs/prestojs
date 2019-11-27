@@ -84,7 +84,7 @@ export default class Field<T> {
      * into a `Date`.
      * @param value
      */
-    public parse(value: any): T {
+    public parse(value: any): T | null {
         return value;
     }
 
@@ -130,7 +130,7 @@ export default class Field<T> {
      * Get the default value for this field. Note that this returns a promise that resolve to the default value
      * as some default values may need to resolve data from a backend.
      */
-    get defaultValue(): Promise<T | null> {
+    get defaultValue(): Promise<T | null | undefined> {
         if (this._defaultValue instanceof Function) {
             return this._defaultValue();
         }

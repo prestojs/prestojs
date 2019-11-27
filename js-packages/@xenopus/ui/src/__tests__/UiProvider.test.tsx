@@ -69,7 +69,7 @@ test('UiProvider should support nested providers', () => {
     function NestedWidget(): React.ReactElement {
         return <>nested_widget</>;
     }
-    function getWidgetOuter<T>(field): FieldWidget<T, any> {
+    function getWidgetOuter<T>(field): FieldWidget<T, any> | null {
         if (field.name === 'special') {
             return SpecialWidget;
         }
@@ -78,7 +78,7 @@ test('UiProvider should support nested providers', () => {
         }
         return DefaultWidget;
     }
-    function getWidgetInner<T>(field): FieldWidget<T, any> {
+    function getWidgetInner<T>(field): FieldWidget<T, any> | null {
         if (field.name === 'inner') {
             return NestedWidget;
         }

@@ -87,5 +87,5 @@ export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement
         throw new Error("When 'field' is not specified you must provide children to render");
     }
 
-    return <InnerFormItem {...extraProps} {...rest} required={required} children={children} />;
+    return <InnerFormItem {...extraProps} {...rest} required={!!required} children={children} />;
 }
