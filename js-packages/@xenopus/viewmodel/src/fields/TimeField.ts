@@ -1,6 +1,8 @@
 import Field from './Field';
 
 /**
- * Is a string because native js Date is not suitable for this.
+ * Time Field.
+ *
+ * String based: Native javascript Date does not have a nice way to describe a time-only object. Make sure any third party library of your choice like MomentJS handles this correctly.
  */
 export default class TimeField extends Field<string> {}

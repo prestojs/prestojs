@@ -1,13 +1,14 @@
 import Field from './Field';
 
 /**
- * NullBooleanField is now disencouraged in django and we'll do the same here - pass undefined or null to this returns null, otherwise True/False.
+ * Field for Boolean type values. Null count as False for this field.
+ *
+ * Follows standard javascript Truthy and Falsy definition.
+ *
+ * See also: NullableBooleanField.
  */
 export default class BooleanField extends Field<boolean> {
     parse(value: any): boolean {
-        if (value === undefined || value === null) {
-            return null;
-        }
         return !!value;
     }
 }

@@ -3,7 +3,7 @@ import Field from './Field';
 /**
  * Base class for File fields
  *
- * Image field will be an extension of filefield with different formatter.
+ * Used by ImageField.
  *
  */
-export default class FileField<File> extends Field<File> {}
+export default class FileField extends Field<File> {}

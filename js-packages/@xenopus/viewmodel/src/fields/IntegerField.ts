@@ -1,6 +1,13 @@
 import NumberField from './NumberField';
 
-/**
- * Just a number field - but BigInt.
- */
-export default class IntegerField extends NumberField<BigInt> {}
+export default class IntegerField extends NumberField<number> {
+    parse(value: any): number {
+        if (value === '' || value == null) {
+            return null;
+        }
+        if (Number.isNaN(Number(value))) {
+            return value;
+        }
+        return parseInt(value, 10);
+    }
+}

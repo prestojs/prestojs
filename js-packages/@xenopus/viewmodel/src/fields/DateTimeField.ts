@@ -1,11 +1,16 @@
 import Field from './Field';
 
-/**
- * We dont use moment, but instead check to see if the type's Date - regardless of datetime lib used, all underlying instances will be Date.
+/*
+ * DateTime Field.
+ *
+ * The basic javascript Date type is consumed and spitted out by this field. All third party libraries, such as Moment, should be compatible
+ * as regardless of how they implement, the underlying base instance will always be Date.
+ *
+ * Invalid datetimes are treated as Null.
  */
 export default class DateTimeField extends Field<Date> {
     parse(value: any): Date {
-        if (!value) {
+        if (Number.isNaN(Date.parse(value))) {
             return null;
         }
         return new Date(value);

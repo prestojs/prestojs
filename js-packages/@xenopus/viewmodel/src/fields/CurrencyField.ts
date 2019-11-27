@@ -1,6 +1,8 @@
 import DecimalField from './DecimalField';
 
 /**
- * Currency field - do we want to store additional info like rangefield eg. currency type?
+ * Currency Field to store currency values.
+ *
+ * Extends DecimalField for precision, TODO - should store additional info on currency types (eg, USD, JPY).
  */
-export default class CurrencyField extends DecimalField<string> {}
+export default class CurrencyField extends DecimalField {}

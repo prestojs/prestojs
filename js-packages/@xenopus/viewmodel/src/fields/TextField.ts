@@ -1,3 +1,3 @@
 import CharField from './CharField';
 
-export default class TextField extends CharField<string> {}
+export default class TextField extends CharField {}

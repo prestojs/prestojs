@@ -1,9 +1,20 @@
-import Field from './Field';
+import NumberField from './NumberField';
 
 /**
- * We dont want to include 3rd party libs - hence no decimal.js; in which case we'll leave this as string.
+ * Decimal Field. Stores decimal value as a string.
+ *
+ * To support decimal operations consider a custom implementation that uses a decimal library eg. decimal.js
  *
  * Also used by CurrencyField.
  *
+ * See also: FloatField
  */
-export default class DecimalField<T> extends Field<string> {}
+export default class DecimalField extends NumberField<string> {
+    parse(value: any): string {
+        if (value === '' || value == null) {
+            // treat empty string as null
+            return null;
+        }
+        return value;
+    }
+}

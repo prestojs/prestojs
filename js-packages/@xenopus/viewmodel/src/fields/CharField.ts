@@ -5,4 +5,4 @@ import Field from './Field';
  *
  * Other char fields (EmailField, URLField...) will extend this.
  */
-export default class CharField<T = string> extends Field<string> {}
+export default class CharField extends Field<string> {}

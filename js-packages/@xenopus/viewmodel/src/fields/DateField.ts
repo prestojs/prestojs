@@ -1,12 +1,19 @@
 import Field from './Field';
 
-/**
- * We dont use moment, but instead check to see if the type's Date - regardless of datetime lib used, all underlying instances will be Date.
- * Formatter should spit out an ISO8601 std date string.
+/*
+ * Date Field.
+ *
+ * The basic javascript Date type is consumed and spitted out by this field. All third party libraries, such as Moment, should be compatible
+ * as regardless of how they implement, the underlying base instance will always be Date.
+ *
+ * Invalid dates are treated as Null. Does not truncate "time" part for a datetime passed in - if necessary, truncate in UI components.
+ *
+ * TODO: Format for Date Field should spit out ISO8601 date string by default.
+ *
  */
 export default class DateField extends Field<Date> {
     parse(value: any): Date {
-        if (!value) {
+        if (Number.isNaN(Date.parse(value))) {
             return null;
         }
         return new Date(value);
