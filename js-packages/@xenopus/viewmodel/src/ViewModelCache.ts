@@ -41,6 +41,10 @@ type ChangeListener<T> = (previous?: T, next?: T) => void;
 type MultiChangeListener<T> = (previous?: (T | null)[], next?: (T | null)[]) => void;
 type ChangeListenerUnsubscribe = () => void;
 
+// Separator used to join multiple values when generating a string key, eg.
+// ['a', 'b', 'c'] becomes 'a⁞b⁞c'
+const CACHE_KEY_FIELD_SEPARATOR = '⁞';
+
 /**
  * A cache for a single record as identified by it's primary key. This caches the
  * different record instances for all the different possible permutations of fields
@@ -83,14 +87,14 @@ class RecordCache<T extends ViewModel> {
     private getCacheKey(fieldNames: string[]): string {
         const f = [...fieldNames];
         f.sort();
-        return f.join('⁞');
+        return f.join(CACHE_KEY_FIELD_SEPARATOR);
     }
 
     /**
      * Take a cache key generated with `getCacheKey` and return the list of fields
      */
     private reverseCacheKey(fieldsKey: string): string[] {
-        return fieldsKey.split('⁞');
+        return fieldsKey.split(CACHE_KEY_FIELD_SEPARATOR);
     }
 
     /**
@@ -261,6 +265,68 @@ class RecordCache<T extends ViewModel> {
  * of a new cache entry. eg. Caching a record with all the possible fields set
  * would result in all the existing partial field cache entries being updated
  * to match the data on the full record for the fields it care about.
+ *
+ * Usage:
+ *
+ * ```js
+ * // Assume User is a ViewModel already defined
+ *
+ * // Add a record
+ * User.cache.add(new User({ id: 1, name: 'John' }));
+ *
+ * // Retrieve a record
+ * const record = User.cache.get(1, ['id', 'name']);
+ *
+ * // To update a record just add it again
+ * User.cache.add(new User({ id: 1, name: 'Johnny' }));
+ *
+ * // Cache is per unique set of fields but a superset will update a subset
+ * User.cache.add(new User({ id: 1, name: 'Johnny Smith', email: 'johnny@test.com' }));
+ * User.cache.get(1, ['id', 'name']);
+ * // { id: 1, name: 'Johnny Smith' }
+ * User.cache.get(1, ['id', 'name', 'email'])
+ * // { id: 1, name: 'Johnny Smith', email: 'johnny@test.com' }
+ *
+ * // Delete a specific cache for a subset of fields
+ * User.cache.delete(1, ['id', 'name']);
+ * User.cache.get(1, ['id', 'name']);
+ * // null
+ * User.cache.get(1, ['id', 'name', 'email'])
+ * // { id: 1, name: 'Johnny Smith', email: 'johnny@test.com' }
+ *
+ * // Or all fields
+ * User.cache.delete(1);
+ * User.cache.get(1, ['id', 'name', 'email'])
+ * // null
+ *
+ * // You can add multiple values at a time
+ * User.cache.addList([johnny, sam]);
+ *
+ * // You can listen to changes
+ * User.cache.addListener(2, ['id', 'name'], (previous, next) => console.log(previous, 'change to', next));
+ * User.cache.add(new User({ id: 2, name: 'Bob' }));
+ * // null changed to User({ id: 2, name: 'Bob' })
+ * User.cache.add(new User({ id: 2, name: 'Bobby' }));
+ * // User({ id: 2, name: 'Bob' }) changed to User({ id: 2, name: 'Bobby' })
+ * User.cache.delete(2)
+ * // User({ id: 2, name: 'Bobby' }) changed to null
+ *
+ * // You can listen to multiple changes. If you use this and addList then you only get one
+ * // call for each change that occurs within addList
+ * User.cache.addListenerList(
+ *  // Ids to listen for changes to
+ *  [3, 4],
+ *  // Only get updates for cached records with these field names
+ *  ['id', 'name'],
+ *  (previous, next) => console.log(previous, 'change to', next)
+ * );
+ * User.cache.addList([new User({ id: 3, name: 'Jay' }), new User({ id: 4, name: 'Bee' })]);
+ * // [null, null] changed to [new User({ id: 3, name: 'Jay' }), new User({ id: 4, name: 'Bee' })]
+ * User.cache.addList([new User({ id: 3, name: 'Jayz' }), new User({ id: 4, name: 'Beeb' })]);
+ * // [new User({ id: 3, name: 'Jay' }), new User({ id: 4, name: 'Bee' })] changed to [new User({ id: 3, name: 'Jayz' }), new User({ id: 4, name: 'Beeb' })]
+ * User.cache.delete(3)
+ * // [new User({ id: 3, name: 'Jayz' }), new User({ id: 4, name: 'Beeb' })] changed to [null, new User({ id: 4, name: 'Beeb' })]
+ * ```
  */
 export default class ViewModelCache<T extends ViewModel> {
     cache: Map<PrimaryKeyCacheKey, RecordCache<T>>;
@@ -274,7 +340,7 @@ export default class ViewModelCache<T extends ViewModel> {
      */
     private getPkCacheKey(pk: PrimaryKey | CompoundPrimaryKey): string | number {
         if (Array.isArray(pk)) {
-            return pk.join('⁞');
+            return pk.join(CACHE_KEY_FIELD_SEPARATOR);
         }
         return pk;
     }
