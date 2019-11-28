@@ -1,8 +1,10 @@
 import CharField from './CharField';
 
 /**
- * Duration Field - represents a duration with three components: day, hour, minute such as 2d0h5m.
+ * Duration Field - represents a duration with two components: hour, minute such as 10h5m.
  *
- * Make sure backend of your choice is capable of storing a duration in a similar manner.
+ * Duration longer than 23h59m is not currently supported.
+ *
+ * Backend of choice need to be capable of storing a duration in a similar manner.
  */
 export default class DurationField extends CharField {}
