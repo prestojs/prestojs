@@ -1,6 +1,6 @@
-import ViewModelCache from '@xenopus/viewmodel/ViewModelCache';
 import isEqual from 'lodash/isEqual';
 import Field from './fields/Field';
+import ViewModelCache from './ViewModelCache';
 
 type FieldsMapping = { [key: string]: Field<any> };
 
