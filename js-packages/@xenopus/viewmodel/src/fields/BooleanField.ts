@@ -1,4 +1,4 @@
-import NullableBooleanField from '@xenopus/viewmodel/fields/NullableBooleanField';
+import NullableBooleanField from './NullableBooleanField';
 
 /**
  * Field for Boolean type values. Null count as False for this field.
