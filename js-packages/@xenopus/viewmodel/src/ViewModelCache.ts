@@ -514,8 +514,8 @@ export default class ViewModelCache<T extends ViewModel> {
             }
             previous = [...next];
         };
-        const unsubscribes = pks.map((pk, index) =>
-            this.addListener(pk, fieldNames, (previous, next) => {
+        const unsubscribes = pks.map(pk =>
+            this.addListener(pk, fieldNames, () => {
                 cb();
             })
         );

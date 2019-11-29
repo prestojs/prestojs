@@ -388,7 +388,7 @@ test('should support listening to multiple pks, batch notifications', () => {
     }
 
     const cb1 = jest.fn();
-    const unsubscribe = Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
+    Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
     const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
     const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
     const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
