@@ -120,12 +120,7 @@ export default class ViewModel {
      *
      * In general use toJS() instead.
      */
-    public get _data(): {} {
-        return this._assignedFields.reduce((acc, fieldName) => {
-            acc[fieldName] = this[fieldName];
-            return acc;
-        }, {});
-    }
+    public _data: { [fieldName: string]: any };
 
     constructor(data: {}) {
         const pkFieldNames = this._model.pkFieldNames;
@@ -148,6 +143,7 @@ export default class ViewModel {
         // TODO: Should partial fields be identified by absence of key?
         const assignedFields: string[] = [];
         const fields = this._model.fields;
+        const assignedData = {};
         for (const key of Object.keys(data)) {
             const value = data[key];
             const field = fields[key];
@@ -156,7 +152,7 @@ export default class ViewModel {
             // which results in the id being set on `groupId` instead? we'd have to handle this
             // differently to support that.
             if (field) {
-                this[key] = field.normalize(value);
+                assignedData[key] = field.normalize(value);
                 assignedFields.push(key);
             } else {
                 // TODO: Should extra keys in data be a warning or ignored?
@@ -166,8 +162,38 @@ export default class ViewModel {
             }
         }
 
+        this._data = Object.freeze(assignedData);
         this._assignedFields = assignedFields;
         this._assignedFields.sort();
+
+        for (const fieldName of Object.keys(fields)) {
+            const definition: { set(value: any): any; get: () => any } = {
+                set(value): void {
+                    const msg = `${fieldName} is read only`;
+                    if (process.env.NODE_ENV === 'development') {
+                        throw new Error(msg);
+                    } else {
+                        console.warn(msg);
+                    }
+                },
+                get(): any {
+                    return assignedData[fieldName];
+                },
+            };
+            if (!this._assignedFields.includes(fieldName)) {
+                definition.get = (): void => {
+                    const msg = `${fieldName} accessed but not fetched. Available fields are: ${this._assignedFields.join(
+                        ', '
+                    )}`;
+                    if (process.env.NODE_ENV === 'development') {
+                        throw new Error(msg);
+                    } else {
+                        console.warn(msg);
+                    }
+                };
+            }
+            Object.defineProperty(this, fieldName, definition);
+        }
     }
 
     /**

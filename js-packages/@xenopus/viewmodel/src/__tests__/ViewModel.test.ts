@@ -269,3 +269,90 @@ test('should clone a ViewModel record', () => {
         name: 'bob',
     });
 });
+
+describe('env tests', () => {
+    const OLD_ENV = process.env;
+
+    beforeEach(() => {
+        jest.resetModules();
+        process.env = { ...OLD_ENV };
+        delete process.env.NODE_ENV;
+    });
+
+    afterEach(() => {
+        process.env = OLD_ENV;
+    });
+
+    test('should error when accessing unfetched fields', () => {
+        process.env.NODE_ENV = 'development';
+        class A extends ViewModel {
+            static fields = {
+                id: new Field({ name: 'id', label: 'Id' }),
+                name: new Field({ name: 'name', label: 'Name' }),
+                email: new Field({ name: 'email', label: 'Email' }),
+            };
+        }
+        const record1 = new A({
+            id: 1,
+            name: 'bob',
+            email: 'a@b',
+        });
+        record1.id;
+        record1.name;
+        record1.email;
+        const record2 = new A({
+            id: 1,
+            name: 'bob',
+        });
+        expect(() => record2.email).toThrowError(/not fetched/);
+
+        process.env.NODE_ENV = 'production';
+
+        const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
+        record2.email;
+        expect(mockWarn).toHaveBeenCalledWith(
+            'email accessed but not fetched. Available fields are: id, name'
+        );
+    });
+
+    test('should error if attempt to set a field', () => {
+        process.env.NODE_ENV = 'development';
+        class A extends ViewModel {
+            static fields = {
+                id: new Field({ name: 'id', label: 'Id' }),
+                name: new Field({ name: 'name', label: 'Name' }),
+                email: new Field({ name: 'email', label: 'Email' }),
+            };
+        }
+        const record1 = new A({
+            id: 1,
+            name: 'bob',
+            email: 'a@b',
+        });
+        expect(() => (record1.email = 'test')).toThrowError('email is read only');
+
+        process.env.NODE_ENV = 'production';
+
+        record1.email = 'test';
+
+        const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
+        expect(mockWarn).toHaveBeenCalledWith('email is read only');
+
+        expect(record1._data).toEqual({
+            id: 1,
+            name: 'bob',
+            email: 'a@b',
+        });
+
+        // This should be frozen, changes should be ignored
+        // Note that what exactly happens depends on where it runs - in node it throws
+        // an error but in chrome it's just ignored
+        expect(() => (record1._data.name = 'jo')).toThrowError(/read only/);
+
+        expect(record1._data).toEqual({
+            id: 1,
+            name: 'bob',
+            email: 'a@b',
+        });
+    });
+});
