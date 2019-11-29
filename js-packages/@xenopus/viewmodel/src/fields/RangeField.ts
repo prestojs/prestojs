@@ -9,8 +9,6 @@ interface Boundary<T> extends Props<T> {
 /**
  * Base class for range fields (fields with a boundary).
  *
- * Note this is not a field for specifying two values (ie, "forming" of a range), but instead a single value that has to fall within two given ones ("use" of a range).
- *
  * supply lowerBound and upperBound to the constructor to define boundaries. they're optional (can be undefined / null).
  *
  * Other range based fields (DateTimeRangeField, IntegerRangeField, ...) will extend this.
