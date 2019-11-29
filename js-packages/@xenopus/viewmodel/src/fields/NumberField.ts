@@ -4,19 +4,23 @@ import Field from './Field';
  * Base class for numeric fields
  *
  * Other numeric fields (IntegerField, DecimalField, FloatField...) will extend this.
+ *
  */
-export default class NumberField extends Field<number> {
-    parse(value: any): number | null {
-        // Don't force empty string, null or undefined to a number (which would be 0) -
-        // force them both to be null to represent no value set.
-        if (value === '' || value == null) {
-            return null;
-        }
-        const numberValue = Number(value);
-        // If we can't parse number just return it as is so as not to break inputs
-        if (Number.isNaN(numberValue)) {
-            return value;
-        }
-        return numberValue;
+export default class NumberField<T = string | number> extends Field<string | number> {
+    public minValue?: number;
+    public maxValue?: number;
+
+    constructor(values) {
+        const { name, minValue, maxValue, ...rest } = values;
+
+        if (minValue !== undefined && typeof minValue !== 'number')
+            throw new Error(`Field ${name}: "minValue" should be a number, received: ${minValue}`);
+        if (maxValue !== undefined && typeof maxValue !== 'number')
+            throw new Error(`Field ${name}: "maxValue" should be a number, received: ${maxValue}`);
+
+        super({ name, ...rest });
+
+        this.minValue = minValue;
+        this.maxValue = maxValue;
     }
 }

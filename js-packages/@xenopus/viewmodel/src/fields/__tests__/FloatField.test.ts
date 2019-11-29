@@ -1,7 +1,7 @@
-import NumberField from '../NumberField';
+import FloatField from '../FloatField';
 
-test('NumberField should parse numeric values as Number', () => {
-    const field = new NumberField({ name: 'number', label: 'number' });
+test('FloatField should parse numeric values as Number', () => {
+    const field = new FloatField({ name: 'float', label: 'float' });
     expect(field.parse('5')).toBe(5);
     expect(field.parse('0.0')).toBe(0);
     expect(field.parse('0')).toBe(0);
