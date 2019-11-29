@@ -75,9 +75,9 @@ export default class Field<T> {
 
         // disallow any option other than those included in the list
         // eslint-disable-next-line
-        Object.keys(values).every(
-            k =>
-                [
+        const unknowns = Object.keys(values).filter(
+            key =>
+                ![
                     'required',
                     'name',
                     'label',
@@ -86,11 +86,12 @@ export default class Field<T> {
                     'choices',
                     'readOnly',
                     'writeOnly',
-                ].includes(k) ||
-                (() => {
-                    throw new Error(`Field ${name}: received unknown option ${k}`);
-                })()
+                ].includes(key)
         );
+
+        if (unknowns.length) {
+            throw new Error(`Field ${name}: received unknown option(s): ${unknowns.join(', ')}`);
+        }
 
         this.required = required;
         this.name = name;

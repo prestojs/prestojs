@@ -9,9 +9,8 @@ export default class CharField extends Field<string> {
     public maxLength?: number;
 
     constructor(values) {
-        const { name, maxLength } = values;
+        const { name, maxLength, ...rest } = values;
 
-        delete values.maxLength;
         if (maxLength !== undefined && typeof maxLength !== 'number')
             throw new Error(
                 `Field ${name}: "maxLength" should be a number, received: ${maxLength}`
@@ -21,7 +20,7 @@ export default class CharField extends Field<string> {
                 `Field ${name}: "maxLength" should be a positive number, received: ${maxLength}`
             );
 
-        super(values);
+        super({ name, ...rest });
 
         this.maxLength = maxLength;
     }

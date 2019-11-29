@@ -11,16 +11,14 @@ export default class NumberField<T = string | number> extends Field<string | num
     public maxValue?: number;
 
     constructor(values) {
-        const { name, minValue, maxValue } = values;
+        const { name, minValue, maxValue, ...rest } = values;
 
-        delete values.minValue;
-        delete values.maxValue;
         if (minValue !== undefined && typeof minValue !== 'number')
             throw new Error(`Field ${name}: "minValue" should be a number, received: ${minValue}`);
         if (maxValue !== undefined && typeof maxValue !== 'number')
             throw new Error(`Field ${name}: "maxValue" should be a number, received: ${maxValue}`);
 
-        super(values);
+        super({ name, ...rest });
 
         this.minValue = minValue;
         this.maxValue = maxValue;

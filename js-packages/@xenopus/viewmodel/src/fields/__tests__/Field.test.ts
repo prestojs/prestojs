@@ -39,7 +39,7 @@ test('Field options validation', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         () => new Field({ name: 'phoneNumber', label: 'phone number', snake: 'oil' })
-    ).toThrowError('Field phoneNumber: received unknown option snake');
+    ).toThrowError('Field phoneNumber: received unknown option(s): snake');
 
     new Field({
         name: 'a',
