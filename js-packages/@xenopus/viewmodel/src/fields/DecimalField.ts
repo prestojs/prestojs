@@ -10,8 +10,28 @@ import NumberField from './NumberField';
  * See also: FloatField
  */
 export default class DecimalField extends NumberField<string> {
+    public decimalPlaces?: number;
+
+    constructor(values) {
+        const { name, decimalPlaces } = values;
+
+        delete values.decimalPlaces;
+        if (decimalPlaces !== undefined && typeof decimalPlaces !== 'number')
+            throw new Error(
+                `Field ${name}: "decimalPlaces" should be a number, received: ${decimalPlaces}`
+            );
+        if (decimalPlaces <= 0)
+            throw new Error(
+                `Field ${name}: "decimalPlaces" should be a positive number, received: ${decimalPlaces}`
+            );
+
+        super(values);
+
+        this.decimalPlaces = decimalPlaces;
+    }
+
     parse(value: any): string | null {
-        if (value === '' || value == null) {
+        if (value === '') {
             // treat empty string as null
             return null;
         }

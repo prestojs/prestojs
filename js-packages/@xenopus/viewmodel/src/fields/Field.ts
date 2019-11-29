@@ -59,6 +59,39 @@ export default class Field<T> {
             readOnly = false,
             writeOnly = false,
         } = values;
+
+        if (!name) throw new Error('Field "name" is required'); // without a name we cant really tell what it is..
+        if (!label) throw new Error(`Field ${name}: "label" is required`);
+        if (required !== undefined && typeof required !== 'boolean')
+            throw new Error(`Field ${name}: "required" should be a boolean, received: ${required}`);
+        if (choices !== undefined && !(choices instanceof Map))
+            throw new Error(`Field ${name}: "choices" should be a Map, received: ${choices}`);
+        if (readOnly !== undefined && typeof readOnly !== 'boolean')
+            throw new Error(`Field ${name}: "readOnly" should be a boolean, received: ${readOnly}`);
+        if (writeOnly !== undefined && typeof writeOnly !== 'boolean')
+            throw new Error(
+                `Field ${name}: "writeOnly" should be a boolean, received: ${writeOnly}`
+            );
+
+        // disallow any option other than those included in the list
+        // eslint-disable-next-line
+        Object.keys(values).every(
+            k =>
+                [
+                    'required',
+                    'name',
+                    'label',
+                    'helpText',
+                    'defaultValue',
+                    'choices',
+                    'readOnly',
+                    'writeOnly',
+                ].includes(k) ||
+                (() => {
+                    throw new Error(`Field ${name}: received unknown option ${k}`);
+                })()
+        );
+
         this.required = required;
         this.name = name;
         this.label = label;
