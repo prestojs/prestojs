@@ -194,7 +194,10 @@ module.exports = ({
 
     const isDev = environment != 'production';
     const FRONTEND_DIR = './';
-    const NODE_MODULES_PATHS = [path.resolve('../../node_modules')];
+    const NODE_MODULES_PATHS = [
+        path.resolve('../../node_modules'),
+        path.resolve('../node_modules'),
+    ];
 
     const OUTPUT_DIR_BASE = path.join(FRONTEND_DIR) + '/';
     const OUTPUT_DIR_RELATIVE = isDev ? 'dev/' : 'dist/';
