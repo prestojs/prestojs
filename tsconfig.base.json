@@ -10,12 +10,11 @@
     "baseUrl": ".",
     "paths": {
       "@xenopus/viewmodel": ["./js-packages/@xenopus/viewmodel/src/"],
-      "@xenopus/viewmodel/*": ["./js-packages/@xenopus/viewmodel/src/*"],
-      "@xenopus/codegen/*": ["./js-packages/@xenopus/codegen/src/*"],
+      "@xenopus/codegen": ["./js-packages/@xenopus/codegen/src/"],
       "@xenopus/ui": ["./js-packages/@xenopus/ui/src/"],
-      "@xenopus/ui/*": ["./js-packages/@xenopus/ui/src/*"],
-      "@xenopus/ui-antd/*": ["./js-packages/@xenopus/ui-antd/src/*"],
-      "@xenopus/final-form/*": ["./js-packages/@xenopus/final-form/src/*"]
+      "@xenopus/ui-antd": ["./js-packages/@xenopus/ui-antd/src/"],
+      "@xenopus/final-form": ["./js-packages/@xenopus/final-form/src/"],
+      "@xenopus/routing": ["./js-packages/@xenopus/routing/src/"]
     }
   },
   "references": [
