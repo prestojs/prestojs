@@ -1,7 +1,7 @@
 import React from 'react';
 
 // TODO: Based on final-form currently without much thought
-interface InputProps<FieldValue, T extends HTMLElement> {
+export interface InputProps<FieldValue, T extends HTMLElement> {
     name: string;
     onBlur: (event?: React.FocusEvent<T>) => void;
     onChange: (event: React.ChangeEvent<T> | any) => void;

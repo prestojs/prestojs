@@ -13,11 +13,11 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
-    "@xenopus/viewmodel": "^0.0.1",
-    "@xenopus/ui": "^0.0.1"
+    "@xenopus/ui": "^0.0.1",
+    "@xenopus/viewmodel": "^0.0.1"
   },
   "dependencies": {
-    "antd": "^3.25.1",
+    "antd": "4.0.0-alpha.9",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
