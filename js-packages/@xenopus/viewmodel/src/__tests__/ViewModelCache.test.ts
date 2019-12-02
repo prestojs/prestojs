@@ -71,6 +71,85 @@ test('should cache records with compound keys', () => {
     expect(Test1.cache.get({ id2: 4, id1: 4 }, ['id1', 'id2', 'name'])).toBe(record4);
 });
 
+test('should validate pk(s)', () => {
+    class Test1 extends ViewModel {
+        static fields = {
+            id: F('id'),
+        };
+    }
+    const record1 = new Test1({ id: 5 });
+
+    Test1.cache.add(record1);
+    expect(() => Test1.cache.get({}, ['id'])).toThrow(
+        "Test1 has a single primary key named 'id' but an object was provided. This should be a number or string."
+    );
+
+    class Test2 extends ViewModel {
+        static pkFieldName = ['id1', 'id2'];
+        static fields = {
+            id1: F('id1'),
+            id2: F('id2'),
+            name: F('name'),
+        };
+    }
+
+    const record2 = new Test2({ id1: 5, id2: 6, name: 'one' });
+    Test2.cache.add(record2);
+    expect(() => Test2.cache.get(1, ['name'])).toThrowError(
+        'Test2 has a compound key of id1, id2. You must provide an object mapping these fields to their values.'
+    );
+    expect(() => Test2.cache.get({ id1: null }, ['name'])).toThrowError(
+        'Test2 has a compound key of id1, id2. Missing value(s) for field(s) id1, id2'
+    );
+});
+
+test('should always use primary key in cache regardless of whether specified', () => {
+    class Test1 extends ViewModel {
+        static pkFieldName = ['id1', 'id2'];
+        static fields = {
+            id1: F('id1'),
+            id2: F('id2'),
+            name: F('name'),
+        };
+    }
+
+    class Test2 extends ViewModel {
+        static fields = {
+            id: F('id'),
+            name: F('name'),
+        };
+    }
+
+    const record1 = new Test1({ id1: 5, id2: 6, name: 'one' });
+
+    Test1.cache.add(record1);
+
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['id1', 'id2', 'name'])).toBe(record1);
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['id2', 'name'])).toBe(record1);
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['id1', 'name'])).toBe(record1);
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['name'])).toBe(record1);
+
+    const record2 = new Test1({ id2: 6, id1: 5, name: 'two' });
+    Test1.cache.add(record2);
+
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['id1', 'id2', 'name'])).toBe(record2);
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['id2', 'name'])).toBe(record2);
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['id1', 'name'])).toBe(record2);
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['name'])).toBe(record2);
+
+    const record3 = new Test2({ id: 1, name: 'one' });
+    Test2.cache.add(record3);
+
+    expect(Test2.cache.get(1, ['id', 'name'])).toBe(record3);
+    expect(Test2.cache.get(1, ['name'])).toBe(record3);
+
+    const record4 = new Test2({ id: 1, name: 'two' });
+    Test2.cache.add(record4);
+
+    expect(Test2.cache.get(1, ['id', 'name'])).toBe(record4);
+    expect(Test2.cache.get(1, ['name'])).toBe(record4);
+});
+
 test('should support custom cache', () => {
     class MyInvalidCache {}
     expect(() => {
@@ -84,7 +163,7 @@ test('should support custom cache', () => {
 
     class MyCache<T extends ViewModel> extends ViewModelCache<T> {}
     class Test1 extends ViewModel {
-        static cache = new MyCache<Test1>();
+        static cache = new MyCache<Test1>(Test1);
     }
 
     expect(Test1.cache).toBeInstanceOf(MyCache);
@@ -428,6 +507,26 @@ test('should support listening to multiple pks, batch notifications', () => {
 
     const cb1 = jest.fn();
     Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
+    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
+    Test1.cache.addList([record1, record2, record3]);
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
+});
+
+test('should support listening to multiple pks without specifying primary keys in field names', () => {
+    class Test1 extends ViewModel {
+        static fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+
+    const cb1 = jest.fn();
+    Test1.cache.addListenerList([2, 3, 4], ['firstName', 'email'], cb1);
     const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
     const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
     const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });

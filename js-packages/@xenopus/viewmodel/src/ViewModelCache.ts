@@ -1,4 +1,5 @@
 import ViewModel, { PrimaryKey } from './ViewModel';
+import { Class } from './util';
 
 /**
  * Points to a record that is cached already. The purpose of this is to have a single object
@@ -81,22 +82,29 @@ const CACHE_KEY_FIELD_SEPARATOR = '⁞';
  * 4) Otherwise we return null
  **/
 class RecordCache<T extends ViewModel> {
+    viewModel: Class<T>;
+    pkFieldNames: string[];
     cache: Map<FieldNameCacheKey, T | RecordPointer<T>>;
     cacheListeners: Map<FieldNameCacheKey, ChangeListener<T>[]>;
     latestRecords: { [fieldsKey: string]: number };
     counter = 0;
 
-    constructor() {
+    constructor(viewModel: Class<T>) {
         this.cache = new Map();
         this.cacheListeners = new Map();
         this.latestRecords = {};
+        this.viewModel = viewModel;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        this.pkFieldNames = viewModel.pkFieldNames;
     }
 
     /**
      * Return the key to use into `cache` for the specified field names
      */
     private getCacheKey(fieldNames: string[]): string {
-        const f = [...fieldNames];
+        // primary key field names are implicit; never include them in the key itself
+        const f = fieldNames.filter(name => !this.pkFieldNames.includes(name));
         f.sort();
         return f.join(CACHE_KEY_FIELD_SEPARATOR);
     }
@@ -355,8 +363,10 @@ class RecordCache<T extends ViewModel> {
  */
 export default class ViewModelCache<T extends ViewModel> {
     cache: Map<PrimaryKeyCacheKey, RecordCache<T>>;
+    viewModel: Class<T>;
 
-    constructor() {
+    constructor(viewModel: Class<T>) {
+        this.viewModel = viewModel;
         this.cache = new Map();
     }
 
@@ -388,7 +398,7 @@ export default class ViewModelCache<T extends ViewModel> {
         const pkKey = this.getPkCacheKey(record._pk);
         let recordCache = this.cache.get(pkKey);
         if (!recordCache) {
-            recordCache = new RecordCache();
+            recordCache = new RecordCache(this.viewModel);
             this.cache.set(pkKey, recordCache);
         }
         recordCache.add(record);
@@ -428,6 +438,35 @@ export default class ViewModelCache<T extends ViewModel> {
      * @returns The cached record or null if none found
      */
     get(pk: PrimaryKey, fieldNames: string[]): T | null {
+        if (!pk) {
+            throw new Error('Primary key must be provided');
+        }
+        // When using Class<T> doesn't actually know about all static properties
+        //  ¯\_(ツ)_/¯
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        const { pkFieldName } = this.viewModel;
+        const isCompound = Array.isArray(pkFieldName);
+        if (isCompound && typeof pk !== 'object') {
+            throw new Error(
+                `${this.viewModel} has a compound key of ${pkFieldName.join(
+                    ', '
+                )}. You must provide an object mapping these fields to their values.`
+            );
+        } else if (isCompound) {
+            const missingValues = pkFieldName.filter(name => pk[name] == null);
+            if (missingValues.length > 0) {
+                throw new Error(
+                    `${this.viewModel} has a compound key of ${pkFieldName.join(
+                        ', '
+                    )}. Missing value(s) for field(s) ${missingValues.join(', ')}`
+                );
+            }
+        } else if (!isCompound && typeof pk === 'object') {
+            throw new Error(
+                `${this.viewModel} has a single primary key named '${pkFieldName}' but an object was provided. This should be a number or string.`
+            );
+        }
         const pkKey = this.getPkCacheKey(pk);
         const recordCache = this.cache.get(pkKey);
         if (!recordCache) {
@@ -502,7 +541,7 @@ export default class ViewModelCache<T extends ViewModel> {
         const pkKey = this.getPkCacheKey(pkOrPks);
         let recordCache = this.cache.get(pkKey);
         if (!recordCache) {
-            recordCache = new RecordCache();
+            recordCache = new RecordCache(this.viewModel);
             this.cache.set(pkKey, recordCache);
         }
         return recordCache.addListener(fieldNames, (listener as unknown) as ChangeListener<T>);
