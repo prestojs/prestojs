@@ -32,6 +32,45 @@ test('should cache records', () => {
     expect(Test2.cache.get(5, ['id'])).toBe(null);
 });
 
+test('should cache records with compound keys', () => {
+    class Test1 extends ViewModel {
+        static pkFieldName = ['id1', 'id2'];
+        static fields = {
+            id1: F('id1'),
+            id2: F('id2'),
+            name: F('name'),
+        };
+    }
+
+    const record1 = new Test1({ id1: 5, id2: 6, name: 'one' });
+
+    Test1.cache.add(record1);
+
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['id1', 'id2', 'name'])).toBe(record1);
+    // Order of keys shouldn't matter
+    expect(Test1.cache.get({ id2: 6, id1: 5 }, ['id1', 'id2', 'name'])).toBe(record1);
+
+    // Adding with keys in different order sholdn't matter
+    const record2 = new Test1({ id2: 6, id1: 5, name: 'two' });
+    Test1.cache.add(record2);
+    expect(Test1.cache.get({ id1: 5, id2: 6 }, ['id1', 'id2', 'name'])).toBe(record2);
+    expect(Test1.cache.get({ id2: 6, id1: 5 }, ['id1', 'id2', 'name'])).toBe(record2);
+
+    const record3 = new Test1({ id1: 4, id2: 4, name: 'one' });
+
+    Test1.cache.add(record3);
+
+    expect(Test1.cache.get({ id1: 4, id2: 4 }, ['id1', 'id2', 'name'])).toBe(record3);
+    // Order of keys shouldn't matter
+    expect(Test1.cache.get({ id2: 4, id1: 4 }, ['id1', 'id2', 'name'])).toBe(record3);
+
+    // Adding with keys in different order shouldn't matter
+    const record4 = new Test1({ id2: 4, id1: 4, name: 'two' });
+    Test1.cache.add(record4);
+    expect(Test1.cache.get({ id1: 4, id2: 4 }, ['id1', 'id2', 'name'])).toBe(record4);
+    expect(Test1.cache.get({ id2: 4, id1: 4 }, ['id1', 'id2', 'name'])).toBe(record4);
+});
+
 test('should support custom cache', () => {
     class MyInvalidCache {}
     expect(() => {

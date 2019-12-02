@@ -58,7 +58,7 @@ test('ViewModel._pk should return primary key', () => {
     }
 
     const record2 = new B({ id1: 1, id2: 2 });
-    expect(record2._pk).toEqual([1, 2]);
+    expect(record2._pk).toEqual({ id1: 1, id2: 2 });
 });
 
 test('_assigned fields should be based on passed data', () => {

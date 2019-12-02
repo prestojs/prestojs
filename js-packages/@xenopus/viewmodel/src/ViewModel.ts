@@ -4,8 +4,9 @@ import ViewModelCache from './ViewModelCache';
 
 type FieldsMapping = { [key: string]: Field<any> };
 
-export type PrimaryKey = string | number;
-export type CompoundPrimaryKey = PrimaryKey[];
+export type SinglePrimaryKey = string | number;
+export type CompoundPrimaryKey = { [fieldName: string]: SinglePrimaryKey };
+export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
 
 /**
  * Base ViewModel class for any model in the system. This should be extended and have relevant fields and meta data
@@ -70,7 +71,7 @@ export default class ViewModel {
     /**
      * Shortcut to get the primary key for this record
      */
-    public get _pk(): PrimaryKey | CompoundPrimaryKey {
+    public get _pk(): PrimaryKey {
         const { name, fields, pkFieldName } = this._model;
         if (Array.isArray(pkFieldName)) {
             const missingFields = pkFieldName.filter(fieldName => !fields[fieldName]);
@@ -84,7 +85,10 @@ export default class ViewModel {
                     )}' does not exist in ${name}.fields. Either add the missing ${fieldDesc} or update 'pkFieldName' to reflect the actual primary key field.`
                 );
             }
-            return pkFieldName.map(fieldName => this[fieldName]);
+            return pkFieldName.reduce((acc, fieldName) => {
+                acc[fieldName] = this[fieldName];
+                return acc;
+            }, {});
         }
         if (!fields[pkFieldName]) {
             throw new Error(

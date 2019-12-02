@@ -1,4 +1,4 @@
-import ViewModel, { PrimaryKey, CompoundPrimaryKey } from './ViewModel';
+import ViewModel, { PrimaryKey } from './ViewModel';
 
 /**
  * Points to a record that is cached already. The purpose of this is to have a single object
@@ -25,17 +25,28 @@ function isSubset(a: string[], b: string[]): boolean {
 }
 
 /**
- * Sorts the pairs returns from RecordCache.lastRecord in order of highest count
+ * Builds a comparator for sorting entries from an object as returned by Object.entries based on either
+ * key (index == 0) or value (index == 1)
  */
-function sortPairsOnCounter(a: [string, number], b: [string, number]): number {
-    if (a[1] < b[1]) {
-        return 1;
-    }
-    if (a[1] > b[1]) {
-        return -1;
-    }
-    return 0;
+function makeEntryComparator(index): (a: [string, number], b: [string, number]) => number {
+    const altIndex = index === 0 ? 1 : 0;
+    return (a: [string, number], b: [string, number]): number => {
+        if (a[index] === b[index]) {
+            // Safe to do this as we are comparing entries can't have two where key and value are the same
+            return a[altIndex] < b[altIndex] ? 1 : -1;
+        }
+        if (a[index] < b[index]) {
+            return 1;
+        }
+        if (a[index] > b[index]) {
+            return -1;
+        }
+        return 0;
+    };
 }
+
+const compareEntriesOnValue = makeEntryComparator(1);
+const compareEntriesOnKey = makeEntryComparator(0);
 
 type ChangeListener<T> = (previous?: T, next?: T) => void;
 type MultiChangeListener<T> = (previous?: (T | null)[], next?: (T | null)[]) => void;
@@ -183,7 +194,7 @@ class RecordCache<T extends ViewModel> {
             // No cache entries exist but there may be cached records that
             // are a superset of the fields requested. Check for this now.
             const pairs = Object.entries(this.latestRecords);
-            pairs.sort(sortPairsOnCounter);
+            pairs.sort(compareEntriesOnValue);
             for (const [key] of pairs) {
                 let record = this.cache.get(key);
                 if (!record) {
@@ -352,9 +363,11 @@ export default class ViewModelCache<T extends ViewModel> {
     /**
      * Get the cache key to use into for the primary key. Handles compound keys.
      */
-    private getPkCacheKey(pk: PrimaryKey | CompoundPrimaryKey): string | number {
-        if (Array.isArray(pk)) {
-            return pk.join(CACHE_KEY_FIELD_SEPARATOR);
+    private getPkCacheKey(pk: PrimaryKey): string | number {
+        if (typeof pk === 'object') {
+            const entries = Object.entries(pk);
+            entries.sort(compareEntriesOnKey);
+            return entries.reduce((acc, pair) => (acc += pair.join(CACHE_KEY_FIELD_SEPARATOR)), '');
         }
         return pk;
     }
@@ -414,7 +427,7 @@ export default class ViewModelCache<T extends ViewModel> {
      *
      * @returns The cached record or null if none found
      */
-    get(pk: PrimaryKey | CompoundPrimaryKey, fieldNames: string[]): T | null {
+    get(pk: PrimaryKey, fieldNames: string[]): T | null {
         const pkKey = this.getPkCacheKey(pk);
         const recordCache = this.cache.get(pkKey);
         if (!recordCache) {
@@ -434,7 +447,7 @@ export default class ViewModelCache<T extends ViewModel> {
      * @returns an array of the cached records. Any records not found will be in
      * the array as a null value
      */
-    getList(pks: (PrimaryKey | CompoundPrimaryKey)[], fieldNames: string[]): (T | null)[] {
+    getList(pks: PrimaryKey[], fieldNames: string[]): (T | null)[] {
         const records: (T | null)[] = [];
         for (const pk of pks) {
             records.push(this.get(pk, fieldNames));
@@ -453,7 +466,7 @@ export default class ViewModelCache<T extends ViewModel> {
      *
      * @returns true if anything was removed, false otherwise
      */
-    delete(pk: PrimaryKey | CompoundPrimaryKey, fieldNames?: string[]): boolean {
+    delete(pk: PrimaryKey, fieldNames?: string[]): boolean {
         const pkKey = this.getPkCacheKey(pk);
         const recordCache = this.cache.get(pkKey);
         if (!recordCache) {
@@ -463,24 +476,36 @@ export default class ViewModelCache<T extends ViewModel> {
     }
 
     /**
-     * Add a listener for any changes, additions or deletions for the record identified by
-     * `pk` for the field names `fieldNames`
-     * @param pk Primary key that identifies the record to listen to changes/additions/deletions to
+     * Add a listener for any changes, additions or deletions for the record(s) identified by
+     * `pkOrPks` for the field names `fieldNames`
+     * @param pkOrPks Primary key or array of multiple primary keys that identifies the record(s)
+     * to listen to changes/additions/deletions to
      * @param fieldNames Field names to listen to changes/additions/deletions to
      * @param listener Function to call with any changes
      */
     addListener(
-        pk: PrimaryKey | CompoundPrimaryKey,
+        pkOrPks: PrimaryKey | PrimaryKey[],
         fieldNames: string[],
-        listener: ChangeListener<T>
+        listener: MultiChangeListener<T> | ChangeListener<T>
     ): ChangeListenerUnsubscribe {
-        const pkKey = this.getPkCacheKey(pk);
+        if (Array.isArray(pkOrPks)) {
+            return this.addListenerList(
+                pkOrPks,
+                fieldNames,
+                // TODO: I couldn't work out how to type this otherwise. I tried
+                // function overload but doesn't seem to be possible to narrow
+                // to type of the function to differentiate between ChangeListener
+                // and MultiChangeListener
+                (listener as unknown) as MultiChangeListener<T>
+            );
+        }
+        const pkKey = this.getPkCacheKey(pkOrPks);
         let recordCache = this.cache.get(pkKey);
         if (!recordCache) {
             recordCache = new RecordCache();
             this.cache.set(pkKey, recordCache);
         }
-        return recordCache.addListener(fieldNames, listener);
+        return recordCache.addListener(fieldNames, (listener as unknown) as ChangeListener<T>);
     }
 
     // TODO: This could probably be part of the above interface; if `pk` is an array
@@ -488,7 +513,7 @@ export default class ViewModelCache<T extends ViewModel> {
     // this to an object. Once that is done we can differentiate between a compound key
     // and an array of pks.
     addListenerList(
-        pks: (PrimaryKey | CompoundPrimaryKey)[],
+        pks: PrimaryKey[],
         fieldNames: string[],
         listener: MultiChangeListener<T>
     ): ChangeListenerUnsubscribe {
