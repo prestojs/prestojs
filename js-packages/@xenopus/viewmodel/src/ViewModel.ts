@@ -8,6 +8,22 @@ export type SinglePrimaryKey = string | number;
 export type CompoundPrimaryKey = { [fieldName: string]: SinglePrimaryKey };
 export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+function verifyMinified(): void {}
+
+// Check inspired by immer
+const isDev = (): boolean =>
+    typeof process !== 'undefined'
+        ? process.env.NODE_ENV !== 'production'
+        : verifyMinified.name === 'verifyMinified';
+
+function freezeObject(obj: {}): {} {
+    if (isDev()) {
+        return Object.freeze(obj);
+    }
+    return obj;
+}
+
 /**
  * Base ViewModel class for any model in the system. This should be extended and have relevant fields and meta data
  * set on it:
@@ -162,7 +178,7 @@ export default class ViewModel {
             }
         }
 
-        this._data = Object.freeze(assignedData);
+        this._data = freezeObject(assignedData);
         this._assignedFields = assignedFields;
         this._assignedFields.sort();
 
@@ -170,7 +186,7 @@ export default class ViewModel {
             const definition: { set(value: any): any; get: () => any } = {
                 set(value): void {
                     const msg = `${fieldName} is read only`;
-                    if (process.env.NODE_ENV === 'development') {
+                    if (isDev()) {
                         throw new Error(msg);
                     } else {
                         console.warn(msg);
@@ -185,7 +201,7 @@ export default class ViewModel {
                     const msg = `${fieldName} accessed but not fetched. Available fields are: ${this._assignedFields.join(
                         ', '
                     )}`;
-                    if (process.env.NODE_ENV === 'development') {
+                    if (isDev()) {
                         throw new Error(msg);
                     } else {
                         console.warn(msg);
