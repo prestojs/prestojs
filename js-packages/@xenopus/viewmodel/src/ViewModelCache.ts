@@ -25,17 +25,28 @@ function isSubset(a: string[], b: string[]): boolean {
 }
 
 /**
- * Sorts the pairs returns from RecordCache.lastRecord in order of highest count
+ * Builds a comparator for sorting entries from an object as returned by Object.entries based on either
+ * key (index == 0) or value (index == 1)
  */
-function sortEntriesOnValue(a: [string, number], b: [string, number]): number {
-    if (a[1] < b[1]) {
-        return 1;
-    }
-    if (a[1] > b[1]) {
-        return -1;
-    }
-    return 0;
+function makeEntryComparator(index): (a: [string, number], b: [string, number]) => number {
+    const altIndex = index === 0 ? 1 : 0;
+    return (a: [string, number], b: [string, number]): number => {
+        if (a[index] === b[index]) {
+            // Safe to do this as we are comparing entries can't have two where key and value are the same
+            return a[altIndex] < b[altIndex] ? 1 : -1;
+        }
+        if (a[index] < b[index]) {
+            return 1;
+        }
+        if (a[index] > b[index]) {
+            return -1;
+        }
+        return 0;
+    };
 }
+
+const compareEntriesOnValue = makeEntryComparator(1);
+const compareEntriesOnKey = makeEntryComparator(0);
 
 type ChangeListener<T> = (previous?: T, next?: T) => void;
 type MultiChangeListener<T> = (previous?: (T | null)[], next?: (T | null)[]) => void;
@@ -183,7 +194,7 @@ class RecordCache<T extends ViewModel> {
             // No cache entries exist but there may be cached records that
             // are a superset of the fields requested. Check for this now.
             const pairs = Object.entries(this.latestRecords);
-            pairs.sort(sortEntriesOnValue);
+            pairs.sort(compareEntriesOnValue);
             for (const [key] of pairs) {
                 let record = this.cache.get(key);
                 if (!record) {
@@ -355,7 +366,7 @@ export default class ViewModelCache<T extends ViewModel> {
     private getPkCacheKey(pk: PrimaryKey): string | number {
         if (typeof pk === 'object') {
             const entries = Object.entries(pk);
-            entries.sort(sortEntriesOnValue);
+            entries.sort(compareEntriesOnKey);
             return entries.reduce((acc, pair) => (acc += pair.join(CACHE_KEY_FIELD_SEPARATOR)), '');
         }
         return pk;
