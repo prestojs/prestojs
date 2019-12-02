@@ -18,13 +18,13 @@ interface Boundary<T> extends Props<T> {
 export default class RangeField<T> extends Field<T> {
     public lowerBound: T | null | undefined;
     public upperBound: T | null | undefined;
-    public seperator: string;
+    public separator: string;
 
     constructor(values: Boundary<T>) {
         super(values);
-        const { lowerBound, upperBound, separator } = values;
+        const { lowerBound, upperBound, separator = '~' } = values;
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
-        this.seperator = separator || '~';
+        this.separator = separator;
     }
 }

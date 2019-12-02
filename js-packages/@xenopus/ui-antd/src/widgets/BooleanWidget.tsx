@@ -5,9 +5,14 @@ import React from 'react';
 /**
  * See [Checkbox](https://next.ant.design/components/checkbox/) for props available
  */
-export default function BooleanWidget({
-    input,
-}: WidgetProps<boolean, HTMLElement>): React.ReactElement {
-    const { value, ...rest } = input;
-    return <Checkbox checked={!!value} {...rest} />;
-}
+const BooleanWidget = React.forwardRef(
+    (
+        { input, ...rest }: WidgetProps<boolean, HTMLInputElement>,
+        ref: React.RefObject<Checkbox>
+    ): React.ReactElement => {
+        const { value, ...restInput } = input;
+        return <Checkbox ref={ref} checked={!!value} {...restInput} {...rest} />;
+    }
+);
+
+export default BooleanWidget;

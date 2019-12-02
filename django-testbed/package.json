@@ -42,6 +42,8 @@
     "babel-plugin-transform-react-remove-prop-types": "^0.4.19",
     "case-sensitive-paths-webpack-plugin": "^2.1.2",
     "css-loader": "^1.0.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
     "eslint": "^5.7.0",
     "eslint-loader": "^2.1.1",
     "eslint-plugin-flowtype": "^3.0.0",
@@ -69,7 +71,8 @@
   "dependencies": {
     "@alliance-software/webpack-dev-utils": "^0.4.0",
     "@xenopus/viewmodel": "*",
-    "antd": "4.0.0-alpha.9",
+    "@ant-design/icons": "^4.0.0-alpha.11",
+    "antd": "4.0.0-alpha.14",
     "classnames": "^2.2.6",
     "core-js": "^3.2.1",
     "file-loader": "^3.0.1",

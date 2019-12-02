@@ -64,8 +64,8 @@ export default class Field<T> {
         if (!label) throw new Error(`Field ${name}: "label" is required`);
         if (required !== undefined && typeof required !== 'boolean')
             throw new Error(`Field ${name}: "required" should be a boolean, received: ${required}`);
-        if (choices !== undefined && !(choices instanceof Map))
-            throw new Error(`Field ${name}: "choices" should be a Map, received: ${choices}`);
+        if (choices !== undefined && !(Symbol.iterator in Object(choices)))
+            throw new Error(`Field ${name}: "choices" should be Iterable, received: ${choices}`);
         if (readOnly !== undefined && typeof readOnly !== 'boolean')
             throw new Error(`Field ${name}: "readOnly" should be a boolean, received: ${readOnly}`);
         if (writeOnly !== undefined && typeof writeOnly !== 'boolean')
@@ -98,7 +98,9 @@ export default class Field<T> {
         this.label = label;
         this.helpText = helpText;
         this._defaultValue = defaultValue;
-        this.choices = choices;
+        if (choices) {
+            this.choices = !(choices instanceof Map) ? new Map(choices) : choices;
+        }
         this.readOnly = readOnly;
         this.writeOnly = writeOnly;
     }

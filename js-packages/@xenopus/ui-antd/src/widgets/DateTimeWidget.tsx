@@ -1,13 +1,19 @@
 import React from 'react';
+import { WidgetProps } from '@xenopus/ui';
 import { DatePicker } from 'antd';
-import { DatePickerWidgetProps } from './DateWidget';
+import { DatePickerProps } from 'antd/lib/date-picker/interface';
 
 /**
  * See [DatePicker](https://next.ant.design/components/date-picker/) for props available
  */
-export default function DateTimeWidget({
-    input,
-}: DatePickerWidgetProps<Date, HTMLElement>): React.ReactElement {
-    const { format = 'MMMM Do YYYY, h:mm a', ...rest } = input;
-    return <DatePicker showTime format={format} {...rest} />;
-}
+const DateTimeWidget = React.forwardRef(
+    (
+        { input, ...rest }: WidgetProps<Date, HTMLInputElement> & { input: DatePickerProps },
+        ref: React.RefObject<React.ClassicComponent<DatePickerProps, any>>
+    ): React.ReactElement => {
+        const { format = 'MMMM Do YYYY, h:mm a', ...restInput } = input;
+        return <DatePicker ref={ref} showTime format={format} {...restInput} {...rest} />;
+    }
+);
+
+export default DateTimeWidget;

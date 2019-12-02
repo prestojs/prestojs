@@ -1,31 +1,41 @@
 import { RangedWidgetProps } from '@xenopus/ui';
 import { DatePicker } from 'antd';
 import React from 'react';
-import { DatePickerWidgetInputType } from './DateWidget';
-
-export interface RangedDatePickerWidgetProps<FieldValue, T extends HTMLElement>
-    extends Omit<RangedWidgetProps<FieldValue, T>, 'lowerInput' | 'upperInput'> {
-    lowerInput: DatePickerWidgetInputType;
-    upperInput: DatePickerWidgetInputType;
-    separator: string;
-}
+import { DatePickerProps } from 'antd/lib/date-picker/interface';
+import RangeWidget from './RangeWidget';
 
 /**
  * See [DatePicker](https://next.ant.design/components/date-picker/) for props available
  *
- * format of this widget will be decided by lowerInput.
+ * As with all range widgets, ref should be shaped as { lowerRef: Ref(), upperRef: Ref() }
  */
-export default function DateRangeWidget({
-    lowerInput,
-    upperInput,
-    separator,
-}: RangedDatePickerWidgetProps<Date, HTMLElement>): React.ReactElement {
-    const { format = 'MMMM Do YYYY', ...restLower } = lowerInput;
-    return (
-        <>
-            <DatePicker format={format} {...restLower} />
-            {{ separator }}
-            <DatePicker {...upperInput} />
-        </>
-    );
-}
+const DateRangeWidget = React.forwardRef(
+    (
+        {
+            lowerInput,
+            upperInput,
+            separator,
+            ...rest
+        }: RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>,
+        ref: React.RefObject<DatePickerProps>
+    ): React.ReactElement => {
+        const { format: formatLower = 'MMMM Do YYYY', ...restLower } = lowerInput;
+        const { format: formatUpper = 'MMMM Do YYYY', ...restUpper } = upperInput;
+
+        const lower = { ...{ format: formatLower, ...restLower } };
+        const upper = { ...{ format: formatUpper, ...restUpper } };
+
+        return (
+            <RangeWidget
+                ref={ref}
+                lowerInput={lower}
+                upperInput={upper}
+                separator={separator}
+                inputWidget={DatePicker}
+                {...rest}
+            />
+        );
+    }
+);
+
+export default DateRangeWidget;

@@ -63,9 +63,9 @@ const mapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([
     [CharField, CharWidget],
     [CurrencyField, CurrencyWidget],
     [DateField, DateWidget],
-    [DateRangeField, DateRangeWidget],
+    [DateRangeField, DateRangeWidget], // 1
     [DateTimeField, DateTimeWidget],
-    [DateTimeRangeField, DateTimeRangeWidget],
+    [DateTimeRangeField, DateTimeRangeWidget], // 2
     [DecimalField, DecimalWidget],
     [DurationField, DurationWidget],
     [EmailField, EmailWidget],
@@ -96,11 +96,11 @@ export default function getWidgetForField<FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
 ): FieldWidget<FieldValue, T> | null {
     // Couldn't work out what to type this as so field.constructor was accepted
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    const widget: FieldWidget | null = field.choices
-        ? choicesMapping.get(field.constructor) || mapping.get(field.constructor)
-        : mapping.get(field.constructor);
+    const widget: FieldWidget<any, any> | null | undefined = field.choices
+        ? choicesMapping.get(field.constructor as Class<Field<any>>) ||
+          mapping.get(field.constructor as Class<Field<any>>)
+        : mapping.get(field.constructor as Class<Field<any>>);
+
     if (widget) {
         return widget;
     }

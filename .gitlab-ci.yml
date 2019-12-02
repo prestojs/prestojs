@@ -6,6 +6,7 @@
 # set your variables here
 variables:
   DJANGO_SETTINGS_MODULE: django_site.settings.ci
+  PYTHONIOENCODING: utf-8
 
 cache:
   key: global
@@ -15,7 +16,7 @@ cache:
 before_script:
   - time source gitlab-ci-init-python.inc
 
-image: alliance/python
+image: alliance/python:bionic
 
 stages:
   - install

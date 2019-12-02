@@ -5,8 +5,13 @@ import React from 'react';
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
  */
-export default function NumberWidget({
-    input,
-}: WidgetProps<number, HTMLElement>): React.ReactElement {
-    return <InputNumber {...input} />;
-}
+const NumberWidget = React.forwardRef(
+    (
+        { input, ...rest }: WidgetProps<number, HTMLInputElement>,
+        ref: React.RefObject<InputNumber>
+    ): React.ReactElement => {
+        return <InputNumber ref={ref} {...input} {...rest} />;
+    }
+);
+
+export default NumberWidget;

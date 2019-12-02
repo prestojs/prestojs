@@ -16,7 +16,6 @@
     "@xenopus/viewmodel": "^0.0.1"
   },
   "dependencies": {
-    "antd": "4.0.0-alpha.9",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
