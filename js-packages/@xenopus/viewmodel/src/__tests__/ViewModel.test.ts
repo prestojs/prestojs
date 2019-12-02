@@ -2,28 +2,38 @@ import ViewModel from '../ViewModel';
 import Field from '../fields/Field';
 
 test('ViewModel._model returns class', () => {
-    class A extends ViewModel {}
+    class A extends ViewModel {
+        static fields = {
+            id: new Field({ name: 'id', label: 'id' }),
+        };
+    }
 
-    const record1 = new A({});
+    const record1 = new A({ id: 1 });
     expect(record1._model).toEqual(A);
 
-    class B extends A {}
+    class B extends A {
+        static fields = {
+            id: new Field({ name: 'id', label: 'id' }),
+        };
+    }
 
-    const record2 = new B({});
+    const record2 = new B({ id: 2 });
     expect(record2._model).toEqual(B);
 });
 
 test('ViewModel._pk should validate primary key fields exist', () => {
+    // Passing data for fields that don't exist triggers a warning; suppress them for this test
+    const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
     class A extends ViewModel {}
 
-    const record1 = new A({});
+    const record1 = new A({ id: 1 });
     expect(() => record1._pk).toThrow(/A has 'pkFieldName' set to 'id' but/);
 
     class B extends ViewModel {
         static pkFieldName = ['id1', 'id2'];
     }
 
-    const record2 = new B({});
+    const record2 = new B({ id1: 1, id2: 2 });
     expect(() => record2._pk).toThrow(
         /B has 'pkFieldName' set to 'id1, id2' but the fields 'id1, id2'/
     );
@@ -35,8 +45,10 @@ test('ViewModel._pk should validate primary key fields exist', () => {
         };
     }
 
-    const record3 = new C({});
+    const record3 = new C({ id1: 1, id2: 2 });
     expect(() => record3._pk).toThrow(/C has 'pkFieldName' set to 'id1, id2' but the field 'id2'/);
+
+    mockWarn.mockRestore();
 });
 
 test('ViewModel._pk should return primary key', () => {
@@ -59,6 +71,42 @@ test('ViewModel._pk should return primary key', () => {
 
     const record2 = new B({ id1: 1, id2: 2 });
     expect(record2._pk).toEqual({ id1: 1, id2: 2 });
+});
+
+test('should validate primary key is provided', () => {
+    class A extends ViewModel {
+        static fields = {
+            id: new Field({ name: 'id', label: 'Id' }),
+        };
+    }
+
+    expect(() => new A({})).toThrowError("Missing value(s) for primary key(s) 'id'");
+    expect(() => new A({ id: null })).toThrowError(
+        "Primary key(s) 'id' was provided but was null or undefined"
+    );
+});
+
+test('should validate primary keys are provided', () => {
+    class A extends ViewModel {
+        static pkFieldName = ['id1', 'id2'];
+        static fields = {
+            id1: new Field({ name: 'id1', label: 'Id1' }),
+            id2: new Field({ name: 'id2', label: 'Id2' }),
+        };
+    }
+
+    expect(() => new A({})).toThrowError("Missing value(s) for primary key(s) 'id1', 'id2'");
+    expect(() => new A({ id1: 1 })).toThrowError("Missing value(s) for primary key(s) 'id2'");
+    expect(() => new A({ id2: 1 })).toThrowError("Missing value(s) for primary key(s) 'id1'");
+    expect(() => new A({ id1: null })).toThrowError(
+        "Primary key(s) 'id1' was provided but was null or undefined, Missing value(s) for primary key(s) 'id2'"
+    );
+    expect(() => new A({ id2: null })).toThrowError(
+        "Primary key(s) 'id2' was provided but was null or undefined, Missing value(s) for primary key(s) 'id1'"
+    );
+    expect(() => new A({ id1: null, id2: null })).toThrowError(
+        "Primary key(s) 'id1', 'id2' was provided but was null or undefined"
+    );
 });
 
 test('_assigned fields should be based on passed data', () => {
@@ -161,7 +209,6 @@ test('Should be able to compare if two records are equal', () => {
             new A({ id: 1, createdAt: new Date('2019-11-20 18:31') })
         )
     ).toBe(false);
-    expect(new A({}).isEqual(new A({}))).toBe(true);
 
     class B extends ViewModel {
         static fields = {
@@ -201,6 +248,14 @@ test('should clone a ViewModel record', () => {
     const cloneName = record1.clone(['id', 'name']);
     expect(cloneName._assignedFields).toEqual(['id', 'name']);
     expect(cloneName.toJS()).toEqual({
+        id: 1,
+        name: 'bob',
+    });
+
+    // Don't have to include primary key
+    const cloneNameNoExplicitId = record1.clone(['name']);
+    expect(cloneNameNoExplicitId._assignedFields).toEqual(['id', 'name']);
+    expect(cloneNameNoExplicitId.toJS()).toEqual({
         id: 1,
         name: 'bob',
     });

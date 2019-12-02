@@ -46,7 +46,7 @@ export default class ViewModel {
         // having to have the descendant create the cache
         let cache = this.__cache.get(this);
         if (!cache) {
-            cache = new ViewModelCache();
+            cache = new ViewModelCache(this);
             this.__cache.set(this, cache);
         }
         return cache;
@@ -57,6 +57,17 @@ export default class ViewModel {
             throw new Error(`cache class must extend ViewModelCache. See ${this.name}.cache`);
         }
         this.__cache.set(this, value);
+    }
+
+    /**
+     * Shortcut to get pkFieldName as an array always, even for non-compound keys
+     */
+    public static get pkFieldNames(): string[] {
+        const pkFieldNames = this.pkFieldName;
+        if (!Array.isArray(pkFieldNames)) {
+            return [pkFieldNames];
+        }
+        return pkFieldNames;
     }
 
     // TODO: What's a better way to type the actual fields? Can't use [fieldName: string]: Field<any> here because
@@ -117,6 +128,23 @@ export default class ViewModel {
     }
 
     constructor(data: {}) {
+        const pkFieldNames = this._model.pkFieldNames;
+        const missing = pkFieldNames.filter(name => !(name in data));
+        const empty = pkFieldNames.filter(name => name in data && data[name] == null);
+        const errors: string[] = [];
+        if (empty.length > 0) {
+            errors.push(
+                `Primary key(s) '${empty.join("', '")}' was provided but was null or undefined`
+            );
+        }
+        if (missing.length > 0) {
+            errors.push(`Missing value(s) for primary key(s) '${missing.join("', '")}'`);
+        }
+
+        if (errors.length) {
+            throw new Error(errors.join(', '));
+        }
+
         // TODO: Should partial fields be identified by absence of key?
         const assignedFields: string[] = [];
         const fields = this._model.fields;
@@ -137,6 +165,7 @@ export default class ViewModel {
                 );
             }
         }
+
         this._assignedFields = assignedFields;
         this._assignedFields.sort();
     }
@@ -216,6 +245,10 @@ export default class ViewModel {
             // TODO: Unclear to me if this needs to call a method on the Field on not. Revisit this.
             data[fieldName] = this[fieldName];
         }
+
+        // Always clone primary keys
+        const pkFieldNames = this._model.pkFieldNames;
+        pkFieldNames.forEach(name => (data[name] = this[name]));
 
         // I don't know how to type this, error is:
         // TS2322: Type 'ViewModel' is not assignable to type 'this'.
