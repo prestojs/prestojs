@@ -10,15 +10,24 @@ export interface InputProps<FieldValue, T extends HTMLElement> {
     value: FieldValue;
     checked?: boolean;
     multiple?: boolean;
+    choices?: Array<[FieldValue, string]>;
 }
 
 export interface WidgetProps<FieldValue, T extends HTMLElement> {
     input: InputProps<FieldValue, T>;
-    meta: {};
+    meta?: {};
+}
+
+export interface RangedWidgetProps<FieldValue, T extends HTMLElement> {
+    lowerInput: InputProps<FieldValue, T>;
+    upperInput: InputProps<FieldValue, T>;
+    separator: string;
+    meta?: {};
 }
 
 type FieldWidget<FieldValue, T extends HTMLElement> =
     | React.ComponentType<WidgetProps<FieldValue, T>>
+    | React.ComponentType<RangedWidgetProps<FieldValue, T>>
     | 'input'
     | 'select'
     | 'textarea';

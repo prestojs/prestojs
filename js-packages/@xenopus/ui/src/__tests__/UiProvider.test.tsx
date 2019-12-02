@@ -9,7 +9,7 @@ import UiProvider from '../UiProvider';
 function FieldWrapper({ field }): React.ReactElement {
     const { getWidgetForField } = useUi();
 
-    const Widget = getWidgetForField(field);
+    const Widget = getWidgetForField(field) as React.ComponentType<WidgetProps<any, any>>;
     const input = {
         name: field.name,
         value: 1,

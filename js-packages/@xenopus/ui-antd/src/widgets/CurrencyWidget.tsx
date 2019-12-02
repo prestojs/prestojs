@@ -1,15 +1,17 @@
-import { WidgetProps } from '@xenopus/ui/FieldWidget';
+import { WidgetProps } from '@xenopus/ui';
 import React from 'react';
-import DecimalWidget from './DecimalWidget';
+import { InputNumber } from 'antd';
 
 /**
- * See [Input](https://next.ant.design/components/input/) for props available
+ * See [InputNumber](https://ant.design/components/input-number/) for props available
  */
 // TODO - We might want to add currency type support to this field one day.
 // TODO - do we want to limit currency decimal points to 2? there ARE countries in the world where 2's not enough eg CLF...
 export default function CurrencyWidget({
     input,
-    meta,
 }: WidgetProps<string, HTMLElement>): React.ReactElement {
-    return <DecimalWidget {...{ input, meta }} />;
+    const { value, ...rest } = input;
+    const valueNum: number | null | undefined =
+        value === undefined || value === null ? value : Number(value);
+    return <InputNumber value={valueNum} {...rest} />;
 }

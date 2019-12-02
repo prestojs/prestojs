@@ -1,25 +1,31 @@
-import { InputProps } from '@xenopus/ui/FieldWidget';
+import { RangedWidgetProps } from '@xenopus/ui';
 import { DatePicker } from 'antd';
 import React from 'react';
+import { DatePickerWidgetInputType } from './DateWidget';
 
-// Omitting Onchange & Value: as of antd 4.0.9 alpha they're Moment type.
-type DateWidgetInputType = Omit<
-    Omit<Omit<Omit<InputProps<Date, HTMLElement>, 'onFocus'>, 'onBlur'>, 'onChange'>,
-    'value'
-> & {
-    onFocus: (event: React.FocusEvent<Element>) => void;
-    onBlur: (event: React.FocusEvent<Element>) => void;
-};
+export interface RangedDatePickerWidgetProps<FieldValue, T extends HTMLElement>
+    extends Omit<RangedWidgetProps<FieldValue, T>, 'lowerInput' | 'upperInput'> {
+    lowerInput: DatePickerWidgetInputType;
+    upperInput: DatePickerWidgetInputType;
+    separator: string;
+}
 
 /**
- * See [Input](https://next.ant.design/components/input/) for props available
+ * See [DatePicker](https://next.ant.design/components/date-picker/) for props available
+ *
+ * format of this widget will be decided by lowerInput.
  */
-// TODO - APPLY BOUNDARY LIMITATION
 export default function DateRangeWidget({
-    input,
-}: {
-    input: DateWidgetInputType;
-    meta: {};
-}): React.ReactElement {
-    return <DatePicker {...input} />;
+    lowerInput,
+    upperInput,
+    separator,
+}: RangedDatePickerWidgetProps<Date, HTMLElement>): React.ReactElement {
+    const { format = 'MMMM Do YYYY', ...restLower } = lowerInput;
+    return (
+        <>
+            <DatePicker format={format} {...restLower} />
+            {{ separator }}
+            <DatePicker {...upperInput} />
+        </>
+    );
 }

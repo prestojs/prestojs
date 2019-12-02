@@ -14,21 +14,24 @@ import {
     FileField,
     FloatField,
     FloatRangeField,
+    ImageField,
     IntegerField,
     IntegerRangeField,
-    UUIDField,
-    ImageField,
-    URLField,
-    SlugField,
-    TextField,
     IPAddressField,
     JsonField,
+    NullableBooleanField,
+    NumberField,
+    SlugField,
+    TextField,
     TimeField,
+    URLField,
+    UUIDField,
 } from '@xenopus/viewmodel';
 import { Class } from '@xenopus/viewmodel';
 
 import BooleanWidget from './widgets/BooleanWidget';
 import CharWidget from './widgets/CharWidget';
+import CharChoicesWidget from './widgets/CharChoicesWidget';
 import CurrencyWidget from './widgets/CurrencyWidget';
 import DateWidget from './widgets/DateWidget';
 import DateRangeWidget from './widgets/DateRangeWidget';
@@ -42,10 +45,12 @@ import FloatWidget from './widgets/FloatWidget';
 import FloatRangeWidget from './widgets/FloatRangeWidget';
 import ImageWidget from './widgets/ImageWidget';
 import IntegerWidget from './widgets/IntegerWidget';
+import IntegerChoicesWidget from './widgets/IntegerChoicesWidget';
 import IntegerRangeWidget from './widgets/IntegerRangeWidget';
 import IPAddressWidget from './widgets/IPAddressWidget';
 import JsonWidget from './widgets/JsonWidget';
-//import NumberWidget from './widgets/NumberWidget';
+import NullableBooleanWidget from './widgets/NullableBooleanWidget';
+import NumberWidget from './widgets/NumberWidget';
 import SlugWidget from './widgets/SlugWidget';
 import TextWidget from './widgets/TextWidget';
 import TimeWidget from './widgets/TimeWidget';
@@ -53,8 +58,6 @@ import URLWidget from './widgets/URLWidget';
 import UUIDWidget from './widgets/UUIDWidget';
 
 // RangeField is not included: its not meant to be used directly - TODO: mark it abstract?
-// TODO: number field's probably an abstract now as well - confirm w/ dave
-// TODO - all these are specific widgets. we might? want to provide some generic widgets wrapped around antd as well?
 const mapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([
     [BooleanField, BooleanWidget],
     [CharField, CharWidget],
@@ -74,11 +77,19 @@ const mapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([
     [IntegerRangeField, IntegerRangeWidget],
     [IPAddressField, IPAddressWidget],
     [JsonField, JsonWidget],
+    [NumberField, NumberWidget],
+    [NullableBooleanField, NullableBooleanWidget],
     [SlugField, SlugWidget],
     [TextField, TextWidget],
     [TimeField, TimeWidget],
     [URLField, URLWidget],
     [UUIDField, UUIDWidget],
+]);
+
+// choices -> select widgets; only accepting integer(for enum) and char for now - might want to expand to currency type of currency later.
+const choicesMapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([
+    [CharField, CharChoicesWidget],
+    [IntegerField, IntegerChoicesWidget],
 ]);
 
 export default function getWidgetForField<FieldValue, T extends HTMLElement>(
@@ -87,7 +98,9 @@ export default function getWidgetForField<FieldValue, T extends HTMLElement>(
     // Couldn't work out what to type this as so field.constructor was accepted
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
-    const widget: FieldWidget | null = mapping.get(field.constructor);
+    const widget: FieldWidget | null = field.choices
+        ? choicesMapping.get(field.constructor) || mapping.get(field.constructor)
+        : mapping.get(field.constructor);
     if (widget) {
         return widget;
     }

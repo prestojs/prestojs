@@ -1,15 +1,15 @@
-import { WidgetProps } from '@xenopus/ui/FieldWidget';
+import { WidgetProps } from '@xenopus/ui';
 import React from 'react';
-import NumberWidget from './NumberWidget';
+import { InputNumber } from 'antd';
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
  */
 export default function DecimalWidget({
     input,
-    meta,
 }: WidgetProps<string, HTMLElement>): React.ReactElement {
     const { value, ...rest } = input;
-    const valueNum = value === undefined || value === null ? value : Number(value);
-    return <NumberWidget {...{ input: { value: valueNum, ...rest }, meta }} />;
+    const valueNum: number | null | undefined =
+        value === undefined || value === null ? value : Number(value);
+    return <InputNumber value={valueNum} {...rest} />;
 }

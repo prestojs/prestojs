@@ -18,6 +18,7 @@ export { default as ImageField } from './fields/ImageField';
 export { default as IntegerField } from './fields/IntegerField';
 export { default as IntegerRangeField } from './fields/IntegerRangeField';
 export { default as IPAddressField } from './fields/IPAddressField';
+export { default as NullableBooleanField } from './fields/NullableBooleanField';
 export { default as JsonField } from './fields/JsonField';
 export { default as NumberField } from './fields/NumberField';
 export { default as SlugField } from './fields/SlugField';

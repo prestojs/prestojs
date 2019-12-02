@@ -1,15 +1,24 @@
+import { Upload } from 'antd';
 import React from 'react';
-import FileWidget, { FileWidgetInputType } from './FileWidget';
+import { UploadWidgetProps } from './FileWidget';
 
 /**
  * See [Upload](https://next.ant.design/components/upload/) for props available
  */
-export default function ImageWidget({
+// FIXME: need test to see whether this works. djRad1 also included fileList manipulation and adjustments for specific backend. mirror?
+// might need additional features eg rescale/EXIF correction
+export default function FileWidget({
     input,
-    meta,
-}: {
-    input: FileWidgetInputType;
-    meta: {};
-}): React.ReactElement {
-    return <FileWidget listType="picture-card" {...{ input, meta }} />;
+}: UploadWidgetProps<File, HTMLElement>): React.ReactElement {
+    const { beforeUpload, listType = 'picture-card', ...rest } = input;
+
+    const beforeUploadFile = (file: File): boolean => {
+        if (beforeUpload) {
+            beforeUpload(file);
+        }
+        input.onChange(file);
+        return false;
+    };
+
+    return <Upload listType={listType} beforeUpload={beforeUploadFile} {...rest} />;
 }

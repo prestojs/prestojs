@@ -1,14 +1,13 @@
-import { WidgetProps } from '@xenopus/ui/FieldWidget';
+import { WidgetProps } from '@xenopus/ui';
+import { Input } from 'antd';
 import React from 'react';
-import TextWidget from './TextWidget';
 
 /**
  * See [Input](https://next.ant.design/components/input/) for props available
  */
 // FIXME - what kind of widget a json field really wants?
-export default function JsonWidget({
+export default function TextWidget({
     input,
-    meta,
 }: WidgetProps<string, HTMLElement>): React.ReactElement {
-    return <TextWidget {...{ input, meta }} />;
+    return <Input.TextArea {...input} />;
 }

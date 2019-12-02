@@ -1,10 +1,18 @@
-import { InputProps } from '@xenopus/ui/FieldWidget';
+import { InputProps, WidgetProps } from '@xenopus/ui';
 import { Upload } from 'antd';
 import React from 'react';
 
-export type FileWidgetInputType = Omit<InputProps<File, HTMLElement>, 'type'> & {
+type UploadWidgetInputType = Omit<InputProps<File, HTMLElement>, 'type'> & {
     type: 'select' | 'drag' | undefined;
-} & { beforeUpload?(file: File): void };
+} & {
+    beforeUpload?(file: File): void;
+    listType: 'picture-card' | 'picture' | 'text' | undefined;
+};
+
+export interface UploadWidgetProps<FieldValue, T extends HTMLElement>
+    extends Omit<WidgetProps<FieldValue, T>, 'input'> {
+    input: UploadWidgetInputType;
+}
 
 /**
  * See [Upload](https://next.ant.design/components/upload/) for props available
@@ -12,13 +20,8 @@ export type FileWidgetInputType = Omit<InputProps<File, HTMLElement>, 'type'> & 
 // Fixme: need test to see whether this works. djRad1 also included fileList manipulation and adjustments for specific backend. mirror?
 export default function FileWidget({
     input,
-    listType,
-}: {
-    input: FileWidgetInputType;
-    meta: {};
-    listType: 'picture-card' | 'picture' | 'text' | undefined;
-}): React.ReactElement {
-    const { beforeUpload, ...rest } = input;
+}: UploadWidgetProps<File, HTMLElement>): React.ReactElement {
+    const { beforeUpload, listType = 'text', ...rest } = input;
 
     const beforeUploadFile = (file: File): boolean => {
         if (beforeUpload) {

@@ -1,13 +1,12 @@
-import { WidgetProps } from '@xenopus/ui/FieldWidget';
+import { WidgetProps } from '@xenopus/ui';
 import React from 'react';
-import NumberWidget from './NumberWidget';
+import { InputNumber } from 'antd';
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
  */
 export default function IntegerWidget({
     input,
-    meta,
 }: WidgetProps<number, HTMLElement>): React.ReactElement {
-    return <NumberWidget {...{ input, meta }} />;
+    return <InputNumber {...input} />;
 }

@@ -1,17 +1,13 @@
 import React from 'react';
-import DateWidget, { DateWidgetInputType } from './DateWidget';
+import { DatePicker } from 'antd';
+import { DatePickerWidgetProps } from './DateWidget';
 
 /**
- * See [Input](https://next.ant.design/components/input/) for props available
+ * See [DatePicker](https://next.ant.design/components/date-picker/) for props available
  */
 export default function DateTimeWidget({
     input,
-    format,
-    meta,
-}: {
-    input: DateWidgetInputType;
-    format?: string;
-    meta: {};
-}): React.ReactElement {
-    return <DateWidget showTime format={format} {...{ input, meta }} />;
+}: DatePickerWidgetProps<Date, HTMLElement>): React.ReactElement {
+    const { format = 'MMMM Do YYYY, h:mm a', ...rest } = input;
+    return <DatePicker showTime format={format} {...rest} />;
 }

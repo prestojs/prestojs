@@ -1,4 +1,4 @@
-import { WidgetProps } from '@xenopus/ui/FieldWidget';
+import { WidgetProps } from '@xenopus/ui';
 import { Input } from 'antd';
 import React from 'react';
 
