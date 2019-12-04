@@ -44,6 +44,13 @@ export default class UrlPattern {
                 arg => !this.validArgNames.includes(arg)
             );
             if (invalidArgs.length) {
+                if (this.validArgNames.length === 0) {
+                    throw new Error(
+                        `Invalid arguments supplied: ${invalidArgs.join(
+                            ', '
+                        )}. This URL pattern accepts no replacement arguments.`
+                    );
+                }
                 throw new Error(
                     `Invalid arguments supplied: ${invalidArgs.join(
                         ', '

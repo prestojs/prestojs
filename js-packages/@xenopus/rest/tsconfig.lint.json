@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.lint.json",
+
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo"
+  },
+  "references": [
+    {
+      "path": "../routing/tsconfig.json"
+    }
+  ],
+
+  "include": ["src/**/*"]
+}
