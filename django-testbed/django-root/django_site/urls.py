@@ -37,14 +37,14 @@ else:
 
 urlpatterns += [
     url(r"^logout/$", LogoutView.as_view(), name="logout"),
+    url(r"^api/", include("xenopus_frog.urls")),
+    url(r"^hijack/", include("hijack.urls", namespace="hijack")),
     # see https://django-authtools.readthedocs.io/en/latest/views.html for other auth-related urls
     # you probably want to include (eg password change, password reset)
     url(
         r"^.*",
         django_site.views.FrontendView.as_view(basename="app", entry_point="app",),
     ),
-    url(r"^hijack/", include("hijack.urls", namespace="hijack")),
-    url(r"^xenopus_frog/", include("xenopus_frog.urls")),
 ]
 
 # Serve media files in development (note: this is a no-op when DEBUG=False)

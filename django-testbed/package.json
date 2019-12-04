@@ -83,6 +83,7 @@
     "react-is": "^16.8.1",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
+    "swr": "^0.1.12",
     "whatwg-fetch": "^3.0.0"
   }
 }

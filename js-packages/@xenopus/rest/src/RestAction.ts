@@ -149,7 +149,7 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
         return response.text();
     }
 
-    // TODO: Do we both handling blob types? eg. response.blob() if image/* etc
+    // TODO: Do we bother handling blob types? eg. response.blob() if image/* etc
 
     return response;
 }
@@ -281,7 +281,6 @@ export default class RestAction {
      * directly.
      */
     prepare({ urlArgs = {}, query, ...init }: PrepareOptions = {}): PreparedAction {
-        // TODO: handle query? second param to resolve
         const url = this.urlPattern.resolve(urlArgs, { query });
         let cache = this.urlCache.get(url);
         if (!cache) {
@@ -303,23 +302,32 @@ export default class RestAction {
      *
      * This can be called directly or indirectly via `prepare`.
      *
+     * If the fetch call itself fails (eg. a network error) a `RequestError` will be thrown.
+     *
+     * If the response is a non-2XX response an `ApiError` will be thrown.
+     *
+     * If the call is successful the body will be decoded using `decodeBody`. The default implementation
+     * will decode JSON to an object or return text based on the content type. If the content type is
+     * not JSON or text the raw `Response` will be returned.
+     *
+     * You can transform the decoded body with `transformBody`. This is useful if you need to do something
+     * with the returned data. For example you could add it to a cache or create an instance of a class.
+     *
      * ```js
      * // Via prepare
-     * const globalConfig = { headers: { 'X-CSRFToken': 'abc123' }};
      * const preparedAction = action.prepare({ urlArgs: { id: '1' }});
-     * preparedAction.execute(globalConfig);
+     * preparedAction.execute();
      *
      * // Directly
-     * action.execute({ urlArgs: { id: '1' }}, globalConfig);
+     * action.execute({ urlArgs: { id: '1' }});
      * ```
      *
      * @param urlArgs args to pass through to `urlPattern.resolve`
      * @param query query params to pass through to `urlPattern.resolve`
      * @param init Options to pass to `fetch`. These will be merged with any options passed to `RestAction` directly
-     * and `globalConfig`. Options passed here will take precedence. Only the `headers` key will be merged if it
-     * exists in multiple places (eg. globalConfig may include headers you want on every request). If you need to remove
+     * and `RestAction.defaultConfig.requestInit`. Options passed here will take precedence. Only the `headers` key will be merged if it
+     * exists in multiple places (eg. defaultConfig may include headers you want on every request). If you need to remove
      * a header entirely set the value to `undefined`.
-     * @param globalConfig An extra global configuration parameters that are used as defaults where not specified in `init`
      */
     async execute({ urlArgs = {}, query, ...init }: PrepareOptions = {}): Promise<any> {
         const url = this.urlPattern.resolve(urlArgs, { query });
