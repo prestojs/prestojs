@@ -1,10 +1,38 @@
+/* eslint-disable no-use-before-define,@typescript-eslint/no-use-before-define */
 import { Endpoint } from '@xenopus/rest';
-import { UrlPattern } from '@xenopus/routing';
 import { NumberField } from '@xenopus/viewmodel';
+
+import namedUrls from '../namedUrls';
 
 import BaseUser from './generated/BaseUser';
 
+function transformAndCacheUser(data) {
+    if (Array.isArray(data)) {
+        const users = data.map(datum => new User(datum));
+        User.cache.addList(users);
+        return users;
+    }
+    const user = new User(data);
+    User.cache.add(user);
+    return user;
+}
+
 export default class User extends BaseUser {
+    static endpoints = {
+        retrieve: new Endpoint(namedUrls.get('users-detail'), {
+            transformBody: transformAndCacheUser,
+        }),
+        update: new Endpoint(namedUrls.get('users-detail'), {
+            transformBody: transformAndCacheUser,
+            method: 'patch',
+        }),
+        list: new Endpoint(namedUrls.get('users-list'), { transformBody: transformAndCacheUser }),
+        create: new Endpoint(namedUrls.get('users-list'), {
+            transformBody: transformAndCacheUser,
+            method: 'post',
+        }),
+    };
+
     static fields = {
         ...BaseUser.fields,
         age: new NumberField({
@@ -15,26 +43,5 @@ export default class User extends BaseUser {
         }),
     };
 }
-
-export const userDetail = new Endpoint(new UrlPattern('/api/users/:id/'), {
-    transformBody: data => {
-        const user = new User(data);
-        User.cache.add(user);
-        return user;
-    },
-});
-
-export const userList = new Endpoint(new UrlPattern('/api/users/'), {
-    transformBody: data => {
-        if (Array.isArray(data)) {
-            const users = data.map(datum => new User(datum));
-            User.cache.addList(users);
-            return users;
-        }
-        const user = new User(data);
-        User.cache.add(user);
-        return user;
-    },
-});
 
 window.User = User;

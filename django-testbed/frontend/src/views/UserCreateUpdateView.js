@@ -1,8 +1,8 @@
-import { Button, Form as AntForm } from 'antd';
+import { Button } from 'antd';
 import React from 'react';
 import { Form } from '@xenopus/final-form';
 
-import User, { userDetail, userList } from '../models/User';
+import User from '../models/User';
 import useConnected from '../useConnected';
 import useEndpoint from '../useEndpoint';
 
@@ -15,22 +15,21 @@ function FieldErrors({ name }) {
 }
 
 export default function UserCreateUpdateView({ userId, onSuccess }) {
-    const formItemLayout = {
-        labelCol: { span: 6 },
-        wrapperCol: { span: 14 },
-    };
     // only relevant if userId is set
-    const { data, error, execute } = useEndpoint(userId && userDetail, {
+    const { data, error } = useEndpoint(userId && User.endpoints.retrieve, {
         urlArgs: { id: userId },
     });
     async function onSubmit(_data) {
         try {
             if (userId) {
-                // Execute the prepared action again (which has the id filled out) but now add
-                // a body and set method to 'PATCH'
-                await execute({ body: JSON.stringify(_data), method: 'PATCH' });
+                await User.endpoints.update.execute({
+                    urlArgs: { id: userId },
+                    body: JSON.stringify(_data),
+                });
             } else {
-                await userList.execute({ body: JSON.stringify(_data), method: 'POST' });
+                await User.endpoints.create.execute({
+                    body: JSON.stringify(_data),
+                });
             }
             onSuccess();
             return null;
@@ -56,22 +55,18 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
             )}
             {/* eslint-disable-next-line no-console */}
             <Form onSubmit={onSubmit} initialValues={record && record.toJS()}>
-                {({ handleSubmit }) => (
-                    <AntForm onSubmit={handleSubmit} layout="horizontal" {...formItemLayout}>
-                        <Form.Item field={User.fields.first_name} />
-                        <FieldErrors name="first_name" />
-                        <Form.Item field={User.fields.last_name} />
-                        <FieldErrors name="last_name" />
-                        <Form.Item field={User.fields.email} />
-                        <FieldErrors name="email" />
-                        <Form.Item field={User.fields.age} />
-                        <FieldErrors name="age" />
-                        <hr />
-                        <Button htmlType="submit" type="primary">
-                            Save
-                        </Button>
-                    </AntForm>
-                )}
+                <Form.Item field={User.fields.first_name} />
+                <FieldErrors name="first_name" />
+                <Form.Item field={User.fields.last_name} />
+                <FieldErrors name="last_name" />
+                <Form.Item field={User.fields.email} />
+                <FieldErrors name="email" />
+                <Form.Item field={User.fields.age} />
+                <FieldErrors name="age" />
+                <hr />
+                <Button htmlType="submit" type="primary">
+                    Save
+                </Button>
             </Form>
         </>
     );

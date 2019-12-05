@@ -8,11 +8,11 @@ import useSWR from 'swr';
  * @return Object Same values as returned by useSWR with the addition of `execute` which
  * can be used to execute the action directly, optionally with new arguments.
  */
-export default function useEndpoint(action, args) {
+export default function useEndpoint(action, args, config) {
     const preparedAction = action ? action.prepare(args) : null;
     const execute = useCallback(init => preparedAction.execute(init), [preparedAction]);
     return {
         execute,
-        ...useSWR(preparedAction && [preparedAction], act => act.execute({})),
+        ...useSWR(preparedAction && [preparedAction], act => act.execute({}), config),
     };
 }

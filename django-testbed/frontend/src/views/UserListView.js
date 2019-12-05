@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'antd';
 
-import User, { userList } from '../models/User';
+import User from '../models/User';
 import useConnected from '../useConnected';
 import useEndpoint from '../useEndpoint';
 import UserCreateUpdateView from './UserCreateUpdateView';
@@ -9,8 +9,7 @@ import UserCreateUpdateView from './UserCreateUpdateView';
 export default function UserListView() {
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
-    const { data, error } = useEndpoint(userList);
-
+    const { data, error } = useEndpoint(User.endpoints.list, {}, { refreshInterval: 10000 });
     if (error) {
         throw error;
     }
