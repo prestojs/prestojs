@@ -3,13 +3,13 @@ import { Button, Modal } from 'antd';
 
 import User, { userList } from '../models/User';
 import useConnected from '../useConnected';
-import useRestAction from '../useRestAction';
+import useEndpoint from '../useEndpoint';
 import UserCreateUpdateView from './UserCreateUpdateView';
 
 export default function UserListView() {
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
-    const { data, error } = useRestAction(userList);
+    const { data, error } = useEndpoint(userList);
 
     if (error) {
         throw error;

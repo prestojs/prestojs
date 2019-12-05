@@ -1,16 +1,16 @@
 import { UrlPattern } from '@xenopus/routing';
 import { FetchMock } from 'jest-fetch-mock';
-import RestAction, { ApiError, RequestError } from '../RestAction';
+import Endpoint, { ApiError, RequestError } from '../Endpoint';
 
 const fetchMock = fetch as FetchMock;
 
 beforeEach(() => {
     fetchMock.resetMocks();
-    RestAction.defaultConfig.requestInit = {};
+    Endpoint.defaultConfig.requestInit = {};
 });
 
 test('prepare should maintain equality based on inputs', () => {
-    const action = new RestAction(new UrlPattern('/whatever/:id?/'));
+    const action = new Endpoint(new UrlPattern('/whatever/:id?/'));
     const a = action.prepare();
     expect(a).toBe(action.prepare());
     const b = action.prepare({ query: { a: 'b' } });
@@ -35,7 +35,7 @@ test('prepare should maintain equality based on inputs', () => {
 
 test('should resolve URLs', () => {
     fetchMock.mockResponse('');
-    const action = new RestAction(new UrlPattern('/whatever/:id?/'));
+    const action = new Endpoint(new UrlPattern('/whatever/:id?/'));
     action.prepare().execute();
     expect(fetchMock.mock.calls.length).toEqual(1);
     expect(fetchMock.mock.calls[0][0]).toEqual('/whatever/');
@@ -52,7 +52,7 @@ test('should resolve URLs', () => {
 
 test('should support calling execute without prepare', () => {
     fetchMock.mockResponse('');
-    const action = new RestAction(new UrlPattern('/whatever/:id?/'));
+    const action = new Endpoint(new UrlPattern('/whatever/:id?/'));
     action.execute();
     expect(fetchMock.mock.calls.length).toEqual(1);
     expect(fetchMock.mock.calls[0][0]).toEqual('/whatever/');
@@ -73,11 +73,11 @@ test('should support transformation function', async () => {
             'Content-Type': 'text/plain',
         },
     });
-    const action1 = new RestAction(new UrlPattern('/whatever/'), {
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         transformBody: (data: Record<string, any>): Record<string, any> => data.toUpperCase(),
     });
     expect(await action1.prepare().execute()).toBe('HELLO WORLD');
-    const action2 = new RestAction(new UrlPattern('/whatever/'), {
+    const action2 = new Endpoint(new UrlPattern('/whatever/'), {
         transformBody: (data: Record<string, any>): Record<string, any> =>
             Object.entries(data).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {}),
     });
@@ -101,7 +101,7 @@ test('should support merging global headers with action specific headers', async
         // @ts-ignore
         expect([...headers1.entries()]).toEqual([...headers2.entries()]);
     };
-    const action1 = new RestAction(new UrlPattern('/whatever/:id?/'));
+    const action1 = new Endpoint(new UrlPattern('/whatever/:id?/'));
     action1.prepare({ headers: { c: 'd' } }).execute({
         headers: { a: 'b' },
     });
@@ -136,7 +136,7 @@ test('should support merging global headers with action specific headers', async
         });
     expectHeadersEqual({ a: '1', b: '5', c: '10' });
 
-    const action2 = new RestAction(new UrlPattern('/whatever/:id?/'), { headers: { a: 'one' } });
+    const action2 = new Endpoint(new UrlPattern('/whatever/:id?/'), { headers: { a: 'one' } });
     action2.prepare({ headers: { b: 'two' } }).execute({
         headers: { c: 'three' },
     });
@@ -147,7 +147,7 @@ test('should support merging global headers with action specific headers', async
     });
     expectHeadersEqual({ a: 'one', c: 'three' });
 
-    RestAction.defaultConfig.requestInit = {
+    Endpoint.defaultConfig.requestInit = {
         headers: {
             token: 'abc123',
             extra: '5',
@@ -169,7 +169,7 @@ test('should raise RequestError on bad request', async () => {
     fetchMock.mockResponseOnce(() => {
         throw new TypeError('Unknown error');
     });
-    const action1 = new RestAction(new UrlPattern('/whatever/'));
+    const action1 = new Endpoint(new UrlPattern('/whatever/'));
     let error;
     try {
         await action1.execute();
@@ -183,7 +183,7 @@ test('should raise RequestError on bad request', async () => {
 
 test('should raise ApiError on non-2xx response', async () => {
     fetchMock.mockResponseOnce('', { status: 400, statusText: 'Bad Request' });
-    const action1 = new RestAction(new UrlPattern('/whatever/'));
+    const action1 = new Endpoint(new UrlPattern('/whatever/'));
     await expect(action1.execute()).rejects.toThrowError(new ApiError(400, 'Bad Request', ''));
     fetchMock.mockResponseOnce('', { status: 500, statusText: 'Server Error' });
     await expect(action1.execute()).rejects.toThrowError(new ApiError(500, 'Server Error', ''));

@@ -1,1 +1,1 @@
-export { default as RestAction } from './RestAction';
+export { default as Endpoint } from './Endpoint';

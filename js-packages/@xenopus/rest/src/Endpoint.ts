@@ -8,7 +8,7 @@ type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
     headers?: HeadersInit | Record<string, undefined | string>;
 };
 
-type RestActionOptions = ExecuteInitOptions & {
+type EndpointOptions = ExecuteInitOptions & {
     decodeBody?: (res: Response) => any;
     transformBody?: (data: any) => any;
 };
@@ -74,12 +74,12 @@ function mergeRequestInit(...args: ExecuteInitOptions[]): RequestInit {
 
 // it will call that to generate the key... which is not what we want
 class PreparedAction {
-    action: RestAction;
+    action: Endpoint;
     options: PrepareOptions;
     urlResolveOptions: UrlResolveOptions;
 
     constructor(
-        action: RestAction,
+        action: Endpoint,
         urlResolveOptions: UrlResolveOptions,
         options: ExecuteInitOptions
     ) {
@@ -92,7 +92,7 @@ class PreparedAction {
         // TODO: This means that if this.options or init tries to remove
         // a default header by setting it to undefined it will not work
         // as the resulting object is a `Headers` instance that has had
-        // the key removed from it already... but then in execute in RestAction
+        // the key removed from it already... but then in execute in Endpoint
         // we merge it with the defaultConfig
         return this.action.execute({
             ...this.urlResolveOptions,
@@ -191,12 +191,12 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  * userDetail.execute({ urlArgs: { id: 1 }, method: 'PATCH', body: JSON.stringify({ name: 'Dave' }) });
  * ```
  *
- * Often you have some global options you want to apply everywhere. This can be set on `RestAction`
+ * Often you have some global options you want to apply everywhere. This can be set on `Endpoint`
  * directly:
  *
  * ```js
  * // Set default options to pass through to the request init option of `fetch`
- * RestAction.defaultConfig.requestInit = {
+ * Endpoint.defaultConfig.requestInit = {
  *   headers: {
  *     'X-CSRFToken': getCsrfToken(),
  *   },
@@ -228,13 +228,13 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  * import useSWR from 'swr';
  *
  * /**
- * * Wrapper around useSWR for use with `RestAction`
- * * @param action RestAction to execute. Can be null if not yet ready to execute
+ * * Wrapper around useSWR for use with `Endpoint`
+ * * @param action Endpoint to execute. Can be null if not yet ready to execute
  * * @param args Any args to pass through to `prepare`
  * * @return Object Same values as returned by useSWR with the addition of `execute` which
  * * can be used to execute the action directly, optionally with new arguments.
  * *
- * export default function useRestAction(action, args) {
+ * export default function useEndpoint(action, args) {
  *   const preparedAction = action ? action.prepare(args) : null;
  *   const execute = useCallback(init => preparedAction.execute(init), [preparedAction]);
  *   return {
@@ -244,7 +244,7 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  * }
  * ```
  */
-export default class RestAction {
+export default class Endpoint {
     static defaultConfig: { requestInit: RequestInit } = {
         requestInit: {},
     };
@@ -257,7 +257,7 @@ export default class RestAction {
 
     constructor(
         urlPattern: UrlPattern,
-        { decodeBody = defaultDecodeBody, transformBody, ...requestInit }: RestActionOptions = {}
+        { decodeBody = defaultDecodeBody, transformBody, ...requestInit }: EndpointOptions = {}
     ) {
         this.urlPattern = urlPattern;
         this.transformBody = transformBody;
@@ -324,8 +324,8 @@ export default class RestAction {
      *
      * @param urlArgs args to pass through to `urlPattern.resolve`
      * @param query query params to pass through to `urlPattern.resolve`
-     * @param init Options to pass to `fetch`. These will be merged with any options passed to `RestAction` directly
-     * and `RestAction.defaultConfig.requestInit`. Options passed here will take precedence. Only the `headers` key will be merged if it
+     * @param init Options to pass to `fetch`. These will be merged with any options passed to `Endpoint` directly
+     * and `Endpoint.defaultConfig.requestInit`. Options passed here will take precedence. Only the `headers` key will be merged if it
      * exists in multiple places (eg. defaultConfig may include headers you want on every request). If you need to remove
      * a header entirely set the value to `undefined`.
      */

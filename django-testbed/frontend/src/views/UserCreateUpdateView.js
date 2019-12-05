@@ -4,7 +4,7 @@ import { Form } from '@xenopus/final-form';
 
 import User, { userDetail, userList } from '../models/User';
 import useConnected from '../useConnected';
-import useRestAction from '../useRestAction';
+import useEndpoint from '../useEndpoint';
 
 function FieldErrors({ name }) {
     return (
@@ -20,7 +20,7 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
         wrapperCol: { span: 14 },
     };
     // only relevant if userId is set
-    const { data, error, execute } = useRestAction(userId && userDetail, {
+    const { data, error, execute } = useEndpoint(userId && userDetail, {
         urlArgs: { id: userId },
     });
     async function onSubmit(_data) {

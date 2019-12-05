@@ -1,4 +1,4 @@
-import { RestAction } from '@xenopus/rest';
+import { Endpoint } from '@xenopus/rest';
 import React from 'react';
 import { render } from 'react-dom';
 
@@ -19,7 +19,7 @@ function getCsrfToken() {
     return 'COOKIE NOT FOUND';
 }
 
-RestAction.defaultConfig.requestInit = {
+Endpoint.defaultConfig.requestInit = {
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
