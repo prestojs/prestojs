@@ -3,22 +3,123 @@ import Field from '../fields/Field';
 
 test('ViewModel._model returns class', () => {
     class A extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'id' }),
+        static _fields = {
+            id: new Field({ label: 'id' }),
         };
     }
-
-    const record1 = new A({ id: 1 });
-    expect(record1._model).toEqual(A);
 
     class B extends A {
-        static fields = {
-            id: new Field({ name: 'id', label: 'id' }),
+        static _fields = {
+            id: new Field({ label: 'id' }),
         };
     }
+    const record1 = new A({ id: 1 });
+
+    expect(record1._model).toEqual(A);
 
     const record2 = new B({ id: 2 });
     expect(record2._model).toEqual(B);
+});
+
+test('ViewModel should be accessible via the field', () => {
+    class A extends ViewModel {
+        static _fields: Record<string, Field<any>> = {
+            id: new Field({ label: 'id' }),
+            name: new Field({ label: 'id' }),
+        };
+    }
+
+    A._fields.email = new Field({ label: 'Name' });
+    expect(A.fields.name.parent).toBe(A);
+    expect(A.fields.email.parent).toBe(A);
+
+    class B extends A {}
+
+    B._fields = {
+        ...B._fields,
+        age: new Field({ label: 'Age' }),
+    };
+
+    expect(B.fields.name.parent).toBe(B);
+    expect(A.fields.name.parent).toBe(A);
+    expect(B.fields.age.parent).toBe(B);
+
+    class C extends B {}
+    expect(C.fields.name.parent).toBe(C);
+    expect(B.fields.name.parent).toBe(B);
+    expect(A.fields.name.parent).toBe(A);
+});
+
+test('_fields should be unusable after fields bound', () => {
+    class A extends ViewModel {
+        static _fields: Record<string, Field<any>> = {
+            id: new Field({ label: 'id' }),
+            name: new Field({ label: 'id' }),
+        };
+    }
+    A.fields;
+
+    expect(() => A._fields).toThrowError(/use the 'fields' property/);
+    expect(() => (A._fields = {})).toThrowError(/already been bound/);
+
+    // Extending a class after it's had it's fields accessed should still work
+    class B extends A {}
+    B.fields;
+
+    expect(() => B._fields).toThrowError(/use the 'fields' property/);
+    expect(() => (B._fields = {})).toThrowError(/already been bound/);
+
+    // Should be able to mess with _fields before fields has been accessed
+    class C extends ViewModel {
+        static _fields: Record<string, Field<any>> = {
+            id: new Field({ label: 'id' }),
+            name: new Field({ label: 'id' }),
+        };
+    }
+    C._fields.age = new Field({ label: 'age' });
+    expect(C.fields.age).toBeInstanceOf(Field);
+
+    expect(() => (C._fields.email = new Field({ label: 'email' }))).toThrowError(
+        /use the 'fields' property/
+    );
+});
+
+test('name and label should be set automatically', () => {
+    class A extends ViewModel {
+        static _fields: Record<string, Field<any>> = {
+            id: new Field(),
+            firstName: new Field(),
+            LastName: new Field(),
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            email_address: new Field(),
+            CONTACT_NUMBER: new Field(),
+            age: new Field({ label: 'User Age' }),
+        };
+    }
+    expect(A.fields.firstName.name).toBe('firstName');
+    expect(A.fields.firstName.label).toBe('First Name');
+    expect(A.fields.LastName.name).toBe('LastName');
+    expect(A.fields.LastName.label).toBe('Last Name');
+    expect(A.fields.email_address.name).toBe('email_address');
+    expect(A.fields.email_address.label).toBe('Email Address');
+    expect(A.fields.CONTACT_NUMBER.name).toBe('CONTACT_NUMBER');
+    expect(A.fields.CONTACT_NUMBER.label).toBe('Contact Number');
+    expect(A.fields.age.name).toBe('age');
+    expect(A.fields.age.label).toBe('User Age');
+});
+
+// This test is skipped because defining a static property like below in the test env
+// actually triggers the ViewModel setter on 'fields'. This does not happen anywhere
+// else that I can replicate - eg. in compiled code in browser, uncompiled code (eg.
+// using native ES6 classes), in node with uncompiled code. I haven't been able to work
+// out why the difference...
+test.skip('ViewModel should identify incorrectly defined fields', () => {
+    class A extends ViewModel {
+        static fields = {
+            name: new Field({ label: 'Name' }),
+        };
+    }
+    expect(() => new A({})).toThrowError(/has not been defined correctly/);
 });
 
 test('ViewModel._pk should validate primary key fields exist', () => {
@@ -41,8 +142,8 @@ test('ViewModel._pk should validate primary key fields exist', () => {
 
     class C extends ViewModel {
         static pkFieldName = ['id1', 'id2'];
-        static fields = {
-            id1: new Field({ name: 'id1', label: 'Id' }),
+        static _fields = {
+            id1: new Field({ label: 'Id' }),
         };
     }
 
@@ -54,8 +155,8 @@ test('ViewModel._pk should validate primary key fields exist', () => {
 
 test('ViewModel._pk should return primary key', () => {
     class A extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'Id' }),
+        static _fields = {
+            id: new Field({ label: 'Id' }),
         };
     }
 
@@ -64,9 +165,9 @@ test('ViewModel._pk should return primary key', () => {
 
     class B extends ViewModel {
         static pkFieldName = ['id1', 'id2'];
-        static fields = {
-            id1: new Field({ name: 'id1', label: 'Id' }),
-            id2: new Field({ name: 'id2', label: 'Id' }),
+        static _fields = {
+            id1: new Field({ label: 'Id' }),
+            id2: new Field({ label: 'Id' }),
         };
     }
 
@@ -76,8 +177,8 @@ test('ViewModel._pk should return primary key', () => {
 
 test('should validate primary key is provided', () => {
     class A extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'Id' }),
+        static _fields = {
+            id: new Field({ label: 'Id' }),
         };
     }
 
@@ -90,9 +191,9 @@ test('should validate primary key is provided', () => {
 test('should validate primary keys are provided', () => {
     class A extends ViewModel {
         static pkFieldName = ['id1', 'id2'];
-        static fields = {
-            id1: new Field({ name: 'id1', label: 'Id1' }),
-            id2: new Field({ name: 'id2', label: 'Id2' }),
+        static _fields = {
+            id1: new Field({ label: 'Id1' }),
+            id2: new Field({ label: 'Id2' }),
         };
     }
 
@@ -112,10 +213,10 @@ test('should validate primary keys are provided', () => {
 
 test('_assigned fields should be based on passed data', () => {
     class A extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'Id' }),
-            name: new Field({ name: 'name', label: 'Name' }),
-            email: new Field({ name: 'email', label: 'Email' }),
+        static _fields = {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
         };
     }
 
@@ -130,10 +231,10 @@ test('_assigned fields should be based on passed data', () => {
 
 test('toJS() should be return assigned data', () => {
     class A extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'Id' }),
-            name: new Field({ name: 'name', label: 'Name' }),
-            email: new Field({ name: 'email', label: 'Email' }),
+        static _fields = {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
         };
     }
 
@@ -153,10 +254,10 @@ test('toJS() should support custom field behaviour', () => {
         }
     }
     class A extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'Id' }),
-            name: new Field({ name: 'name', label: 'Name' }),
-            email: new LowerField({ name: 'email', label: 'Email' }),
+        static _fields = {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new LowerField({ label: 'Email' }),
         };
     }
 
@@ -171,10 +272,10 @@ test('ViewModel should use normalize() from field', () => {
         }
     }
     class A extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'Id' }),
-            name: new Field({ name: 'name', label: 'Name' }),
-            email: new LowerField({ name: 'email', label: 'Email' }),
+        static _fields = {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new LowerField({ label: 'Email' }),
         };
     }
 
@@ -189,11 +290,11 @@ test('Should be able to compare if two records are equal', () => {
         }
     }
     class A extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'Id' }),
-            name: new Field({ name: 'name', label: 'Name' }),
-            email: new Field({ name: 'email', label: 'Email' }),
-            createdAt: new TestDateField({ name: 'createdAt', label: 'Created At' }),
+        static _fields = {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
+            createdAt: new TestDateField({ label: 'Created At' }),
         };
     }
 
@@ -212,11 +313,11 @@ test('Should be able to compare if two records are equal', () => {
     ).toBe(false);
 
     class B extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'Id' }),
-            name: new Field({ name: 'name', label: 'Name' }),
-            email: new Field({ name: 'email', label: 'Email' }),
-            createdAt: new TestDateField({ name: 'createdAt', label: 'Created At' }),
+        static _fields = {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
+            createdAt: new TestDateField({ label: 'Created At' }),
         };
     }
     const data = {
@@ -229,10 +330,10 @@ test('Should be able to compare if two records are equal', () => {
 
 test('should clone a ViewModel record', () => {
     class A extends ViewModel {
-        static fields = {
-            id: new Field({ name: 'id', label: 'Id' }),
-            name: new Field({ name: 'name', label: 'Name' }),
-            email: new Field({ name: 'email', label: 'Email' }),
+        static _fields = {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
         };
     }
 
@@ -287,10 +388,10 @@ describe('env tests', () => {
     test('should error when accessing unfetched fields', () => {
         process.env.NODE_ENV = 'development';
         class A extends ViewModel {
-            static fields = {
-                id: new Field({ name: 'id', label: 'Id' }),
-                name: new Field({ name: 'name', label: 'Name' }),
-                email: new Field({ name: 'email', label: 'Email' }),
+            static _fields = {
+                id: new Field({ label: 'Id' }),
+                name: new Field({ label: 'Name' }),
+                email: new Field({ label: 'Email' }),
             };
         }
         const record1 = new A({
@@ -320,10 +421,10 @@ describe('env tests', () => {
     test('should error if attempt to set a field', () => {
         process.env.NODE_ENV = 'development';
         class A extends ViewModel {
-            static fields = {
-                id: new Field({ name: 'id', label: 'Id' }),
-                name: new Field({ name: 'name', label: 'Name' }),
-                email: new Field({ name: 'email', label: 'Email' }),
+            static _fields = {
+                id: new Field({ label: 'Id' }),
+                name: new Field({ label: 'Name' }),
+                email: new Field({ label: 'Email' }),
             };
         }
         const record1 = new A({

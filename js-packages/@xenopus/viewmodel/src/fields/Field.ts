@@ -1,7 +1,8 @@
+import FieldBinder from '../FieldBinder';
+
 export interface Props<T> {
     required?: boolean;
-    name: string;
-    label: string;
+    label?: string;
     helpText?: string;
     defaultValue?: T | (() => Promise<T>);
     // A field can have choices regardless of it's type.
@@ -14,17 +15,46 @@ export interface Props<T> {
     writeOnly?: boolean;
 }
 
+class UnboundFieldError<T> extends Error {
+    constructor(field: Field<T>) {
+        const msg = `Field ${field} has not been bound to it's parent. Check that the fields of the associated class are defined on the static '_fields' property and not 'fields'.`;
+        super(msg);
+    }
+}
+
 /**
  * Base Field
  */
 export default class Field<T> {
+    private _parent: typeof FieldBinder;
+    public set parent(viewModel: typeof FieldBinder) {
+        this._parent = viewModel;
+    }
+    public get parent(): typeof FieldBinder {
+        if (!this._parent) {
+            throw new UnboundFieldError<T>(this);
+        }
+        return this._parent;
+    }
+
+    private _name: string;
+    public set name(name: string) {
+        this._name = name;
+    }
+    public get name(): string {
+        if (!this._name) {
+            throw new UnboundFieldError<T>(this);
+        }
+        return this._name;
+    }
     /** Is this field required when saving a record? */
     public required: boolean;
-    public name: string;
     /**
      * Label that can be displayed as the form label for a widget
+     *
+     * If not specified will be generated from `name`.
      */
-    public label: string;
+    public label?: string;
     /**
      * Help text that can be displayed with the form widget
      */
@@ -48,10 +78,9 @@ export default class Field<T> {
 
     protected _defaultValue?: T | (() => Promise<T>);
 
-    constructor(values: Props<T>) {
+    constructor(values: Props<T> = {}) {
         const {
             required = false,
-            name,
             label,
             helpText,
             defaultValue,
@@ -60,18 +89,14 @@ export default class Field<T> {
             writeOnly = false,
         } = values;
 
-        if (!name) throw new Error('Field "name" is required'); // without a name we cant really tell what it is..
-        if (!label) throw new Error(`Field ${name}: "label" is required`);
         if (required !== undefined && typeof required !== 'boolean')
-            throw new Error(`Field ${name}: "required" should be a boolean, received: ${required}`);
+            throw new Error(`"required" should be a boolean, received: ${required}`);
         if (choices !== undefined && !(Symbol.iterator in Object(choices)))
-            throw new Error(`Field ${name}: "choices" should be Iterable, received: ${choices}`);
+            throw new Error(`"choices" should be Iterable, received: ${choices}`);
         if (readOnly !== undefined && typeof readOnly !== 'boolean')
-            throw new Error(`Field ${name}: "readOnly" should be a boolean, received: ${readOnly}`);
+            throw new Error(`"readOnly" should be a boolean, received: ${readOnly}`);
         if (writeOnly !== undefined && typeof writeOnly !== 'boolean')
-            throw new Error(
-                `Field ${name}: "writeOnly" should be a boolean, received: ${writeOnly}`
-            );
+            throw new Error(`"writeOnly" should be a boolean, received: ${writeOnly}`);
 
         // disallow any option other than those included in the list
         // eslint-disable-next-line
@@ -79,7 +104,6 @@ export default class Field<T> {
             key =>
                 ![
                     'required',
-                    'name',
                     'label',
                     'helpText',
                     'defaultValue',
@@ -90,11 +114,10 @@ export default class Field<T> {
         );
 
         if (unknowns.length) {
-            throw new Error(`Field ${name}: received unknown option(s): ${unknowns.join(', ')}`);
+            throw new Error(`Received unknown option(s): ${unknowns.join(', ')}`);
         }
 
         this.required = required;
-        this.name = name;
         this.label = label;
         this.helpText = helpText;
         this._defaultValue = defaultValue;
@@ -175,7 +198,7 @@ export default class Field<T> {
 
     toString(): string {
         const className = this.constructor.name;
-        return `${className}({ name: "${this.name}" })`;
+        return `${className}({ name: "${this._name || '<unbound - name unknown>'}" })`;
     }
 
     /**
@@ -185,5 +208,12 @@ export default class Field<T> {
      */
     public isEqual(value1: T, value2: T): boolean {
         return value1 === value2;
+    }
+
+    /**
+     * Returns a clone of the field that should be functionally equivalent
+     */
+    public clone(): Field<T> {
+        return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
     }
 }

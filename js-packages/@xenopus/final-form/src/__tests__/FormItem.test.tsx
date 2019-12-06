@@ -5,12 +5,9 @@ import { NumberField, ViewModel } from '@xenopus/viewmodel';
 import Form from '../Form';
 
 class User extends ViewModel {
-    static _meta = {
-        label: 'User',
-        labelPlural: 'Users',
+    static _fields = {
+        age: new NumberField({ label: 'Age' }),
     };
-
-    static age = new NumberField({ name: 'age', label: 'Age' });
 }
 
 function Widget({ input }): React.ReactElement {
@@ -40,7 +37,7 @@ test('FormItem should render default field widget when none specified but allow 
                 <Form onSubmit={jest.fn()}>
                     {({ handleSubmit }): React.ReactElement => (
                         <form onSubmit={handleSubmit}>
-                            <Form.Item field={User.age} {...props} />
+                            <Form.Item field={User.fields.age} {...props} />
                         </form>
                     )}
                 </Form>

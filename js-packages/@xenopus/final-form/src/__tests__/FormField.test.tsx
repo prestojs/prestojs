@@ -8,8 +8,8 @@ class User extends ViewModel {
     static label = 'User';
     static labelPlural = 'Users';
 
-    static fields = {
-        age: new NumberField({ name: 'age', label: 'Age' }),
+    static _fields = {
+        age: new NumberField({ label: 'Age' }),
     };
 }
 

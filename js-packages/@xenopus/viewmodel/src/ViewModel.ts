@@ -1,28 +1,11 @@
 import isEqual from 'lodash/isEqual';
-import Field from './fields/Field';
+import FieldBinder from './FieldBinder';
+import { freezeObject, isDev } from './util';
 import ViewModelCache from './ViewModelCache';
-
-type FieldsMapping = { [key: string]: Field<any> };
 
 export type SinglePrimaryKey = string | number;
 export type CompoundPrimaryKey = { [fieldName: string]: SinglePrimaryKey };
 export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-function verifyMinified(): void {}
-
-// Check inspired by immer
-const isDev = (): boolean =>
-    typeof process !== 'undefined'
-        ? process.env.NODE_ENV !== 'production'
-        : verifyMinified.name === 'verifyMinified';
-
-function freezeObject(obj: {}): {} {
-    if (isDev()) {
-        return Object.freeze(obj);
-    }
-    return obj;
-}
 
 /**
  * Base ViewModel class for any model in the system. This should be extended and have relevant fields and meta data
@@ -41,20 +24,20 @@ function freezeObject(obj: {}): {} {
  *     // User to describe an indeterminate number of users
  *     static labelPlural = 'Users';
  *
- *     static fields = {
- *         userId: new IntegerField({ name: 'userId', label: 'User ID' })
- *         firstName: new CharField({ name: 'firstName', label: 'First Name' }),
- *         lastName: new CharField({ name: 'lastName', label: 'Last Name' }),
+ *     static _fields = {
+ *         userId: new IntegerField({ label: 'User ID' })
+ *         firstName: new CharField({ label: 'First Name' }),
+ *         // label is optional; will be generated as 'Last name'
+ *         lastName: new CharField(),
  *     };
  * }
  * ```
  */
-export default class ViewModel {
+export default class ViewModel extends FieldBinder {
     // Name of the primary key field for this this ViewModel (or fields for compound keys)
     static pkFieldName: string | string[] = 'id';
     static label: string;
     static labelPlural: string;
-    static fields: FieldsMapping = {};
 
     private static __cache: Map<typeof ViewModel, ViewModelCache<ViewModel>> = new Map();
     public static get cache(): ViewModelCache<ViewModel> {
@@ -139,6 +122,23 @@ export default class ViewModel {
     public _data: { [fieldName: string]: any };
 
     constructor(data: {}) {
+        super();
+        // Catch any improperly defined classes at this point. eg. if a class is defined as
+        // class A extends ViewModel {
+        //    static fields = {}
+        // }
+        // This will be caught here (it should be '_fields' not 'fields').
+        // The check on `this._model.fields` exists so it triggers the getter on it and catches
+        // the unlikely case of the property being deleted altogether rather than just replaced.
+        // Error here is: TS2345: Argument of type 'typeof ViewModel' is not assignable to parameter of type 'typeof FieldBinder'.
+        // Not sure what to do about that ¯\_(ツ)_/¯
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        if (!this._model.fields || !this._model.__boundFields.has(this._model)) {
+            throw new Error(
+                `Class ${this._model.name} has not been defined correctly. Make sure field definitions are set on the '_fields' property and not 'fields'.`
+            );
+        }
         const pkFieldNames = this._model.pkFieldNames;
         const missing = pkFieldNames.filter(name => !(name in data));
         const empty = pkFieldNames.filter(name => name in data && data[name] == null);

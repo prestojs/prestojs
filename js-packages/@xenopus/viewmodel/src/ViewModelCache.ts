@@ -1,5 +1,5 @@
+import { Class } from './typeUtil';
 import ViewModel, { PrimaryKey } from './ViewModel';
-import { Class } from './util';
 
 /**
  * Points to a record that is cached already. The purpose of this is to have a single object

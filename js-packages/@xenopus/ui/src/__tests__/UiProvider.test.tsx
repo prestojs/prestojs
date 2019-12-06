@@ -11,7 +11,7 @@ function FieldWrapper({ field }): React.ReactElement {
 
     const Widget = getWidgetForField(field) as React.ComponentType<WidgetProps<any, any>>;
     const input = {
-        name: field.name,
+        name: field.label,
         value: 1,
         onChange: (): any => {},
         onBlur: (): any => {},
@@ -39,7 +39,7 @@ test('UiProvider should provide widget', () => {
         return <>special_widget</>;
     }
     function getWidget<T>(field): FieldWidget<T, any> {
-        if (field.name === 'special') {
+        if (field.label === 'special') {
             return SpecialWidget;
         }
         return DefaultWidget;
@@ -51,8 +51,8 @@ test('UiProvider should provide widget', () => {
             </UiProvider>
         );
     }
-    const field1 = new Field({ name: 'special', label: 'Special' });
-    const field2 = new Field({ name: 'normal', label: 'Normal' });
+    const field1 = new Field({ label: 'special' });
+    const field2 = new Field({ label: 'normal' });
     const { rerender, container } = render(<TestWrapper field={field1} />);
     expect(container.innerHTML).toBe('special_widget');
     rerender(<TestWrapper field={field2} />);
@@ -70,16 +70,16 @@ test('UiProvider should support nested providers', () => {
         return <>nested_widget</>;
     }
     function getWidgetOuter<T>(field): FieldWidget<T, any> | null {
-        if (field.name === 'special') {
+        if (field.label === 'special') {
             return SpecialWidget;
         }
-        if (field.name == 'unknown') {
+        if (field.label == 'unknown') {
             return null;
         }
         return DefaultWidget;
     }
     function getWidgetInner<T>(field): FieldWidget<T, any> | null {
-        if (field.name === 'inner') {
+        if (field.label === 'inner') {
             return NestedWidget;
         }
         return null;
@@ -94,10 +94,10 @@ test('UiProvider should support nested providers', () => {
             </UiProvider>
         );
     }
-    const field1 = new Field({ name: 'special', label: 'Special' });
-    const field2 = new Field({ name: 'normal', label: 'Normal' });
-    const field3 = new Field({ name: 'inner', label: 'Inner' });
-    const field4 = new Field({ name: 'unknown', label: 'Unknown' });
+    const field1 = new Field({ label: 'special' });
+    const field2 = new Field({ label: 'normal' });
+    const field3 = new Field({ label: 'inner' });
+    const field4 = new Field({ label: 'unknown' });
     const { rerender, container } = render(<TestWrapper field={field1} />);
     expect(container.innerHTML).toBe('special_widget');
     rerender(<TestWrapper field={field2} />);

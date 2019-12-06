@@ -9,9 +9,9 @@ class User extends ViewModel {
     static label = 'User';
     static labelPlural = 'Users';
 
-    static fields = {
-        age: new NumberField({ name: 'age', label: 'Age' }),
-        email: new Field({ name: 'email', label: 'Email' }),
+    static _fields = {
+        age: new NumberField({ label: 'Age' }),
+        email: new Field({ label: 'Email' }),
     };
 }
 
