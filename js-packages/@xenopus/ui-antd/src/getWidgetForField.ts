@@ -86,7 +86,7 @@ const mapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([
     [UUIDField, UUIDWidget],
 ]);
 
-// choices -> select widgets; only accepting integer(for enum) and char for now - might want to expand to currency type of currency later.
+// choices -> select/radio widgets; only accepting integer(for enum) and char for now - might want to expand to currency type of currency later.
 const choicesMapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([
     [CharField, CharChoicesWidget],
     [IntegerField, IntegerChoicesWidget],

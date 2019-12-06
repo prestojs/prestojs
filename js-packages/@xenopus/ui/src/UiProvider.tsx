@@ -10,6 +10,14 @@ type GetWidgetForFieldWithNull = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
 ) => FieldWidget<FieldValue, T> | null;
 
+type GetFormatterForField = <FieldValue, T extends HTMLElement>(
+    field: Field<FieldValue>
+) => React.ComponentType<T> | string | null;
+
+type GetFormatterForFieldWithNull = <FieldValue, T extends HTMLElement>(
+    field: Field<FieldValue>
+) => React.ComponentType<T> | string | null;
+
 export interface FormItemProps {
     required: boolean;
     help?: React.ReactNode;
@@ -22,12 +30,14 @@ export interface UiContextValue {
     // it can return null. I don't know if it's possible to type that... So useUi is
     // typed to return TopLevelUiContextValue instead (see useUi for more)
     getWidgetForField: GetWidgetForFieldWithNull;
+    getFormatterForField: GetFormatterForFieldWithNull;
     formItemComponent?: React.ComponentType<FormItemProps>;
 }
 
 export interface TopLevelUiContextValue {
     // See comments above on UiContextValue
     getWidgetForField: GetWidgetForField;
+    getFormatterForField: GetFormatterForField;
     formItemComponent?: React.ComponentType<FormItemProps>;
 }
 
@@ -47,6 +57,14 @@ type Props = {
      */
     getWidgetForField?: GetWidgetForFieldWithNull;
     /**
+     * A function that is passed an instance of `Field` and should return the widget component to use
+     * for this field. If falsey is returned then it will fall back to a parent UiProvider (if any) or if
+     * no parent UiProvider an error will be thrown.
+     *
+     * @param field The specific field instance for a model
+     */
+    getFormatterForField?: GetFormatterForFieldWithNull;
+    /**
      * A component to use to render items in a form. This is the component that will be rendered by
      * Form.Item.
      */
@@ -60,10 +78,13 @@ type Props = {
  * TODO: Add formatters, eg. getFormatterForField
  */
 export default function UiProvider(props: Props): React.ReactElement {
-    const { children, getWidgetForField, formItemComponent } = props;
+    const { children, getWidgetForField, getFormatterForField, formItemComponent } = props;
     const context = useContext(UiContext);
     const { getWidgetForField: parentGetWidgetForField = null } = context || {
         getWidgetForField: null,
+    };
+    const { getFormatterForField: parentGetFormatterForField = null } = context || {
+        getFormatterForField: null,
     };
     const providedContext = useMemo(
         () => ({
@@ -85,8 +106,31 @@ export default function UiProvider(props: Props): React.ReactElement {
                 }
                 return widget;
             },
+            getFormatterForField<FieldValue, T extends HTMLElement>(
+                field: Field<FieldValue>
+            ): React.ComponentType<T> | string | null {
+                let formatter: React.ComponentType<T> | string | null = null;
+                if (getFormatterForField) {
+                    formatter = getFormatterForField(field);
+                }
+                if (!formatter) {
+                    if (!parentGetFormatterForField) {
+                        throw new Error(
+                            `No formatter provided for field ${field}. Update the 'getFormatterForField' function passed to UiProvider to handle this field.`
+                        );
+                    }
+                    return parentGetFormatterForField(field);
+                }
+                return formatter;
+            },
         }),
-        [formItemComponent, getWidgetForField, parentGetWidgetForField]
+        [
+            formItemComponent,
+            getWidgetForField,
+            parentGetWidgetForField,
+            getFormatterForField,
+            parentGetFormatterForField,
+        ]
     );
     return <UiContext.Provider value={providedContext}>{children}</UiContext.Provider>;
 }
