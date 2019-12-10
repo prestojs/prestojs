@@ -1,11 +1,11 @@
 {
   "name": "django-testbed",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Just for testing features end to end",
   "private": true,
   "main": "bundle.js",
   "scripts": {
-    "build": "cd frontend && yarn run clean && NODE_ENV=production webpack",
+    "build": "echo skipped",
     "postbuild": "mkdir -p frontend/dist-source-maps && mv frontend/dist/*.map frontend/dist-source-maps/ || :",
     "clean": "rm -rf frontend/dist",
     "dev": "cd frontend && node webpack.devserver.js",
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@alliance-software/webpack-dev-utils": "^0.4.0",
-    "@xenopus/viewmodel": "*",
+    "@xenopus/viewmodel": "^0.0.2",
     "antd": "^3.25.2",
     "classnames": "^2.2.6",
     "core-js": "^3.2.1",

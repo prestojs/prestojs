@@ -1,6 +1,6 @@
 {
   "name": "@xenopus/rest",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
@@ -13,7 +13,7 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@xenopus/routing": "^0.0.1",
+    "@xenopus/routing": "^0.0.2",
     "swr": "^0.1.12"
   },
   "devDependencies": {
