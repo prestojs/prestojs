@@ -14,6 +14,7 @@
     "check-types": "tsc -b tsconfig.lint.json",
     "clean": "lerna run clean --ignore django-testbed",
     "prebuild": "lerna run clean",
+    "prepublish": "lerna run build",
     "test": "jest",
     "dev": "lerna run --parallel 'dev'",
     "build": "lerna run --parallel 'build' --ignore django-testbed",

@@ -1,6 +1,6 @@
 {
   "name": "@xenopus/ui-antd",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
@@ -13,8 +13,8 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
-    "@xenopus/viewmodel": "^0.0.1",
-    "@xenopus/ui": "^0.0.1"
+    "@xenopus/ui": "^0.0.1",
+    "@xenopus/viewmodel": "^0.0.1"
   },
   "dependencies": {
     "antd": "^3.25.1",

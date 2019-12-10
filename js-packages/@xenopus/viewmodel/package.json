@@ -1,6 +1,6 @@
 {
   "name": "@xenopus/viewmodel",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
   "module": "build/module/index.js",
