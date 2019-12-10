@@ -74,11 +74,12 @@ test('should support transformation function', async () => {
         },
     });
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
-        transformBody: (data: Record<string, any>): Record<string, any> => data.toUpperCase(),
+        transformResponseBody: (data: Record<string, any>): Record<string, any> =>
+            data.toUpperCase(),
     });
     expect(await action1.prepare().execute()).toBe('HELLO WORLD');
     const action2 = new Endpoint(new UrlPattern('/whatever/'), {
-        transformBody: (data: Record<string, any>): Record<string, any> =>
+        transformResponseBody: (data: Record<string, any>): Record<string, any> =>
             Object.entries(data).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {}),
     });
     fetchMock.mockResponseOnce(JSON.stringify({ a: 'b', c: 'd' }), {

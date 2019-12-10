@@ -10,7 +10,7 @@ type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
 
 type EndpointOptions = ExecuteInitOptions & {
     decodeBody?: (res: Response) => any;
-    transformBody?: (data: any) => any;
+    transformResponseBody?: (data: any) => any;
 };
 
 type UrlResolveOptions = {
@@ -158,9 +158,9 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  * Describe an REST API endpoint that can then be executed.
  *
  * Accepts a `UrlPattern` and optionally a `decodeBody` function which decodes the `Response` body as returned by
- * `fetch` and a `transformBody` function that can transform the decoded body. The default `decodeBody` handles
+ * `fetch` and a `transformResponseBody` function that can transform the decoded body. The default `decodeBody` handles
  * decoding the data based on content type and is suitable for endpoints that return JSON or text with the appropriate
- * content types. If you just wish to do something with the decoded data (eg. the JSON data) use `transformBody`.
+ * content types. If you just wish to do something with the decoded data (eg. the JSON data) use `transformResponseBody`.
  *
  * In addition you can pass all options accepted by `fetch` and these will be used as defaults to any call to `execute`
  * or `prepare`.
@@ -250,17 +250,21 @@ export default class Endpoint {
     };
 
     urlPattern: UrlPattern;
-    transformBody?: (data: any) => any;
+    transformResponseBody?: (data: any) => any;
     urlCache: Map<string, Map<{}, PreparedAction>>;
     decodeBody: (res: Response) => any;
     requestInit: ExecuteInitOptions;
 
     constructor(
         urlPattern: UrlPattern,
-        { decodeBody = defaultDecodeBody, transformBody, ...requestInit }: EndpointOptions = {}
+        {
+            decodeBody = defaultDecodeBody,
+            transformResponseBody,
+            ...requestInit
+        }: EndpointOptions = {}
     ) {
         this.urlPattern = urlPattern;
-        this.transformBody = transformBody;
+        this.transformResponseBody = transformResponseBody;
         this.urlCache = new Map();
         this.decodeBody = decodeBody;
         this.requestInit = requestInit;
@@ -310,7 +314,7 @@ export default class Endpoint {
      * will decode JSON to an object or return text based on the content type. If the content type is
      * not JSON or text the raw `Response` will be returned.
      *
-     * You can transform the decoded body with `transformBody`. This is useful if you need to do something
+     * You can transform the decoded body with `transformResponseBody`. This is useful if you need to do something
      * with the returned data. For example you could add it to a cache or create an instance of a class.
      *
      * ```js
@@ -344,7 +348,9 @@ export default class Endpoint {
                     return res;
                 })
                 .then(res => this.decodeBody(res))
-                .then(data => (this.transformBody ? this.transformBody(data) : data));
+                .then(data =>
+                    this.transformResponseBody ? this.transformResponseBody(data) : data
+                );
         } catch (err) {
             // Fetch itself threw an error. This can happen on network error.
             // All other errors (eg. 40X responses) are handled above on res.ok

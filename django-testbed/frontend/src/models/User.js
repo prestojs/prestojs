@@ -18,17 +18,21 @@ function transformAndCacheUser(data) {
 }
 
 export default class User extends BaseUser {
+    // TODO: Not sure if we want this to be the convention. Maybe best to just
+    // export as mapping of endpoints somewhere?
     static endpoints = {
         retrieve: new Endpoint(namedUrls.get('users-detail'), {
-            transformBody: transformAndCacheUser,
+            transformResponseBody: transformAndCacheUser,
         }),
         update: new Endpoint(namedUrls.get('users-detail'), {
-            transformBody: transformAndCacheUser,
+            transformResponseBody: transformAndCacheUser,
             method: 'patch',
         }),
-        list: new Endpoint(namedUrls.get('users-list'), { transformBody: transformAndCacheUser }),
+        list: new Endpoint(namedUrls.get('users-list'), {
+            transformResponseBody: transformAndCacheUser,
+        }),
         create: new Endpoint(namedUrls.get('users-list'), {
-            transformBody: transformAndCacheUser,
+            transformResponseBody: transformAndCacheUser,
             method: 'post',
         }),
     };
