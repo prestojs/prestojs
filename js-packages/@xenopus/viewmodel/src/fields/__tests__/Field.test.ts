@@ -48,7 +48,7 @@ test('Field should clone correctly', () => {
         label: 'a',
         required: false,
         helpText: 'Help',
-        defaultValue: 1,
+        defaultValue: 'default',
         choices: new Map(),
         readOnly: false,
         writeOnly: true,

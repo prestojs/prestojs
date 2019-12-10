@@ -1,4 +1,9 @@
-import Field from './Field';
+import Field, { Props } from './Field';
+
+type NumberFieldProps = Props<string | number> & {
+    minValue?: number;
+    maxValue?: number;
+};
 
 /**
  * Base class for numeric fields
@@ -10,7 +15,7 @@ export default class NumberField<T = string | number> extends Field<string | num
     public minValue?: number;
     public maxValue?: number;
 
-    constructor(values) {
+    constructor(values: NumberFieldProps = {}) {
         const { minValue, maxValue, ...rest } = values;
 
         if (minValue !== undefined && typeof minValue !== 'number')

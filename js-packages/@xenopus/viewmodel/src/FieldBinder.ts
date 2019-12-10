@@ -2,7 +2,7 @@ import startCase from 'lodash/startCase';
 import Field from './fields/Field';
 import { freezeObject } from './util';
 
-type FieldsMapping = { [key: string]: Field<any> };
+export type FieldsMapping = { [key: string]: Field<any> };
 
 /**
  * Generate a label for a field based on its name
@@ -66,7 +66,7 @@ export default abstract class FieldBinder {
     // C respectively
     protected static __boundFields: Map<typeof FieldBinder, FieldsMapping> = new Map();
 
-    private static bindFields(fields: FieldsMapping, bindTo: typeof FieldBinder): FieldsMapping {
+    protected static bindFields(fields: FieldsMapping, bindTo: typeof FieldBinder): FieldsMapping {
         const newFields = Object.entries(fields).reduce((acc, [fieldName, field]) => {
             acc[fieldName] = field.clone();
             acc[fieldName].parent = bindTo;
@@ -77,6 +77,18 @@ export default abstract class FieldBinder {
             return acc;
         }, {});
         return freezeObject(newFields);
+    }
+
+    /**
+     * Get the unbound fields. Use this instead of accessing _fields directly. Accessing _fields after binding
+     * results in an error to avoid accidentally retrieving the unbound version when the intention was to retrieve
+     * the bound versions from `fields`.
+     */
+    public static get unboundFields(): FieldsMapping {
+        if (this.__fieldsCopy) {
+            return this.__fieldsCopy;
+        }
+        return this._fields;
     }
 
     public static set fields(fields: FieldsMapping) {

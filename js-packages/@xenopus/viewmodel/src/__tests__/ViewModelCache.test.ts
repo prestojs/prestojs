@@ -34,7 +34,7 @@ test('should cache records', () => {
 
 test('should cache records with compound keys', () => {
     class Test1 extends ViewModel {
-        static pkFieldName = ['id1', 'id2'];
+        static _pkFieldName = ['id1', 'id2'];
         static _fields = {
             id1: F('id1'),
             id2: F('id2'),
@@ -85,7 +85,7 @@ test('should validate pk(s)', () => {
     );
 
     class Test2 extends ViewModel {
-        static pkFieldName = ['id1', 'id2'];
+        static _pkFieldName = ['id1', 'id2'];
         static _fields = {
             id1: F('id1'),
             id2: F('id2'),
@@ -107,7 +107,7 @@ test('should validate pk(s)', () => {
 
 test('should always use primary key in cache regardless of whether specified', () => {
     class Test1 extends ViewModel {
-        static pkFieldName = ['id1', 'id2'];
+        static _pkFieldName = ['id1', 'id2'];
         static _fields = {
             id1: F('id1'),
             id2: F('id2'),
