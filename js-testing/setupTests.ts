@@ -1,4 +1,10 @@
+import { GlobalWithFetchMock } from 'jest-fetch-mock';
 import diff from 'jest-diff';
+
+const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock;
+
+customGlobal.fetch = require('jest-fetch-mock');
+customGlobal.fetchMock = customGlobal.fetch;
 
 expect.extend({
     toBeEqualToRecord(expected, received, msg) {

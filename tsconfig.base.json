@@ -14,7 +14,8 @@
       "@xenopus/ui": ["./js-packages/@xenopus/ui/src/"],
       "@xenopus/ui-antd": ["./js-packages/@xenopus/ui-antd/src/"],
       "@xenopus/final-form": ["./js-packages/@xenopus/final-form/src/"],
-      "@xenopus/routing": ["./js-packages/@xenopus/routing/src/"]
+      "@xenopus/routing": ["./js-packages/@xenopus/routing/src/"],
+      "@xenopus/rest": ["./js-packages/@xenopus/rest/src/"]
     }
   },
   "references": [

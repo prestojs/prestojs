@@ -1,9 +1,11 @@
-from django.conf.urls import url
+from rest_framework import routers
 
-from .views import XenopusFrogAppHomepageView
+from .views import UserViewSet
 
 app_name = "xenopus_frog"
 
-urlpatterns = [
-    url(r"^$", XenopusFrogAppHomepageView.as_view(), name="homepage"),
-]
+
+router = routers.SimpleRouter()
+router.register(r"users", UserViewSet, basename="users")
+
+urlpatterns = router.urls
