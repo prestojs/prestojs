@@ -1,6 +1,6 @@
 {
   "name": "@xenopus/final-form",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "index.js",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
