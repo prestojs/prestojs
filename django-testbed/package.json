@@ -1,6 +1,6 @@
 {
   "name": "django-testbed",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Just for testing features end to end",
   "private": true,
   "main": "bundle.js",
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@alliance-software/webpack-dev-utils": "^0.4.0",
-    "@xenopus/viewmodel": "^0.0.2",
+    "@xenopus/viewmodel": "^0.0.3",
     "antd": "^3.25.2",
     "classnames": "^2.2.6",
     "core-js": "^3.2.1",
