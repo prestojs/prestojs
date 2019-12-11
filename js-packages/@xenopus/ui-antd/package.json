@@ -1,6 +1,6 @@
 {
   "name": "@xenopus/ui-antd",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.js",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
