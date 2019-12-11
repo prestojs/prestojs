@@ -336,7 +336,7 @@ test('should support removing records from cache for only specified field names'
 
     expect(Test1.cache.get(2, ['id', 'lastName'])).toBeNull();
 
-    const email = Test1.cache.get(2, ['id', 'email']);
+    const email: any = Test1.cache.get(2, ['id', 'email']);
     expect(email).not.toBeNull();
     expect(email.toJS()).toEqual({ id: 2, email: 'bob@b.com' });
 });

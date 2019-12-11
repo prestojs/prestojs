@@ -32,8 +32,8 @@ test('Field options validation', () => {
     expect(
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
-        () => new Field({ name: 'phoneNumber', label: 'phone number', choices: [1, 2] })
-    ).toThrowError('Field phoneNumber: "choices" should be a Map, received: 1,2');
+        () => new Field({ name: 'phoneNumber', label: 'phone number', choices: 3 })
+    ).toThrowError('Field phoneNumber: "choices" should be Iterable, received: 3');
 
     expect(
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
