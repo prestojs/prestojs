@@ -23,6 +23,7 @@ test('ViewModel._model returns class', () => {
 
 test('ViewModel._pk should validate primary key fields exist', () => {
     // Passing data for fields that don't exist triggers a warning; suppress them for this test
+    // eslint-disable-next-line
     const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
     class A extends ViewModel {}
 
@@ -308,6 +309,7 @@ describe('env tests', () => {
 
         process.env.NODE_ENV = 'production';
 
+        // eslint-disable-next-line
         const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
         record2.email;
         expect(mockWarn).toHaveBeenCalledWith(
@@ -335,6 +337,7 @@ describe('env tests', () => {
 
         record1.email = 'test';
 
+        // eslint-disable-next-line
         const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
         expect(mockWarn).toHaveBeenCalledWith('email is read only');
 

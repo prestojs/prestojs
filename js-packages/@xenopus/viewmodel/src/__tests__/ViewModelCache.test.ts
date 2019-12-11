@@ -98,6 +98,8 @@ test('should validate pk(s)', () => {
     expect(() => Test2.cache.get(1, ['name'])).toThrowError(
         'Test2 has a compound key of id1, id2. You must provide an object mapping these fields to their values.'
     );
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     expect(() => Test2.cache.get({ id1: null }, ['name'])).toThrowError(
         'Test2 has a compound key of id1, id2. Missing value(s) for field(s) id1, id2'
     );
@@ -184,15 +186,15 @@ test('updating a record should result in cache for subset of fields being update
 
     Test1.cache.add(new Test1({ id: 5, firstName: 'C', lastName: 'I' }));
 
-    let firstName = Test1.cache.get(5, ['id', 'firstName']);
+    let firstName: any = Test1.cache.get(5, ['id', 'firstName']);
     expect(firstName).not.toBeNull();
     expect(firstName.toJS()).toEqual({ id: 5, firstName: 'C' });
 
-    let lastName = Test1.cache.get(5, ['id', 'lastName']);
+    let lastName: any = Test1.cache.get(5, ['id', 'lastName']);
     expect(lastName).not.toBeNull();
     expect(lastName.toJS()).toEqual({ id: 5, lastName: 'I' });
 
-    let firstLast = Test1.cache.get(5, ['id', 'firstName', 'lastName']);
+    let firstLast: any = Test1.cache.get(5, ['id', 'firstName', 'lastName']);
     expect(firstLast).not.toBeNull();
     expect(firstLast.toJS()).toEqual({ id: 5, firstName: 'C', lastName: 'I' });
 
@@ -202,11 +204,11 @@ test('updating a record should result in cache for subset of fields being update
     expect(firstName).not.toBeNull();
     expect(firstName.toJS()).toEqual({ id: 5, firstName: 'D' });
 
-    let email = Test1.cache.get(5, ['id', 'email']);
+    let email: any = Test1.cache.get(5, ['id', 'email']);
     expect(email).not.toBeNull();
     expect(email.toJS()).toEqual({ id: 5, email: '-' });
 
-    let firstEmail = Test1.cache.get(5, ['id', 'firstName', 'email']);
+    let firstEmail: any = Test1.cache.get(5, ['id', 'firstName', 'email']);
     expect(firstEmail).not.toBeNull();
     expect(firstEmail.toJS()).toEqual({ id: 5, firstName: 'D', email: '-' });
 
@@ -248,23 +250,23 @@ test('updating a record should result in cache for subset of fields being update
 
     const record1 = new Test1({ id: 5, firstName: 'Bob', lastName: 'Jack', email: 'a@b.com' });
     Test1.cache.add(record1);
-    const firstName = Test1.cache.get(5, ['id', 'firstName']);
+    const firstName: any = Test1.cache.get(5, ['id', 'firstName']);
     expect(firstName).not.toBeNull();
     expect(firstName.toJS()).toEqual({ id: 5, firstName: 'Bob' });
 
-    const lastName = Test1.cache.get(5, ['id', 'lastName']);
+    const lastName: any = Test1.cache.get(5, ['id', 'lastName']);
     expect(lastName).not.toBeNull();
     expect(lastName.toJS()).toEqual({ id: 5, lastName: 'Jack' });
 
-    let email = Test1.cache.get(5, ['id', 'email']);
+    let email: any = Test1.cache.get(5, ['id', 'email']);
     expect(email).not.toBeNull();
     expect(email.toJS()).toEqual({ id: 5, email: 'a@b.com' });
 
-    const firstLast = Test1.cache.get(5, ['id', 'firstName', 'lastName']);
+    const firstLast: any = Test1.cache.get(5, ['id', 'firstName', 'lastName']);
     expect(firstLast).not.toBeNull();
     expect(firstLast.toJS()).toEqual({ id: 5, firstName: 'Bob', lastName: 'Jack' });
 
-    const firstEmail = Test1.cache.get(5, ['id', 'firstName', 'email']);
+    const firstEmail: any = Test1.cache.get(5, ['id', 'firstName', 'email']);
     expect(firstEmail).not.toBeNull();
     expect(firstEmail.toJS()).toEqual({ id: 5, firstName: 'Bob', email: 'a@b.com' });
 
@@ -288,7 +290,7 @@ test('should use most recently set superset of fields', () => {
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
 
-    let email = Test1.cache.get(2, ['id', 'email']);
+    let email: any = Test1.cache.get(2, ['id', 'email']);
     expect(email).not.toBeNull();
     expect(email.toJS()).toEqual({ id: 2, email: 'jack@b.com' });
     // Getting same record again should be the same object
@@ -334,7 +336,7 @@ test('should support removing records from cache for only specified field names'
 
     expect(Test1.cache.get(2, ['id', 'lastName'])).toBeNull();
 
-    const email = Test1.cache.get(2, ['id', 'email']);
+    const email: any = Test1.cache.get(2, ['id', 'email']);
     expect(email).not.toBeNull();
     expect(email.toJS()).toEqual({ id: 2, email: 'bob@b.com' });
 });

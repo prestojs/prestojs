@@ -17,7 +17,6 @@ export default class NumberField<T = string | number> extends Field<string | num
             throw new Error(`Field ${name}: "minValue" should be a number, received: ${minValue}`);
         if (maxValue !== undefined && typeof maxValue !== 'number')
             throw new Error(`Field ${name}: "maxValue" should be a number, received: ${maxValue}`);
-
         super({ name, ...rest });
 
         this.minValue = minValue;

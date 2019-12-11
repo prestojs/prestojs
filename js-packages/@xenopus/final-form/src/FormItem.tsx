@@ -2,7 +2,7 @@ import React from 'react';
 import { useUi } from '@xenopus/ui';
 import { FieldProps } from 'react-final-form';
 import FormField from './FormField';
-import { Field } from '@xenopus/viewmodel/';
+import { Field } from '@xenopus/viewmodel';
 
 type CommonProps = {
     help?: React.ReactNode;
@@ -77,11 +77,15 @@ export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement
     if (field) {
         extraProps.help = field.helpText;
         extraProps.label = field.label;
+
+        // TODO - see https://gitlab.internal.alliancesoftware.com.au/alliance/xenopus/issues/21 on better way to do this
+        const fieldPropsAdded = { choices: field.choices, ...fieldProps };
+
         if (required == null && field.required) {
             required = field.required;
         }
         if (!children) {
-            children = <FormField {...fieldProps} field={field} />;
+            children = <FormField {...fieldPropsAdded} field={field} />;
         }
     } else if (!children) {
         throw new Error("When 'field' is not specified you must provide children to render");

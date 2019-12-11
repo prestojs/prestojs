@@ -1,11 +1,11 @@
 import { WidgetProps } from '@xenopus/ui';
-import { InputNumber } from 'antd';
 import React from 'react';
+import { InputNumber } from 'antd';
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
  */
-const NumberWidget = React.forwardRef(
+const FloatWidget = React.forwardRef(
     (
         { input, ...rest }: WidgetProps<number, HTMLInputElement>,
         ref: React.RefObject<InputNumber>
@@ -14,4 +14,4 @@ const NumberWidget = React.forwardRef(
     }
 );
 
-export default NumberWidget;
+export default FloatWidget;

@@ -5,4 +5,4 @@
 
 # Since pip doesn't check python versions we include a non-existent package
 # to trigger a failure if you're using the wrong python version
-python-assert-version-3.7; python_version < '3.7' or python_version > '3.7'
+python-assert-version-3.6; python_version < '3.6' or python_version > '3.6'

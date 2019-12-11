@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define,@typescript-eslint/no-use-before-define */
 import { Endpoint } from '@xenopus/rest';
-import { NumberField } from '@xenopus/viewmodel';
+import { ViewModel, IntegerField, ImageField, NullableBooleanField } from '@xenopus/viewmodel';
 
 import namedUrls from '../namedUrls';
 
@@ -39,11 +39,26 @@ export default class User extends BaseUser {
 
     static fields = {
         ...BaseUser.fields,
-        age: new NumberField({
+        age: new IntegerField({
             name: 'age',
             label: 'Age',
             required: true,
             helpText: 'Users age in years',
+            choices: [
+                [1, 'One'],
+                [2, 'OneOne'],
+                [3, 'OneOneOne'],
+                [4, 'OneOneOneOne'],
+            ],
+        }),
+        photo: new ImageField({
+            name: 'photo',
+            label: 'Photo',
+            helpText: 'foooo towwww',
+        }),
+        adult: new NullableBooleanField({
+            name: 'adult',
+            label: 'Adult',
         }),
     };
 }

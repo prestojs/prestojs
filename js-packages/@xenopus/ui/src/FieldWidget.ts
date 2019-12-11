@@ -1,7 +1,7 @@
 import React from 'react';
 
 // TODO: Based on final-form currently without much thought
-interface InputProps<FieldValue, T extends HTMLElement> {
+export interface InputProps<FieldValue, T extends HTMLElement> {
     name: string;
     onBlur: (event?: React.FocusEvent<T>) => void;
     onChange: (event: React.ChangeEvent<T> | any) => void;
@@ -14,11 +14,20 @@ interface InputProps<FieldValue, T extends HTMLElement> {
 
 export interface WidgetProps<FieldValue, T extends HTMLElement> {
     input: InputProps<FieldValue, T>;
-    meta: {};
+    meta?: {};
+    choices?: Map<FieldValue, string>;
+}
+
+export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {
+    lowerInput: P;
+    upperInput: P;
+    separator: string;
+    meta?: {};
 }
 
 type FieldWidget<FieldValue, T extends HTMLElement> =
     | React.ComponentType<WidgetProps<FieldValue, T>>
+    | React.ComponentType<RangedWidgetProps<FieldValue, T, any>>
     | 'input'
     | 'select'
     | 'textarea';
