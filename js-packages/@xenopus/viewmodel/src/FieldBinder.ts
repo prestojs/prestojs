@@ -26,9 +26,7 @@ function generateFieldLabel(name: string): string {
  * To define fields on a class implementing this use `_fields`:
  *
  * ```js
- * class FilterSet extends FieldBinder {}
- *
- * class UserFilterSet extends FilterSet {
+ * class UserFilterSet extends FieldBinder {
  *     static _fields = {
  *         name: new Field(),
  *         emailAddress: new Field(),
