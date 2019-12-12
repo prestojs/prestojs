@@ -16,11 +16,11 @@ export default function TimeFormatter({
     if (!value) return null;
 
     // we use a dummy date here as the day's irrelevant for toLocaleTimeString
-    if (Number.isNaN(Date.parse(`1970-01-01 ${value}`))) {
+    if (Number.isNaN(Date.parse(`0999-04-11 ${value}`))) {
         return null;
     }
 
-    const finalValue = new Date(`1970-01-01 ${value}`);
+    const finalValue = new Date(`0999-04-11 ${value}`);
 
     return finalValue.toLocaleTimeString(locales, localeOptions);
 }

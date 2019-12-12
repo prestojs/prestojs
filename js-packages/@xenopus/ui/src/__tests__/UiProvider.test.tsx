@@ -25,7 +25,7 @@ function FieldFormatter({ field }): React.ReactElement {
 
     const Formatter = getFormatterForField(field) as React.ComponentType<any>;
     const input = {
-        name: field.name,
+        name: field.label,
     };
     return <Formatter input={input} />;
 }
@@ -77,7 +77,7 @@ test('UiProvider should provide formatter', () => {
         return <>special_formatter</>;
     }
     function getFormatter<T>(field): React.ComponentType<T> {
-        if (field.name === 'special') {
+        if (field.label === 'special') {
             return SpecialFormatter;
         }
         return DefaultFormatter;
@@ -89,8 +89,8 @@ test('UiProvider should provide formatter', () => {
             </UiProvider>
         );
     }
-    const field1 = new Field({ name: 'special', label: 'Special' });
-    const field2 = new Field({ name: 'normal', label: 'Normal' });
+    const field1 = new Field({ label: 'special' });
+    const field2 = new Field({ label: 'normal' });
     const { rerender, container } = render(<TestWrapper field={field1} />);
     expect(container.innerHTML).toBe('special_formatter');
     rerender(<TestWrapper field={field2} />);
