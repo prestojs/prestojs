@@ -24,7 +24,7 @@ test('Field options validation', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         () => new Field({ label: 'phone number', choices: 3 })
-    ).toThrowError('Field phoneNumber: "choices" should be Iterable, received: 3');
+    ).toThrowError('"choices" should be Iterable, received: 3');
 
     expect(
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
