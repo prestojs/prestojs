@@ -1,12 +1,11 @@
 import { WidgetProps } from '@xenopus/ui';
 import { Select } from 'antd';
 import React from 'react';
-import SelectChoiceWidget from './SelectChoiceWidget';
+import SelectChoiceWidget, { SelectChoiceProps } from './SelectChoiceWidget';
 
 /**
  * See [Select](https://next.ant.design/components/select/) for Select props available
  */
-// Baaah antd still cannot distinguish between null / undefined / '' and now we're stuck with stupid blankValue.
 const NullableBooleanWidget = React.forwardRef(
     (
         {
@@ -14,9 +13,8 @@ const NullableBooleanWidget = React.forwardRef(
             blankLabel = 'Undecided',
             ...rest
         }: WidgetProps<boolean | string, HTMLElement> & {
-            blankValue: boolean | string;
             blankLabel: string;
-        },
+        } & SelectChoiceProps,
         ref: React.RefObject<Select>
     ): React.ReactElement => {
         const defaultChoices =
@@ -33,8 +31,6 @@ const NullableBooleanWidget = React.forwardRef(
             )
         ) as Map<boolean | string, string>;
         // rest onChange override comes before input onChange.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
         const f = rest.onChange || (rest.input as any).onChange;
         const onChange = (v: boolean | string): void => f(v === 'null' ? null : v);
 

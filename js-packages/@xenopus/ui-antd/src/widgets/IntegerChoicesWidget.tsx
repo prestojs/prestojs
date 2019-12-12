@@ -15,7 +15,7 @@ const IntegerChoicesWidget = React.forwardRef(
         {
             widgetType,
             ...rest
-        }: WidgetProps<number, HTMLElement> & { widgetType: 'select' | 'radio' | undefined },
+        }: WidgetProps<number, HTMLElement> & { widgetType?: 'select' | 'radio' | undefined },
         ref: any
     ): React.ReactElement => {
         if (widgetType === 'select') {
