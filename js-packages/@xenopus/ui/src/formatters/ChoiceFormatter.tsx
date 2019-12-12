@@ -1,9 +1,6 @@
-import React from 'react';
-
 export default function ChoiceFormatter<T>({
     value,
     choices,
-    ...rest
 }: {
     value: T;
     choices: Array<[T, string]>;

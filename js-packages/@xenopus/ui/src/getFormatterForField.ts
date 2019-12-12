@@ -32,13 +32,11 @@ import BooleanFormatter from './formatters/BooleanFormatter';
 import CharFormatter from './formatters/CharFormatter';
 import ChoiceFormatter from './formatters/ChoiceFormatter';
 import DateFormatter from './formatters/DateFormatter';
-import DateRangeFormatter from './formatters/DateRangeFormatter';
 import DateTimeFormatter from './formatters/DateTimeFormatter';
-import DateTimeRangeFormatter from './formatters/DateTimeRangeFormatter';
 import ImageFormatter from './formatters/ImageFormatter';
 import NumberFormatter from './formatters/NumberFormatter';
-import NumberRangeFormatter from './formatters/NumberRangeFormatter';
 import LinkFormatter from './formatters/LinkFormatter';
+import RangeFormatter from './formatters/RangeFormatter';
 import TimeFormatter from './formatters/TimeFormatter';
 
 const mapping = new Map<Class<Field<any>>, any>([
@@ -46,18 +44,18 @@ const mapping = new Map<Class<Field<any>>, any>([
     [CharField, CharFormatter],
     [CurrencyField, NumberFormatter],
     [DateField, DateFormatter],
-    [DateRangeField, DateRangeFormatter],
+    [DateRangeField, [RangeFormatter, { baseFormatter: DateFormatter }]],
     [DateTimeField, DateTimeFormatter],
-    [DateTimeRangeField, DateTimeRangeFormatter],
+    [DateTimeRangeField, [RangeFormatter, { baseFormatter: DateTimeFormatter }]],
     [DecimalField, NumberFormatter],
     [DurationField, TimeFormatter],
     [EmailField, CharFormatter],
     [FileField, LinkFormatter],
     [FloatField, NumberFormatter],
-    [FloatRangeField, NumberRangeFormatter],
+    [FloatRangeField, [RangeFormatter, { baseFormatter: NumberFormatter }]],
     [ImageField, ImageFormatter],
     [IntegerField, NumberFormatter],
-    [IntegerRangeField, NumberRangeFormatter],
+    [IntegerRangeField, [RangeFormatter, { baseFormatter: NumberFormatter }]],
     [IPAddressField, CharFormatter],
     [JsonField, CharFormatter],
     [NullableBooleanField, BooleanFormatter],
@@ -77,7 +75,7 @@ const choicesMapping = new Map<Class<Field<any>>, any>([
 
 export default function getFormatterForField<FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-): React.ComponentType<T> | string | null {
+): React.ComponentType<T> | string | null | Array<[React.ComponentType<T>, object]> {
     const formatter: React.ComponentType<T> | null | undefined = field.choices
         ? choicesMapping.get(field.constructor as Class<Field<any>>) ||
           mapping.get(field.constructor as Class<Field<any>>)

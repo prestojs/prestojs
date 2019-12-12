@@ -1,8 +1,6 @@
-import React from 'react';
-
 export default function BooleanFormatter({
     value,
-    blankLabel = 'Unknown',
+    blankLabel = '',
 }: {
     value?: boolean;
     blankLabel: string;

@@ -57,7 +57,7 @@ type Props = {
      */
     getWidgetForField?: GetWidgetForFieldWithNull;
     /**
-     * A function that is passed an instance of `Field` and should return the widget component to use
+     * A function that is passed an instance of `Field` and should return the formatter to use
      * for this field. If falsey is returned then it will fall back to a parent UiProvider (if any) or if
      * no parent UiProvider an error will be thrown.
      *
