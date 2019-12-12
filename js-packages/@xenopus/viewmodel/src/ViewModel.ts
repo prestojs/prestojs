@@ -1,28 +1,13 @@
 import isEqual from 'lodash/isEqual';
-import Field from './fields/Field';
+import FieldBinder, { FieldsMapping } from './FieldBinder';
+import NumberField from './fields/NumberField';
+import { freezeObject, isDev } from './util';
 import ViewModelCache from './ViewModelCache';
-
-type FieldsMapping = { [key: string]: Field<any> };
+import Field from './fields/Field';
 
 export type SinglePrimaryKey = string | number;
 export type CompoundPrimaryKey = { [fieldName: string]: SinglePrimaryKey };
 export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-function verifyMinified(): void {}
-
-// Check inspired by immer
-const isDev = (): boolean =>
-    typeof process !== 'undefined'
-        ? process.env.NODE_ENV !== 'production'
-        : verifyMinified.name === 'verifyMinified';
-
-function freezeObject(obj: {}): {} {
-    if (isDev()) {
-        return Object.freeze(obj);
-    }
-    return obj;
-}
 
 /**
  * Base ViewModel class for any model in the system. This should be extended and have relevant fields and meta data
@@ -34,27 +19,141 @@ function freezeObject(obj: {}): {} {
  *     static cache = new MyCustomCache();
  *
  *     // Default pkFieldName is 'id'; if you have a different pk specify here
- *     static pkFieldName = 'userId';
+ *     static _pkFieldName = 'userId';
  *
  *     // Used to describe a single user
  *     static label = 'User';
  *     // User to describe an indeterminate number of users
  *     static labelPlural = 'Users';
  *
- *     static fields = {
- *         userId: new IntegerField({ name: 'userId', label: 'User ID' })
- *         firstName: new CharField({ name: 'firstName', label: 'First Name' }),
- *         lastName: new CharField({ name: 'lastName', label: 'Last Name' }),
+ *     static _fields = {
+ *         userId: new IntegerField({ label: 'User ID' })
+ *         firstName: new CharField({ label: 'First Name' }),
+ *         // label is optional; will be generated as 'Last name'
+ *         lastName: new CharField(),
  *     };
  * }
  * ```
  */
-export default class ViewModel {
-    // Name of the primary key field for this this ViewModel (or fields for compound keys)
-    static pkFieldName: string | string[] = 'id';
+export default class ViewModel extends FieldBinder {
     static label: string;
     static labelPlural: string;
-    static fields: FieldsMapping = {};
+
+    /**
+     * Name of the primary key field for this this ViewModel (or fields for compound keys)
+     *
+     * If not specified a field will be created from `getImplicitPk`.
+     */
+    static _pkFieldName?: string | string[];
+
+    /**
+     * Get the primary key field name for this ViewModel. If `_pkFieldName` is set then
+     * that will be returned otherwise the value returned from `getImplicitPkField` will
+     * be used.
+     */
+    public static get pkFieldName(): string | string[] {
+        if (!this._pkFieldName) {
+            return this.getImplicitPkField()[0];
+        }
+        return this._pkFieldName;
+    }
+
+    /**
+     * When a primary key hasn't been explicitly defined on a ViewModel this method is
+     * called to generate the default.
+     *
+     * This can inspect the class or other fields to generate this.
+     *
+     * ```js
+     * static getImplicitPkField() {
+     *     // Generate a name based on model class name
+     *     // eg. `User` => `userId`, `AdminUser` => `adminUserId`
+     *     const name = this.name[0].toLowerCase() + this.name.slice(1);
+     *     return [`${name}Id`, new NumberField()];
+     * }
+     * ```
+     *
+     * You can also return an existing field to use that:
+     *
+     * ```js
+     * static getImplicitPkField() {
+     *     // If a ViewModel has an EntityId field use that, otherwise fallback to default
+     *     if ('EntityId' in this.unboundFields) {
+     *         return ['EntityId', this.unboundFields.EntityId];
+     *     }
+     *     return ['id', new NumberField()];
+     * }
+     * ```
+     *
+     * Compound keys are also supported:
+     *
+     * ```js
+     * static getImplicitPkField() {
+     *      return [
+     *          ['model', 'uuid'],
+     *          [new CharField(), new NumberField()],
+     *      ];
+     * }
+     * ```
+     */
+    public static getImplicitPkField(): [string, Field<any>] | [string[], Field<any>[]] {
+        // If id is defined as a field use that definition
+        if ('id' in this.unboundFields) {
+            return ['id', this.unboundFields.id];
+        }
+        return ['id', new NumberField()];
+    }
+
+    protected static bindFields(fields: FieldsMapping, bindTo: typeof FieldBinder): FieldsMapping {
+        // Detect when a class has set pkFieldName instead of _pkFieldName. In this case it will
+        // have a descriptor set and it won't be a getter.
+        const descriptor = Object.getOwnPropertyDescriptors(this).pkFieldName;
+        if (descriptor && !descriptor.get) {
+            const pkDef = Array.isArray(this.pkFieldName)
+                ? `'${this.pkFieldName.join("', '")}'`
+                : `'${this.pkFieldName}'`;
+            throw new Error(
+                `Invalid ViewModel pkFieldName customisation on ${this.name}. Please set 'static _pkFieldName = ${pkDef}' instead of  'static pkFieldName = ${pkDef}'`
+            );
+        }
+        if (this._pkFieldName) {
+            const pkFieldNames = Array.isArray(this._pkFieldName)
+                ? this._pkFieldName
+                : [this._pkFieldName];
+            const missingFields = pkFieldNames.filter(fieldName => !fields[fieldName]);
+            if (missingFields.length > 0) {
+                throw new Error(
+                    `${this.name} has '_pkFieldName' set to '${pkFieldNames.join(
+                        ', '
+                    )}' but the field(s) '${missingFields.join(', ')}' does not exist in ${
+                        this.name
+                    }._fields. Either add the missing field(s) or update '_pkFieldName' to reflect the actual primary key field.`
+                );
+            }
+        } else {
+            const [pkFieldName, pkField] = this.getImplicitPkField();
+            const newFields = { ...fields };
+            if (Array.isArray(pkFieldName) && Array.isArray(pkField)) {
+                if (pkFieldName.length !== pkField.length) {
+                    throw new Error(
+                        `When defining a compound key both the name and field definition must be an array of the same size. Received ${pkFieldName} and ${pkField}.`
+                    );
+                }
+                pkFieldName.forEach((fieldName, i) => {
+                    newFields[fieldName] = pkField[i];
+                });
+            } else {
+                if (Array.isArray(pkFieldName) || Array.isArray(pkField)) {
+                    throw new Error(
+                        `When defining a compound key both the name and field definition must be an array. Received ${pkFieldName} and ${pkField}.`
+                    );
+                }
+                newFields[pkFieldName] = pkField;
+            }
+            return super.bindFields(newFields, bindTo);
+        }
+        return super.bindFields(fields, bindTo);
+    }
 
     private static __cache: Map<typeof ViewModel, ViewModelCache<ViewModel>> = new Map();
     public static get cache(): ViewModelCache<ViewModel> {
@@ -99,28 +198,12 @@ export default class ViewModel {
      * Shortcut to get the primary key for this record
      */
     public get _pk(): PrimaryKey {
-        const { name, fields, pkFieldName } = this._model;
+        const { pkFieldName } = this._model;
         if (Array.isArray(pkFieldName)) {
-            const missingFields = pkFieldName.filter(fieldName => !fields[fieldName]);
-            if (missingFields.length > 0) {
-                const fieldDesc = `field${missingFields.length > 1 ? 's' : ''}`;
-                throw new Error(
-                    `${name} has 'pkFieldName' set to '${pkFieldName.join(
-                        ', '
-                    )}' but the ${fieldDesc} '${missingFields.join(
-                        ', '
-                    )}' does not exist in ${name}.fields. Either add the missing ${fieldDesc} or update 'pkFieldName' to reflect the actual primary key field.`
-                );
-            }
             return pkFieldName.reduce((acc, fieldName) => {
                 acc[fieldName] = this[fieldName];
                 return acc;
             }, {});
-        }
-        if (!fields[pkFieldName]) {
-            throw new Error(
-                `${name} has 'pkFieldName' set to '${pkFieldName}' but no such field exists in ${name}.fields. Either add the missing field or update 'pkFieldName' to reflect the actual primary key field.`
-            );
         }
         return this[pkFieldName];
     }
@@ -139,6 +222,23 @@ export default class ViewModel {
     public _data: { [fieldName: string]: any };
 
     constructor(data: {}) {
+        super();
+        // Catch any improperly defined classes at this point. eg. if a class is defined as
+        // class A extends ViewModel {
+        //    static fields = {}
+        // }
+        // This will be caught here (it should be '_fields' not 'fields').
+        // The check on `this._model.fields` exists so it triggers the getter on it and catches
+        // the unlikely case of the property being deleted altogether rather than just replaced.
+        // Error here is: TS2345: Argument of type 'typeof ViewModel' is not assignable to parameter of type 'typeof FieldBinder'.
+        // Not sure what to do about that ¯\_(ツ)_/¯
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        if (!this._model.fields || !this._model.__boundFields.has(this._model)) {
+            throw new Error(
+                `Class ${this._model.name} has not been defined correctly. Make sure field definitions are set on the '_fields' property and not 'fields'.`
+            );
+        }
         const pkFieldNames = this._model.pkFieldNames;
         const missing = pkFieldNames.filter(name => !(name in data));
         const empty = pkFieldNames.filter(name => name in data && data[name] == null);

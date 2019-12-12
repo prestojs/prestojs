@@ -37,10 +37,9 @@ export default class User extends BaseUser {
         }),
     };
 
-    static fields = {
-        ...BaseUser.fields,
+    static _fields = {
+        ...BaseUser._fields,
         age: new IntegerField({
-            name: 'age',
             label: 'Age',
             required: true,
             helpText: 'Users age in years',
@@ -52,12 +51,10 @@ export default class User extends BaseUser {
             ],
         }),
         photo: new ImageField({
-            name: 'photo',
             label: 'Photo',
             helpText: 'foooo towwww',
         }),
         adult: new NullableBooleanField({
-            name: 'adult',
             label: 'Adult',
         }),
     };

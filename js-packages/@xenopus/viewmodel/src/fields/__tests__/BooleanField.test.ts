@@ -1,7 +1,7 @@
 import BooleanField from '../BooleanField';
 
 test('BooleanField parse values correctly', () => {
-    const field = new BooleanField({ name: 'bool', label: 'bool' });
+    const field = new BooleanField({ label: 'bool' });
     expect(field.parse(true)).toBe(true);
     expect(field.parse(false)).toBe(false);
     expect(field.parse(null)).toBe(false);

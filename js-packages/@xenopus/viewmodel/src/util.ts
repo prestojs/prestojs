@@ -1,19 +1,15 @@
-/**
- * Utility to type a generic class type, eg.
- *
- * NOTE: If not dealing with generics just use `typeof <class>` instead
- *
- * ```js
- * class Base<T> {
- *   value?: T;
- * }
- * class Concrete<T> extends Base<T> {}
- * function factory<T>(a: Class<Base<T>>): Base<T> {
- *   return new a();
- * }
- * factory(Concrete);
- * ```
- */
-export interface Class<T> extends Function {
-    new (...args: any[]): T;
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+function verifyMinified(): void {}
+
+// Check inspired by immer
+export const isDev = (): boolean =>
+    typeof process !== 'undefined'
+        ? process.env.NODE_ENV !== 'production'
+        : verifyMinified.name === 'verifyMinified';
+
+export function freezeObject(obj: {}): {} {
+    if (isDev()) {
+        return Object.freeze(obj);
+    }
+    return obj;
 }

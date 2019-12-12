@@ -13,18 +13,16 @@ export default class DecimalField extends NumberField<string> {
     public decimalPlaces?: number;
 
     constructor(values) {
-        const { name, decimalPlaces, ...rest } = values;
+        const { decimalPlaces, ...rest } = values;
 
         if (decimalPlaces !== undefined && typeof decimalPlaces !== 'number')
-            throw new Error(
-                `Field ${name}: "decimalPlaces" should be a number, received: ${decimalPlaces}`
-            );
+            throw new Error(`"decimalPlaces" should be a number, received: ${decimalPlaces}`);
         if (decimalPlaces <= 0)
             throw new Error(
-                `Field ${name}: "decimalPlaces" should be a positive number, received: ${decimalPlaces}`
+                `"decimalPlaces" should be a positive number, received: ${decimalPlaces}`
             );
 
-        super({ name, ...rest });
+        super(rest);
 
         this.decimalPlaces = decimalPlaces;
     }

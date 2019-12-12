@@ -4,17 +4,17 @@ import ViewModel from '../ViewModel';
 import ViewModelCache from '../ViewModelCache';
 
 function F<T>(name): Field<T> {
-    return new Field({ name, label: name });
+    return new Field({ label: name });
 }
 
 test('should cache records', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
         };
     }
     class Test2 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
         };
     }
@@ -34,8 +34,8 @@ test('should cache records', () => {
 
 test('should cache records with compound keys', () => {
     class Test1 extends ViewModel {
-        static pkFieldName = ['id1', 'id2'];
-        static fields = {
+        static _pkFieldName = ['id1', 'id2'];
+        static _fields = {
             id1: F('id1'),
             id2: F('id2'),
             name: F('name'),
@@ -73,7 +73,7 @@ test('should cache records with compound keys', () => {
 
 test('should validate pk(s)', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
         };
     }
@@ -85,8 +85,8 @@ test('should validate pk(s)', () => {
     );
 
     class Test2 extends ViewModel {
-        static pkFieldName = ['id1', 'id2'];
-        static fields = {
+        static _pkFieldName = ['id1', 'id2'];
+        static _fields = {
             id1: F('id1'),
             id2: F('id2'),
             name: F('name'),
@@ -107,8 +107,8 @@ test('should validate pk(s)', () => {
 
 test('should always use primary key in cache regardless of whether specified', () => {
     class Test1 extends ViewModel {
-        static pkFieldName = ['id1', 'id2'];
-        static fields = {
+        static _pkFieldName = ['id1', 'id2'];
+        static _fields = {
             id1: F('id1'),
             id2: F('id2'),
             name: F('name'),
@@ -116,7 +116,7 @@ test('should always use primary key in cache regardless of whether specified', (
     }
 
     class Test2 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             name: F('name'),
         };
@@ -173,7 +173,7 @@ test('should support custom cache', () => {
 
 test('updating a record should result in cache for subset of fields being updated', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -240,7 +240,7 @@ test('updating a record should result in cache for subset of fields being update
     // been cached yet but is available as a superset of those fields. In those cases we expect the cache to
     // be populated lazily
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -280,7 +280,7 @@ test('updating a record should result in cache for subset of fields being update
 
 test('should use most recently set superset of fields', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -305,7 +305,7 @@ test('should use most recently set superset of fields', () => {
 
 test('should support removing records from cache', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -323,7 +323,7 @@ test('should support removing records from cache', () => {
 
 test('should support removing records from cache for only specified field names', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -343,7 +343,7 @@ test('should support removing records from cache for only specified field names'
 
 test('should support retrieving multiple records', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -369,7 +369,7 @@ test('should support retrieving multiple records', () => {
 
 test('should notify listeners on add, change, delete', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -441,7 +441,7 @@ test('should notify listeners on add, change, delete', () => {
 
 test('should not notify if identical record added', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -465,7 +465,7 @@ test('should not notify if identical record added', () => {
 
 test('should support listening to multiple pks', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -499,7 +499,7 @@ test('should support listening to multiple pks', () => {
 
 test('should support listening to multiple pks, batch notifications', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),
@@ -519,7 +519,7 @@ test('should support listening to multiple pks, batch notifications', () => {
 
 test('should support listening to multiple pks without specifying primary keys in field names', () => {
     class Test1 extends ViewModel {
-        static fields = {
+        static _fields = {
             id: F('id'),
             firstName: F('firstName'),
             lastName: F('lastName'),

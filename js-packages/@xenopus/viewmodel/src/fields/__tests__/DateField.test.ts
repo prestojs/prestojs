@@ -1,7 +1,7 @@
 import DateField from '../DateField';
 
 test('DateField parse values correctly', () => {
-    const field = new DateField({ name: 'date', label: 'date' });
+    const field = new DateField({ label: 'date' });
     expect(field.parse(true)).toBe(null);
     expect(field.parse(null)).toBe(null);
     expect(field.parse(undefined)).toBe(null);

@@ -27,4 +27,4 @@ export { default as TimeField } from './fields/TimeField';
 export { default as URLField } from './fields/URLField';
 export { default as UUIDField } from './fields/UUIDField';
 
-export { Class } from './util';
+export { Class } from './typeUtil';

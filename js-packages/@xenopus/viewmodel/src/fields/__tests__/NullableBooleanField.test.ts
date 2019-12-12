@@ -1,7 +1,7 @@
 import NullableBooleanField from '../NullableBooleanField';
 
 test('NullableBooleanField parse values like bool, except undefined and null are parsed as null', () => {
-    const field = new NullableBooleanField({ name: 'nullablebool', label: 'Nullable Bool' });
+    const field = new NullableBooleanField({ label: 'Nullable Bool' });
     expect(field.parse(true)).toBe(true);
     expect(field.parse(false)).toBe(false);
     expect(field.parse(null)).toBe(null);

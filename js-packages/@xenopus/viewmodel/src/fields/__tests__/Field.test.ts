@@ -1,48 +1,38 @@
+import CharField from '../CharField';
 import Field from '../Field';
 
 test('Field options validation', () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    expect(() => new Field({})).toThrowError('Field "name" is required');
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    expect(() => new Field({ name: 'phoneNumber' })).toThrowError(
-        'Field phoneNumber: "label" is required'
-    );
+    expect(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        () => new Field({ label: 'phone number', required: 3 })
+    ).toThrowError('"required" should be a boolean, received: 3');
 
     expect(
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
-        () => new Field({ name: 'phoneNumber', label: 'phone number', required: 3 })
-    ).toThrowError('Field phoneNumber: "required" should be a boolean, received: 3');
+        () => new Field({ label: 'phone number', readOnly: {} })
+    ).toThrowError('"readOnly" should be a boolean, received: [object Object]');
 
     expect(
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
-        () => new Field({ name: 'phoneNumber', label: 'phone number', readOnly: {} })
-    ).toThrowError('Field phoneNumber: "readOnly" should be a boolean, received: [object Object]');
+        () => new Field({ label: 'phone number', writeOnly: 'no' })
+    ).toThrowError('"writeOnly" should be a boolean, received: no');
 
     expect(
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
-        () => new Field({ name: 'phoneNumber', label: 'phone number', writeOnly: 'no' })
-    ).toThrowError('Field phoneNumber: "writeOnly" should be a boolean, received: no');
+        () => new Field({ label: 'phone number', choices: 3 })
+    ).toThrowError('"choices" should be Iterable, received: 3');
 
     expect(
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
-        () => new Field({ name: 'phoneNumber', label: 'phone number', choices: 3 })
-    ).toThrowError('Field phoneNumber: "choices" should be Iterable, received: 3');
-
-    expect(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        () => new Field({ name: 'phoneNumber', label: 'phone number', snake: 'oil' })
-    ).toThrowError('Field phoneNumber: received unknown option(s): snake');
+        () => new Field({ label: 'phone number', snake: 'oil' })
+    ).toThrowError('Received unknown option(s): snake');
 
     new Field({
-        name: 'a',
         label: 'a',
         required: false,
         helpText: 'Help',
@@ -51,4 +41,32 @@ test('Field options validation', () => {
         readOnly: false,
         writeOnly: true,
     });
+});
+
+test('Field should clone correctly', () => {
+    const f1 = new CharField({
+        label: 'a',
+        required: false,
+        helpText: 'Help',
+        defaultValue: 'default',
+        choices: new Map(),
+        readOnly: false,
+        writeOnly: true,
+    });
+    const f2 = f1.clone();
+    expect(Object.getPrototypeOf(f2)).toBe(Object.getPrototypeOf(f1));
+    expect(f1.constructor).toBe(f2.constructor);
+    expect(f2).toBeInstanceOf(Field);
+    expect(f2).toBeInstanceOf(CharField);
+    for (const prop of [
+        'label',
+        'required',
+        'helpText',
+        'defaultValue',
+        'choices',
+        'readOnly',
+        'writeOnly',
+    ]) {
+        expect(f2[prop]).toEqual(f1[prop]);
+    }
 });
