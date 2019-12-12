@@ -73,10 +73,15 @@ const choicesMapping = new Map<Class<Field<any>>, any>([
     [IntegerField, ChoiceFormatter],
 ]);
 
+/*
+ * Returns the default formatter for any given Field.
+ *
+ * Depending on Field, this will return either a Formatter component directly, or [Formatter, props] where props is the default props that would be applied to said formatter.
+ */
 export default function getFormatterForField<FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-): React.ComponentType<T> | string | null | Array<[React.ComponentType<T>, object]> {
-    const formatter: React.ComponentType<T> | null | undefined = field.choices
+): React.FunctionComponent | [React.FunctionComponent, object] | null {
+    const formatter: React.FunctionComponent | null | undefined = field.choices
         ? choicesMapping.get(field.constructor as Class<Field<any>>) ||
           mapping.get(field.constructor as Class<Field<any>>)
         : mapping.get(field.constructor as Class<Field<any>>);

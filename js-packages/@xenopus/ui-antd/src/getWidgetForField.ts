@@ -1,4 +1,4 @@
-import { FieldWidget } from '@xenopus/ui';
+import { FieldWidgetType } from '@xenopus/ui';
 import {
     Field,
     BooleanField,
@@ -58,14 +58,14 @@ import URLWidget from './widgets/URLWidget';
 import UUIDWidget from './widgets/UUIDWidget';
 
 // RangeField is not included: its not meant to be used directly - TODO: mark it abstract?
-const mapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([
+const mapping = new Map<Class<Field<any>>, FieldWidgetType<any, any>>([
     [BooleanField, BooleanWidget],
     [CharField, CharWidget],
     [CurrencyField, CurrencyWidget],
     [DateField, DateWidget],
-    [DateRangeField, DateRangeWidget], // 1
+    [DateRangeField, DateRangeWidget],
     [DateTimeField, DateTimeWidget],
-    [DateTimeRangeField, DateTimeRangeWidget], // 2
+    [DateTimeRangeField, DateTimeRangeWidget],
     [DecimalField, DecimalWidget],
     [DurationField, DurationWidget],
     [EmailField, EmailWidget],
@@ -87,27 +87,48 @@ const mapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([
 ]);
 
 // choices -> select/radio widgets; only accepting integer(for enum) and char for now - might want to expand to currency type of currency later.
-const choicesMapping = new Map<Class<Field<any>>, FieldWidget<any, any>>([
+const choicesMapping = new Map<Class<Field<any>>, FieldWidgetType<any, any>>([
     [CharField, CharChoicesWidget],
     [IntegerField, IntegerChoicesWidget],
 ]);
 
+/*
+ * Returns the default widget for any given Field.
+ *
+ * Depending on Field, this will return either a FieldWidget component directly, or [FieldWidget, props] where props is the default props that would be applied to said widget.
+ */
 export default function getWidgetForField<FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-): FieldWidget<FieldValue, T> | null {
+): FieldWidgetType<FieldValue, T> | [FieldWidgetType<FieldValue, T>, object] | null {
     // Couldn't work out what to type this as so field.constructor was accepted
-    const widget: FieldWidget<any, any> | null | undefined = field.choices
+    const widget: FieldWidgetType<any, any> | null | undefined = field.choices
         ? choicesMapping.get(field.constructor as Class<Field<any>>) ||
           mapping.get(field.constructor as Class<Field<any>>)
         : mapping.get(field.constructor as Class<Field<any>>);
 
+    const getReturnWithChoices = (
+        w,
+        f
+    ): FieldWidgetType<FieldValue, T> | [FieldWidgetType<FieldValue, T>, object] => {
+        if (f.choices) {
+            if (Array.isArray(w)) {
+                return [w[0], { ...w[1], choices: f.choices }];
+            } else {
+                return [w, { choices: f.choices }];
+            }
+        } else {
+            return w;
+        }
+    };
+
     if (widget) {
-        return widget;
+        return getReturnWithChoices(widget, field);
     }
+
     // If exact match not found check for any descendant classes
     for (const [fieldClass, component] of mapping) {
         if (field instanceof fieldClass) {
-            return component;
+            return getReturnWithChoices(component, field);
         }
     }
 

@@ -1,5 +1,11 @@
-import { RangedWidgetProps } from './FieldWidget';
-
 export { default as UiProvider } from './UiProvider';
 export { default as useUi } from './useUi';
-export { default as FieldWidget, WidgetProps, InputProps, RangedWidgetProps } from './FieldWidget';
+export {
+    default as FieldWidgetType,
+    WidgetProps,
+    InputProps,
+    RangedWidgetProps,
+} from './FieldWidgetInterface';
+export { default as getFormatterForField } from './getFormatterForField';
+export { default as FieldWidget } from './FieldWidget';
+export { default as FieldFormatter } from './FieldFormatter';

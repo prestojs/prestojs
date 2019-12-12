@@ -2,7 +2,7 @@ import { Field } from '@xenopus/viewmodel';
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import FieldWidget, { WidgetProps } from '../FieldWidget';
+import FieldWidgetType, { WidgetProps } from '../FieldWidgetInterface';
 import useUi from '../useUi';
 import UiProvider from '../UiProvider';
 
@@ -23,7 +23,7 @@ function FieldWrapper({ field }): React.ReactElement {
 function FieldFormatter({ field }): React.ReactElement {
     const { getFormatterForField } = useUi();
 
-    const Formatter = getFormatterForField(field) as React.ComponentType<any>;
+    const Formatter = getFormatterForField(field) as React.FunctionComponent<any>;
     const input = {
         name: field.label,
     };
@@ -116,8 +116,9 @@ test('UiProvider should support nested providers', () => {
         }
         return DefaultWidget;
     }
-    function getWidgetInner<T>(field): FieldWidget<T, any> | null {
-        if (field.label === 'inner') {
+
+    function getWidgetInner<T>(field): FieldWidgetType<T, any> | null {
+        if (field.name === 'inner') {
             return NestedWidget;
         }
         return null;
