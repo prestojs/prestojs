@@ -1,9 +1,5 @@
 import { GlobalWithFetchMock } from 'jest-fetch-mock';
 import diff from 'jest-diff';
-import { configure } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
-
-configure({ adapter: new Adapter() });
 
 const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock;
 

@@ -7,7 +7,7 @@ export interface InputProps<FieldValue, T extends HTMLElement> {
     onChange: (event: React.ChangeEvent<T> | any) => void;
     onFocus: (event?: React.FocusEvent<T>) => void;
     type?: string;
-    value: FieldValue;
+    value?: FieldValue;
     checked?: boolean;
     multiple?: boolean;
 }
