@@ -14,6 +14,21 @@ This is a monorepo. Structure:
 * `python-packages` - all packages to be `pip` installed go here
 * `django-testbed` - clone of the django template project for testing things end to end. all `js-packages` can be imported and any python django apps should be symlinked in `django-root`.
 
+### Commits
+
+Using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) with [commit-zen](https://github.com/commitizen/cz-cli) to
+assist with releases and generating changelogs. Changelog integration with lerna is through [cz-lerna-changelog](https://github.com/atlassian/cz-lerna-changelog).
+
+A git commit hook is in place to trigger commit-zen on commit.
+
+### Releases
+
+TODO: Fill out more as we know what we are doing
+
+```bash
+yarn publish
+```
+
 ### Initial setup
 
 * Install dependencies, initialise lerna

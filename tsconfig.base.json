@@ -4,9 +4,8 @@
     "esModuleInterop": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "target": "esnext",
-    "module": "esnext",
-    "lib": ["esnext", "dom"],
+    "target": "es6",
+    "lib": ["dom", "es2017"],
     "baseUrl": ".",
     "paths": {
       "@xenopus/viewmodel": ["./js-packages/@xenopus/viewmodel/src/"],
