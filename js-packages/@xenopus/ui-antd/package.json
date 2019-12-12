@@ -1,13 +1,21 @@
 {
   "name": "@xenopus/ui-antd",
   "version": "0.0.1",
-  "main": "index.js",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
+  "main": "build/cjs/index.js",
   "module": "build/module/index.js",
+  "files": [
+    "build",
+    "src",
+    "README.md"
+  ],
+  "sideEffects": false,
   "scripts": {
     "build:declaration": "tsc --project tsconfig.json",
-    "build": "BABEL_ENV=build babel src --root-mode upward --out-dir build/module --source-maps --extensions .ts,.tsx --delete-dir-on-start",
+    "build": "yarn build:esmodule && yarn build:commonjs",
+    "build:esmodule": "BABEL_MODULES=esmodule BABEL_ENV=build babel src --root-mode upward --out-dir build/module --source-maps --extensions .ts,.tsx --delete-dir-on-start",
+    "build:commonjs": "BABEL_MODULES=commonjs BABEL_ENV=build babel src --root-mode upward --out-dir build/cjs --source-maps --extensions .ts,.tsx --delete-dir-on-start",
     "build:watch": "yarn build --watch",
     "dev": "yarn build:watch",
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"

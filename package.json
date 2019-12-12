@@ -14,6 +14,8 @@
     "check-types": "tsc -b tsconfig.lint.json",
     "clean": "lerna run clean --ignore django-testbed",
     "prebuild": "lerna run clean",
+    "prepublish": "lerna run build",
+    "publish": "yarn clean && lerna publish",
     "test": "jest",
     "dev": "lerna run --parallel 'dev'",
     "build": "lerna run --parallel 'build' --ignore django-testbed",
@@ -28,6 +30,8 @@
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",
     "babel-jest": "^24.9.0",
+    "commitizen": "^4.0.3",
+    "cz-lerna-changelog": "^2.0.0",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-import": "^2.18.2",
@@ -57,8 +61,12 @@
     "hooks": {
       "pre-commit": "yarn check-types && lint-staged",
       "pre-push": "LINT_PUSH=1 ./bin/lint/lint-general.py",
-      "commit-msg": "./bin/lint/git-commit-msg $HUSKY_GIT_PARAMS",
-      "prepare-commit-msg": "./bin/lint/git-prepare-commit-msg $HUSKY_GIT_PARAMS"
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-lerna-changelog"
     }
   }
 }
