@@ -1,16 +1,20 @@
 import React from 'react';
 import getFormatterForField from './getFormatterForField';
 import { Field } from '@xenopus/viewmodel';
+import useUi from './useUi';
 
+/*
+ Wraps around getFormatterForField to always return ReactElement; Applies default props from getFormatterForField if any.
+ */
 export default function FieldFormatter<FieldValue>({
     field,
     ...rest
 }: {
     field: Field<FieldValue>;
-}): React.ReactElement | null {
-    const Formatter = getFormatterForField(field);
+}): React.ReactElement {
+    const { getFormatterForField } = useUi();
 
-    if (!Formatter) return null;
+    const Formatter = getFormatterForField(field) as React.ComponentType<any>;
 
     if (Array.isArray(Formatter)) {
         const [ActualFormatter, props] = Formatter;

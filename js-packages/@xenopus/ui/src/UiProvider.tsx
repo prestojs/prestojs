@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { Field } from '@xenopus/viewmodel';
-import FieldWidgetType from './FieldWidgetInterface';
+import { FieldWidgetType } from './FieldWidgetInterface';
 
 type GetWidgetForField = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
@@ -12,11 +12,11 @@ type GetWidgetForFieldWithNull = <FieldValue, T extends HTMLElement>(
 
 type GetFormatterForField = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-) => React.FunctionComponent | string;
+) => React.ComponentType<T>;
 
 type GetFormatterForFieldWithNull = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-) => React.FunctionComponent | string | null;
+) => React.ComponentType<T> | null;
 
 export interface FormItemProps {
     required: boolean;
@@ -108,8 +108,8 @@ export default function UiProvider(props: Props): React.ReactElement {
             },
             getFormatterForField<FieldValue, T extends HTMLElement>(
                 field: Field<FieldValue>
-            ): React.FunctionComponent | string | null {
-                let formatter: React.FunctionComponent | string | null = null;
+            ): React.ComponentType<T> | null {
+                let formatter: React.ComponentType<T> | null = null;
                 if (getFormatterForField) {
                     formatter = getFormatterForField(field);
                 }

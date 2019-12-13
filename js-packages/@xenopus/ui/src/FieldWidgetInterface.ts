@@ -25,11 +25,8 @@ export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {
     meta?: {};
 }
 
-type FieldWidgetType<FieldValue, T extends HTMLElement> =
-    | React.ComponentType<WidgetProps<FieldValue, T>>
-    | React.ComponentType<RangedWidgetProps<FieldValue, T, any>>
+export type FieldWidgetType<FieldValue, T extends HTMLElement> =
+    | React.ComponentType<WidgetProps<FieldValue, T> | RangedWidgetProps<FieldValue, T, any>>
     | 'input'
     | 'select'
     | 'textarea';
-
-export default FieldWidgetType;

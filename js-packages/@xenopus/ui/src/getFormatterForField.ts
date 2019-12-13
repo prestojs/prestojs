@@ -80,7 +80,7 @@ const choicesMapping = new Map<Class<Field<any>>, any>([
  */
 export default function getFormatterForField<FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-): React.FunctionComponent | [React.FunctionComponent, object] | null {
+): React.ComponentType<T> | [React.ComponentType<T>, object] | null {
     const formatter: React.FunctionComponent | null | undefined = field.choices
         ? choicesMapping.get(field.constructor as Class<Field<any>>) ||
           mapping.get(field.constructor as Class<Field<any>>)

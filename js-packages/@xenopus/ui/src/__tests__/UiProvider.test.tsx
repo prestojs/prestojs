@@ -2,7 +2,7 @@ import { Field } from '@xenopus/viewmodel';
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import FieldWidgetType, { WidgetProps } from '../FieldWidgetInterface';
+import { FieldWidgetType, WidgetProps } from '../FieldWidgetInterface';
 import useUi from '../useUi';
 import UiProvider from '../UiProvider';
 
@@ -23,7 +23,7 @@ function FieldWrapper({ field }): React.ReactElement {
 function FieldFormatter({ field }): React.ReactElement {
     const { getFormatterForField } = useUi();
 
-    const Formatter = getFormatterForField(field) as React.FunctionComponent<any>;
+    const Formatter = getFormatterForField(field) as React.ComponentType<any>;
     const input = {
         name: field.label,
     };
@@ -48,7 +48,7 @@ test('UiProvider should provide widget', () => {
     function SpecialWidget(): React.ReactElement {
         return <>special_widget</>;
     }
-    function getWidget<T>(field): FieldWidget<T, any> {
+    function getWidget<T>(field): FieldWidgetType<T, any> {
         if (field.label === 'special') {
             return SpecialWidget;
         }
@@ -107,7 +107,7 @@ test('UiProvider should support nested providers', () => {
     function NestedWidget(): React.ReactElement {
         return <>nested_widget</>;
     }
-    function getWidgetOuter<T>(field): FieldWidget<T, any> | null {
+    function getWidgetOuter<T>(field): FieldWidgetType<T, any> | null {
         if (field.label === 'special') {
             return SpecialWidget;
         }
