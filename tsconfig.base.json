@@ -8,30 +8,30 @@
     "lib": ["dom", "es2017"],
     "baseUrl": ".",
     "paths": {
-      "@xenopus/viewmodel": ["./js-packages/@xenopus/viewmodel/src/"],
-      "@xenopus/codegen": ["./js-packages/@xenopus/codegen/src/"],
-      "@xenopus/ui": ["./js-packages/@xenopus/ui/src/"],
-      "@xenopus/ui-antd": ["./js-packages/@xenopus/ui-antd/src/"],
-      "@xenopus/final-form": ["./js-packages/@xenopus/final-form/src/"],
-      "@xenopus/routing": ["./js-packages/@xenopus/routing/src/"],
-      "@xenopus/rest": ["./js-packages/@xenopus/rest/src/"]
+      "@prestojs/viewmodel": ["./js-packages/@prestojs/viewmodel/src/"],
+      "@prestojs/codegen": ["./js-packages/@prestojs/codegen/src/"],
+      "@prestojs/ui": ["./js-packages/@prestojs/ui/src/"],
+      "@prestojs/ui-antd": ["./js-packages/@prestojs/ui-antd/src/"],
+      "@prestojs/final-form": ["./js-packages/@prestojs/final-form/src/"],
+      "@prestojs/routing": ["./js-packages/@prestojs/routing/src/"],
+      "@prestojs/rest": ["./js-packages/@prestojs/rest/src/"]
     }
   },
   "references": [
     {
-      "path": "./js-packages/@xenopus/viewmodel/tsconfig.json"
+      "path": "./js-packages/@prestojs/viewmodel/tsconfig.json"
     },
     {
-      "path": "./js-packages/@xenopus/codegen/tsconfig.json"
+      "path": "./js-packages/@prestojs/codegen/tsconfig.json"
     },
     {
-      "path": "./js-packages/@xenopus/ui/tsconfig.json"
+      "path": "./js-packages/@prestojs/ui/tsconfig.json"
     },
     {
-      "path": "./js-packages/@xenopus/ui-antd/tsconfig.json"
+      "path": "./js-packages/@prestojs/ui-antd/tsconfig.json"
     },
     {
-      "path": "./js-packages/@xenopus/final-form/tsconfig.json"
+      "path": "./js-packages/@prestojs/final-form/tsconfig.json"
     }
   ],
 

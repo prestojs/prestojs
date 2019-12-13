@@ -1,4 +1,4 @@
-import { NamedUrlPatterns, UrlPattern } from '@xenopus/routing';
+import { NamedUrlPatterns, UrlPattern } from '@prestojs/routing';
 
 export default new NamedUrlPatterns({
     'users-detail': new UrlPattern('/api/users/:id/'),

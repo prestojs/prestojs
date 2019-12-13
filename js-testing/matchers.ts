@@ -1,4 +1,4 @@
-import { ViewModel } from '@xenopus/viewmodel';
+import { ViewModel } from '@prestojs/viewmodel';
 import './setupTests';
 
 /**

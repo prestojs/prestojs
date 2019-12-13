@@ -11,19 +11,19 @@
   },
   "references": [
     {
-      "path": "./js-packages/@xenopus/viewmodel/tsconfig.lint.json"
+      "path": "./js-packages/@prestojs/viewmodel/tsconfig.lint.json"
     },
     {
-      "path": "./js-packages/@xenopus/codegen/tsconfig.lint.json"
+      "path": "./js-packages/@prestojs/codegen/tsconfig.lint.json"
     },
     {
-      "path": "./js-packages/@xenopus/ui/tsconfig.json"
+      "path": "./js-packages/@prestojs/ui/tsconfig.json"
     },
     {
-      "path": "./js-packages/@xenopus/ui-antd/tsconfig.json"
+      "path": "./js-packages/@prestojs/ui-antd/tsconfig.json"
     },
     {
-      "path": "./js-packages/@xenopus/final-form/tsconfig.json"
+      "path": "./js-packages/@prestojs/final-form/tsconfig.json"
     }
   ]
 }

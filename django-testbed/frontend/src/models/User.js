@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define,@typescript-eslint/no-use-before-define */
-import { Endpoint } from '@xenopus/rest';
-import { ViewModel, IntegerField, ImageField, NullableBooleanField } from '@xenopus/viewmodel';
+import { Endpoint } from '@prestojs/rest';
+import { ViewModel, IntegerField, ImageField, NullableBooleanField } from '@prestojs/viewmodel';
 
 import namedUrls from '../namedUrls';
 

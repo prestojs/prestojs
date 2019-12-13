@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import React from 'react';
-import { Form } from '@xenopus/final-form';
+import { Form } from '@prestojs/final-form';
 
 import User from '../models/User';
 import useConnected from '../useConnected';

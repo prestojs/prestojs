@@ -1,7 +1,7 @@
-import { ViewModel } from '@xenopus/viewmodel';
+import { ViewModel } from '@prestojs/viewmodel';
 import { useEffect, useState } from 'react';
 
-// Placeholder until proper version written in @xenopus
+// Placeholder until proper version written in @prestojs
 export default function useConnected(data) {
     const [record, setRecord] = useState(() => {
         if (data instanceof ViewModel) {

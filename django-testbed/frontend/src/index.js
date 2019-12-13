@@ -1,4 +1,4 @@
-import { Endpoint } from '@xenopus/rest';
+import { Endpoint } from '@prestojs/rest';
 import React from 'react';
 import { render } from 'react-dom';
 
