@@ -19,7 +19,7 @@ export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
  *     static cache = new MyCustomCache();
  *
  *     // Default pkFieldName is 'id'; if you have a different pk specify here
- *     static _pkFieldName = 'userId';
+ *     // static pkFieldName = 'userId';
  *
  *     // Used to describe a single user
  *     static label = 'User';
@@ -39,23 +39,103 @@ export default class ViewModel extends FieldBinder {
     static label: string;
     static labelPlural: string;
 
+    private static __pkFieldNameMap: Map<typeof ViewModel, string | string[]> = new Map();
+
+    // This gets triggered in test cases when extending a class... I don't think this is
+    // standard behaviour and definitely doesn't occur in all the browsers + node I've tried.
+    // Without this it triggers an error in test cases because only the getter is available.
+    // Must be something to do with how code is being compiled.
+    // eg.
+    // class A extends ViewModel {
+    //     // In test cases this triggers the setter
+    //     // Everywhere else it just overrides the property
+    //     static pkFieldName = 'id';
+    // }
+    public static set pkFieldName(pkFieldName: string | string[]) {
+        Object.defineProperty(this, 'pkFieldName', { value: pkFieldName });
+    }
+
     /**
      * Name of the primary key field for this this ViewModel (or fields for compound keys)
      *
      * If not specified a field will be created from `getImplicitPk`.
      */
-    static _pkFieldName?: string | string[];
+    public static get pkFieldName(): string | string[] {
+        // This is deferred to another function as we need to create pk fields either here
+        // or in bindFields - whichever one is called first
+        return this.getOrCreatePkField();
+    }
 
     /**
-     * Get the primary key field name for this ViewModel. If `_pkFieldName` is set then
-     * that will be returned otherwise the value returned from `getImplicitPkField` will
-     * be used.
+     * Get or create primary key as required. Returns the primary key name(s).
+     *
+     * See createImplicitPkField for details on how `fields` is used
      */
-    public static get pkFieldName(): string | string[] {
-        if (!this._pkFieldName) {
-            return this.getImplicitPkField()[0];
+    private static getOrCreatePkField(fields?: FieldsMapping): string | string[] {
+        // If pkFieldName has been explicitly defined then we need to just return that
+        const descriptor = Object.getOwnPropertyDescriptors(this).pkFieldName;
+        if (descriptor && !descriptor.get) {
+            return descriptor.value as string | string[];
         }
-        return this._pkFieldName;
+
+        // TODO: We could replace the getter here:
+        //    Object.defineProperty(this, 'pkFieldName', { value: pkFieldName })
+        // But then dynamic logic (eg. naming a field based on class name in
+        // getImplicitPkField) will break, eg
+        //
+        // class User extends ViewModel {}
+        // class AdminUser extends  B {}
+        // Depending on order of access:
+        // User.pkFieldName // = userId
+        // AdminUser.pkFieldName // = userId
+        //   vs
+        // AdminUser.pkFieldName // = adminUserId
+        // User.pkFieldName // = userId
+        let pkFieldName = this.__pkFieldNameMap.get(this);
+        if (!pkFieldName) {
+            pkFieldName = this.createImplicitPkField(fields);
+            this.__pkFieldNameMap.set(this, pkFieldName);
+        }
+        return pkFieldName;
+    }
+
+    /**
+     * Create the implicit primary key field(s). If `fields` is provided then the new field(s) will be
+     * added to this object otherwise `this._fields` will be replaced with a new object with the additional
+     * fields added.
+     *
+     * The difference is to do with order of operations: if this.fields is accessed first then
+     * fields will be passed in from bindFields otherwise if pkFieldName is accessed first we operate
+     * directly on _fields.
+     */
+    protected static createImplicitPkField(fields?: FieldsMapping): string | string[] {
+        const [pkFieldName, pkField] = this.getImplicitPkField();
+        const extraFields = {};
+        if (Array.isArray(pkFieldName) && Array.isArray(pkField)) {
+            if (pkFieldName.length !== pkField.length) {
+                throw new Error(
+                    `When defining a compound key both the name and field definition must be an array of the same size. Received ${pkFieldName} and ${pkField}.`
+                );
+            }
+            pkFieldName.forEach((fieldName, i) => {
+                extraFields[fieldName] = pkField[i];
+            });
+        } else {
+            if (Array.isArray(pkFieldName) || Array.isArray(pkField)) {
+                throw new Error(
+                    `When defining a compound key both the name and field definition must be an array. Received ${pkFieldName} and ${pkField}.`
+                );
+            }
+            extraFields[pkFieldName] = pkField;
+        }
+        if (Object.keys(extraFields).length > 0) {
+            if (!fields) {
+                this._fields = { ...this._fields, ...extraFields };
+            } else {
+                Object.assign(fields, extraFields);
+            }
+        }
+        return pkFieldName;
     }
 
     /**
@@ -105,52 +185,19 @@ export default class ViewModel extends FieldBinder {
     }
 
     protected static bindFields(fields: FieldsMapping, bindTo: typeof FieldBinder): FieldsMapping {
-        // Detect when a class has set pkFieldName instead of _pkFieldName. In this case it will
-        // have a descriptor set and it won't be a getter.
-        const descriptor = Object.getOwnPropertyDescriptors(this).pkFieldName;
-        if (descriptor && !descriptor.get) {
-            const pkDef = Array.isArray(this.pkFieldName)
-                ? `'${this.pkFieldName.join("', '")}'`
-                : `'${this.pkFieldName}'`;
-            throw new Error(
-                `Invalid ViewModel pkFieldName customisation on ${this.name}. Please set 'static _pkFieldName = ${pkDef}' instead of  'static pkFieldName = ${pkDef}'`
-            );
+        let pkFieldNames = this.getOrCreatePkField(fields);
+        if (!Array.isArray(pkFieldNames)) {
+            pkFieldNames = [pkFieldNames];
         }
-        if (this._pkFieldName) {
-            const pkFieldNames = Array.isArray(this._pkFieldName)
-                ? this._pkFieldName
-                : [this._pkFieldName];
-            const missingFields = pkFieldNames.filter(fieldName => !fields[fieldName]);
-            if (missingFields.length > 0) {
-                throw new Error(
-                    `${this.name} has '_pkFieldName' set to '${pkFieldNames.join(
-                        ', '
-                    )}' but the field(s) '${missingFields.join(', ')}' does not exist in ${
-                        this.name
-                    }._fields. Either add the missing field(s) or update '_pkFieldName' to reflect the actual primary key field.`
-                );
-            }
-        } else {
-            const [pkFieldName, pkField] = this.getImplicitPkField();
-            const newFields = { ...fields };
-            if (Array.isArray(pkFieldName) && Array.isArray(pkField)) {
-                if (pkFieldName.length !== pkField.length) {
-                    throw new Error(
-                        `When defining a compound key both the name and field definition must be an array of the same size. Received ${pkFieldName} and ${pkField}.`
-                    );
-                }
-                pkFieldName.forEach((fieldName, i) => {
-                    newFields[fieldName] = pkField[i];
-                });
-            } else {
-                if (Array.isArray(pkFieldName) || Array.isArray(pkField)) {
-                    throw new Error(
-                        `When defining a compound key both the name and field definition must be an array. Received ${pkFieldName} and ${pkField}.`
-                    );
-                }
-                newFields[pkFieldName] = pkField;
-            }
-            return super.bindFields(newFields, bindTo);
+        const missingFields = pkFieldNames.filter(fieldName => !fields[fieldName]);
+        if (missingFields.length > 0) {
+            throw new Error(
+                `${this.name} has 'pkFieldName' set to '${pkFieldNames.join(
+                    ', '
+                )}' but the field(s) '${missingFields.join(', ')}' does not exist in ${
+                    this.name
+                }._fields. Either add the missing field(s) or update 'pkFieldName' to reflect the actual primary key field.`
+            );
         }
         return super.bindFields(fields, bindTo);
     }
