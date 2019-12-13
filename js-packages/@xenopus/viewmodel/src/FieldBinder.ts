@@ -96,7 +96,9 @@ export default abstract class FieldBinder {
     public static get fields(): FieldsMapping {
         let boundFields = this.__boundFields.get(this);
         if (!boundFields) {
-            boundFields = this.bindFields(this.__fieldsCopy || this._fields, this);
+            // We always pass through a copy of fields as `bindFields` is allowed to modify the
+            // object in place to add new fields (eg. see ViewModel.bindFields)
+            boundFields = this.bindFields({ ...(this.__fieldsCopy || this._fields) }, this);
             if (!this.__fieldsCopy) {
                 this.__fieldsCopy = this._fields;
                 // Add getter/setter to catch misuse of _fields after fields have be bound
@@ -119,13 +121,13 @@ export default abstract class FieldBinder {
                             return this.__fieldsCopy;
                         }
                         throw new Error(
-                            "To access fields use the 'fields' property instead of '_fields'. '_fields' is only used for defining the fields."
+                            "To access fields use the 'fields' property instead of '_fields'. '_fields' is only used for defining the fields. If you are extending this class and wish to copy the unbound fields use '.unboundFields' instead."
                         );
                     },
                 });
             }
+            this.__boundFields.set(this, boundFields);
         }
-        this.__boundFields.set(this, boundFields);
         return boundFields;
     }
 }

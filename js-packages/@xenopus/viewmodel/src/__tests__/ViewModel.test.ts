@@ -203,22 +203,21 @@ test('ViewModel should validate primary key fields exist when binding fields', (
     expect(record1._pk).toBe(1);
 
     class B extends ViewModel {
-        static _pkFieldName = ['id1', 'id2'];
+        static pkFieldName = ['id1', 'id2'];
     }
-
     expect(() => B.fields).toThrow(
-        /B has '_pkFieldName' set to 'id1, id2' but the field\(s\) 'id1, id2'/
+        /B has 'pkFieldName' set to 'id1, id2' but the field\(s\) 'id1, id2'/
     );
 
     class C extends ViewModel {
-        static _pkFieldName = ['id1', 'id2'];
+        static pkFieldName = ['id1', 'id2'];
         static _fields = {
             id1: new Field({ label: 'Id' }),
         };
     }
 
     expect(() => C.fields).toThrow(
-        /C has '_pkFieldName' set to 'id1, id2' but the field\(s\) 'id2'/
+        /C has 'pkFieldName' set to 'id1, id2' but the field\(s\) 'id2'/
     );
 
     mockWarn.mockRestore();
@@ -235,7 +234,7 @@ test('ViewModel._pk should return primary key', () => {
     expect(record1._pk).toBe(1);
 
     class B extends ViewModel {
-        static _pkFieldName = ['id1', 'id2'];
+        static pkFieldName = ['id1', 'id2'];
         static _fields = {
             id1: new Field({ label: 'Id' }),
             id2: new Field({ label: 'Id' }),
@@ -261,7 +260,7 @@ test('should validate primary key is provided', () => {
 
 test('should validate primary keys are provided', () => {
     class A extends ViewModel {
-        static _pkFieldName = ['id1', 'id2'];
+        static pkFieldName = ['id1', 'id2'];
         static _fields = {
             id1: new Field({ label: 'Id1' }),
             id2: new Field({ label: 'Id2' }),
