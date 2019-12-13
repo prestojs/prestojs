@@ -80,7 +80,7 @@ if DEBUG:
 
 # NOTE: The dev database name is shared with other developers,
 # so use something sensible and unambiguous (`reponame`, or `clientname_reponame`)
-DATABASES["default"]["NAME"] = get_env_setting("DB_NAME", "xenopus")
+DATABASES["default"]["NAME"] = get_env_setting("DB_NAME", "presto")
 DATABASES["default"]["PORT"] = get_env_setting("DB_PORT", "5432")
 DATABASES["default"]["USER"] = get_env_setting(["DB_USER", "USER"])
 _db_password = get_env_setting("DB_PASSWORD", None)
