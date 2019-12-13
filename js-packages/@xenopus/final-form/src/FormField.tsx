@@ -1,5 +1,5 @@
 import React from 'react';
-import { useUi } from '@xenopus/ui';
+import { FieldWidget } from '@xenopus/ui';
 import { Field } from '@xenopus/viewmodel';
 import { Field as FinalFormField, FieldProps } from 'react-final-form';
 
@@ -19,7 +19,6 @@ export default function FormField<T>({
     field,
     ...formProps
 }: FormFieldProps<T>): React.ReactElement {
-    const { getWidgetForField } = useUi();
     const requireModelWidget = !formProps.component && !formProps.render && !formProps.children;
     if (requireModelWidget) {
         if (!field) {
@@ -33,7 +32,7 @@ export default function FormField<T>({
         if (!formProps.name) {
             formProps.name = field.name;
         }
-        formProps.component = getWidgetForField(field);
+        formProps.render = (props): React.ReactElement => <FieldWidget field={field} {...props} />;
     }
     return <FinalFormField name={name} {...formProps} />;
 }

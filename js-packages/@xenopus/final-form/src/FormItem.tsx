@@ -78,14 +78,11 @@ export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement
         extraProps.help = field.helpText;
         extraProps.label = field.label;
 
-        // TODO - see https://gitlab.internal.alliancesoftware.com.au/alliance/xenopus/issues/21 on better way to do this
-        const fieldPropsAdded = { choices: field.choices, ...fieldProps };
-
         if (required == null && field.required) {
             required = field.required;
         }
         if (!children) {
-            children = <FormField {...fieldPropsAdded} field={field} />;
+            children = <FormField {...fieldProps} field={field} />;
         }
     } else if (!children) {
         throw new Error("When 'field' is not specified you must provide children to render");

@@ -1,22 +1,22 @@
 import React, { useContext, useMemo } from 'react';
 import { Field } from '@xenopus/viewmodel';
-import FieldWidget from './FieldWidget';
+import { FieldWidgetType } from './FieldWidgetInterface';
 
 type GetWidgetForField = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-) => FieldWidget<FieldValue, T>;
+) => FieldWidgetType<FieldValue, T>;
 
 type GetWidgetForFieldWithNull = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-) => FieldWidget<FieldValue, T> | null;
+) => FieldWidgetType<FieldValue, T> | null;
 
 type GetFormatterForField = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-) => React.ComponentType<T> | string | null;
+) => React.ComponentType<T>;
 
 type GetFormatterForFieldWithNull = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-) => React.ComponentType<T> | string | null;
+) => React.ComponentType<T> | null;
 
 export interface FormItemProps {
     required: boolean;
@@ -91,8 +91,8 @@ export default function UiProvider(props: Props): React.ReactElement {
             formItemComponent,
             getWidgetForField<FieldValue, T extends HTMLElement>(
                 field: Field<FieldValue>
-            ): FieldWidget<FieldValue, T> | null {
-                let widget: FieldWidget<FieldValue, T> | null = null;
+            ): FieldWidgetType<FieldValue, T> | null {
+                let widget: FieldWidgetType<FieldValue, T> | null = null;
                 if (getWidgetForField) {
                     widget = getWidgetForField(field);
                 }
@@ -108,8 +108,8 @@ export default function UiProvider(props: Props): React.ReactElement {
             },
             getFormatterForField<FieldValue, T extends HTMLElement>(
                 field: Field<FieldValue>
-            ): React.ComponentType<T> | string | null {
-                let formatter: React.ComponentType<T> | string | null = null;
+            ): React.ComponentType<T> | null {
+                let formatter: React.ComponentType<T> | null = null;
                 if (getFormatterForField) {
                     formatter = getFormatterForField(field);
                 }
