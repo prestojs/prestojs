@@ -118,7 +118,7 @@ test('UiProvider should support nested providers', () => {
     }
 
     function getWidgetInner<T>(field): FieldWidgetType<T, any> | null {
-        if (field.name === 'inner') {
+        if (field.label === 'inner') {
             return NestedWidget;
         }
         return null;
