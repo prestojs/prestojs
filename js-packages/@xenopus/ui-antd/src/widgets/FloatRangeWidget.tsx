@@ -1,4 +1,4 @@
-import { RangedWidgetProps } from '@xenopus/ui';
+import { RangedWidgetProps } from '@prestojs/ui';
 import { InputNumber } from 'antd';
 import React from 'react';
 import RangeWidget from './RangeWidget';

@@ -1,6 +1,6 @@
 import React from 'react';
 import getFormatterForField from './getFormatterForField';
-import { Field } from '@xenopus/viewmodel';
+import { Field } from '@prestojs/viewmodel';
 import useUi from './useUi';
 
 /*

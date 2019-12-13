@@ -1,4 +1,4 @@
-import { InputProps, WidgetProps } from '@xenopus/ui';
+import { InputProps, WidgetProps } from '@prestojs/ui';
 import { Select } from 'antd';
 import React from 'react';
 import { SelectProps } from 'antd/lib/select';

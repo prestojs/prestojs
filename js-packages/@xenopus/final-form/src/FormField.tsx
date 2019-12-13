@@ -1,6 +1,6 @@
 import React from 'react';
-import { FieldWidget } from '@xenopus/ui';
-import { Field } from '@xenopus/viewmodel';
+import { FieldWidget } from '@prestojs/ui';
+import { Field } from '@prestojs/viewmodel';
 import { Field as FinalFormField, FieldProps } from 'react-final-form';
 
 type FormFieldProps<T> =

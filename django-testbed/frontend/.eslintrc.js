@@ -19,11 +19,11 @@ module.exports = {
     rules: {
         'import/no-unresolved': [
             'error',
-            { ignore: ['.*\\.(scss|less|css)\\?no-css-modules', '@xenopus/*'] },
+            { ignore: ['.*\\.(scss|less|css)\\?no-css-modules', '@prestojs/*'] },
         ],
         // This config is for our testbed project - don't force us to create prop-types there
         'react/prop-types': 0,
-        'import/extensions': ['error', { ignore: ['@xenopus/*'] }],
+        'import/extensions': ['error', { ignore: ['@prestojs/*'] }],
         'import/no-restricted-paths': [
             'error',
             {

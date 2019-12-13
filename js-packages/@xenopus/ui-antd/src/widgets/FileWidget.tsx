@@ -1,4 +1,4 @@
-import { InputProps, WidgetProps } from '@xenopus/ui';
+import { InputProps, WidgetProps } from '@prestojs/ui';
 import { Upload, Button } from 'antd';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';

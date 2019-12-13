@@ -1,14 +1,14 @@
 # UI
 
-Base types and components for UI integration with Xenopus.
+Base types and components for UI integration with prestojs.
 
 To use wrap your app with the `UiProvider`:
 
 ```js
 import { render } from 'react-dom';
-import { UiProvider } from '@xenopus/ui';
+import { UiProvider } from '@prestojs/ui';
 import { getWidgetForField as getDateWidget} from 'customdatepackage';
-import { getWidgetForField as getAntdWidget } from '@xenopus/ui-antd';
+import { getWidgetForField as getAntdWidget } from '@prestojs/ui-antd';
 
 import App from './App';
 

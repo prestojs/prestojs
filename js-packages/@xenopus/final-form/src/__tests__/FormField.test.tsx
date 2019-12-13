@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { UiProvider } from '@xenopus/ui';
-import { NumberField, ViewModel, Field } from '@xenopus/viewmodel';
+import { UiProvider } from '@prestojs/ui';
+import { NumberField, ViewModel, Field } from '@prestojs/viewmodel';
 import Form from '../Form';
 
 class User extends ViewModel {

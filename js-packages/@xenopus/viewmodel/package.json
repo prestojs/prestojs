@@ -1,5 +1,5 @@
 {
-  "name": "@xenopus/viewmodel",
+  "name": "@prestojs/viewmodel",
   "version": "0.0.1",
   "license": "MIT",
   "typings": "build/module/index.d.ts",

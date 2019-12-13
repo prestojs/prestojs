@@ -1,5 +1,5 @@
 {
-  "name": "@xenopus/ui-antd",
+  "name": "@prestojs/ui-antd",
   "version": "0.0.1",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
@@ -21,8 +21,8 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
-    "@xenopus/ui": "^0.0.1",
-    "@xenopus/viewmodel": "^0.0.1"
+    "@prestojs/ui": "^0.0.1",
+    "@prestojs/viewmodel": "^0.0.1"
   },
   "dependencies": {
     "@ant-design/icons": "^4.0.0-alpha.11",

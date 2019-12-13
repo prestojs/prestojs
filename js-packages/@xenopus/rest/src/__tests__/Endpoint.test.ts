@@ -1,4 +1,4 @@
-import { UrlPattern } from '@xenopus/routing';
+import { UrlPattern } from '@prestojs/routing';
 import { FetchMock } from 'jest-fetch-mock';
 import Endpoint, { ApiError, RequestError } from '../Endpoint';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@xenopus/final-form",
+  "name": "@prestojs/final-form",
   "version": "0.0.1",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
@@ -21,8 +21,8 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
-    "@xenopus/ui": "^0.0.1",
-    "@xenopus/viewmodel": "^0.0.1"
+    "@prestojs/ui": "^0.0.1",
+    "@prestojs/viewmodel": "^0.0.1"
   },
   "dependencies": {
     "final-form": "^4.18.6",

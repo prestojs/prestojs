@@ -25,8 +25,8 @@ import {
     TimeField,
     URLField,
     UUIDField,
-} from '@xenopus/viewmodel';
-import { Class } from '@xenopus/viewmodel';
+} from '@prestojs/viewmodel';
+import { Class } from '@prestojs/viewmodel';
 
 import BooleanFormatter from './formatters/BooleanFormatter';
 import CharFormatter from './formatters/CharFormatter';

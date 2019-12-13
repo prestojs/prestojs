@@ -1,5 +1,5 @@
 {
-  "name": "@xenopus/codegen",
+  "name": "@prestojs/codegen",
   "version": "0.0.1",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
@@ -21,7 +21,7 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
-    "@xenopus/viewmodel": "^0.0.1"
+    "@prestojs/viewmodel": "^0.0.1"
   },
   "dependencies": {
     "lodash": "^4.17.15"

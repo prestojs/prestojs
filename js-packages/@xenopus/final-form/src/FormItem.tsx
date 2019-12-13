@@ -1,8 +1,8 @@
 import React from 'react';
-import { useUi } from '@xenopus/ui';
+import { useUi } from '@prestojs/ui';
 import { FieldProps } from 'react-final-form';
 import FormField from './FormField';
-import { Field } from '@xenopus/viewmodel';
+import { Field } from '@prestojs/viewmodel';
 
 type CommonProps = {
     help?: React.ReactNode;

@@ -1,12 +1,12 @@
 {
-  "name": "xenopus",
+  "name": "prestojs",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Dave Coates <david.coates@alliancesoftware.com.au>",
   "license": "MIT",
   "private": true,
   "workspaces": [
-    "js-packages/@xenopus/*",
+    "js-packages/@prestojs/*",
     "django-testbed"
   ],
   "scripts": {

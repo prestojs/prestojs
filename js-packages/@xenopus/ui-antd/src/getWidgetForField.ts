@@ -1,4 +1,4 @@
-import { FieldWidgetType } from '@xenopus/ui';
+import { FieldWidgetType } from '@prestojs/ui';
 import {
     Field,
     BooleanField,
@@ -26,8 +26,8 @@ import {
     TimeField,
     URLField,
     UUIDField,
-} from '@xenopus/viewmodel';
-import { Class } from '@xenopus/viewmodel';
+} from '@prestojs/viewmodel';
+import { Class } from '@prestojs/viewmodel';
 
 import BooleanWidget from './widgets/BooleanWidget';
 import CharWidget from './widgets/CharWidget';

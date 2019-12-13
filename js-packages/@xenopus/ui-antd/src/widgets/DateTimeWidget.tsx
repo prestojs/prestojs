@@ -1,5 +1,5 @@
 import React from 'react';
-import { WidgetProps } from '@xenopus/ui';
+import { WidgetProps } from '@prestojs/ui';
 import { DatePicker } from 'antd';
 import { DatePickerProps } from 'antd/lib/date-picker/interface';
 

@@ -8,7 +8,7 @@ See [path-to-regexp](https://github.com/pillarjs/path-to-regexp) for more detail
 accepted format for pattern definitions.
 
 ```js
-import { UrlPattern} from '@xenopus/routing';
+import { UrlPattern} from '@prestojs/routing';
 const userList = new UrlPattern('/users/');
 const userDetail = new UrlPattern('/users/:id/');
 
@@ -28,7 +28,7 @@ This allows you to lookup URLs based on a name
 
 ```js
 // urls.js
-import { NamedUrlPatterns, UrlPattern} from '@xenopus/routing';
+import { NamedUrlPatterns, UrlPattern} from '@prestojs/routing';
 
 export default new NamedUrlPatterns({
     'user-list': new UrlPattern('/users/'),

@@ -19,7 +19,7 @@ export class NamedUrlNotFoundError extends Error {
  *
  * ```js
  * // urls.js
- * import { NamedUrlPatterns, UrlPattern} from '@xenopus/routing';
+ * import { NamedUrlPatterns, UrlPattern} from '@prestojs/routing';
  *
  * export default new NamedUrlPatterns({
  *   'user-list': new UrlPattern('/users/'),

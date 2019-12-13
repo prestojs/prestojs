@@ -1,4 +1,4 @@
-import { WidgetProps } from '@xenopus/ui';
+import { WidgetProps } from '@prestojs/ui';
 import React from 'react';
 import { InputNumber } from 'antd';
 

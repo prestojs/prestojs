@@ -1,5 +1,5 @@
 import React from 'react';
-import { Field } from '@xenopus/viewmodel';
+import { Field } from '@prestojs/viewmodel';
 import { RangedWidgetProps, WidgetProps } from './FieldWidgetInterface';
 import useUi from './useUi';
 

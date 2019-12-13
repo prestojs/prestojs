@@ -1,7 +1,7 @@
 /**
  * TODO: Name? Action too overloaded? RestApi?
  */
-import { UrlPattern } from '@xenopus/routing';
+import { UrlPattern } from '@prestojs/routing';
 import isEqual from 'lodash/isEqual';
 
 type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {

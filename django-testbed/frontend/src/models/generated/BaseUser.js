@@ -1,4 +1,4 @@
-import { CharField, EmailField, ViewModel, NumberField } from '@xenopus/viewmodel';
+import { CharField, EmailField, ViewModel, NumberField } from '@prestojs/viewmodel';
 
 export default class Base extends ViewModel {
     static label = 'User';

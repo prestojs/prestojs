@@ -1,6 +1,6 @@
 import NumberWidget from '../widgets/NumberWidget';
 import getWidgetForField from '../getWidgetForField';
-import { NumberField } from '@xenopus/viewmodel';
+import { NumberField } from '@prestojs/viewmodel';
 
 test('getWidgetForField should return widget for field', () => {
     const fieldArgs = { label: 'b' };

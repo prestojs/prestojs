@@ -1,7 +1,7 @@
 import { Input } from 'antd';
 import React from 'react';
-import { UiProvider } from '@xenopus/ui';
-import { getWidgetForField as antdGetWidgetForField, FormItemWrapper } from '@xenopus/ui-antd';
+import { UiProvider } from '@prestojs/ui';
+import { getWidgetForField as antdGetWidgetForField, FormItemWrapper } from '@prestojs/ui-antd';
 import { SWRConfig } from 'swr';
 
 // eslint-disable-next-line import/extensions

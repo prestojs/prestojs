@@ -1,6 +1,6 @@
 import { DatePicker } from 'antd';
 import React from 'react';
-import { RangedWidgetProps } from '@xenopus/ui';
+import { RangedWidgetProps } from '@prestojs/ui';
 import RangeWidget from './RangeWidget';
 import { DatePickerProps } from 'antd/lib/date-picker/interface';
 

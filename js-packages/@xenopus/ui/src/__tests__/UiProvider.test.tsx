@@ -1,4 +1,4 @@
-import { Field } from '@xenopus/viewmodel';
+import { Field } from '@prestojs/viewmodel';
 import React from 'react';
 import { render } from '@testing-library/react';
 

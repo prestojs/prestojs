@@ -1,4 +1,4 @@
-import { RangedWidgetProps } from '@xenopus/ui';
+import { RangedWidgetProps } from '@prestojs/ui';
 import { Input } from 'antd';
 import React from 'react';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ViewModel } from '@xenopus/viewmodel';
+import { ViewModel } from '@prestojs/viewmodel';
 import { Form as FinalForm, FormProps as FinalFormProps } from 'react-final-form';
 import FormField from './FormField';
 import FormItem from './FormItem';

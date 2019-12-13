@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react';
-import { Field } from '@xenopus/viewmodel';
+import { Field } from '@prestojs/viewmodel';
 import { FieldWidgetType } from './FieldWidgetInterface';
 
 type GetWidgetForField = <FieldValue, T extends HTMLElement>(

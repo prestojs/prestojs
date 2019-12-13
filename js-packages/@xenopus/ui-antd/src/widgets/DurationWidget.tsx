@@ -1,4 +1,4 @@
-import { WidgetProps } from '@xenopus/ui';
+import { WidgetProps } from '@prestojs/ui';
 import { TimePicker } from 'antd';
 import React from 'react';
 import { TimePickerProps } from 'antd/lib/time-picker';

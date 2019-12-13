@@ -1,4 +1,4 @@
-import { RangedWidgetProps } from '@xenopus/ui';
+import { RangedWidgetProps } from '@prestojs/ui';
 import { DatePicker } from 'antd';
 import React from 'react';
 import { DatePickerProps } from 'antd/lib/date-picker/interface';

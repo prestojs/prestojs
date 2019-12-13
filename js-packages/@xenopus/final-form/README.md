@@ -9,7 +9,7 @@ TODO: Review/expand this once interface settled
 
 ```js
 import React from 'react';
-import { Form } from '@xenopus/final-form';
+import { Form } from '@prestojs/final-form';
 
 function UserForm(onSubmit) {
     return (
