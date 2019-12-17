@@ -1,0 +1,20 @@
+import { {{field_types}}, ViewModel } from '@prestojs/viewmodel';
+
+export default class Base{{ model_name }} extends ViewModel {
+    static pkFieldName = '{{ model_pk }}';
+    static label = '{{ model_label | title }}';
+    static labelPlural = '{{ model_label_plural | title }}';
+
+
+    static _fields = {
+      {% for field in fields %}
+        {{ field.name }}: new {{ field.type }}({
+          {% for name, value in field.attributes.items %}
+            {{ name }}: {{ value|safe }},
+          {% endfor %}
+        }),
+      {% endfor %}
+    };
+}
+
+

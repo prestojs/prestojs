@@ -5,6 +5,8 @@ from django.conf import settings
 from django.core.checks import register
 from django.core.checks import Tags
 
+from presto_codegen import BaseCodeGenConfig
+
 ID_WARNING_GIT = "django_site.W001"
 ID_WARNING_GIT_HOOKS = "django_site.W002"
 ID_ERROR_GIT_HOOKS = "django_site.E003"
@@ -37,3 +39,10 @@ class DjangoSiteAppConfig(AppConfig):
             from django.utils.autoreload import autoreload_started
 
             autoreload_started.connect(add_watchers)
+
+
+class MyAppCodeGenConfig(BaseCodeGenConfig):
+    frontend_path = settings.BASE_DIR.parent / "frontend/src/"
+    generate_to = frontend_path / 'models/generated/'
+    generate_descendant_to = frontend_path / 'models/'
+

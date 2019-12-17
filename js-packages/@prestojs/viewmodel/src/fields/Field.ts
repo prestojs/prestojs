@@ -1,7 +1,8 @@
 import FieldBinder from '../FieldBinder';
 
 export interface Props<T> {
-    required?: boolean;
+    blank?: boolean;
+    blankAsNull?: boolean;
     label?: string;
     helpText?: string;
     defaultValue?: T | (() => Promise<T>);
@@ -48,7 +49,9 @@ export default class Field<T> {
         return this._name;
     }
     /** Is this field required when saving a record? */
-    public required: boolean;
+    public blank: boolean;
+    /** store null instead of '' if the user left something blank? */
+    public blankAsNull: boolean;
     /**
      * Label that can be displayed as the form label for a widget
      *
@@ -80,7 +83,8 @@ export default class Field<T> {
 
     constructor(values: Props<T> = {}) {
         const {
-            required = false,
+            blank = true,
+            blankAsNull = true,
             label,
             helpText,
             defaultValue,
@@ -89,8 +93,10 @@ export default class Field<T> {
             writeOnly = false,
         } = values;
 
-        if (required !== undefined && typeof required !== 'boolean')
-            throw new Error(`"required" should be a boolean, received: ${required}`);
+        if (blank !== undefined && typeof blank !== 'boolean')
+            throw new Error(`"blank" should be a boolean, received: ${blank}`);
+        if (blankAsNull !== undefined && typeof blankAsNull !== 'boolean')
+            throw new Error(`"blankAsNull" should be a boolean, received: ${blankAsNull}`);
         if (choices !== undefined && !(Symbol.iterator in Object(choices)))
             throw new Error(`"choices" should be Iterable, received: ${choices}`);
         if (readOnly !== undefined && typeof readOnly !== 'boolean')
@@ -103,7 +109,8 @@ export default class Field<T> {
         const unknowns = Object.keys(values).filter(
             key =>
                 ![
-                    'required',
+                    'blank',
+                    'blankAsNull',
                     'label',
                     'helpText',
                     'defaultValue',
@@ -117,7 +124,8 @@ export default class Field<T> {
             throw new Error(`Received unknown option(s): ${unknowns.join(', ')}`);
         }
 
-        this.required = required;
+        this.blank = blank;
+        this.blankAsNull = blankAsNull;
         this.label = label;
         this.helpText = helpText;
         this._defaultValue = defaultValue;

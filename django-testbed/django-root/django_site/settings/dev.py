@@ -16,8 +16,13 @@ from .base import *
 # Core Site configuration
 
 DEBUG = _strtobool(get_env_setting("DEBUG", "1"))
+
+DJANGO_PRESTO_AUTO_CODEGEN = True
+DEFAULT_CODEGEN_CONFIG = "django_site.apps.MyAppCodeGenConfig"
+
 DEBUG_WEBPACK = True
 AUTOMATED_TESTS = True
+
 
 ALLOWED_HOSTS += [
     "127.0.0.1",

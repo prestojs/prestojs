@@ -13,14 +13,16 @@ export default class CharField extends Field<string> {
     public maxLength?: number;
 
     constructor(values: CharFieldProps = {}) {
-        const { maxLength, ...rest } = values;
+        const { maxLength, blankAsNull, ...rest } = values;
 
-        if (maxLength !== undefined && typeof maxLength !== 'number')
+        const asNull = blankAsNull ?? false;
+
+        if (maxLength !== undefined && maxLength !== null && typeof maxLength !== 'number')
             throw new Error(`"maxLength" should be a number, received: ${maxLength}`);
-        if (maxLength !== undefined && maxLength <= 0)
+        if (maxLength !== undefined && maxLength !== null && maxLength <= 0)
             throw new Error(`"maxLength" should be a positive number, received: ${maxLength}`);
 
-        super(rest);
+        super({blankAsNull: asNull, ...rest});
 
         this.maxLength = maxLength;
     }

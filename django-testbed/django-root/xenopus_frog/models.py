@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from allianceutils.auth.models import GenericUserProfile
 from allianceutils.auth.models import GenericUserProfileManagerMixin
 from authtools.models import AbstractEmailUser
@@ -229,3 +231,20 @@ class CustomerProfile(User):
     class Meta:
         db_table = "xenopus_frog_customer_profile"
         manager_inheritance_from_future = True
+
+
+class CandyColor:
+    ORANGE = 1
+    MAPLE = 2
+    choices = OrderedDict(((ORANGE, "orange"), (MAPLE, "maple")))
+
+
+class Candy(models.Model):
+    belongs_to = models.ForeignKey("User", on_delete=models.CASCADE)
+    color = models.PositiveSmallIntegerField(
+        choices=CandyColor.choices.items(), default=CandyColor.ORANGE
+    )
+    flavor = models.CharField(
+        blank=True, max_length=10, choices=(("Orange", "Orange"), ("Maple", "Maple"))
+    )
+    is_unistable = models.BooleanField()

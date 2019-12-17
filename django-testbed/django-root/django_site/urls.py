@@ -1,5 +1,4 @@
 from allianceutils.api.permissions import SimpleDjangoObjectPermissions
-from authtools.views import LoginView
 from authtools.views import LogoutView
 from django.conf import settings
 from django.conf.urls import include
@@ -9,6 +8,12 @@ from rest_framework.permissions import BasePermission
 from rest_framework.routers import APIRootView
 
 import django_site.views
+
+# this has nothing to do with url, but unfortunately its the only place you can safely do it post-startup
+# as by this point serializer definitions would had been imported
+# @levi: i dont think it solves you dynamic generated classes issue tho, and anything not imported automatically
+# would just gets ignored.
+from presto_codegen import run_codegen
 
 urlpatterns = []
 
@@ -56,3 +61,6 @@ if "debug_toolbar" in settings.INSTALLED_APPS:
     urlpatterns += [
         url(r"^__debug__/", include(debug_toolbar.urls)),
     ]
+
+if getattr(settings, "DJANGO_PRESTO_AUTO_CODEGEN", False) and settings.DEBUG:
+    run_codegen()
