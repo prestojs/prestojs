@@ -1,7 +1,7 @@
 Django==2.2.*
 
 # Alliance software utils
--e git+git@gitlab.internal.alliancesoftware.com.au:alliance/alliance-django-utils.git@v/0.6.0#egg=allianceutils
+-e git+https://gitlab.alliancesoftware.com.au/alliance/alliance-django-utils.git@v/0.6.1#egg=allianceutils
 
 # Bleach HTML sanitizer
 bleach

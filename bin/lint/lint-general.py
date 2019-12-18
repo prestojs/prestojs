@@ -29,7 +29,8 @@ if __name__ == "__main__":
     error = os.system("bin/lint/lint_python_packages.sh") or error
     error = os.system("bin/lint/lint_python_version.sh") or error
     error = os.system("bin/lint/lint_tests.sh") or error
-    error = os.system("bin/lint/lint_virtualenv.sh") or error
+    if not os.environ.get("NOVENV", None):
+        error = os.system("bin/lint/lint_virtualenv.sh") or error
     # error = os.system("bin/lint/lint_template_fixme.sh") or error
 
     print(f'{"👻" if error else "✅"} Linting General Done. Error code: {error}')  # noqa

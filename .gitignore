@@ -13,6 +13,7 @@ node_modules
 # dev files
 venv/
 build/
+src/
 
 # Media files
 assets/

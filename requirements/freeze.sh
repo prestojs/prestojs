@@ -66,6 +66,7 @@ echo "# WARNING: Do not edit the contents of this file directly;" >> "$REQUIREME
 echo "# You should modify base.txt and then run freeze.sh"        >> "$REQUIREMENTS_OUT"
 echo "# --------------------------------------------------------" >> "$REQUIREMENTS_OUT"
 $PIP freeze |
+	sed 's/^pytz=.*$/pytz/' |
 	grep -E -v '^(virtualenv)([>=<]|$)' >> "$REQUIREMENTS_OUT"
 
 # If for some reason you're stuck with setuptools >=34,<36 then you probably want to also filter out the extra dependencies
