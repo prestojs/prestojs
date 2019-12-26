@@ -115,7 +115,7 @@ module.exports = ({
 
     // Dev server config
     serverHost = '0.0.0.0',
-    serverPort = '3000',
+    serverPort = '3033',
 
     // List of webpack bundles
     //
