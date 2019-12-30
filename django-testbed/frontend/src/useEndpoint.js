@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 /**
@@ -9,12 +9,15 @@ import useSWR from 'swr';
  * can be used to execute the action directly, optionally with new arguments.
  */
 export default function useEndpoint(action, args, config) {
-    const preparedAction = action ? action.prepare(args) : null;
+    const [paginationState, setPaginationState] = useState();
+    const paginator = useMemo(() => action.createPaginator(null, setPaginationState), [action]);
+    const preparedAction = action ? action.prepare({ ...args, paginator }) : null;
     const execute = useCallback(init => preparedAction.execute(init), [preparedAction]);
     const result = useSWR(preparedAction && [preparedAction], act => act.execute({}), config);
     // We mutate this object as return var of useSWR is an object with getters that you lose
     // if you just spread the result
     // https://github.com/zeit/swr/issues/224
     result.execute = execute;
+    result.paginator = paginator;
     return result;
 }

@@ -1,6 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
+
 from django_filters import rest_framework as filters
+from rest_framework.pagination import CursorPagination
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
@@ -30,8 +34,30 @@ class UserFilterSet(filters.FilterSet):
         )
 
 
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size = 10
+    page_query_param = "page"
+    page_size_query_param = "pageSize"
+
+
+class UserCursorPagination(CursorPagination):
+    ordering = "date_joined"
+    page_size_query_param = "pageSize"
+
+
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all().order_by("first_name", "last_name", "email")
     serializer_class = UserSerializer
     filterset_class = UserFilterSet
     permission_classes = []
+
+    @property
+    def pagination_class(self):
+        pagination_type = self.request.query_params.get("paginationType")
+        if pagination_type == "cursor":
+            return UserCursorPagination
+        if pagination_type == "limitOffset":
+            return LimitOffsetPagination
+        if pagination_type == "pageNumber":
+            return CustomPageNumberPagination
+        return None
