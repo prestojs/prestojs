@@ -1,11 +1,12 @@
-/**
- * TODO: Name? Action too overloaded? RestApi?
- */
 import { UrlPattern } from '@prestojs/routing';
 import isEqual from 'lodash/isEqual';
+import InferredPaginator from './InferredPaginator';
+import defaultGetPaginationState from './getPaginationState';
+import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
 
 type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
     headers?: HeadersInit | Record<string, undefined | string>;
+    paginator?: PaginatorInterface;
 };
 
 type EndpointOptions = ExecuteInitOptions & {
@@ -18,7 +19,17 @@ type UrlResolveOptions = {
     query?: Record<string, boolean | string | null | number>;
 };
 
-type PrepareOptions = ExecuteInitOptions & UrlResolveOptions;
+export type ExecuteReturnVal = {
+    url: string;
+    urlArgs?: Record<string, any>;
+    query?: Record<string, boolean | string | null | number>;
+    requestInit: ExecuteInitOptions;
+    response?: Response;
+    decodedBody?: any;
+    result: any;
+};
+
+export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
 
 /**
  * Merge two Headers instances together
@@ -75,7 +86,7 @@ function mergeRequestInit(...args: ExecuteInitOptions[]): RequestInit {
 // it will call that to generate the key... which is not what we want
 class PreparedAction {
     action: Endpoint;
-    options: PrepareOptions;
+    options: EndpointExecuteOptions;
     urlResolveOptions: UrlResolveOptions;
 
     constructor(
@@ -247,8 +258,17 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  * @extract-docs
  */
 export default class Endpoint {
-    static defaultConfig: { requestInit: RequestInit } = {
+    static defaultConfig: {
+        requestInit: RequestInit;
+        getPaginationState: (
+            paginator: PaginatorInterface,
+            executeReturnVal: ExecuteReturnVal
+        ) => Record<string, any> | false;
+        paginatorClass: PaginatorInterfaceClass;
+    } = {
         requestInit: {},
+        getPaginationState: defaultGetPaginationState,
+        paginatorClass: InferredPaginator,
     };
 
     urlPattern: UrlPattern;
@@ -272,6 +292,11 @@ export default class Endpoint {
         this.requestInit = requestInit;
     }
 
+    createPaginator(initialState = {}, onChange?): PaginatorInterface {
+        const cls = Object.getPrototypeOf(this).constructor;
+        return new cls.defaultConfig.paginatorClass(initialState, onChange);
+    }
+
     /**
      * Prepare an action for execution. Given the same parameters returns the same object. This is useful
      * when using libraries like `useSWR` that accept a parameter that identifies a request and is used
@@ -286,7 +311,11 @@ export default class Endpoint {
      * If you just want to call the action directly then you can bypass `prepare` and just call `execute`
      * directly.
      */
-    prepare({ urlArgs = {}, query, ...init }: PrepareOptions = {}): PreparedAction {
+    prepare(options: EndpointExecuteOptions = {}): PreparedAction {
+        if (options.paginator) {
+            options = options.paginator.getRequestInit(options);
+        }
+        const { urlArgs = {}, query, ...init } = options;
         const url = this.urlPattern.resolve(urlArgs, { query });
         let cache = this.urlCache.get(url);
         if (!cache) {
@@ -328,32 +357,71 @@ export default class Endpoint {
      * action.execute({ urlArgs: { id: '1' }});
      * ```
      *
-     * @param urlArgs args to pass through to `urlPattern.resolve`
-     * @param query query params to pass through to `urlPattern.resolve`
-     * @param init Options to pass to `fetch`. These will be merged with any options passed to `Endpoint` directly
+     * @param options.urlArgs args to pass through to `urlPattern.resolve`
+     * @param options.query query params to pass through to `urlPattern.resolve`
+     * @param options Options to pass to `fetch`. These will be merged with any options passed to `Endpoint` directly
      * and `Endpoint.defaultConfig.requestInit`. Options passed here will take precedence. Only the `headers` key will be merged if it
      * exists in multiple places (eg. defaultConfig may include headers you want on every request). If you need to remove
      * a header entirely set the value to `undefined`.
      */
-    async execute({ urlArgs = {}, query, ...init }: PrepareOptions = {}): Promise<any> {
+    async execute(options: EndpointExecuteOptions = {}): Promise<ExecuteReturnVal> {
+        if (options.paginator) {
+            options = options.paginator.getRequestInit(options);
+        }
+        const { urlArgs = {}, query, paginator, ...init } = options;
         const url = this.urlPattern.resolve(urlArgs, { query });
         try {
             const cls = Object.getPrototypeOf(this).constructor;
-            return fetch(
+            const requestInit = mergeRequestInit(
+                cls.defaultConfig.requestInit,
+                this.requestInit,
+                init
+            );
+            const returnVal: ExecuteReturnVal = {
                 url,
-                mergeRequestInit(cls.defaultConfig.requestInit, this.requestInit, init)
-            )
+                urlArgs,
+                query,
+                requestInit,
+                result: null,
+            };
+            returnVal.result = await fetch(url, requestInit)
                 .then(async res => {
+                    returnVal.response = res;
                     if (!res.ok) {
                         throw new ApiError(res.status, res.statusText, await this.decodeBody(res));
                     }
                     return res;
                 })
                 .then(res => this.decodeBody(res))
-                .then(data =>
-                    this.transformResponseBody ? this.transformResponseBody(data) : data
-                );
+                .then(data => {
+                    returnVal.decodedBody = data;
+                    if (paginator) {
+                        // If we have a paginator update it's state based on response
+                        // This runs for all requests but should return false if response
+                        // is not paginated.
+                        const paginationState = cls.defaultConfig.getPaginationState(
+                            paginator,
+                            returnVal
+                        );
+                        if (paginationState) {
+                            paginator.setResponse(paginationState);
+                            data = paginationState.results;
+                        } else {
+                            // TODO: If you specify a paginator and the response is not paginated should
+                            // we warn? I think yes as I can't think of a reason why not but may need to
+                            // revisit this if we find a usecase
+                            console.warn(
+                                'A paginator was defined but the response was not paginated. Paginator state has not been updated.'
+                            );
+                        }
+                    }
+                    return this.transformResponseBody ? this.transformResponseBody(data) : data;
+                });
+            return returnVal;
         } catch (err) {
+            if (err instanceof ApiError) {
+                throw err;
+            }
             // Fetch itself threw an error. This can happen on network error.
             // All other errors (eg. 40X responses) are handled above on res.ok
             // check
