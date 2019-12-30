@@ -1,12 +1,17 @@
 import { UrlPattern } from '@prestojs/routing';
 import { FetchMock } from 'jest-fetch-mock';
 import Endpoint, { ApiError, RequestError } from '../Endpoint';
+import getPaginationState from '../getPaginationState';
+import InferredPaginator from '../InferredPaginator';
+import LimitOffsetPaginator from '../LimitOffsetPaginator';
+import PageNumberPaginator from '../PageNumberPaginator';
 
 const fetchMock = fetch as FetchMock;
 
 beforeEach(() => {
     fetchMock.resetMocks();
     Endpoint.defaultConfig.requestInit = {};
+    Endpoint.defaultConfig.getPaginationState = getPaginationState;
 });
 
 test('prepare should maintain equality based on inputs', () => {
@@ -77,7 +82,7 @@ test('should support transformation function', async () => {
         transformResponseBody: (data: Record<string, any>): Record<string, any> =>
             data.toUpperCase(),
     });
-    expect(await action1.prepare().execute()).toBe('HELLO WORLD');
+    expect((await action1.prepare().execute()).result).toBe('HELLO WORLD');
     const action2 = new Endpoint(new UrlPattern('/whatever/'), {
         transformResponseBody: (data: Record<string, any>): Record<string, any> =>
             Object.entries(data).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {}),
@@ -87,7 +92,7 @@ test('should support transformation function', async () => {
             'Content-Type': 'application/json',
         },
     });
-    expect(await action2.prepare().execute()).toEqual({ b: 'a', d: 'c' });
+    expect((await action2.prepare().execute()).result).toEqual({ b: 'a', d: 'c' });
 });
 
 test('should support merging global headers with action specific headers', async () => {
@@ -207,4 +212,66 @@ test('should raise ApiError on non-2xx response', async () => {
     expect(error.status).toBe(400);
     expect(error.statusText).toBe('Bad Request');
     expect(error.content).toEqual({ name: 'This field is required' });
+});
+
+test('should update paginator state on response', async () => {
+    const action1 = new Endpoint(new UrlPattern('/whatever/'));
+    let paginator: InferredPaginator = action1.createPaginator() as InferredPaginator;
+
+    const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));
+    fetchMock.mockResponseOnce(JSON.stringify({ count: 10, results: records }), {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    const { result } = await action1.execute({ paginator });
+    expect(paginator.paginator).toBeInstanceOf(PageNumberPaginator);
+    expect((paginator.paginator as PageNumberPaginator).pageSize).toBe(5);
+    expect(result).toEqual(records);
+
+    // Should also work by passing paginator to prepare
+    paginator = action1.createPaginator() as InferredPaginator;
+    fetchMock.mockResponseOnce(
+        JSON.stringify({
+            count: 10,
+            results: records,
+            next: 'http://loclahost/whatever/?limit=5&offset=5',
+        }),
+        {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    );
+    const prepared = action1.prepare({ paginator });
+    const { result: result2 } = await prepared.execute();
+
+    expect(paginator.paginator).toBeInstanceOf(LimitOffsetPaginator);
+    expect((paginator.paginator as LimitOffsetPaginator).limit).toBe(5);
+    expect(result2).toEqual(records);
+});
+
+test('should support changing paginatorClass & getPaginationState', async () => {
+    Endpoint.defaultConfig.paginatorClass = PageNumberPaginator;
+    Endpoint.defaultConfig.getPaginationState = (paginator, execReturnVal): Record<string, any> => {
+        const { total, records, pageSize } = execReturnVal.decodedBody;
+        return {
+            total,
+            results: records,
+            pageSize,
+        };
+    };
+    const action1 = new Endpoint(new UrlPattern('/whatever/'));
+    const paginator = action1.createPaginator();
+
+    const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));
+    fetchMock.mockResponseOnce(JSON.stringify({ total: 10, records, pageSize: 5 }), {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    const { result } = await action1.execute({ paginator });
+    expect(paginator).toBeInstanceOf(PageNumberPaginator);
+    expect((paginator as PageNumberPaginator).pageSize).toBe(5);
+    expect(result).toEqual(records);
 });

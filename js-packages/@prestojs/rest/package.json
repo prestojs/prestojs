@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "@prestojs/routing": "^0.0.1",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "qs": "^6.9.1"
   },
   "devDependencies": {
     "jest-fetch-mock": "^3.0.1",
