@@ -608,6 +608,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         # Any other renders
     ),
+    "PAGE_SIZE": 20,
 }
 
 
