@@ -40,7 +40,7 @@ class HtmlField(models.TextField):
         strip_comments=None,
         trusted=False,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().init(*args, **kwargs)
         self.bleach_options = self.get_bleach_options(
