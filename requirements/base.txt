@@ -1,4 +1,4 @@
-Django==2.2.*
+Django==3.0.*
 
 # Alliance software utils
 -e git+https://gitlab.alliancesoftware.com.au/alliance/alliance-django-utils.git@v/0.6.1#egg=allianceutils
