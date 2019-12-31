@@ -7,7 +7,8 @@
   "private": true,
   "workspaces": [
     "js-packages/@prestojs/*",
-    "django-testbed"
+    "django-testbed",
+    "doc-site"
   ],
   "scripts": {
     "lint": "eslint js-packages --ext .js,.ts",
@@ -30,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",
     "babel-jest": "^24.9.0",
+    "babel-preset-gatsby": "^0.2.26",
     "commitizen": "^4.0.3",
     "cz-lerna-changelog": "^2.0.0",
     "eslint": "^6.6.0",

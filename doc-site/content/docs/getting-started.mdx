@@ -1,0 +1,60 @@
+---
+id: getting-started
+title: Getting Started
+slug: docs/getting-started.html
+---
+
+import { Form } from '@prestojs/final-form';
+import { View, PropTypes } from 'react-view';
+
+## Getting Started
+
+The smallest React example looks like this:
+
+```jsx
+ReactDOM.render(
+  <h1>Hello, world!</h1>,
+  document.getElementById('root')
+);
+```
+
+It displays a heading saying "Hello, world!" on the page.
+
+`embed:sample.js`
+
+<div>{User.label}</div>
+
+<Form onSubmit={data => console.log(data)}>
+                    <Form.Item field={User.fields.first_name} />
+                </Form>
+                
+
+<View
+    componentName="Form"
+    stuff={{
+        layout: {
+            type: PropTypes.String,
+            value: 'horizontal',
+        },
+        onSubmit: {
+            type: PropTypes.Function,
+            value: 'data=> console.log(data)',
+        },
+        children: {
+            value: `
+            <Form.Item field={User.fields.email} />
+            `,
+            type: PropTypes.ReactNode,
+            description: 'Visible label.',
+        },
+    }}
+    scope={{
+        Form,
+        User,
+    }}
+    imports={{
+        '@prestojs/final-form': {
+            named: ['Form'],
+        },
+    }}
+/>

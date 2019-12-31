@@ -1,0 +1,134 @@
+/**
+ * Theme from https://github.com/reactjs/reactjs.org/blob/master/src/prism-styles.js
+ *
+ * Copyright (c) 2013-present, Facebook, Inc.
+ */
+.gatsby-highlight {
+    background: #282c34;
+    color: #ffffff;
+    border-radius: 10px;
+    overflow: auto;
+    tab-size: 1.5em;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 25px;
+    margin-left: -30px;
+    margin-right: -30px;
+    margin-bottom: 25px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.gatsby-highlight > code[class*="gatsby-code-"],
+.gatsby-highlight > pre[class*="gatsby-code-"],
+.gatsby-highlight > pre.prism-code
+{
+    height: auto !important;
+    margin: 1rem;
+    font-size: 14px;
+    line-height: 20px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.gatsby-highlight + .gatsby-highlight {
+    margin-top: 20px;
+}
+
+.gatsby-highlight-code-line {
+    background-color: #353b45;
+    display: block;
+    margin: -0.125rem calc(-1rem - 15px);
+    padding: 0.125rem calc(1rem + 15px);
+}
+
+.token.attr-name {
+    color: #c5a5c5;
+}
+
+.token.comment,
+.token.block-comment,
+.token.prolog,
+.token.doctype,
+.token.cdata
+{
+    color: #B2B2B2;
+}
+
+.token.property,
+.token.number,
+.token.function-name,
+.token.constant,
+.token.symbol,
+.token.deleted
+{
+    color: #5a9bcf;
+}
+
+.token.boolean {
+    color: #ff8b50;
+}
+
+.token.tag {
+    color: #fc929e;
+}
+
+.token.string {
+    color: #8dc891;
+}
+
+.token.punctuation {
+    color: #88C6BE;
+}
+
+.token.selector,
+.token.char,
+.token.builtin,
+.token.inserted
+{
+    color: #D8DEE9;
+}
+
+.token.function {
+    color: #79b6f2;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.token.variable
+{
+    color: #d7deea;
+}
+
+.token.attr-value {
+    color: #8dc891;
+}
+
+.token.keyword{
+    color: #c5a5c5;
+}
+
+.token.atrule,
+.token.class-name
+{
+    color: #FAC863;
+}
+
+.token.important {
+    font-weight: 400;
+}
+
+.token.bold {
+    font-weight: 700;
+}
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}
+
+.namespace {
+    opacity: 0.7;
+}

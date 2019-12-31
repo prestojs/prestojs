@@ -1,5 +1,5 @@
 {
-  "packages": ["js-packages/@prestojs/*", "django-testbed/"],
+  "packages": ["js-packages/@prestojs/*", "django-testbed/", "doc-site/"],
   "npmClient": "yarn",
   "useWorkspaces": true,
   "version": "independent",
