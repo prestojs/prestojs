@@ -607,3 +607,6 @@ pre tt:after {
     font-size: 100%;
   }
 }
+pre {
+  overflow: visible;
+}

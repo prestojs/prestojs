@@ -6,6 +6,8 @@ import NullableBooleanField from './NullableBooleanField';
  * Follows standard javascript Truthy and Falsy definition.
  *
  * See also: NullableBooleanField.
+ *
+ * @extract-docs
  */
 export default class BooleanField extends NullableBooleanField {
     parse(value: any): boolean {

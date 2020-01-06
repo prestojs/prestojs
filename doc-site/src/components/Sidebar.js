@@ -1,17 +1,26 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const StyledSidebar = styled.div`
+const SidebarOuter = styled.div`
+    flex: 0 0 300px;
+    margin-right: 50px;
+`;
+const SidebarInner = styled.div`
     position: fixed;
-    top: 60px;
-    left: 0;
-    background-color: #f7f7f7;
-    height: calc(100vh - 60px);
+    top: ${props => props.theme.headerHeight};
+    height: calc(100vh - ${props => props.theme.headerHeight});
     border-right: 1px solid #ececec;
     overflow-y: auto;
-    width: 300px;
+    background-color: #f7f7f7;
+    padding-top: 20px;
+    margin-left: -1000px;
+    padding-left: 1000px;
 `;
 
 export default function Sidebar({ children }) {
-    return <StyledSidebar>{children}</StyledSidebar>;
+    return (
+        <SidebarOuter>
+            <SidebarInner>{children}</SidebarInner>
+        </SidebarOuter>
+    );
 }

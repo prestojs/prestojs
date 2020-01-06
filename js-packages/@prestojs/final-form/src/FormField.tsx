@@ -14,6 +14,8 @@ type FormFieldProps<T> =
  *
  * If `component`, `render` or `children` are passed they will be used instead of selecting a widget
  * based on the field type.
+ *
+ * @extract-docs
  */
 export default function FormField<T>({
     field,

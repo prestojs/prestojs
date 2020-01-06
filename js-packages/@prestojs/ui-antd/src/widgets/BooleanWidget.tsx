@@ -4,6 +4,8 @@ import React from 'react';
 
 /**
  * See [Checkbox](https://next.ant.design/components/checkbox/) for props available
+ *
+ * @extract-docs
  */
 const BooleanWidget = React.forwardRef(
     (

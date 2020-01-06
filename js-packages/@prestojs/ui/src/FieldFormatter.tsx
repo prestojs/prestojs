@@ -1,10 +1,11 @@
 import React from 'react';
-import getFormatterForField from './getFormatterForField';
 import { Field } from '@prestojs/viewmodel';
 import useUi from './useUi';
 
-/*
- Wraps around getFormatterForField to always return ReactElement; Applies default props from getFormatterForField if any.
+/**
+ * Wraps around getFormatterForField to always return ReactElement; Applies default props from getFormatterForField if any.
+ *
+ * @extract-docs
  */
 export default function FieldFormatter<FieldValue>({
     field,

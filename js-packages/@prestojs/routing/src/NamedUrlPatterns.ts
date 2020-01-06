@@ -38,6 +38,8 @@ export class NamedUrlNotFoundError extends Error {
  * namedUrls.get('user-list')
  * // UrlPattern('/users/')
  * ```
+ *
+ * @extract-docs
  */
 export default class NamedUrlPatterns {
     urlPatterns: UrlPatternMapping;

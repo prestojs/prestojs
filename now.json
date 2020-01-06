@@ -1,0 +1,9 @@
+{
+  "version": 2,
+    "builds": [
+      { "src": "./doc-site/public/**", "use": "@now/static" }
+    ],
+    "routes": [
+      { "src": "/(.*)", "dest": "doc-site/public/$1" }
+    ]
+}

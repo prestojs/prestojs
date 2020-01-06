@@ -7,15 +7,20 @@ import HeaderLink from './HeaderLink';
 const isActive = section => typeof window !== 'undefined' && window.location.href.includes(section);
 
 const Nav = styled.nav`
-    height: 60px;
+    height: ${props => props.theme.headerHeight};
     display: flex;
     width: 60%;
 `;
 
 const StyledHeader = styled.header`
-    background-color: #282c34;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 5;
+    background-color: ${props => props.theme.color5};
     margin-bottom: 1.45rem;
-    height: 60px;
+    height: ${props => props.theme.headerHeight};
 `;
 
 const TitleLink = styled(Link)`
@@ -38,11 +43,14 @@ const Header = ({ siteTitle }) => (
         <HeaderInner>
             <TitleLink to="/">{siteTitle}</TitleLink>
             <Nav>
-                <HeaderLink isActive={isActive('docs')} href="/docs/getting-started.html">
+                <HeaderLink isActive={isActive('docs')} to="/docs/getting-started.html">
                     Docs
                 </HeaderLink>
-                <HeaderLink isActive={isActive('tutorial')} href="/tutorial/start.html">
+                <HeaderLink isActive={isActive('tutorial')} to="/tutorial/start.html">
                     Tutorial
+                </HeaderLink>
+                <HeaderLink isActive={isActive('api')} to="/api/@prestojs/viewmodel/ViewModel.html">
+                    API
                 </HeaderLink>
             </Nav>
             <a

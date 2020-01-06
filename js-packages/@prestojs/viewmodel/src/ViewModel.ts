@@ -34,6 +34,8 @@ export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
  *     };
  * }
  * ```
+ *
+ * @extract-docs
  */
 export default class ViewModel extends FieldBinder {
     static label: string;

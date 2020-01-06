@@ -63,6 +63,8 @@ type FormItemProps<T> = FormItemPropsNoField | FormItemPropsWithField<T>;
  *     <Form.Field field={User.fields.email} />
  * </Form.Item>
  * ```
+ *
+ * @extract-docs
  */
 export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement {
     const { formItemComponent: InnerFormItem } = useUi();
