@@ -24,6 +24,10 @@ export interface FormItemProps {
     label?: React.ReactNode;
 }
 
+export interface FormProps {
+    onSubmit: (...args: any[]) => any;
+}
+
 export interface UiContextValue {
     // Technically if you use this at the top level then it will always return a widget
     // or throw an error. It's only when you use it nested within another provider that
@@ -32,6 +36,7 @@ export interface UiContextValue {
     getWidgetForField: GetWidgetForFieldWithNull;
     getFormatterForField: GetFormatterForFieldWithNull;
     formItemComponent?: React.ComponentType<FormItemProps>;
+    formComponent: string | React.ComponentType<FormProps>;
 }
 
 export interface TopLevelUiContextValue {
@@ -39,6 +44,7 @@ export interface TopLevelUiContextValue {
     getWidgetForField: GetWidgetForField;
     getFormatterForField: GetFormatterForField;
     formItemComponent?: React.ComponentType<FormItemProps>;
+    formComponent: string | React.ComponentType<FormProps>;
 }
 
 export const UiContext = React.createContext<UiContextValue | null>(null);
@@ -69,16 +75,65 @@ type Props = {
      * Form.Item.
      */
     formItemComponent?: React.ComponentType<FormItemProps>;
+    /**
+     * A component to use to render the form. This is the component that will be rendered by
+     * Form. Defaults to `form`.
+     */
+    formComponent?: React.ComponentType<any>;
 };
 
 /**
- * Provider that allows you to define a function to return the form widget and
- * value formatter to use for a particular field.
+ * UiProvider is used to supply the UI library specific widgets, formatters, form components etc that are used
+ * throughout the system.
+ *
+ * For example to use with ui-antd (install `@prestojs/ui-antd` and `antd`):
+ *
+ * ```jsx
+ * import React from 'react';
+ * import { UiProvider } from '@prestojs/ui';
+ * import { Input } from 'antd';
+ * import {
+ *   FormWrapper,
+ *   getWidgetForField as antdGetWidgetForField,
+ *   FormItemWrapper,
+ * } from '@prestojs/ui-antd';
+ *
+ * const DefaultWidget = ({ input }) => <Input {...input} />;
+ *
+ * function getWidgetForField(field) {
+ *   const widget = antdGetWidgetForField(field);
+ *   // If ui-antd doesn't provide a widget fall back to a default
+ *   // You can add your own customisations here too (eg. override widgets
+ *   // for specific fields or add support for new fields)
+ *   if (!widget) {
+ *     return DefaultWidget;
+ *   }
+ *   return widget;
+ * }
+ *
+ * export default function Root() {
+ *   return (
+ *     <UiProvider
+ *       getWidgetForField={getWidgetForField}
+ *       formItemComponent={FormItemWrapper}
+ *       formComponent={FormWrapper}
+ *     >
+ *        <YourApp />
+ *     </UiProvider>
+ *   );
+ * }
+ * ```
  *
  * @extract-docs
  */
 export default function UiProvider(props: Props): React.ReactElement {
-    const { children, getWidgetForField, getFormatterForField, formItemComponent } = props;
+    const {
+        children,
+        getWidgetForField,
+        getFormatterForField,
+        formItemComponent,
+        formComponent = 'form',
+    } = props;
     const context = useContext(UiContext);
     const { getWidgetForField: parentGetWidgetForField = null } = context || {
         getWidgetForField: null,
@@ -89,6 +144,7 @@ export default function UiProvider(props: Props): React.ReactElement {
     const providedContext = useMemo(
         () => ({
             formItemComponent,
+            formComponent,
             getWidgetForField<FieldValue, T extends HTMLElement>(
                 field: Field<FieldValue>
             ): FieldWidgetType<FieldValue, T> | null {
@@ -130,6 +186,7 @@ export default function UiProvider(props: Props): React.ReactElement {
         }),
         [
             formItemComponent,
+            formComponent,
             getWidgetForField,
             parentGetWidgetForField,
             getFormatterForField,
