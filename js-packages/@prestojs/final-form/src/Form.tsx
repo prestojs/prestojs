@@ -1,3 +1,4 @@
+import { useUi } from '@prestojs/ui';
 import React from 'react';
 import { ViewModel } from '@prestojs/viewmodel';
 import { Form as FinalForm, FormProps as FinalFormProps } from 'react-final-form';
@@ -6,6 +7,7 @@ import FormItem from './FormItem';
 
 type FormProps<FormValues = object> = FinalFormProps<FormValues> & {
     initialValues?: FormValues | ViewModel;
+    formProps?: Record<string, any>;
 };
 
 /**
@@ -19,14 +21,22 @@ type FormProps<FormValues = object> = FinalFormProps<FormValues> & {
  *
  * @extract-docs
  */
-export default function Form({ initialValues, children, ...rest }: FormProps): React.ReactElement {
+export default function Form({
+    initialValues,
+    children,
+    formProps,
+    ...rest
+}: FormProps): React.ReactElement {
+    const { formComponent: FormComponent } = useUi();
     if (initialValues instanceof ViewModel) {
         initialValues = initialValues.serializeToForm();
     }
     if (typeof children !== 'function') {
         const renderableChildren = children;
         children = ({ handleSubmit }): React.ReactElement => (
-            <form onSubmit={handleSubmit}>{renderableChildren}</form>
+            <FormComponent onSubmit={handleSubmit} {...formProps}>
+                {renderableChildren}
+            </FormComponent>
         );
     }
     return (
