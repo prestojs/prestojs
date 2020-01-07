@@ -54,7 +54,11 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
                 </p>
             )}
             {/* eslint-disable-next-line no-console */}
-            <Form onSubmit={onSubmit} initialValues={record && record.toJS()}>
+            <Form
+                onSubmit={onSubmit}
+                initialValues={record && record.toJS()}
+                formProps={{ layout: 'horizontal' }}
+            >
                 <Form.Item field={User.fields.first_name} />
                 <FieldErrors name="first_name" />
                 <Form.Item field={User.fields.last_name} />

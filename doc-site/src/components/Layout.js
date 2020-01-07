@@ -10,7 +10,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStaticQuery, graphql } from 'gatsby';
 import styled, { ThemeProvider } from 'styled-components';
-import { FormItemWrapper } from '@prestojs/ui-antd';
+import { FormItemWrapper, FormWrapper } from '@prestojs/ui-antd';
 import { UiProvider } from '@prestojs/ui';
 
 import getWidgetForField from '../getWidgetForField';
@@ -41,7 +41,11 @@ const Layout = ({ children }) => {
 
     return (
         <MDXProvider components={{ View, CodeEditor, code: CodeBlock }}>
-            <UiProvider getWidgetForField={getWidgetForField} formItemComponent={FormItemWrapper}>
+            <UiProvider
+                getWidgetForField={getWidgetForField}
+                formItemComponent={FormItemWrapper}
+                formComponent={FormWrapper}
+            >
                 <ThemeProvider theme={theme}>
                     <Header siteTitle={data.site.siteMetadata.title} />
                     <div
