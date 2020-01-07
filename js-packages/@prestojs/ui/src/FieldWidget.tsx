@@ -3,8 +3,10 @@ import { Field } from '@prestojs/viewmodel';
 import { RangedWidgetProps, WidgetProps } from './FieldWidgetInterface';
 import useUi from './useUi';
 
-/*
- Wraps around getWidgetForField to always return ReactElement; Applies default props from getWidgetForField if any.
+/**
+ * Wraps around getWidgetForField to always return ReactElement; Applies default props from getWidgetForField if any.
+ *
+ * @extract-docs
  */
 export default function FieldWidget<FieldValue, T extends HTMLElement>({
     field,

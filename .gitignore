@@ -15,7 +15,6 @@ venv/
 build/
 
 # Media files
-assets/
 media/
 
 # Log files

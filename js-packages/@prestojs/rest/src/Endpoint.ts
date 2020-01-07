@@ -243,6 +243,8 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  *   };
  * }
  * ```
+ *
+ * @extract-docs
  */
 export default class Endpoint {
     static defaultConfig: { requestInit: RequestInit } = {

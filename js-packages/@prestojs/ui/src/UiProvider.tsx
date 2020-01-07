@@ -75,7 +75,7 @@ type Props = {
  * Provider that allows you to define a function to return the form widget and
  * value formatter to use for a particular field.
  *
- * TODO: Add formatters, eg. getFormatterForField
+ * @extract-docs
  */
 export default function UiProvider(props: Props): React.ReactElement {
     const { children, getWidgetForField, getFormatterForField, formItemComponent } = props;

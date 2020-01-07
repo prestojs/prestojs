@@ -360,11 +360,16 @@ class RecordCache<T extends ViewModel> {
  * User.cache.delete(3)
  * // [new User({ id: 3, name: 'Jayz' }), new User({ id: 4, name: 'Beeb' })] changed to [null, new User({ id: 4, name: 'Beeb' })]
  * ```
+ *
+ * @extract-docs
  */
 export default class ViewModelCache<T extends ViewModel> {
     cache: Map<PrimaryKeyCacheKey, RecordCache<T>>;
     viewModel: Class<T>;
 
+    /**
+     * @param viewModel The `ViewModel` this class is for
+     */
     constructor(viewModel: Class<T>) {
         this.viewModel = viewModel;
         this.cache = new Map();

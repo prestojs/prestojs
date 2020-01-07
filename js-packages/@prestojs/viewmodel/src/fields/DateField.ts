@@ -10,6 +10,7 @@ import Field from './Field';
  *
  * TODO: Format for Date Field should spit out ISO8601 date string by default.
  *
+ * @extract-docs
  */
 export default class DateField extends Field<Date> {
     parse(value: any): Date | null {

@@ -19,6 +19,8 @@ export interface ResolveOptions {
  * url.resolve({ id: 5 }, { query: { showAddresses: true }});
  * // /users/5/?showAddresses=true
  * ```
+ *
+ * @extract-docs
  */
 export default class UrlPattern {
     pattern: string;

@@ -77,6 +77,8 @@ const choicesMapping = new Map<Class<Field<any>>, any>([
  * Returns the default formatter for any given Field.
  *
  * Depending on Field, this will return either a Formatter component directly, or [Formatter, props] where props is the default props that would be applied to said formatter.
+ *
+ * @extract-docs
  */
 export default function getFormatterForField<FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>

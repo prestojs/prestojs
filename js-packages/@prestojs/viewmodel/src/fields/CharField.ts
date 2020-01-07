@@ -6,6 +6,8 @@ type CharFieldProps = Props<string> & { maxLength?: number };
  * Base class for string fields
  *
  * Other char fields (EmailField, URLField...) will extend this.
+ *
+ * @extract-docs
  */
 export default class CharField extends Field<string> {
     public maxLength?: number;
