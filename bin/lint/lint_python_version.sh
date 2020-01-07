@@ -109,23 +109,23 @@ function lint_pythonversion() {
 	fi
 
 	# check python version (heroku)
-	if [[ -e runtime.txt ]] ; then
-		python_version_heroku="$(<runtime.txt)"
-		python_version_heroku="${python_version_heroku//python-/}"
-
-		if [[ ! $python_version_heroku =~ $python_version_pip_regex ]] ; then
-			err "heroku runtime.txt ($python_version_heroku) != requirements.txt ($python_version_pip)"
-		fi
-
-		if [[ $python_version_heroku != $python_version_pyenv ]] && ! $is_template_repo ; then
-			err "heroku runtime.txt ($python_version_heroku) != pyenv .python-version ($python_version_pyenv)"
-		fi
-
-		if [[ $python_version_latest != "" && $python_version_heroku != ${python_version_latest} ]] ; then
-			# Can't be an error - latest version isn't always available in heroku
-			warn "heroku runtime.txt ($python_version_heroku) != latest point release ($python_version_latest)"
-		fi
-	fi
+#	if [[ -e runtime.txt ]] ; then
+#		python_version_heroku="$(<runtime.txt)"
+#		python_version_heroku="${python_version_heroku//python-/}"
+#
+#		if [[ ! $python_version_heroku =~ $python_version_pip_regex ]] ; then
+#			err "heroku runtime.txt ($python_version_heroku) != requirements.txt ($python_version_pip)"
+#		fi
+#
+#		if [[ $python_version_heroku != $python_version_pyenv ]] && ! $is_template_repo ; then
+#			err "heroku runtime.txt ($python_version_heroku) != pyenv .python-version ($python_version_pyenv)"
+#		fi
+#
+#		if [[ $python_version_latest != "" && $python_version_heroku != ${python_version_latest} ]] ; then
+#			# Can't be an error - latest version isn't always available in heroku
+#			warn "heroku runtime.txt ($python_version_heroku) != latest point release ($python_version_latest)"
+#		fi
+#	fi
 }
 
 
