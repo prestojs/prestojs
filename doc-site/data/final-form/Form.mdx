@@ -9,40 +9,46 @@ slug: /api/@prestojs/final-form/Form.html
    handleSubmit. Most the time this is the same thing so you optionally just pass through renderable
    children and the form will be created implicitly for you.
 
+The form component rendered can be specified in [UiProvider](/api/@prestojs/ui/UiProvider.html). If
+not specified this will default to `form`.
+
 
 import { Form } from '@prestojs/final-form';
 import { User } from 'docSite/models';
 import { PropTypes } from 'docSite/components/View';
+import { Button } from 'antd';
 
 <View
     componentName="Form"
     componentProps={{
-        layout: {
-            type: PropTypes.String,
-            value: 'horizontal',
-        },
         onSubmit: {
             type: PropTypes.Function,
-            value: 'data=> console.log(data)',
+            value: 'data => console.log(data)',
         },
         children: {
-            value: `
-<Form.Item field={User.fields.firstName} />
+            value: `<Form.Item field={User.fields.firstName} />
 <Form.Item field={User.fields.lastName} />
 <Form.Item field={User.fields.email} />
+<Form.Item label=" " colon={false}>
+    <Button type="primary" htmlType="submit">Save</Button>
+</Form.Item>
 `,
             type: PropTypes.ReactNode,
-            description: 'Visible label.',
+            description: 'The form items to render. To control rendering of the form component itself you can pass a function - see react-final-form documentation for more.',
         },
     }}
     scope={{
         Form,
         User,
+        Button,
     }}
     imports={{
         '@prestojs/final-form': {
             named: ['Form'],
         },
+        'antd': {
+            named: ['Button'],
+        }
     }}
 />
 

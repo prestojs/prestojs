@@ -9,10 +9,19 @@ import {
     ActionButtons,
     Placeholder,
 } from 'react-view';
+import styled from 'styled-components';
 import { liveEditorTheme } from '../prismTheme';
 import LiveCodeContainer from './LiveCodeContainer';
 
 export { PropTypes };
+
+const CompilerContainer = styled.div`
+    > div > div {
+        // react-view doesn't allow you to customise styles - resort to specific targeting
+        // to override the defaults
+        display: block !important;
+    }
+`;
 
 export default function View({ componentName, componentProps, scope, imports }) {
     const params = useView({
@@ -23,12 +32,9 @@ export default function View({ componentName, componentProps, scope, imports }) 
     });
     return (
         <LiveCodeContainer>
-            <Compiler
-                {...params.compilerProps}
-                minHeight={62}
-                placeholder={Placeholder}
-                style={{ display: 'block' }}
-            />
+            <CompilerContainer>
+                <Compiler {...params.compilerProps} minHeight={62} placeholder={Placeholder} />
+            </CompilerContainer>
             <Error msg={params.errorProps.msg} isPopup />
             <Knobs {...params.knobProps} />
             <Editor {...params.editorProps} theme={liveEditorTheme} />
