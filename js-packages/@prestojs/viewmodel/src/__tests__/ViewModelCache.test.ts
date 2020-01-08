@@ -7,7 +7,7 @@ function F<T>(name): Field<T> {
     return new Field({ label: name });
 }
 
-test('should cache records', () => {
+test('should cache records from record instance', () => {
     class Test1 extends ViewModel {
         static _fields = {
             id: F('id'),
@@ -24,12 +24,58 @@ test('should cache records', () => {
     // Should always get independent caches
     expect(Test1.cache).not.toBe(Test2.cache);
 
-    Test1.cache.add(record1);
+    expect(Test1.cache.add(record1)).toBe(record1);
 
     expect(Test1.cache.get(5, ['id'])).toBe(record1);
 
     expect(Test2.cache.cache).toEqual(new Map());
     expect(Test2.cache.get(5, ['id'])).toBe(null);
+});
+
+test('should cache records from plain object', () => {
+    class Test1 extends ViewModel {
+        static _fields = {
+            id: F('id'),
+        };
+    }
+    class Test2 extends ViewModel {
+        static _fields = {
+            id: F('id'),
+        };
+    }
+
+    const record1Data = { id: 5 };
+
+    const record1 = Test1.cache.add(record1Data);
+
+    expect(record1).toBeInstanceOf(Test1);
+    expect(record1 instanceof ViewModel ? record1.toJS() : false).toEqual(record1Data);
+
+    expect(Test1.cache.get(5, ['id'])).toBe(record1);
+
+    expect(Test2.cache.cache).toEqual(new Map());
+    expect(Test2.cache.get(5, ['id'])).toBe(null);
+});
+
+test('should throw error if caching different ViewModel', () => {
+    class Test1 extends ViewModel {
+        static _fields = {
+            id: F('id'),
+        };
+    }
+    class Test2 extends ViewModel {
+        static _fields = {
+            id: F('id'),
+        };
+    }
+
+    const record1 = new Test1({ id: 5 });
+    const record2 = new Test2({ id: 5 });
+
+    expect(Test1.cache.add(record1)).toBe(record1);
+    expect(() => Test1.cache.add(record2)).toThrow(
+        /Attempted to cache ViewModel of type Test2 in cache for Test1/
+    );
 });
 
 test('should cache records with compound keys', () => {
@@ -535,4 +581,48 @@ test('should support listening to multiple pks without specifying primary keys i
     Test1.cache.addList([record1, record2, record3]);
     expect(cb1).toHaveBeenCalledTimes(1);
     expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
+});
+
+test('should support adding list of plain objects', () => {
+    class Test1 extends ViewModel {
+        static _fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+
+    const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
+    const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
+    const record3 = { id: 4, firstName: 'Gandalf', email: 'gandy@b.com' };
+    const result = Test1.cache.addList([record1, record2, record3]);
+
+    expect(result).toEqual([
+        recordEqualTo(record1),
+        recordEqualTo(record2),
+        recordEqualTo(record3),
+    ]);
+});
+
+test('should support adding list of via add', () => {
+    class Test1 extends ViewModel {
+        static _fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+
+    const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
+    const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
+    const record3 = { id: 4, firstName: 'Gandalf', email: 'gandy@b.com' };
+    const result = Test1.cache.add([record1, record2, record3]);
+
+    expect(result).toEqual([
+        recordEqualTo(record1),
+        recordEqualTo(record2),
+        recordEqualTo(record3),
+    ]);
 });

@@ -387,16 +387,37 @@ export default class ViewModelCache<T extends ViewModel> {
         return pk;
     }
 
+    private isInstanceOfModel(a: any): a is T {
+        return a instanceof this.viewModel;
+    }
+
     /**
-     * Add a record to the cache. Records are cached based on the fields that are
+     * Add a record or records to the cache. Records are cached based on the fields that are
      * set on them (`record._assignedFields`).
      *
      * If record A has a superset of fields of record B then when A is cached it
      * will update the cache for record B. The reverse isn't true.
      *
-     * @param record The record to cache
+     * @param recordOrData The record instance to cache. If a plain object is passed then
+     * an instance of the view model will be created and returned. An array is also supported
+     * in which case each entry in the array will be converted to the view model if required
+     * and returned.
      */
-    add(record: T): void {
+    add(recordOrData: T | Record<string, any> | (T | Record<string, any>)[]): T | T[] {
+        if (Array.isArray(recordOrData)) {
+            return this.addList(recordOrData);
+        }
+        let record: T;
+        if (!this.isInstanceOfModel(recordOrData)) {
+            if (recordOrData instanceof ViewModel) {
+                throw new Error(
+                    `Attempted to cache ViewModel of type ${recordOrData._model} in cache for ${this.viewModel}`
+                );
+            }
+            record = new this.viewModel(recordOrData) as T;
+        } else {
+            record = recordOrData;
+        }
         if (!record._assignedFields) {
             throw new Error('_assignedFields not set on record; cannot be cached');
         }
@@ -407,6 +428,7 @@ export default class ViewModelCache<T extends ViewModel> {
             this.cache.set(pkKey, recordCache);
         }
         recordCache.add(record);
+        return record;
     }
 
     isAddingList = false;
@@ -418,15 +440,16 @@ export default class ViewModelCache<T extends ViewModel> {
      * notified once of the change to the list rather than for
      * each record in the list.
      */
-    addList(record: T[]): void {
+    addList(records: (T | Record<string, any>)[]): T[] {
         this.isAddingList = true;
         try {
-            record.forEach(record => this.add(record));
+            const ret = records.map(record => this.add(record)) as T[];
             this.isAddingList = false;
             if (this.onAddingListDone) {
                 this.onAddingListDone();
                 this.onAddingListDone = null;
             }
+            return ret;
         } catch (e) {
             this.onAddingListDone = null;
             this.isAddingList = false;
