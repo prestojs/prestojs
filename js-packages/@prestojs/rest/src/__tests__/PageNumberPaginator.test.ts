@@ -92,7 +92,6 @@ test('should handle changing pages', () => {
         },
     });
 
-    expect(() => paginator.next()).toThrowError(/Invalid page/);
     expect(() => paginator.gotoPage(0)).toThrowError(/Invalid page/);
 });
 

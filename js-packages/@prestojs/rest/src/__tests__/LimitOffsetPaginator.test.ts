@@ -72,7 +72,6 @@ test('should handle changing pages', () => {
         },
     });
 
-    expect(() => paginator.next()).toThrowError(/Invalid offset/);
     expect(() => paginator.setOffset(-1)).toThrowError(/Invalid offset/);
 });
 

@@ -43,11 +43,6 @@ export default class LimitOffsetPaginator extends Paginator {
         if (offset < 0) {
             throw new Error(`Invalid offset ${offset} - should be >= 0`);
         }
-        if (this.total != null && offset >= this.total) {
-            throw new Error(
-                `Invalid offset ${offset} - should be less than the total number of results (${this.total})`
-            );
-        }
         this.setState(currentState => {
             const nextState: LimitOffsetPaginationState = { ...currentState, offset };
             if (offset === 0) {

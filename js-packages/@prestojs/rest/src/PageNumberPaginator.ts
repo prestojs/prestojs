@@ -32,12 +32,8 @@ export default class PageNumberPaginator extends Paginator {
     }
 
     gotoPage(page: number): void {
-        const totalPages = this.totalPages;
         if (page < 1) {
             throw new Error(`Invalid page ${page} - should be >= 1`);
-        }
-        if (totalPages !== null && page > totalPages) {
-            throw new Error(`Invalid page ${page} - last page is ${totalPages}`);
         }
         this.setState(currentState => ({ ...currentState, page }));
     }
