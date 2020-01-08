@@ -1,6 +1,7 @@
 import React from 'react';
 import { graphql } from 'gatsby';
 import { MDXRenderer } from 'gatsby-plugin-mdx';
+import styled from 'styled-components';
 import Article from '../components/Article';
 import Menu from '../components/Menu';
 import Sidebar from '../components/Sidebar';
@@ -82,10 +83,14 @@ function ClassDoc({ doc }) {
                             <strong>{p.name}</strong> <CommentBlock comment={p.comment} />
                         </p>
                     ))}
-                    <h3>Methods</h3>
-                    {methods.map(method => (
-                        <MethodDoc method={method} />
-                    ))}
+                    {methods && (
+                        <>
+                            <h3>Methods</h3>
+                            {methods.map(method => (
+                                <MethodDoc method={method} />
+                            ))}
+                        </>
+                    )}
                 </>
             )}
         </>
@@ -112,6 +117,12 @@ const kindComponents = {
     Variable: VariableDoc,
 };
 
+const ImportString = styled.code`
+    padding: 5px;
+    margin-bottom: 10px;
+    display: block;
+`;
+
 const Api = props => {
     const {
         // if mdx is set that's considered an override (ie. there exists a file in data/ with same slug as this)
@@ -125,6 +136,9 @@ const Api = props => {
             </Sidebar>
             <Article>
                 <h1>{doc.name}</h1>
+                <ImportString>
+                    {`import { ${doc.name} } from "@prestojs/${doc.packageName}";`}
+                </ImportString>
                 {mdx ? <MDXRenderer>{mdx.body}</MDXRenderer> : <DocComponent doc={doc} />}
             </Article>
         </Layout>

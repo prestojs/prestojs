@@ -44,10 +44,11 @@ function extractChildren(node) {
     rest.extractDocs = extractDocs;
     if (extractDocs) {
         const { fileName } = rest.sources[0];
-        const slug = fileName
+        const importPath = fileName
             .replace('js-packages/', '')
             .replace('src/', '')
             .split('.')[0];
+        const slug = [...importPath.split('/').slice(0, -1), rest.name].join('/');
         const permaLink = `/api/${slug}.html`;
         const [, packageName, ...names] = slug.split('/');
         rest.slug = permaLink;
