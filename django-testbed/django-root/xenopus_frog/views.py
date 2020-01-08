@@ -53,6 +53,7 @@ class UserViewSet(ModelViewSet):
 
     @property
     def pagination_class(self):
+        # For demonstration purposes - real app wouldn't let user choose pagination
         pagination_type = self.request.query_params.get("paginationType")
         if pagination_type == "cursor":
             return UserCursorPagination

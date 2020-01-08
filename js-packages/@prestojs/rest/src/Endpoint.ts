@@ -41,7 +41,6 @@ function mergeHeaders(headers1: Headers, headers2: Headers): Headers {
     return headers1;
 }
 
-// If we pass an object to useSWR it uses it as the key but if we pass a function (eg. execute) then
 /**
  * Given multiple RequestInit objects merge them into a single RequestInit merging headers
  * from each one. Does not merge body. The last object passed with the value set takes
@@ -83,6 +82,7 @@ function mergeRequestInit(...args: ExecuteInitOptions[]): RequestInit {
     }, {});
 }
 
+// If we pass an object to useSWR it uses it as the key but if we pass a function (eg. execute) then
 // it will call that to generate the key... which is not what we want
 class PreparedAction {
     action: Endpoint;
@@ -453,7 +453,7 @@ export default class Endpoint {
                 .then(data => {
                     returnVal.decodedBody = data;
                     if (paginator) {
-                        // If we have a paginator update it's state based on response
+                        // If we have a paginator update its state based on response
                         // This runs for all requests but should return false if response
                         // is not paginated.
                         const paginationState = cls.defaultConfig.getPaginationState(

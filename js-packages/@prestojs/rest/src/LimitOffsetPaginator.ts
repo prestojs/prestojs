@@ -24,18 +24,22 @@ export default class LimitOffsetPaginator extends Paginator {
         super(initialState || {}, onChange);
     }
 
-    setLimit(limit: number): void {
-        if (limit < 1) {
+    setLimit(limit: number | null): void {
+        if (limit != null && limit < 1) {
             throw new Error(`Invalid limit ${limit} - should be >= 1`);
         }
-        this.setState(currentState => {
-            // When page size changes we need to reset the offset
-            if (currentState.limit !== limit && currentState.offset) {
-                const nextState: LimitOffsetPaginationState = { ...currentState, limit };
-                delete nextState.offset;
-                return nextState;
+        this.setState((currentState: LimitOffsetPaginationState) => {
+            // When page size changes we need to adjust the offset
+            if (limit != null && currentState.limit !== limit && currentState.offset) {
+                const offset = Math.floor(currentState.offset / limit) * limit;
+                return { ...currentState, limit, offset };
             }
-            return { ...currentState, limit };
+            const nextState = { ...currentState, limit };
+            if (limit == null) {
+                delete nextState.offset;
+                delete nextState.limit;
+            }
+            return nextState;
         });
     }
 
@@ -63,7 +67,7 @@ export default class LimitOffsetPaginator extends Paginator {
         if (this.limit == null) {
             throw new Error('Cannot go to next page until limit of current results is known');
         }
-        this.setOffset(this.offset - this.limit);
+        this.setOffset(Math.max(0, this.offset - this.limit));
     }
 
     first(): void {

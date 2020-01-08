@@ -38,16 +38,30 @@ export default class PageNumberPaginator extends Paginator {
         this.setState(currentState => ({ ...currentState, page }));
     }
 
-    setPageSize(pageSize: number): void {
-        if (pageSize < 1) {
+    setPageSize(pageSize: null | number): void {
+        if (pageSize != null && pageSize < 1) {
             throw new Error(`Invalid pageSize ${pageSize} - should be >= 1`);
         }
-        this.setState(currentState => {
-            // When page size changes we need to reset the page to page 1
-            if (currentState.pageSize !== pageSize && currentState.page) {
-                return { ...currentState, pageSize, page: 1 };
+        this.setState((currentState: PageNumberPaginationState) => {
+            // When page size changes we need to alter the page
+            if (
+                pageSize != null &&
+                currentState.pageSize &&
+                currentState.pageSize !== pageSize &&
+                currentState.page
+            ) {
+                const page = Math.max(
+                    1,
+                    Math.ceil(((currentState.page - 1) * currentState.pageSize) / pageSize)
+                );
+                return { ...currentState, pageSize, page };
             }
-            return { ...currentState, pageSize };
+            const nextState = { ...currentState, pageSize };
+            if (pageSize == null) {
+                delete nextState.page;
+                delete nextState.pageSize;
+            }
+            return nextState;
         });
     }
 

@@ -12,11 +12,11 @@ import UserFilterForm from './UserFilterForm';
 
 export default function UserListView() {
     const { search, pathname, origin } = window.location;
-    const { paginationType } = qs.parse(search.split('?').pop());
+    const { paginationType } = qs.parse(search, { ignoreQueryPrefix: true });
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
     const [filter, setFilter] = useState({});
-    const { data, error, paginator, setPaginationState } = useEndpoint(
+    const { data, error, paginator } = useEndpoint(
         User.endpoints.list,
         {
             query: {
@@ -59,13 +59,31 @@ export default function UserListView() {
             <Button onClick={() => paginator.next()}>Next</Button>
             <Button onClick={() => paginator.last()}>Last</Button>
             <Button
-                onClick={() =>
-                    setPaginationState({
-                        [paginationType === 'limitOffset' ? 'limit' : 'pageSize']: 5,
-                    })
-                }
+                onClick={() => {
+                    paginationType === 'limitOffset'
+                        ? paginator.setLimit(6)
+                        : paginator.setPageSize(6);
+                }}
             >
-                Page Size 5
+                Page Size 6
+            </Button>
+            <Button
+                onClick={() => {
+                    paginationType === 'limitOffset'
+                        ? paginator.setLimit(10)
+                        : paginator.setPageSize(10);
+                }}
+            >
+                Page Size 10
+            </Button>
+            <Button
+                onClick={() => {
+                    paginationType === 'limitOffset'
+                        ? paginator.setLimit(null)
+                        : paginator.setPageSize(null);
+                }}
+            >
+                Reset Page Size
             </Button>
             <table>
                 <thead>
