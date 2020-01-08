@@ -115,14 +115,18 @@ class PreparedAction {
 /**
  * Indicates a response outside the 200 range
  *
- * @param status response status code
- * @param statusText HTTP status code message
- * @param content the contents returned by server as processed be decodeBody
+ * @extract-docs
  */
 export class ApiError extends Error {
     status: number;
     statusText: string;
     content: any;
+
+    /**
+     * @param status response status code
+     * @param statusText HTTP status code message
+     * @param content the contents returned by server as processed be decodeBody
+     */
     constructor(status: number, statusText: string, content: any) {
         super();
         this.status = status;
@@ -193,7 +197,7 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  *
  * You can also pass through any `fetch` options to both the constructor and calls to `execute` and `prepare`
  *
- * ```
+ * ```js
  * // Always pass through Content-Type header to all calls to userDetail
  * const userDetail = new Action(new UrlPattern('/api/user/:id/'), {
  *     'Content-Type': 'application/json'
@@ -238,13 +242,11 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  * import { useCallback } from 'react';
  * import useSWR from 'swr';
  *
- * /**
- * * Wrapper around useSWR for use with `Endpoint`
- * * @param action Endpoint to execute. Can be null if not yet ready to execute
- * * @param args Any args to pass through to `prepare`
- * * @return Object Same values as returned by useSWR with the addition of `execute` which
- * * can be used to execute the action directly, optionally with new arguments.
- * *
+ * // Wrapper around useSWR for use with `Endpoint`
+ * // @param action Endpoint to execute. Can be null if not yet ready to execute
+ * // @param args Any args to pass through to `prepare`
+ * // @return Object Same values as returned by useSWR with the addition of `execute` which
+ * // can be used to execute the action directly, optionally with new arguments.
  * export default function useEndpoint(action, args) {
  *   const preparedAction = action ? action.prepare(args) : null;
  *   const execute = useCallback(init => preparedAction.execute(init), [preparedAction]);
@@ -253,6 +255,61 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  *     ...useSWR(preparedAction && [preparedAction], act => act.execute()),
  *   };
  * }
+ * ```
+ *
+ * ## Pagination
+ *
+ * Pagination for an endpoint is handled by a `Paginator` class returned from the `createPaginator` method. The
+ * default implementation chooses the paginator based on the shape of the response (eg. if the response looks like
+ * cursor based paginator it will use `CursorPaginator`, if page number based `PageNumberPaginator` or if limit/offset
+ * use `LimitOffsetPaginator`). The pagination state as returned by the backend is stored on the instance of the
+ * paginator:
+ *
+ * ```js
+ * const paginator = endpoint.createPaginator();
+ * // This returns the page of results
+ * const results = await endpoint.execute({ paginator });
+ * // This now has the total number of records (eg. if the paginator was PageNumberPaginator)
+ * paginator.total
+ * ```
+ *
+ * You can calculate the next request state by mutating the paginator:
+ *
+ * ```js
+ * paginator.next()
+ * // The call to endpoint here will include the modified page request data, eg. ?page=2
+ * const results = await endpoint.execute({ paginator });
+ * ```
+ *
+ * When using with React you'll likely want to store the state somewhere in React. To do this
+ * you can pass a `onChange` function to `createPaginator` to synchronise changes that occur
+ * internally within the paginator to the React state. If changes happen in React that need
+ * to reflect in the paginator (eg. syncing state from the URL) then you need to call `syncState`
+ * on the paginator.
+ *
+ * Example usage with React with a fictional `useUrlState` hook that works like `useState` but
+ * reads and stores state in the URL instead:
+ *
+ * ```jsx
+ * // Where the state for pagination will be synced to
+ * const [paginationState, setPaginationState] = useUrlState();
+ * // Create the paginator once. We pass the `setPaginationState` function which is called whenever
+ * // pagination state changes. This triggers a re-render and API will be called.
+ * const paginator = useMemo(() => endpoint.createPaginator(null, setPaginationState), [endpoint]);
+ *
+ * // Make sure state is always in sync so that if the URL is changed on the frontend it reflects
+ * // in the paginator
+ * paginator.syncState(paginationState);
+ *
+ * // Prepare takes into account the state of the paginator - when paginator state changes it returns
+ * // a new action.
+ * const preparedAction = endpoint.prepare({ paginator });
+ *
+ * // Fire the endpoint initially and whenever it changes.
+ * const { data } = useSWR([preparedAction], action => action.execute())
+ *
+ * // You can now bind UI to the paginator actions, eg.
+ * <>{paginator.total} records found. <Button onClick={() => paginator.next()}>Next Page</Button></>
  * ```
  *
  * @extract-docs
