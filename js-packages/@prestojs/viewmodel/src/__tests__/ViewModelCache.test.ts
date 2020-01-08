@@ -626,3 +626,71 @@ test('should support adding list of via add', () => {
         recordEqualTo(record3),
     ]);
 });
+
+// Run this test both with and without listeners. Code path is different between the two (optimisation for
+// when no listeners in use)
+test.each`
+    withListeners
+    ${true}
+    ${false}
+`('Should support getting all records, listeners = $withListeners ', ({ withListeners }) => {
+    class Test1 extends ViewModel {
+        static _fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+
+    const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
+    const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
+    const record3 = { id: 4, firstName: 'Gandalf', email: 'gandy@b.com' };
+    Test1.cache.add([record1, record2, record3]);
+
+    if (withListeners) {
+        Test1.cache.addListener([2, 3, 4], ['id', 'firstName', 'email'], jest.fn());
+        Test1.cache.addListener([2, 3, 4], ['id', 'firstName'], jest.fn());
+    }
+
+    let result = Test1.cache.getAll(['firstName', 'email']);
+
+    expect(result).toEqual([
+        recordEqualTo(record1),
+        recordEqualTo(record2),
+        recordEqualTo(record3),
+    ]);
+
+    // Calling it again should return the same array (strict equality pass)
+    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
+
+    // Getting subfields should work and not break equality checks
+    let result2 = Test1.cache.getAll(['firstName']);
+
+    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
+
+    expect(result2).toEqual([
+        recordEqualTo({ id: 2, firstName: 'Bob' }),
+        recordEqualTo({ id: 3, firstName: 'Samwise' }),
+        recordEqualTo({ id: 4, firstName: 'Gandalf' }),
+    ]);
+    expect(result2).toBe(Test1.cache.getAll(['firstName']));
+
+    Test1.cache.add(record1);
+    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
+    expect(result2).toBe(Test1.cache.getAll(['firstName']));
+
+    Test1.cache.add({ ...record1, firstName: 'Bobby' });
+
+    expect(result).not.toBe(Test1.cache.getAll(['firstName', 'email']));
+    expect(result2).not.toBe(Test1.cache.getAll(['firstName']));
+
+    result = Test1.cache.getAll(['firstName', 'email']);
+    result2 = Test1.cache.getAll(['firstName']);
+
+    expect(result[0].firstName).toBe('Bobby');
+    expect(result2[0].firstName).toBe('Bobby');
+
+    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
+    expect(result2).toBe(Test1.cache.getAll(['firstName']));
+});
