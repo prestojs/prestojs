@@ -73,12 +73,12 @@ export default function getWidgetForField<FieldValue, T extends HTMLElement>(
     let f = Object.getPrototypeOf(field.constructor);
     do {
         const widgetF: FieldWidgetType<any, any> | null | undefined = field.choices
-            ? choicesMapping.get(f.constructor.name) || mapping.get(f.constructor.name)
-            : mapping.get(f.constructor.name);
+            ? choicesMapping.get(f.name) || mapping.get(f.name)
+            : mapping.get(f.name);
         if (widgetF) {
             return getReturnWithChoices(widgetF, field);
         }
-        f = Object.getPrototypeOf(f.constructor);
+        f = Object.getPrototypeOf(f);
     } while (f.name);
 
     return null;
