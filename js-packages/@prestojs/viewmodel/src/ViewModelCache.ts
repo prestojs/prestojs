@@ -9,10 +9,49 @@ import ViewModel, { PrimaryKey } from './ViewModel';
  * to just check if it's an instanceof RecordPointer
  */
 class RecordPointer<T extends ViewModel> {
+    /**
+     * This is the value that was replaced by this pointer in the cache. When we actually clone
+     * the record we compare against this value - if it's the same we return the original object
+     * so that equality checks still hold. This is because we never return the RecordPointer - we
+     * only resolve the underlying value as is required. In order to determine whether or not
+     * an object is the same requires first cloning it and then comparing it. As such we do that
+     * at the time we need the cloned value, not upfront (ie. we don't do it before we store the
+     * RecordPointer as that would be lower than doing it lazily - especially if you are updating
+     * lots of records)
+     */
+    currentValue?: null | T;
     record: T;
-    constructor(record: T) {
+    constructor(currentValue: null | undefined | T | RecordPointer<T>, record: T) {
+        this.currentValue =
+            currentValue instanceof RecordPointer ? currentValue.currentValue : currentValue;
         this.record = record;
     }
+
+    clone(fieldNames: string[]): T {
+        const cloned = this.record.clone(fieldNames);
+        // Check if the value has actually changed from what it used to be. If not we can return
+        // the old value so that equality checks still hold.
+        if (this.currentValue && cloned.isEqual(this.currentValue)) {
+            return this.currentValue;
+        }
+        return cloned;
+    }
+}
+
+function isEqual<T extends ViewModel>(
+    a: null | T | RecordPointer<T>,
+    b: null | T | RecordPointer<T>
+): boolean {
+    if (a == null || b == null) {
+        return a === b;
+    }
+    if (a instanceof RecordPointer) {
+        a = a.record;
+    }
+    if (b instanceof RecordPointer) {
+        b = b.record;
+    }
+    return a.isEqual(b);
 }
 
 type PrimaryKeyCacheKey = string | number;
@@ -56,6 +95,13 @@ type ChangeListenerUnsubscribe = () => void;
 // Separator used to join multiple values when generating a string key, eg.
 // ['a', 'b', 'c'] becomes 'a⁞b⁞c'
 const CACHE_KEY_FIELD_SEPARATOR = '⁞';
+
+function getFieldNameCacheKey(fieldNames: string[], excludeFields: string[]): string {
+    // primary key field names are implicit; never include them in the key itself
+    const f = fieldNames.filter(name => !excludeFields.includes(name));
+    f.sort();
+    return f.join(CACHE_KEY_FIELD_SEPARATOR);
+}
 
 /**
  * A cache for a single record as identified by it's primary key. This caches the
@@ -103,10 +149,7 @@ class RecordCache<T extends ViewModel> {
      * Return the key to use into `cache` for the specified field names
      */
     private getCacheKey(fieldNames: string[]): string {
-        // primary key field names are implicit; never include them in the key itself
-        const f = fieldNames.filter(name => !this.pkFieldNames.includes(name));
-        f.sort();
-        return f.join(CACHE_KEY_FIELD_SEPARATOR);
+        return getFieldNameCacheKey(fieldNames, this.pkFieldNames);
     }
 
     /**
@@ -125,14 +168,13 @@ class RecordCache<T extends ViewModel> {
     ): Map<string, T | RecordPointer<T>> | null {
         let before = this.cache.get(key) || null;
         let ret;
-
         if (this.cacheListeners.has(key)) {
             if (value instanceof RecordPointer) {
                 // If we have a listener on a key but it's currently a pointer we
                 // need to clone it to a real record so we can pass it through to
                 // the callbacks.
                 const fieldNames = this.reverseCacheKey(key);
-                const record = value.record.clone(fieldNames);
+                const record = value.clone(fieldNames);
                 return this.setValueForKey(key, record);
             } else {
                 if (before instanceof RecordPointer) {
@@ -141,12 +183,12 @@ class RecordCache<T extends ViewModel> {
                     // anywhere as it represents the previous value - the new value is set
                     // below.
                     const fieldNames = this.reverseCacheKey(key);
-                    before = before.record.clone(fieldNames);
+                    before = before.clone(fieldNames);
                 }
                 if (before === value) {
                     return null;
                 }
-                if (before && value && before.isEqual(value)) {
+                if (before && value && isEqual(before, value)) {
                     return null;
                 }
                 if (value === null) {
@@ -164,7 +206,17 @@ class RecordCache<T extends ViewModel> {
             if (value === null) {
                 ret = this.cache.delete(key);
             } else {
-                ret = this.cache.set(key, value);
+                if (before === value) {
+                    return null;
+                }
+                if (before && isEqual(before, value)) {
+                    ret = this.cache.set(
+                        key,
+                        before instanceof RecordPointer ? before.record : before
+                    );
+                } else {
+                    ret = this.cache.set(key, value);
+                }
             }
         }
 
@@ -183,8 +235,8 @@ class RecordCache<T extends ViewModel> {
         const fieldNames = record._assignedFields;
         const fieldsKey = this.getCacheKey(fieldNames);
         this.latestRecords[fieldsKey] = this.counter++;
-        const pointer = new RecordPointer(record);
         for (const key of [...this.cache.keys(), ...this.cacheListeners.keys()]) {
+            const pointer = new RecordPointer(this.cache.get(key), record);
             const f = this.reverseCacheKey(key);
             if (isSubset(f, fieldNames)) {
                 this.setValueForKey(key, pointer);
@@ -204,7 +256,7 @@ class RecordCache<T extends ViewModel> {
             const pairs = Object.entries(this.latestRecords);
             pairs.sort(compareEntriesOnValue);
             for (const [key] of pairs) {
-                let record = this.cache.get(key);
+                const record = this.cache.get(key);
                 if (!record) {
                     // This is certainly a bug (this check is also to appease typescript)
                     console.error(
@@ -212,10 +264,8 @@ class RecordCache<T extends ViewModel> {
                     );
                     continue;
                 }
-                if (record instanceof RecordPointer) {
-                    record = record.record;
-                }
-                if (isSubset(fieldNames, record._assignedFields)) {
+                const underlyingRecord = record instanceof RecordPointer ? record.record : record;
+                if (isSubset(fieldNames, underlyingRecord._assignedFields)) {
                     // Create a new record with subset of fields and cache
                     // it so that we maintain object equality if you fetch
                     // this entry from the cache multiple times
@@ -231,7 +281,7 @@ class RecordCache<T extends ViewModel> {
         if (recordOrPointer instanceof RecordPointer) {
             // If a pointer to a record with a superset of fields exists then
             // clone that record with just the fields requested.
-            const record = recordOrPointer.record.clone(fieldNames);
+            const record = recordOrPointer.clone(fieldNames);
             this.setValueForKey(fieldsKey, record);
             return record;
         }
@@ -519,6 +569,42 @@ export default class ViewModelCache<T extends ViewModel> {
         for (const pk of pks) {
             records.push(this.get(pk, fieldNames));
         }
+        return records;
+    }
+
+    _lastAllRecords: Map<string, T[]> = new Map();
+
+    /**
+     * Get all records in the cache for the specified field names. This acts like `getList` but returns
+     * all records not just records with specified primary keys.
+     *
+     * This function guarantees to return the same array (ie. passes strict equality check) if the underlying
+     * records have not changed.
+     *
+     * @param fieldNames List of field names to return records for
+     */
+    getAll(fieldNames: string[]): T[] {
+        const records: T[] = [];
+        let isSame = true;
+        let index = 0;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        const key = getFieldNameCacheKey(fieldNames, this.viewModel.pkFieldNames);
+        const lastRecords = this._lastAllRecords.get(key) || [];
+        for (const cacheValue of this.cache.values()) {
+            const record = cacheValue.get(fieldNames);
+            if (record) {
+                records.push(record);
+                if (index > lastRecords.length - 1 || lastRecords[index] !== record) {
+                    isSame = false;
+                }
+                index += 1;
+            }
+        }
+        if (isSame) {
+            return lastRecords;
+        }
+        this._lastAllRecords.set(key, records);
         return records;
     }
 
