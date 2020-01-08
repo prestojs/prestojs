@@ -91,16 +91,21 @@ test('should handle changing page size', () => {
     // Page size same shouldn't change anything
     paginator.setPageSize(5);
     expect(paginator.currentState).toEqual({ pageSize: 5, cursor: 'abc123' });
-    // Page size changed should reset to cursor
+    // Page size changed should not reset cursor
     paginator.setPageSize(10);
-    expect(paginator.currentState).toEqual({ pageSize: 10 });
+    expect(paginator.currentState).toEqual({ pageSize: 10, cursor: 'abc123' });
     expect(paginator.getRequestInit({ query: {} })).toEqual({
         query: {
+            cursor: 'abc123',
             pageSize: 10,
         },
     });
 
     expect(() => paginator.setPageSize(0)).toThrowError(/Invalid/);
+
+    // Setting to null should just reset to default
+    paginator.setPageSize(null);
+    expect(paginator.currentState).toEqual({ cursor: 'abc123' });
 });
 
 test('should handle syncing state', () => {

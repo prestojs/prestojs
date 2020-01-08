@@ -25,8 +25,8 @@ export default class CursorPaginator extends Paginator {
         super(initialState || {}, onChange);
     }
 
-    setPageSize(pageSize: number): void {
-        if (pageSize < 1) {
+    setPageSize(pageSize: number | null): void {
+        if (pageSize != null && pageSize < 1) {
             throw new Error(`Invalid pageSize ${pageSize} - should be >= 1`);
         }
         this.setState(currentState => {
@@ -35,13 +35,11 @@ export default class CursorPaginator extends Paginator {
                 this.nextCursor = null;
                 this.previousCursor = null;
             }
-            // When page size changes we need to reset the cursor
-            if (currentState.pageSize !== pageSize && currentState.cursor) {
-                const nextState: CursorPaginationState = { ...currentState, pageSize };
-                delete nextState.cursor;
-                return nextState;
+            const nextState = { ...currentState, pageSize };
+            if (pageSize == null) {
+                delete nextState.pageSize;
             }
-            return { ...currentState, pageSize };
+            return nextState;
         });
     }
 

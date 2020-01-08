@@ -6,7 +6,7 @@ import Paginator from './Paginator';
 /**
  * Return the state for a paginator based on the response itself.
  *
- * The default implementation is for is in conjunction with InferredPaginator where the pagination type
+ * The default implementation is for use in conjunction with InferredPaginator where the pagination type
  * isn't known upfront but is inferred from the shape of the response.
  */
 export default function getPaginationState(

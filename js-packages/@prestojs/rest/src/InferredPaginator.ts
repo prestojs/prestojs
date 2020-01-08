@@ -223,8 +223,5 @@ export default class InferredPaginator implements PaginatorInterface {
         if (this.paginator) {
             this.paginator.syncState(state);
         }
-        throw new Error(
-            'Cannot call syncState() until pagination type has been inferred (after call to setResponse)'
-        );
     }
 }

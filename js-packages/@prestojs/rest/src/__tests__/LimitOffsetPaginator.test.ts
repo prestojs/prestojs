@@ -85,16 +85,20 @@ test('should handle changing limit', () => {
     // Page size same shouldn't change anything
     paginator.setLimit(10);
     expect(paginator.currentState).toEqual({ limit: 10, offset: 10 });
-    // Page size changed should reset to offset
-    paginator.setLimit(5);
-    expect(paginator.currentState).toEqual({ limit: 5 });
-    expect(paginator.getRequestInit({ query: {} })).toEqual({
-        query: {
-            limit: 5,
-        },
-    });
+    // Page size changed should alter offset such that it's still in step while
+    // keeping existing result on the page
+    paginator.setLimit(6);
+    expect(paginator.currentState).toEqual({ limit: 6, offset: 6 });
+    paginator.next();
+    expect(paginator.currentState).toEqual({ limit: 6, offset: 12 });
+    paginator.setLimit(10);
+    expect(paginator.currentState).toEqual({ limit: 10, offset: 10 });
 
     expect(() => paginator.setLimit(0)).toThrowError(/Invalid/);
+
+    // Setting to null should just reset to default
+    paginator.setLimit(null);
+    expect(paginator.currentState).toEqual({});
 });
 
 test('should handle syncing state', () => {
