@@ -559,13 +559,15 @@ export default class ViewModelCache<T extends ViewModel> {
         }
         const { pkFieldName } = this.viewModel;
         const isCompound = Array.isArray(pkFieldName);
-        if (isCompound && typeof pk !== 'object') {
+        // typescript failed to narrow pkFieldName to array using isCompound here
+        // for some reason...
+        if (Array.isArray(pkFieldName) && typeof pk !== 'object') {
             throw new Error(
                 `${this.viewModel} has a compound key of ${pkFieldName.join(
                     ', '
                 )}. You must provide an object mapping these fields to their values.`
             );
-        } else if (isCompound) {
+        } else if (Array.isArray(pkFieldName)) {
             const missingValues = pkFieldName.filter(name => pk[name] == null);
             if (missingValues.length > 0) {
                 throw new Error(
