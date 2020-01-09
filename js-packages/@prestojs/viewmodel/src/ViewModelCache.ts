@@ -1,4 +1,4 @@
-import { Class } from './typeUtil';
+import { Class, ViewModelClass } from './typeUtil';
 import ViewModel, { PrimaryKey } from './ViewModel';
 
 /**
@@ -91,6 +91,7 @@ const compareEntriesOnKey = makeEntryComparator(0);
 type ChangeListener<T> = (previous?: T, next?: T) => void;
 type MultiChangeListener<T> = (previous?: (T | null)[], next?: (T | null)[]) => void;
 type ChangeListenerUnsubscribe = () => void;
+type AllChangesListener = () => void;
 
 // Separator used to join multiple values when generating a string key, eg.
 // ['a', 'b', 'c'] becomes 'a⁞b⁞c'
@@ -128,21 +129,21 @@ function getFieldNameCacheKey(fieldNames: string[], excludeFields: string[]): st
  * 4) Otherwise we return null
  **/
 class RecordCache<T extends ViewModel> {
-    viewModel: Class<T>;
+    viewModel: ViewModelClass<T>;
     pkFieldNames: string[];
     cache: Map<FieldNameCacheKey, T | RecordPointer<T>>;
     cacheListeners: Map<FieldNameCacheKey, ChangeListener<T>[]>;
     latestRecords: { [fieldsKey: string]: number };
     counter = 0;
+    onAnyChange: () => void;
 
-    constructor(viewModel: Class<T>) {
+    constructor(viewModel: ViewModelClass<T>, onAnyChange: () => void) {
         this.cache = new Map();
         this.cacheListeners = new Map();
         this.latestRecords = {};
         this.viewModel = viewModel;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
         this.pkFieldNames = viewModel.pkFieldNames;
+        this.onAnyChange = onAnyChange;
     }
 
     /**
@@ -210,10 +211,8 @@ class RecordCache<T extends ViewModel> {
                     return null;
                 }
                 if (before && isEqual(before, value)) {
-                    ret = this.cache.set(
-                        key,
-                        before instanceof RecordPointer ? before.record : before
-                    );
+                    this.cache.set(key, before instanceof RecordPointer ? before.record : before);
+                    return null;
                 } else {
                     ret = this.cache.set(key, value);
                 }
@@ -235,14 +234,25 @@ class RecordCache<T extends ViewModel> {
         const fieldNames = record._assignedFields;
         const fieldsKey = this.getCacheKey(fieldNames);
         this.latestRecords[fieldsKey] = this.counter++;
+        let anyChanges = false;
         for (const key of [...this.cache.keys(), ...this.cacheListeners.keys()]) {
             const pointer = new RecordPointer(this.cache.get(key), record);
             const f = this.reverseCacheKey(key);
             if (isSubset(f, fieldNames)) {
-                this.setValueForKey(key, pointer);
+                if (this.setValueForKey(key, pointer) != null) {
+                    anyChanges = true;
+                }
             }
         }
-        return this.setValueForKey(fieldsKey, record);
+        const ret = this.setValueForKey(fieldsKey, record);
+        if (anyChanges || ret != null) {
+            // TODO: This will be called sometimes when there's no change... eg. when value is a RecordPointer
+            // that actually matches the current data. We currently determine this and optimise it away when
+            // we fetch the record rather than when it's cached. Would need to profile this and see if it matters enough
+            // or whether we can always check it.
+            this.onAnyChange();
+        }
+        return ret;
     }
 
     /**
@@ -295,9 +305,15 @@ class RecordCache<T extends ViewModel> {
      */
     delete(fieldNames?: string[]): boolean {
         if (!fieldNames) {
+            let anyDeleted = false;
             for (const key of this.cache.keys()) {
-                this.setValueForKey(key, null);
+                if (this.setValueForKey(key, null) != null) {
+                    anyDeleted = true;
+                }
                 delete this.latestRecords[key];
+            }
+            if (anyDeleted) {
+                this.onAnyChange();
             }
             return true;
         }
@@ -307,6 +323,7 @@ class RecordCache<T extends ViewModel> {
         }
         this.setValueForKey(fieldsKey, null);
         delete this.latestRecords[fieldsKey];
+        this.onAnyChange();
         return true;
     }
 
@@ -415,12 +432,12 @@ class RecordCache<T extends ViewModel> {
  */
 export default class ViewModelCache<T extends ViewModel> {
     cache: Map<PrimaryKeyCacheKey, RecordCache<T>>;
-    viewModel: Class<T>;
+    viewModel: ViewModelClass<T>;
 
     /**
      * @param viewModel The `ViewModel` this class is for
      */
-    constructor(viewModel: Class<T>) {
+    constructor(viewModel: ViewModelClass<T>) {
         this.viewModel = viewModel;
         this.cache = new Map();
     }
@@ -474,7 +491,7 @@ export default class ViewModelCache<T extends ViewModel> {
         const pkKey = this.getPkCacheKey(record._pk);
         let recordCache = this.cache.get(pkKey);
         if (!recordCache) {
-            recordCache = new RecordCache(this.viewModel);
+            recordCache = new RecordCache(this.viewModel, this.onAnyChange.bind(this));
             this.cache.set(pkKey, recordCache);
         }
         recordCache.add(record);
@@ -482,7 +499,7 @@ export default class ViewModelCache<T extends ViewModel> {
     }
 
     isAddingList = false;
-    onAddingListDone?: null | (() => void);
+    onAddingListDone: (() => void)[] = [];
 
     /**
      * Add a list of records. Use this in place of manually calling
@@ -495,13 +512,11 @@ export default class ViewModelCache<T extends ViewModel> {
         try {
             const ret = records.map(record => this.add(record)) as T[];
             this.isAddingList = false;
-            if (this.onAddingListDone) {
-                this.onAddingListDone();
-                this.onAddingListDone = null;
-            }
+            this.onAddingListDone.forEach(cb => cb());
+            this.onAddingListDone = [];
             return ret;
         } catch (e) {
-            this.onAddingListDone = null;
+            this.onAddingListDone = [];
             this.isAddingList = false;
             throw e;
         }
@@ -519,10 +534,6 @@ export default class ViewModelCache<T extends ViewModel> {
         if (!pk) {
             throw new Error('Primary key must be provided');
         }
-        // When using Class<T> doesn't actually know about all static properties
-        //  ¯\_(ツ)_/¯
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
         const { pkFieldName } = this.viewModel;
         const isCompound = Array.isArray(pkFieldName);
         if (isCompound && typeof pk !== 'object') {
@@ -587,8 +598,6 @@ export default class ViewModelCache<T extends ViewModel> {
         const records: T[] = [];
         let isSame = true;
         let index = 0;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
         const key = getFieldNameCacheKey(fieldNames, this.viewModel.pkFieldNames);
         const lastRecords = this._lastAllRecords.get(key) || [];
         for (const cacheValue of this.cache.values()) {
@@ -628,19 +637,63 @@ export default class ViewModelCache<T extends ViewModel> {
         return recordCache.delete(fieldNames);
     }
 
+    private notifyAnyChange = (): void => {
+        this.allChangeListeners.forEach(cb => cb());
+    };
+
+    private onAnyChange(): void {
+        if (this.isAddingList) {
+            if (!this.onAddingListDone.includes(this.notifyAnyChange)) {
+                this.onAddingListDone.push(this.notifyAnyChange);
+            }
+        } else {
+            this.notifyAnyChange();
+        }
+    }
+
+    allChangeListeners: (() => void)[] = [];
+
+    /**
+     * Add a listener to any changes at all. The detail of the changes are not available.
+     *
+     * @param listener Function to that is called when any change occurs. The function is called with no parameters.
+     * @returns A function that removes the listener
+     */
+    addListener(listener: AllChangesListener): ChangeListenerUnsubscribe;
     /**
      * Add a listener for any changes, additions or deletions for the record(s) identified by
-     * `pkOrPks` for the field names `fieldNames`
+     * `pkOrPks` for the field names `fieldNames`.
+     *
      * @param pkOrPks Primary key or array of multiple primary keys that identifies the record(s)
      * to listen to changes/additions/deletions to
      * @param fieldNames Field names to listen to changes/additions/deletions to
      * @param listener Function to call with any changes
+     * @returns A function that removes the listener
      */
     addListener(
         pkOrPks: PrimaryKey | PrimaryKey[],
         fieldNames: string[],
         listener: MultiChangeListener<T> | ChangeListener<T>
+    ): ChangeListenerUnsubscribe;
+    addListener(
+        pkOrPksOrListener: PrimaryKey | PrimaryKey[] | (() => void),
+        fieldNames?: string[],
+        listener?: MultiChangeListener<T> | ChangeListener<T>
     ): ChangeListenerUnsubscribe {
+        if (typeof pkOrPksOrListener == 'function') {
+            this.allChangeListeners.push(pkOrPksOrListener);
+            return (): void => {
+                const index = this.allChangeListeners.indexOf(pkOrPksOrListener);
+
+                if (index !== -1) {
+                    this.allChangeListeners.splice(index, 1);
+                }
+            };
+        }
+        if (!fieldNames) {
+            throw new Error('If primary key(s) are specified fieldNames msut also be specified');
+        }
+        const pkOrPks: PrimaryKey | PrimaryKey[] = pkOrPksOrListener;
         if (Array.isArray(pkOrPks)) {
             return this.addListenerList(
                 pkOrPks,
@@ -655,22 +708,19 @@ export default class ViewModelCache<T extends ViewModel> {
         const pkKey = this.getPkCacheKey(pkOrPks);
         let recordCache = this.cache.get(pkKey);
         if (!recordCache) {
-            recordCache = new RecordCache(this.viewModel);
+            recordCache = new RecordCache(this.viewModel, this.onAnyChange.bind(this));
             this.cache.set(pkKey, recordCache);
         }
         return recordCache.addListener(fieldNames, (listener as unknown) as ChangeListener<T>);
     }
 
-    // TODO: This could probably be part of the above interface; if `pk` is an array
-    // do what this does. Currently CompoundPrimaryKey is an array; I'd like to change
-    // this to an object. Once that is done we can differentiate between a compound key
-    // and an array of pks.
     addListenerList(
         pks: PrimaryKey[],
         fieldNames: string[],
         listener: MultiChangeListener<T>
     ): ChangeListenerUnsubscribe {
         let previous = pks.map(pk => this.get(pk, fieldNames));
+        let onDoneCallback;
         const cb = (): void => {
             const next = pks.map(pk => this.get(pk, fieldNames));
             if (this.isAddingList) {
@@ -678,14 +728,15 @@ export default class ViewModelCache<T extends ViewModel> {
                 // notifying the listener. We need to cache the value of 'previous'
                 // at the time the first change is detected and pass that through once
                 // the list has been added.
-                if (!this.onAddingListDone) {
+                if (!this.onAddingListDone.includes(onDoneCallback)) {
                     const firstPrevious = previous;
-                    this.onAddingListDone = (): void => {
+                    onDoneCallback = (): void => {
                         listener(
                             firstPrevious,
                             pks.map(pk => this.get(pk, fieldNames))
                         );
                     };
+                    this.onAddingListDone.push(onDoneCallback);
                 }
             } else {
                 listener(previous, next);
