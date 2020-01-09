@@ -1,4 +1,5 @@
 import ViewModel from './ViewModel';
+import ViewModelCache from './ViewModelCache';
 
 /**
  * Utility to type a generic class type, eg.
@@ -23,7 +24,15 @@ export interface Class<T> extends Function {
 /**
  * Specific version of `Class` for `ViewModel`. Allows you to use static properties
  * on ViewModel which doesn't work with just `Class`
+ *
+ * Originally this extended ViewModel which seemed to work in some cases but broke in
+ * others (incompatibility between ViewModelClass and typeof ViewModel in some cases).
+ * Unclear why. Adding properties directly here though works... expand as required
  */
-export interface ViewModelClass<T extends ViewModel> extends ViewModel {
+export interface ViewModelClass<T extends ViewModel> extends Function {
     new (...args: any[]): T;
+
+    pkFieldNames: string[];
+    pkFieldName: string | string[];
+    cache: ViewModelCache<T>;
 }
