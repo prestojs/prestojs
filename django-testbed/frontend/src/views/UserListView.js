@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import { FieldFormatter } from '@prestojs/ui';
+import { useViewModelCache, useViewModelChangeEffect } from '@prestojs/viewmodel';
 import { Button, Modal } from 'antd';
 import qs from 'qs';
-import { FieldFormatter } from '@prestojs/ui';
-import { useViewModelCache } from '@prestojs/viewmodel';
+import React, { useState } from 'react';
 
 import User from '../models/User';
 import useEndpoint from '../useEndpoint';
 import useNaviUrlQueryState from '../useNaviUrlQueryState';
 import UserCreateUpdateView from './UserCreateUpdateView';
 import UserFilterForm from './UserFilterForm';
+
+// TODO: We don't yet support selecting partial fields on backend
+const fieldList = ['email', 'first_name', 'last_name'];
 
 export default function UserListView() {
     const { search, pathname, origin } = window.location;
@@ -17,7 +20,7 @@ export default function UserListView() {
     const paginationStatePair = useNaviUrlQueryState({}, { prefix: 'p_' });
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
-    const { data, error, paginator } = useEndpoint(
+    const { data, error, paginator, revalidate, isValidating } = useEndpoint(
         User.endpoints.list,
         {
             query: {
@@ -33,6 +36,11 @@ export default function UserListView() {
     if (error) {
         throw error;
     }
+
+    // Refetch data whenever underlying cache changes
+    const allRecords = useViewModelCache(User, cache => cache.getAll(fieldList));
+    useViewModelChangeEffect(!isValidating && allRecords, revalidate);
+
     const records = useViewModelCache(User, cache => data && cache.getList(data.result));
     if (!records) {
         return null;
