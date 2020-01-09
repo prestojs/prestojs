@@ -27,5 +27,6 @@ export { default as TextField } from './fields/TextField';
 export { default as TimeField } from './fields/TimeField';
 export { default as URLField } from './fields/URLField';
 export { default as UUIDField } from './fields/UUIDField';
+export { default as useViewModelCache } from './useViewModelCache';
 
 export { Class } from './typeUtil';
