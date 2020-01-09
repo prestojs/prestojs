@@ -1,3 +1,4 @@
+import { useViewModelCache } from '@prestojs/viewmodel';
 import { Button } from 'antd';
 import React from 'react';
 import { Form } from '@prestojs/final-form';
@@ -37,7 +38,7 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
             return err.content;
         }
     }
-    const record = useConnected(data);
+    const record = useViewModelCache(User, cache => data && cache.get(data));
     if (error) {
         return error.message;
     }
