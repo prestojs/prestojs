@@ -28,6 +28,7 @@ export { default as TimeField } from './fields/TimeField';
 export { default as URLField } from './fields/URLField';
 export { default as UUIDField } from './fields/UUIDField';
 export { default as useViewModelCache } from './useViewModelCache';
+export { default as useViewModelChangeEffect } from './useViewModelChangeEffect';
 
 export { isViewModelInstance, isViewModelClass } from './ViewModelFactory';
 
