@@ -211,6 +211,8 @@ test('should support custom cache', () => {
 
     class MyCache<T extends ViewModel> extends ViewModelCache<T> {}
     class Test1 extends ViewModel {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
         static cache = new MyCache<Test1>(Test1);
     }
 
@@ -554,13 +556,19 @@ test('should support listening to multiple pks, batch notifications', () => {
     }
 
     const cb1 = jest.fn();
+    const cb2 = jest.fn();
     Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
+    // Add another callback - there's internal optimisations in addListenerList that we need
+    // to ensure don't break this
+    Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb2);
     const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
     const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
     const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
     Test1.cache.addList([record1, record2, record3]);
     expect(cb1).toHaveBeenCalledTimes(1);
     expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
+    expect(cb2).toHaveBeenCalledTimes(1);
+    expect(cb2).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
 });
 
 test('should support listening to multiple pks without specifying primary keys in field names', () => {
@@ -693,4 +701,40 @@ test.each`
 
     expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
     expect(result2).toBe(Test1.cache.getAll(['firstName']));
+});
+
+test('should support listening all changes on a ViewModel', () => {
+    class Test1 extends ViewModel {
+        static _fields = {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        };
+    }
+
+    const cb1 = jest.fn();
+    const cb2 = jest.fn();
+    Test1.cache.addListener(cb1);
+    Test1.cache.addListener(cb2);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
+    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
+    Test1.cache.addList([record1, record2, record3]);
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb2).toHaveBeenCalledTimes(1);
+
+    Test1.cache.add({ id: 6, firstName: 'Ho' });
+
+    expect(cb1).toHaveBeenCalledTimes(2);
+    expect(cb2).toHaveBeenCalledTimes(2);
+
+    Test1.cache.delete(6);
+    expect(cb1).toHaveBeenCalledTimes(3);
+    expect(cb2).toHaveBeenCalledTimes(3);
+
+    // Shouldn't call it again, record already deleted
+    Test1.cache.delete(6);
+    expect(cb1).toHaveBeenCalledTimes(3);
+    expect(cb2).toHaveBeenCalledTimes(3);
 });

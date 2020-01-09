@@ -1,3 +1,5 @@
+import ViewModel from './ViewModel';
+
 /**
  * Utility to type a generic class type, eg.
  *
@@ -15,5 +17,13 @@
  * ```
  */
 export interface Class<T> extends Function {
+    new (...args: any[]): T;
+}
+
+/**
+ * Specific version of `Class` for `ViewModel`. Allows you to use static properties
+ * on ViewModel which doesn't work with just `Class`
+ */
+export interface ViewModelClass<T extends ViewModel> extends ViewModel {
     new (...args: any[]): T;
 }
