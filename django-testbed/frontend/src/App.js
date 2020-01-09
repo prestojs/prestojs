@@ -20,10 +20,12 @@ function getWidgetForField(field) {
 
 export default function App() {
     return (
-        <UiProvider getWidgetForField={getWidgetForField} formItemComponent={FormItemWrapper}>
-            <SWRConfig>
-                <UserListView />
-            </SWRConfig>
-        </UiProvider>
+        <React.Suspense fallback={<div>Loading...</div>}>
+            <UiProvider getWidgetForField={getWidgetForField} formItemComponent={FormItemWrapper}>
+                <SWRConfig>
+                    <UserListView />
+                </SWRConfig>
+            </UiProvider>
+        </React.Suspense>
     );
 }
