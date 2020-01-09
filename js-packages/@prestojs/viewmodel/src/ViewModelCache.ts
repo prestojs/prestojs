@@ -523,6 +523,14 @@ export default class ViewModelCache<T extends ViewModel> {
     }
 
     /**
+     * Get the currently cached version of the specified version
+     *
+     * @param record a current instance of a ViewModel to get the latest cached version of
+     *
+     * @returns The cached record or null if none found
+     */
+    get(record: T): T | null;
+    /**
      * Get a record with the specified `fieldNames` set from the cache
      *
      * @param pk the primary key of the record to get
@@ -530,7 +538,22 @@ export default class ViewModelCache<T extends ViewModel> {
      *
      * @returns The cached record or null if none found
      */
-    get(pk: PrimaryKey, fieldNames: string[]): T | null {
+    get(pk: PrimaryKey, fieldNames: string[]): T | null;
+    get(pkOrRecord: PrimaryKey | T, fieldNames?: string[]): T | null {
+        let pk = pkOrRecord;
+        if (pk instanceof ViewModel) {
+            const { _model } = pk;
+            if (!this.isInstanceOfModel(pk)) {
+                throw new Error(
+                    `Attempted to get ViewModel of type ${_model} in cache for ${this.viewModel}`
+                );
+            }
+            fieldNames = pk._assignedFields;
+            pk = pk._pk;
+        }
+        if (!fieldNames) {
+            throw new Error('fieldNames must be provided');
+        }
         if (!pk) {
             throw new Error('Primary key must be provided');
         }
@@ -565,6 +588,14 @@ export default class ViewModelCache<T extends ViewModel> {
     }
 
     /**
+     * Get list of cached records from an existing list of records
+     *
+     * @param records List of existing ViewModel records to get latest cache version for
+     * @param removeNulls whether to remove entries that have no record in the cache. Defaults to true.
+     * @returns an array of the cached records. Any records not found will be in the array as a null value if `removeNulls` is false otherwise they will be removed.
+     **/
+    getList(records: T[], removeNulls?: boolean): (T | null)[];
+    /**
      * Get a list of records with the specified `fieldNames` set from the cache
      *
      * Any record that is not found will end up in the array as a null value. If this
@@ -572,13 +603,29 @@ export default class ViewModelCache<T extends ViewModel> {
      *
      * @param pks An array of primary keys
      * @param fieldNames the field names to use to look up the cached entries
-     * @returns an array of the cached records. Any records not found will be in
-     * the array as a null value
+     * @param removeNulls whether to remove entries that have no record in the cache. Defaults to true.
+     * @returns an array of the cached records. Any records not found will be in the array as a null value if `removeNulls` is false otherwise they will be removed.
      */
-    getList(pks: PrimaryKey[], fieldNames: string[]): (T | null)[] {
-        const records: (T | null)[] = [];
-        for (const pk of pks) {
-            records.push(this.get(pk, fieldNames));
+    getList(pks: PrimaryKey[], fieldNames: string[], removeNulls?: boolean): (T | null)[];
+    getList(
+        pksOrRecords: PrimaryKey[],
+        fieldNames?: string[] | boolean,
+        removeNulls = true
+    ): (T | null)[] {
+        if (pksOrRecords.length === 0) {
+            return [];
+        }
+        let records: (T | null)[] = [];
+        if (!Array.isArray(fieldNames)) {
+            removeNulls = fieldNames == null ? true : fieldNames;
+            records = pksOrRecords.map(record => this.get(record as T));
+        } else {
+            for (const pk of pksOrRecords) {
+                records.push(this.get(pk, fieldNames));
+            }
+        }
+        if (removeNulls) {
+            return records.filter(Boolean);
         }
         return records;
     }

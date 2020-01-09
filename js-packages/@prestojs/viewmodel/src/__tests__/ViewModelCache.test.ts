@@ -27,6 +27,7 @@ test('should cache records from record instance', () => {
     expect(Test1.cache.add(record1)).toBe(record1);
 
     expect(Test1.cache.get(5, ['id'])).toBe(record1);
+    expect(Test1.cache.get(record1)).toBe(record1);
 
     expect(Test2.cache.cache).toEqual(new Map());
     expect(Test2.cache.get(5, ['id'])).toBe(null);
@@ -402,16 +403,24 @@ test('should support retrieving multiple records', () => {
     Test1.cache.add(new Test1({ id: 3, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
 
-    expect(Test1.cache.getList([2, 3, 4], ['id', 'firstName', 'email'])).toEqual([
+    const records1 = Test1.cache.getList([2, 3, 4], ['id', 'firstName', 'email'], false);
+    expect(records1).toEqual([
         recordEqualTo({ id: 2, firstName: 'Bob', email: 'bob@b.com' }),
         null,
         recordEqualTo({ id: 4, firstName: 'Sam', email: 'sam@b.com' }),
     ]);
 
-    expect(Test1.cache.getList([2, 3, 4], ['id', 'email'])).toEqual([
+    const records2 = Test1.cache.getList([2, 3, 4], ['id', 'email']) as Test1[];
+    expect(records2).toEqual([
         recordEqualTo({ id: 2, email: 'bob@b.com' }),
         recordEqualTo({ id: 3, email: 'jack@b.com' }),
         recordEqualTo({ id: 4, email: 'sam@b.com' }),
+    ]);
+
+    expect(Test1.cache.getList(records2)).toEqual(records2);
+    expect(Test1.cache.getList(records1.filter(Boolean) as Test1[])).toEqual([
+        recordEqualTo({ id: 2, firstName: 'Bob', email: 'bob@b.com' }),
+        recordEqualTo({ id: 4, firstName: 'Sam', email: 'sam@b.com' }),
     ]);
 });
 
