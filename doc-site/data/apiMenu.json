@@ -71,6 +71,10 @@
       "href": "/api/@prestojs/viewmodel/fields/CurrencyField.html"
     },
     {
+      "title": "FilterSet",
+      "href": "/api/@prestojs/viewmodel/FilterSet.html"
+    },
+    {
       "title": "ViewModel",
       "href": "/api/@prestojs/viewmodel/ViewModel.html"
     },

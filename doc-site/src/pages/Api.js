@@ -78,11 +78,12 @@ function ClassDoc({ doc }) {
             {constructor && (
                 <>
                     <h3>Constructor</h3>
-                    {constructor.signatures[0].parameters.map(p => (
-                        <p>
-                            <strong>{p.name}</strong> <CommentBlock comment={p.comment} />
-                        </p>
-                    ))}
+                    {constructor.signatures[0].parameters &&
+                        constructor.signatures[0].parameters.map(p => (
+                            <p>
+                                <strong>{p.name}</strong> <CommentBlock comment={p.comment} />
+                            </p>
+                        ))}
                     {methods && (
                         <>
                             <h3>Methods</h3>
