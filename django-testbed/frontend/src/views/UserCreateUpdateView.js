@@ -6,7 +6,7 @@ import User from '../models/User';
 import useConnected from '../useConnected';
 import useEndpoint from '../useEndpoint';
 
-function FieldErrors({ name }) {
+export function FieldErrors({ name }) {
     return (
         <Form.Field name={name}>
             {({ meta }) => (meta.submitError ? meta.submitError.join(', ') : null)}

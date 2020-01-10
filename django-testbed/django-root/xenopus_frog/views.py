@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
+from django_filters import rest_framework as filters
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
@@ -16,7 +17,21 @@ class UserSerializer(ModelSerializer):
         fields = ("id", "first_name", "last_name", "email")
 
 
+class UserFilterSet(filters.FilterSet):
+    first_name = filters.CharFilter(lookup_expr="icontains")
+    last_name = filters.CharFilter(lookup_expr="icontains")
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+        )
+
+
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all().order_by("first_name", "last_name", "email")
     serializer_class = UserSerializer
+    filterset_class = UserFilterSet
     permission_classes = []

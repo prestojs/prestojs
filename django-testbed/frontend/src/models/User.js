@@ -1,6 +1,13 @@
 /* eslint-disable no-use-before-define,@typescript-eslint/no-use-before-define */
 import { Endpoint } from '@prestojs/rest';
-import { ViewModel, IntegerField, ImageField, NullableBooleanField } from '@prestojs/viewmodel';
+import {
+    IntegerField,
+    ImageField,
+    NullableBooleanField,
+    FilterSet,
+    CharField,
+    NumberField,
+} from '@prestojs/viewmodel';
 
 import namedUrls from '../namedUrls';
 
@@ -61,3 +68,21 @@ export default class User extends BaseUser {
 }
 
 window.User = User;
+
+export class UserFilterSet extends FilterSet {
+    static _model = User;
+
+    static _fields = {
+        id: new NumberField({
+            label: 'Id',
+        }),
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        first_name: new CharField({
+            label: 'First Name',
+        }),
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        last_name: new CharField({
+            label: 'Last Name',
+        }),
+    };
+}
