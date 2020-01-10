@@ -24,7 +24,9 @@
     "@prestojs/viewmodel": "^0.0.1"
   },
   "dependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "react-navi": "^0.14.2",
+    "navi": "^0.14.0"
   },
   "devDependencies": {
     "typescript": "^3.7.2"

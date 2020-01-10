@@ -47,8 +47,7 @@
     "lint-staged": "^9.4.3",
     "prettier": "^1.19.1",
     "ts-jest": "^24.1.0",
-    "typedoc": "^0.15.2",
-    "typedoc-neo-theme": "^1.0.4"
+    "typedoc": "^0.15.2"
   },
   "dependencies": {
     "@babel/cli": "^7.7.0",

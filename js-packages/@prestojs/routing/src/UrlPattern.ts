@@ -28,8 +28,10 @@ export default class UrlPattern {
     requiredArgNames: string[];
     toPath: PathFunction;
     keys: Key[];
+    name?: string;
+    parent?: string;
 
-    constructor(pattern: string) {
+    constructor(pattern: string, name?: string, parent?: string) {
         this.keys = [];
         pathToRegexp(pattern, this.keys);
         this.validArgNames = this.keys.map(key => key.name.toString());
@@ -38,6 +40,8 @@ export default class UrlPattern {
             .map(key => key.name.toString());
         this.pattern = pattern;
         this.toPath = compile(pattern);
+        this.name = name; // route name (not NamedURL name). better name?
+        this.parent = parent; // NamedURL name (not route name) of parent of current url. better name?
     }
 
     resolve(kwargs: {} = {}, { query }: ResolveOptions = {}): string {

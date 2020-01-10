@@ -7,7 +7,7 @@ export default function useConnected(data) {
         if (data instanceof ViewModel) {
             return data._model.cache.get(data._pk, data._assignedFields);
         }
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length) {
             const { _model, _assignedFields } = data[0];
             return _model.cache.getList(
                 data.map(r => r._pk),

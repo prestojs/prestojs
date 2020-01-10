@@ -7,7 +7,8 @@
     // very annoying
     // https://github.com/microsoft/TypeScript/issues/30661
     // "noEmit": true
-    "outDir": "/tmp/tsc-output"
+    "outDir": "/tmp/tsc-output",
+    "skipLibCheck": true
   },
   "references": [
     {

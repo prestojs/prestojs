@@ -9,3 +9,4 @@ export {
 export { default as getFormatterForField } from './getFormatterForField';
 export { default as FieldWidget } from './FieldWidget';
 export { default as FieldFormatter } from './FieldFormatter';
+export { default as Breadcrumb } from './components/Breadcrumb';

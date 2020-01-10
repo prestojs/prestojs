@@ -31,3 +31,5 @@ export { default as UUIDWidget } from './widgets/UUIDWidget';
 
 export { default as getWidgetForField } from './getWidgetForField';
 export { default as FormItemWrapper } from './FormItemWrapper';
+
+export { default as Breadcrumb } from './components/Breadcrumb';

@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'antd';
+import { useNavigation } from 'react-navi';
 
 import { FieldFormatter } from '@prestojs/ui';
+
+import { Breadcrumb } from '@prestojs/ui-antd';
 
 import User from '../models/User';
 import useConnected from '../useConnected';
 import useEndpoint from '../useEndpoint';
 import UserCreateUpdateView from './UserCreateUpdateView';
 import UserFilterForm from './UserFilterForm';
+import namedUrls from '../namedUrls';
 
 export default function UserListView() {
+    const nav = useNavigation();
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
     const [filter, setFilter] = useState({});
@@ -26,8 +31,11 @@ export default function UserListView() {
     if (!records) {
         return null;
     }
+
     return (
         <>
+            <Breadcrumb />
+            <hr />
             {User.label} / {User.labelPlural}
             <Button type="primary" onClick={() => setShowCreate(true)}>
                 Add User
@@ -64,6 +72,15 @@ export default function UserListView() {
                             </td>
                             <td>
                                 <button onClick={() => selectId(record._pk)}>Edit</button>
+                                <button
+                                    onClick={() =>
+                                        nav.navigate(
+                                            namedUrls.reverse('user-detail', { id: record._pk })
+                                        )
+                                    }
+                                >
+                                    View
+                                </button>
                             </td>
                         </tr>
                     ))}
