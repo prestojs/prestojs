@@ -5,11 +5,17 @@ import User from '../models/User';
 import useConnected from '../useConnected';
 import useEndpoint from '../useEndpoint';
 import UserCreateUpdateView from './UserCreateUpdateView';
+import UserFilterForm from './UserFilterForm';
 
 export default function UserListView() {
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
-    const { data, error } = useEndpoint(User.endpoints.list, {}, { refreshInterval: 10000 });
+    const [filter, setFilter] = useState({});
+    const { data, error } = useEndpoint(
+        User.endpoints.list,
+        { query: filter },
+        { refreshInterval: 10000 }
+    );
     if (error) {
         throw error;
     }
@@ -25,6 +31,7 @@ export default function UserListView() {
                 Add User
             </Button>
             <hr />
+            <UserFilterForm onApplyFilter={setFilter} />
             <table>
                 <tbody>
                     {records.map(record => (

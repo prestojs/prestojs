@@ -1,4 +1,5 @@
 export { default as ViewModel } from './ViewModel';
+export { default as FilterSet } from './FilterSet';
 export { default as Field } from './fields/Field';
 
 export { default as BooleanField } from './fields/BooleanField';

@@ -591,6 +591,7 @@ LOGGING = {
 # ----------------------------------------------------------------------------------------------------------------------
 # APIs
 REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         # we prioritise BasicAuthentication so that we can distinguish logged out (401) vs permission denied (403)
         # http response codes; our code doesn't actually use http basic authentication
