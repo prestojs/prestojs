@@ -1,5 +1,4 @@
 import FieldBinder from './FieldBinder';
-import ViewModel from './ViewModel';
 
 /**
  * Base Filterset class for filters to be applied to models. Shares commonality with ViewModels in sense that FilterSets
@@ -26,21 +25,15 @@ import ViewModel from './ViewModel';
  * @extract-docs
  */
 export default class FilterSet extends FieldBinder {
-    static _model: typeof ViewModel; // TODO - review whether we do want this; guess depends on whether filtering-on-related-model is a thing?
-
     [fieldName: string]: any;
-
-    public get _filterSet(): typeof FilterSet {
-        return Object.getPrototypeOf(this).constructor;
-    }
 
     constructor() {
         super();
-        if (!this._filterSet.fields || !this._filterSet.__boundFields.has(this._filterSet)) {
-            throw new Error(
-                `Class ${this._filterSet.name} has not been defined correctly. Make sure field definitions are set on the '_fields' property and not 'fields'.`
-            );
-        }
+        throw new Error(
+            `${
+                Object.getPrototypeOf(this).constructor.name
+            }: FilterSet serves as a collection of fields and should not be instantized.`
+        );
     }
 
     public static toString(): string {
