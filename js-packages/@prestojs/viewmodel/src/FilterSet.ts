@@ -32,7 +32,7 @@ export default class FilterSet extends FieldBinder {
         throw new Error(
             `${
                 Object.getPrototypeOf(this).constructor.name
-            }: FilterSet serves as a collection of fields and should not be instantized.`
+            }: FilterSet serves as a static collection of fields and should not be instantiated.`
         );
     }
 

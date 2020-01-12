@@ -333,7 +333,7 @@ export default class ViewModel extends FieldBinder {
 
         for (const fieldName of Object.keys(fields)) {
             const definition: { set(value: any): any; get: () => any } = {
-                set(value): void {
+                set(): void {
                     const msg = `${fieldName} is read only`;
                     if (isDev()) {
                         throw new Error(msg);
