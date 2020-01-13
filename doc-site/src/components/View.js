@@ -22,21 +22,19 @@ export default function View({ componentName, componentProps, scope, imports }) 
         imports,
     });
     return (
-        <React.Suspense fallback={'Loading...'}>
-            <LiveCodeContainer>
-                <Compiler
-                    {...params.compilerProps}
-                    minHeight={62}
-                    placeholder={Placeholder}
-                    style={{ display: 'block' }}
-                />
-                <Error msg={params.errorProps.msg} isPopup />
-                <Knobs {...params.knobProps} />
-                <Editor {...params.editorProps} theme={liveEditorTheme} />
-                <Error {...params.errorProps} />
-                <ActionButtons {...params.actions} />
-            </LiveCodeContainer>
-        </React.Suspense>
+        <LiveCodeContainer>
+            <Compiler
+                {...params.compilerProps}
+                minHeight={62}
+                placeholder={Placeholder}
+                style={{ display: 'block' }}
+            />
+            <Error msg={params.errorProps.msg} isPopup />
+            <Knobs {...params.knobProps} />
+            <Editor {...params.editorProps} theme={liveEditorTheme} />
+            <Error {...params.errorProps} />
+            <ActionButtons {...params.actions} />
+        </LiveCodeContainer>
     );
 }
 

@@ -27,7 +27,6 @@ function CommentBlock({ comment }) {
 
 function Signature({ signature }) {
     const parameters = (signature.parameters && signature.parameters.filter(p => p.comment)) || [];
-    console.log(parameters);
     return (
         <>
             <h4>

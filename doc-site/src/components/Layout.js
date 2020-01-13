@@ -10,9 +10,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useStaticQuery, graphql } from 'gatsby';
 import styled, { ThemeProvider } from 'styled-components';
-import { getWidgetForField, FormItemWrapper } from '@prestojs/ui-antd';
+import { FormItemWrapper } from '@prestojs/ui-antd';
 import { UiProvider } from '@prestojs/ui';
 
+import getWidgetForField from '../getWidgetForField';
 import theme from '../theme';
 import CodeBlock from './CodeBlock';
 import CodeEditor from './CodeEditor';
