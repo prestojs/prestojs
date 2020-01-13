@@ -526,10 +526,6 @@ p *:last-child {
 li > p {
   margin-bottom: calc(1.45rem / 2);
 }
-code {
-  font-size: 0.85rem;
-  line-height: 1.45rem;
-}
 kbd {
   font-size: 0.85rem;
   line-height: 1.45rem;
@@ -575,8 +571,7 @@ th:last-child,
 td:last-child {
   padding-right: 0;
 }
-tt,
-code {
+tt {
   background-color: hsla(0, 0%, 0%, 0.04);
   border-radius: 3px;
   font-family: "SFMono-Regular", Consolas, "Roboto Mono", "Droid Sans Mono",
@@ -589,8 +584,6 @@ pre code {
   background: none;
   line-height: 1.42;
 }
-code:before,
-code:after,
 tt:before,
 tt:after {
   letter-spacing: -0.2em;
@@ -609,4 +602,11 @@ pre tt:after {
 }
 pre {
   overflow: visible;
+}
+
+code {
+  background-color: rgba(255,229,100,.2);
+  padding: 0 3px;
+  word-break: break-word;
+  color: #1a1a1a;
 }

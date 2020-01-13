@@ -223,6 +223,10 @@ exports.createSchemaCustomization = ({ actions, schema }) => {
       text: Mdx @mdx
       shortText: Mdx @mdx
     }
+    type TypeDocsJsonChildNodesSignaturesComment implements Node {
+      text: Mdx @mdx
+      shortText: Mdx @mdx
+    }
     type TypeDocsJsonChildNodesSignaturesParametersComment implements Node {
       text: Mdx @mdx
       shortText: Mdx @mdx

@@ -26,15 +26,19 @@ function CommentBlock({ comment }) {
 }
 
 function Signature({ signature }) {
+    const parameters = (signature.parameters && signature.parameters.filter(p => p.comment)) || [];
+    console.log(parameters);
     return (
         <>
-            {signature.name}(
-            {signature.parameters && signature.parameters.map(param => param.name).join(', ')})
+            <h4>
+                {signature.name}(
+                {signature.parameters && signature.parameters.map(param => param.name).join(', ')})
+            </h4>
             <br />
             <CommentBlock comment={signature.comment} />
-            {signature.parameters && (
+            {parameters.length > 0 && (
                 <dl>
-                    {signature.parameters.map(param => (
+                    {parameters.map(param => (
                         <>
                             <dt>{param.name}</dt>
                             <dd>
@@ -48,14 +52,23 @@ function Signature({ signature }) {
     );
 }
 
+const MethodWrapper = styled.div`
+    border-bottom: 1px solid #ececec;
+    > h4 {
+        font-size: 2em;
+        margin: 0;
+    }
+    padding: 10px 0;
+    margin-bottom: 10px;
+`;
+
 function MethodDoc({ method }) {
     return (
-        <>
-            <h4>{method.name}</h4>
+        <MethodWrapper>
             {method.signatures.map(sig => (
                 <Signature signature={sig} />
             ))}
-        </>
+        </MethodWrapper>
     );
 }
 
@@ -70,8 +83,21 @@ function ClassDoc({ doc }) {
     }, {});
     const constructor = groups.Constructors && children[groups.Constructors.children[0]];
     const methods =
-        groups.Methods &&
-        groups.Methods.children.map(id => children[id]).filter(method => !method.flags.isPrivate);
+        (groups.Methods &&
+            groups.Methods.children
+                .map(id => children[id])
+                .filter(method => !method.flags.isPrivate)) ||
+        [];
+    const direct = [];
+    const inherited = [];
+    for (const method of methods) {
+        if (method.signatures[0].inheritedFrom) {
+            inherited.push(method);
+        } else {
+            direct.push(method);
+        }
+    }
+
     return (
         <>
             <CommentBlock comment={doc.comment} />
@@ -79,17 +105,27 @@ function ClassDoc({ doc }) {
                 <>
                     <h3>Constructor</h3>
                     {constructor.signatures[0].parameters &&
-                        constructor.signatures[0].parameters.map(p => (
-                            <p>
-                                <strong>{p.name}</strong> <CommentBlock comment={p.comment} />
-                            </p>
-                        ))}
-                    {methods && (
+                        constructor.signatures[0].parameters
+                            .filter(p => p.comment)
+                            .map(p => (
+                                <p>
+                                    <strong>{p.name}</strong> <CommentBlock comment={p.comment} />
+                                </p>
+                            ))}
+                    {methods.length > 0 && (
                         <>
                             <h3>Methods</h3>
-                            {methods.map(method => (
+                            {direct.map(method => (
                                 <MethodDoc method={method} />
                             ))}
+                            {inherited.length > 0 && (
+                                <>
+                                    <h3>Inherited Methods</h3>
+                                    {inherited.map(method => (
+                                        <MethodDoc method={method} />
+                                    ))}
+                                </>
+                            )}
                         </>
                     )}
                 </>
@@ -124,6 +160,12 @@ const ImportString = styled.code`
     display: block;
 `;
 
+const ArticleWrapper = styled(Article)`
+    h3 {
+        font-size: 2.5em;
+    }
+`;
+
 const Api = props => {
     const {
         // if mdx is set that's considered an override (ie. there exists a file in data/ with same slug as this)
@@ -135,13 +177,13 @@ const Api = props => {
             <Sidebar>
                 <Menu items={menuItems} />
             </Sidebar>
-            <Article>
+            <ArticleWrapper>
                 <h1>{doc.name}</h1>
                 <ImportString>
                     {`import { ${doc.name} } from "@prestojs/${doc.packageName}";`}
                 </ImportString>
                 {mdx ? <MDXRenderer>{mdx.body}</MDXRenderer> : <DocComponent doc={doc} />}
-            </Article>
+            </ArticleWrapper>
         </Layout>
     );
 };
@@ -187,6 +229,14 @@ export const pageQuery = graphql`
                 }
                 signatures {
                     name
+                    comment {
+                        shortText {
+                            body
+                        }
+                        text {
+                            body
+                        }
+                    }
                     parameters {
                         id
                         name

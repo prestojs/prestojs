@@ -274,11 +274,11 @@ export default class ViewModel extends FieldBinder {
         super();
         // Catch any improperly defined classes at this point. eg. if a class is defined as
         // class A extends ViewModel {
-        //    static fields = {}
+        //    static fields = {
         // }
         // This will be caught here (it should be '_fields' not 'fields').
         // The check on `this._model.fields` exists so it triggers the getter on it and catches
-        // the unlikely case of the property being deleted altogether rather than just replaced.
+        // the unlikely case of the property being deleted altogether rather than st replaced.
         // Error here is: TS2345: Argument of type 'typeof ViewModel' is not assignable to parameter of type 'typeof FieldBinder'.
         // Not sure what to do about that ¯\_(ツ)_/¯
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

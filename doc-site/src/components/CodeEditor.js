@@ -9,11 +9,13 @@ export default function CodeEditor({ children, scope }) {
         scope,
     });
     return (
-        <LiveCodeContainer>
-            <Compiler {...params.compilerProps} />
-            <Editor {...params.editorProps} language="jsx" theme={liveEditorTheme} />
-            <Error {...params.errorProps} />
-            <ActionButtons {...params.actions} />
-        </LiveCodeContainer>
+        <React.Suspense fallback={'Loading...'}>
+            <LiveCodeContainer>
+                <Compiler {...params.compilerProps} />
+                <Editor {...params.editorProps} language="jsx" theme={liveEditorTheme} />
+                <Error {...params.errorProps} />
+                <ActionButtons {...params.actions} />
+            </LiveCodeContainer>
+        </React.Suspense>
     );
 }
