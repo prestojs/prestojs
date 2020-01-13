@@ -11,8 +11,10 @@ import useSWR from 'swr';
 export default function useEndpoint(action, args, config) {
     const preparedAction = action ? action.prepare(args) : null;
     const execute = useCallback(init => preparedAction.execute(init), [preparedAction]);
-    return {
-        execute,
-        ...useSWR(preparedAction && [preparedAction], act => act.execute({}), config),
-    };
+    const result = useSWR(preparedAction && [preparedAction], act => act.execute({}), config);
+    // We mutate this object as return var of useSWR is an object with getters that you lose
+    // if you just spread the result
+    // https://github.com/zeit/swr/issues/224
+    result.execute = execute;
+    return result;
 }
