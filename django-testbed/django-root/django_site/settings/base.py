@@ -533,6 +533,12 @@ LOGGING = {
             "level": "WARNING",
             "propagate": False,
         },
+        "django.template": {
+            # Get rid of noisy debug messages
+            "handlers": ["console"],
+            "level": ("INFO"),
+            "propagate": False,
+        },
         # web requests (5xx=error, 4xx=warning, 3xx/2xx=info)
         "django.request": {
             "handlers": ["console"],
