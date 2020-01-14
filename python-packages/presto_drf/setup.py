@@ -13,7 +13,7 @@ setup(
     description="Export serializer information for consumption by codegen",
     # long_description=...,
     # license='??',
-    install_requires=["djangorestframework >= 3.8",],
+    install_requires=["djangorestframework >= 3.8"],
     url="https://gitlab.internal.alliancesoftware.com.au/alliance/presto",
     classifiers=[],
     keywords=["rad", "rapid application development", "drf", "rest", "django"],
