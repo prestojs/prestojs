@@ -6,16 +6,17 @@ import { useViewModelCache } from '@prestojs/viewmodel';
 
 import User from '../models/User';
 import useEndpoint from '../useEndpoint';
+import useNaviUrlQueryState from '../useNaviUrlQueryState';
 import UserCreateUpdateView from './UserCreateUpdateView';
 import UserFilterForm from './UserFilterForm';
 
 export default function UserListView() {
     const { search, pathname, origin } = window.location;
     const { paginationType } = qs.parse(search, { ignoreQueryPrefix: true });
+    const [filter, setFilter] = useNaviUrlQueryState();
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
-    const [filter, setFilter] = useState({});
-    const { data, error, paginator } = useEndpoint(
+    const { data, error, paginator} = useEndpoint(
         User.endpoints.list,
         {
             query: {
@@ -51,7 +52,7 @@ export default function UserListView() {
                 Add User
             </Button>
             <hr />
-            <UserFilterForm onApplyFilter={setFilter} />
+            <UserFilterForm onApplyFilter={setFilter} initialValues={filter} />
             <Button onClick={() => paginator.first()}>First</Button>
             <Button onClick={() => paginator.previous()}>Previous</Button>
             <Button onClick={() => paginator.next()}>Next</Button>

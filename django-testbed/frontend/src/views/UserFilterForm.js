@@ -11,7 +11,7 @@ function ClearButton() {
     return (
         <Button
             onClick={() => {
-                api.reset();
+                api.reset({});
                 api.submit();
             }}
         >
@@ -20,11 +20,11 @@ function ClearButton() {
     );
 }
 
-export default function UserFilterForm({ onApplyFilter }) {
+export default function UserFilterForm({ initialValues, onApplyFilter }) {
     return (
         <Collapse defaultActiveKey={['generatedFilterForm']}>
             <Panel header="Filters" key="generatedFilterForm">
-                <Form onSubmit={onApplyFilter}>
+                <Form onSubmit={onApplyFilter} initialValues={initialValues}>
                     <Form.Item field={UserFilterSet.fields.id} />
                     <Form.Item field={UserFilterSet.fields.first_name} />
                     <Form.Item field={UserFilterSet.fields.last_name} />
