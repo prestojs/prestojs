@@ -4,11 +4,11 @@ except ImportError:
     from distutils.core import setup
 
 setup(
-    name="presto_viewmodels_drf",
+    name="presto_drf",
     version="0.0.1",
     author="Alliance Software",
     author_email="support@alliancesoftware.com.au",
-    packages=["presto_viewmodels_drf"],  # this must be the same as the name above
+    packages=["presto_drf"],  # this must be the same as the name above
     include_package_data=True,
     description="Export serializer information for consumption by codegen",
     # long_description=...,

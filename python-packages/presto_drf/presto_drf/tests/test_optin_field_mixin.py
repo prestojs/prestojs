@@ -3,10 +3,10 @@ from rest_framework.serializers import ModelSerializer
 
 from xenopus_frog.models import User
 
-from ..serializers import OptinFieldsSerializerMixin
+from ..mixins import SerializerOptinFieldsMixin
 
 
-class UserSerializer(OptinFieldsSerializerMixin, ModelSerializer):
+class UserSerializer(SerializerOptinFieldsMixin, ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "first_name", "last_name", "email", "activated_at", "is_staff")

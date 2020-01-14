@@ -4,7 +4,7 @@ from django_filters import rest_framework as filters
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
-from presto_viewmodels_drf.presto_viewmodels_drf import serializers
+from presto_drf.mixins import SerializerOptinFieldsMixin
 from xenopus_frog.models import User
 
 
@@ -12,7 +12,7 @@ class XenopusFrogAppHomepageView(LoginRequiredMixin, TemplateView):
     template_name = "xenopus_frog/homepage.html"
 
 
-class UserSerializer(serializers.OptinFieldsSerializerMixin, ModelSerializer):
+class UserSerializer(SerializerOptinFieldsMixin, ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "first_name", "last_name", "email", "activated_at", "is_staff")
