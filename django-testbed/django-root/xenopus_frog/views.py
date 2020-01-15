@@ -14,7 +14,7 @@ class XenopusFrogAppHomepageView(LoginRequiredMixin, TemplateView):
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "first_name", "last_name", "email")
+        fields = ("id", "first_name", "last_name", "email", "region")
 
 
 class UserFilterSet(filters.FilterSet):

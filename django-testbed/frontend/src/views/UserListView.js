@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'antd';
 
+import { FieldFormatter } from '@prestojs/ui';
+
 import User from '../models/User';
 import useConnected from '../useConnected';
 import useEndpoint from '../useEndpoint';
@@ -33,13 +35,33 @@ export default function UserListView() {
             <hr />
             <UserFilterForm onApplyFilter={setFilter} />
             <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Region</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {records.map(record => (
                         <tr key={record._pk}>
                             <td>
-                                {record.first_name} {record.last_name}
+                                <FieldFormatter
+                                    field={User.fields.first_name}
+                                    value={record.first_name}
+                                />
+                                <FieldFormatter
+                                    field={User.fields.last_name}
+                                    value={record.last_name}
+                                />
                             </td>
-                            <td>{record.email}</td>
+                            <td>
+                                <FieldFormatter field={User.fields.email} value={record.email} />
+                            </td>
+                            <td>
+                                <FieldFormatter field={User.fields.region} value={record.region} />
+                            </td>
                             <td>
                                 <button onClick={() => selectId(record._pk)}>Edit</button>
                             </td>

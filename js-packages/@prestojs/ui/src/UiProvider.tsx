@@ -12,11 +12,11 @@ type GetWidgetForFieldWithNull = <FieldValue, T extends HTMLElement>(
 
 type GetFormatterForField = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-) => React.ComponentType<T>;
+) => string | React.ComponentType<T> | [React.ComponentType<T>, object];
 
 type GetFormatterForFieldWithNull = <FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
-) => React.ComponentType<T> | null;
+) => string | React.ComponentType<T> | [React.ComponentType<T>, object] | null;
 
 export interface FormItemProps {
     required: boolean;
@@ -108,8 +108,12 @@ export default function UiProvider(props: Props): React.ReactElement {
             },
             getFormatterForField<FieldValue, T extends HTMLElement>(
                 field: Field<FieldValue>
-            ): React.ComponentType<T> | null {
-                let formatter: React.ComponentType<T> | null = null;
+            ): string | React.ComponentType<T> | [React.ComponentType<T>, object] | null {
+                let formatter:
+                    | string
+                    | React.ComponentType<T>
+                    | [React.ComponentType<T>, object]
+                    | null = null;
                 if (getFormatterForField) {
                     formatter = getFormatterForField(field);
                 }

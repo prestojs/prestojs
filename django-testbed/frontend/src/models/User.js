@@ -46,15 +46,18 @@ export default class User extends BaseUser {
 
     static _fields = {
         ...BaseUser._fields,
-        age: new IntegerField({
-            label: 'Age',
+        region: new IntegerField({
+            label: 'region',
             required: true,
-            helpText: 'Users age in years',
+            helpText: 'Region Coding of the user',
             choices: [
-                [1, 'One'],
-                [2, 'OneOne'],
-                [3, 'OneOneOne'],
-                [4, 'OneOneOneOne'],
+                [1, 'Oceania'],
+                [2, 'Asia'],
+                [3, 'Africa'],
+                [4, 'America'],
+                [5, 'Europe'],
+                [6, 'Antarctica'],
+                [7, 'Atlantis'],
             ],
         }),
         photo: new ImageField({

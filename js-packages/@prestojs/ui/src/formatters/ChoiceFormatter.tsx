@@ -4,14 +4,14 @@ export default function ChoiceFormatter<T>({
 }: {
     value: T;
     choices: Array<[T, string]>;
-}): string {
-    const choiceValue = choices.find(choice => choice[0] === value);
+}): string | T {
+    const choiceValue = Array.from(choices).find(choice => choice[0] === value);
     if (choiceValue === null || choiceValue === undefined) {
         console.warn(
             `Expected to find value choice label with value ${value} but no such choice option exists among `,
             choices
         );
-        return (value as any).toString();
+        return value;
     }
-    return (value as any).toString();
+    return choiceValue[1];
 }

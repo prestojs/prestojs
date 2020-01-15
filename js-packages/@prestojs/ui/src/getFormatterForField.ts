@@ -78,8 +78,23 @@ export default function getFormatterForField<FieldValue, T extends HTMLElement>(
         ? choicesMapping.get(field.constructor.name) || mapping.get(field.constructor.name)
         : mapping.get(field.constructor.name);
 
+    const getReturnWithChoices = (
+        w,
+        f
+    ): React.ComponentType<T> | [React.ComponentType<T>, object] | string => {
+        if (f.choices) {
+            if (Array.isArray(w)) {
+                return [w[0], { ...w[1], choices: f.choices }];
+            } else {
+                return [w, { choices: f.choices }];
+            }
+        } else {
+            return w;
+        }
+    };
+
     if (formatter) {
-        return formatter;
+        return getReturnWithChoices(formatter, field);
     }
 
     let f = Object.getPrototypeOf(field.constructor);
@@ -88,7 +103,7 @@ export default function getFormatterForField<FieldValue, T extends HTMLElement>(
             ? choicesMapping.get(f.name) || mapping.get(f.name)
             : mapping.get(f.name);
         if (formatterF) {
-            return formatterF;
+            return getReturnWithChoices(formatterF, field);
         }
         f = Object.getPrototypeOf(f);
     } while (f.name);

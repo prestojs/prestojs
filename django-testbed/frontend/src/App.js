@@ -1,6 +1,6 @@
 import { Input } from 'antd';
 import React from 'react';
-import { UiProvider } from '@prestojs/ui';
+import { UiProvider, getFormatterForField } from '@prestojs/ui';
 import { getWidgetForField as antdGetWidgetForField, FormItemWrapper } from '@prestojs/ui-antd';
 import { SWRConfig } from 'swr';
 
@@ -21,7 +21,11 @@ function getWidgetForField(field) {
 export default function App() {
     return (
         <React.Suspense fallback={<div>Loading...</div>}>
-            <UiProvider getWidgetForField={getWidgetForField} formItemComponent={FormItemWrapper}>
+            <UiProvider
+                getWidgetForField={getWidgetForField}
+                getFormatterForField={getFormatterForField}
+                formItemComponent={FormItemWrapper}
+            >
                 <SWRConfig>
                     <UserListView />
                 </SWRConfig>
