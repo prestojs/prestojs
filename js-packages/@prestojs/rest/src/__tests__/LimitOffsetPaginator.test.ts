@@ -73,6 +73,10 @@ test('should handle changing pages', () => {
     });
 
     expect(() => paginator.setOffset(-1)).toThrowError(/Invalid offset/);
+
+    // Setting to null should just reset to default
+    paginator.setOffset(null);
+    expect(paginator.currentState).toEqual({ limit: 10 });
 });
 
 test('should handle changing limit', () => {
