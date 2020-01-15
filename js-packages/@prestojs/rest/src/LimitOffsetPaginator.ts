@@ -43,13 +43,13 @@ export default class LimitOffsetPaginator extends Paginator {
         });
     }
 
-    setOffset(offset: number): void {
-        if (offset < 0) {
+    setOffset(offset: number | null): void {
+        if (offset != null && offset < 0) {
             throw new Error(`Invalid offset ${offset} - should be >= 0`);
         }
         this.setState(currentState => {
-            const nextState: LimitOffsetPaginationState = { ...currentState, offset };
-            if (offset === 0) {
+            const nextState = { ...currentState, offset };
+            if (offset === 0 || offset == null) {
                 delete nextState.offset;
             }
             return nextState;
