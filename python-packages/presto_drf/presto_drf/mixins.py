@@ -1,3 +1,6 @@
+from typing import List
+
+
 class SerializerOptInFieldsMixin:
     """
     Regulates fields exposed by default & as requested based on query parameters or context.
@@ -12,7 +15,16 @@ class SerializerOptInFieldsMixin:
     Pinned fields are always returned. (currently pk only if pk exists)
     """
 
-    def get_pinned_fields(self):
+    def get_pinned_fields(self) -> List:
+        """
+        Get by-default pinned fields. Pinned fields are fields always returned regardless of include_fields inclusions.
+        Override on serializer to customize.
+
+        Currently, the only pinned field is pk of model (with ModelSerializer).
+
+        :return: [] - a list of pinned fields.
+        """
+
         try:
             return [self.Meta.model._meta.pk.name]
         except Exception:
