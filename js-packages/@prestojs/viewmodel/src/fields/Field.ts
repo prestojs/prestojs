@@ -216,4 +216,22 @@ export default class Field<T> {
     public clone(): Field<T> {
         return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
     }
+
+    /**
+     * Returns true if field is bound to a ViewModel instance. When a field is bound to a instance
+     * the value for that field is accessible on the 'value' property.
+     */
+    public get isBound(): boolean {
+        // See ViewModel._f for implementation of when this will be true
+        return false;
+    }
+
+    /**
+     * When `isBound` is true this will return the current value of this field on the bound ViewModel.
+     * Otherwise will always be undefined.
+     */
+    public get value(): void {
+        console.warn('Accessed value on unbound field - this will never return a value');
+        return undefined;
+    }
 }

@@ -12,11 +12,16 @@ export default function FieldFormatter<FieldValue>({
     ...rest
 }: {
     field: Field<FieldValue>;
+    value?: any;
     [rest: string]: any;
 }): React.ReactElement {
     const { getFormatterForField } = useUi();
 
     const Formatter = getFormatterForField(field) as React.ComponentType<any>;
+
+    if (field.isBound && !('value' in rest)) {
+        rest.value = field.value;
+    }
 
     if (Array.isArray(Formatter)) {
         const [ActualFormatter, props] = Formatter;

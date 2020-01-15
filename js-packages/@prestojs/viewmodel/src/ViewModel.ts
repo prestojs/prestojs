@@ -449,4 +449,45 @@ export default class ViewModel extends FieldBinder {
         // @ts-ignore
         return new this._model(data);
     }
+
+    private __recordBoundFields: FieldsMapping;
+
+    /**
+     * Get fields bound to this record instance. Each field behaves the same as accessing it via ViewModel.fields but
+     * has a `value` property that contains the value for that field on this record.
+     *
+     * This is useful when you need to know both the field on the ViewModel and the value on a record (eg. when formatting
+     * a value from a record
+     *
+     * ```js
+     * const user = new User({ name: 'Jon Snow' });
+     * user.name
+     * // Jon Snow
+     * user._f.name
+     * // CharField({ name: 'name', label: 'Label' });
+     * user._f.name.value
+     * // Jon Snow
+     * ```
+     */
+    public get _f(): FieldsMapping {
+        if (!this.__recordBoundFields) {
+            const { fields } = this._model;
+            const { _data } = this;
+            this.__recordBoundFields = this._assignedFields.reduce((acc, fieldName) => {
+                acc[fieldName] = new Proxy(fields[fieldName], {
+                    get(target, prop): any {
+                        if (prop === 'value') {
+                            return _data[fieldName];
+                        }
+                        if (prop === 'isBound') {
+                            return true;
+                        }
+                        return target[prop];
+                    },
+                });
+                return acc;
+            }, {});
+        }
+        return this.__recordBoundFields;
+    }
 }

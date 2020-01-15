@@ -47,20 +47,14 @@ export default function UserListView() {
                     {records.map(record => (
                         <tr key={record._pk}>
                             <td>
-                                <FieldFormatter
-                                    field={User.fields.first_name}
-                                    value={record.first_name}
-                                />
-                                <FieldFormatter
-                                    field={User.fields.last_name}
-                                    value={record.last_name}
-                                />
+                                <FieldFormatter field={record._f.first_name} />
+                                <FieldFormatter field={record._f.last_name} />
                             </td>
                             <td>
-                                <FieldFormatter field={User.fields.email} value={record.email} />
+                                <FieldFormatter field={record._f.email} />
                             </td>
                             <td>
-                                <FieldFormatter field={User.fields.region} value={record.region} />
+                                <FieldFormatter field={record._f.region} />
                             </td>
                             <td>
                                 <button onClick={() => selectId(record._pk)}>Edit</button>
