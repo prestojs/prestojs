@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
-from presto_viewmodels_drf.presto_viewmodels_drf import serializers
+from presto_drf.mixins import SerializerOptInFieldsMixin
 from xenopus_frog.models import User
 
 
@@ -16,7 +16,7 @@ class XenopusFrogAppHomepageView(LoginRequiredMixin, TemplateView):
     template_name = "xenopus_frog/homepage.html"
 
 
-class UserSerializer(serializers.OptinFieldsSerializerMixin, ModelSerializer):
+class UserSerializer(SerializerOptInFieldsMixin, ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "first_name", "last_name", "email", "region", "activated_at", "is_staff")
