@@ -61,8 +61,8 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
                 <FieldErrors name="last_name" />
                 <Form.Item field={User.fields.email} />
                 <FieldErrors name="email" />
-                <Form.Item field={User.fields.age} />
-                <FieldErrors name="age" />
+                <Form.Item field={User.fields.region} />
+                <FieldErrors name="region" />
                 <hr />
                 <Button htmlType="submit" type="primary">
                     Save

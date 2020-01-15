@@ -33,6 +33,18 @@ class User(GenericUserProfile, AbstractEmailUser):
     last_name = models.CharField(max_length=128, blank=True)
     email = models.EmailField(unique=True)
 
+    REGION_CHOICES = [
+        [1, "Oceania"],
+        [2, "Asia"],
+        [3, "Africa"],
+        [4, "America"],
+        [5, "Europe"],
+        [6, "Antarctica"],
+        [7, "Atlantis"],
+    ]
+
+    region = models.IntegerField(null=True, blank=True, choices=REGION_CHOICES)
+
     activated_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:

@@ -12,6 +12,7 @@ export default function FieldFormatter<FieldValue>({
     ...rest
 }: {
     field: Field<FieldValue>;
+    [rest: string]: any;
 }): React.ReactElement {
     const { getFormatterForField } = useUi();
 
