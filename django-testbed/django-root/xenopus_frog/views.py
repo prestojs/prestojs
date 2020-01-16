@@ -15,7 +15,15 @@ class XenopusFrogAppHomepageView(LoginRequiredMixin, TemplateView):
 class UserSerializer(SerializerOptInFieldsMixin, ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "first_name", "last_name", "email", "region", "activated_at", "is_staff")
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "region",
+            "activated_at",
+            "is_staff",
+        )
         opt_in_only_fields = ["activated_at", "is_staff"]
 
 
