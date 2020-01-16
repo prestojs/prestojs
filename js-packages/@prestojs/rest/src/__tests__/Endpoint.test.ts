@@ -1,12 +1,23 @@
 import { UrlPattern } from '@prestojs/routing';
+import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
+import { useState } from 'react';
+import { act } from 'react-test-renderer';
 import Endpoint, { ApiError, RequestError } from '../Endpoint';
 import getPaginationState from '../getPaginationState';
 import InferredPaginator from '../InferredPaginator';
 import LimitOffsetPaginator from '../LimitOffsetPaginator';
 import PageNumberPaginator from '../PageNumberPaginator';
+import { PaginatorInterface, PaginatorInterfaceClass } from '../Paginator';
 
 const fetchMock = fetch as FetchMock;
+
+function useTestHook(
+    paginatorClass: PaginatorInterfaceClass,
+    initialState = {}
+): PaginatorInterface {
+    return new paginatorClass(useState(initialState), useState());
+}
 
 beforeEach(() => {
     fetchMock.resetMocks();
@@ -216,7 +227,7 @@ test('should raise ApiError on non-2xx response', async () => {
 
 test('should update paginator state on response', async () => {
     const action1 = new Endpoint(new UrlPattern('/whatever/'));
-    let paginator: InferredPaginator = action1.createPaginator() as InferredPaginator;
+    let { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
     const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));
     fetchMock.mockResponseOnce(JSON.stringify({ count: 10, results: records }), {
@@ -224,13 +235,19 @@ test('should update paginator state on response', async () => {
             'Content-Type': 'application/json',
         },
     });
-    const { result } = await action1.execute({ paginator });
-    expect(paginator.paginator).toBeInstanceOf(PageNumberPaginator);
-    expect((paginator.paginator as PageNumberPaginator).pageSize).toBe(5);
-    expect(result).toEqual(records);
+    await act(async () => {
+        const { result } = await action1.execute({ paginator: hookResult.current });
+        expect((hookResult.current as InferredPaginator).paginator).toBeInstanceOf(
+            PageNumberPaginator
+        );
+        expect(
+            ((hookResult.current as InferredPaginator).paginator as PageNumberPaginator).pageSize
+        ).toBe(5);
+        expect(result).toEqual(records);
+    });
 
     // Should also work by passing paginator to prepare
-    paginator = action1.createPaginator() as InferredPaginator;
+    hookResult = renderHook(() => useTestHook(action1.getPaginatorClass())).result;
     fetchMock.mockResponseOnce(
         JSON.stringify({
             count: 10,
@@ -243,12 +260,19 @@ test('should update paginator state on response', async () => {
             },
         }
     );
-    const prepared = action1.prepare({ paginator });
-    const { result: result2 } = await prepared.execute();
+    const prepared = action1.prepare({ paginator: hookResult.current });
 
-    expect(paginator.paginator).toBeInstanceOf(LimitOffsetPaginator);
-    expect((paginator.paginator as LimitOffsetPaginator).limit).toBe(5);
-    expect(result2).toEqual(records);
+    await act(async () => {
+        const { result: result2 } = await prepared.execute();
+
+        expect((hookResult.current as InferredPaginator).paginator).toBeInstanceOf(
+            LimitOffsetPaginator
+        );
+        expect(
+            ((hookResult.current as InferredPaginator).paginator as LimitOffsetPaginator).limit
+        ).toBe(5);
+        expect(result2).toEqual(records);
+    });
 });
 
 test('should support changing paginatorClass & getPaginationState', async () => {
@@ -262,7 +286,7 @@ test('should support changing paginatorClass & getPaginationState', async () => 
         };
     };
     const action1 = new Endpoint(new UrlPattern('/whatever/'));
-    const paginator = action1.createPaginator();
+    const { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
     const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));
     fetchMock.mockResponseOnce(JSON.stringify({ total: 10, records, pageSize: 5 }), {
@@ -270,8 +294,10 @@ test('should support changing paginatorClass & getPaginationState', async () => 
             'Content-Type': 'application/json',
         },
     });
-    const { result } = await action1.execute({ paginator });
-    expect(paginator).toBeInstanceOf(PageNumberPaginator);
-    expect((paginator as PageNumberPaginator).pageSize).toBe(5);
-    expect(result).toEqual(records);
+    await act(async () => {
+        const { result } = await action1.execute({ paginator: hookResult.current });
+        expect(hookResult.current).toBeInstanceOf(PageNumberPaginator);
+        expect((hookResult.current as PageNumberPaginator).pageSize).toBe(5);
+        expect(result).toEqual(records);
+    });
 });

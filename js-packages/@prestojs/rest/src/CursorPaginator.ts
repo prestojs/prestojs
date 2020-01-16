@@ -1,14 +1,27 @@
 import { EndpointExecuteOptions } from './Endpoint';
-import Paginator, { PaginationStateChangeListener } from './Paginator';
+import Paginator from './Paginator';
 
 export type CursorPaginationState = {
     pageSize?: number;
     cursor?: string;
 };
 
-export default class CursorPaginator extends Paginator {
-    nextCursor: string | null = null;
-    previousCursor: string | null = null;
+export type InternalCursorPaginatorState = {
+    nextCursor?: string | null;
+    previousCursor?: string | null;
+};
+
+export default class CursorPaginator extends Paginator<
+    CursorPaginationState,
+    InternalCursorPaginatorState
+> {
+    get nextCursor(): string | null {
+        return this.internalState.nextCursor ?? null;
+    }
+
+    get previousCursor(): string | null {
+        return this.internalState.previousCursor ?? null;
+    }
 
     get cursor(): string | null | undefined {
         return this.currentState.cursor;
@@ -18,52 +31,100 @@ export default class CursorPaginator extends Paginator {
         return this.currentState.pageSize;
     }
 
-    constructor(
-        initialState: CursorPaginationState = {},
-        onChange?: PaginationStateChangeListener
-    ) {
-        super(initialState || {}, onChange);
-    }
-
-    setPageSize(pageSize: number | null): void {
+    /**
+     * Return the state for the specified page size
+     *
+     * Does not transition state. To transition state call `setPageSize` instead.
+     */
+    pageSizeState(pageSize: number | null): CursorPaginationState {
         if (pageSize != null && pageSize < 1) {
             throw new Error(`Invalid pageSize ${pageSize} - should be >= 1`);
         }
-        this.setState(currentState => {
-            // If page size changes any next/previous cursors are no invalid
-            if (currentState.pageSize !== pageSize) {
-                this.nextCursor = null;
-                this.previousCursor = null;
-            }
-            const nextState = { ...currentState, pageSize };
-            if (pageSize == null) {
-                delete nextState.pageSize;
-            }
-            return nextState;
-        });
+
+        // If page size changes any next/previous cursors are no invalid
+        if (this.currentState.pageSize !== pageSize) {
+            this.setInternalState({ nextCursor: null, previousCursor: null });
+        }
+        const nextState = { ...this.currentState, pageSize };
+        if (pageSize == null) {
+            delete nextState.pageSize;
+        }
+        return nextState as CursorPaginationState;
     }
 
-    first(): void {
+    setPageSize(pageSize: null | number): void {
+        this.setCurrentState(this.pageSizeState(pageSize));
+    }
+
+    /**
+     * Return the state for the first page
+     *
+     * Does not transition state. To transition state call `first` instead.
+     */
+    firstState(): CursorPaginationState {
         // first page is equivalent to not specifying cursor
-        this.setState(currentState => {
-            const nextState: CursorPaginationState = { ...currentState };
-            delete nextState.cursor;
-            return nextState;
-        });
+        const nextState: CursorPaginationState = { ...this.currentState };
+        delete nextState.cursor;
+        return nextState;
     }
 
-    next(): void {
+    /**
+     * Go to the first page.
+     */
+    first(): void {
+        this.setCurrentState(this.firstState());
+    }
+
+    /**
+     * Return the state for the first page. If the next page isn't yet known (eg. results
+     * haven't yet been returned) then null will be returned.
+     *
+     * Does not transition state. To transition state call `next` instead.
+     */
+    nextState(): CursorPaginationState | null {
         if (this.nextCursor == null) {
-            throw new Error('Cannot go to next page as next cursor is not known');
+            return null;
         }
-        this.setState(currentState => ({ ...currentState, cursor: this.nextCursor }));
+        return { ...this.currentState, cursor: this.nextCursor };
     }
 
-    previous(): void {
-        if (this.previousCursor == null) {
-            throw new Error('Cannot go to previous page as previous cursor is not known');
+    /**
+     * Go to the next page.
+     *
+     * If the last next is not yet known because results haven't been returned this function
+     * does nothing.
+     */
+    next(): void {
+        const nextState = this.nextState();
+        if (nextState) {
+            this.setCurrentState(nextState);
         }
-        this.setState(currentState => ({ ...currentState, cursor: this.previousCursor }));
+    }
+
+    /**
+     * Return the state for the previous page. If the previous page isn't yet known (eg. results
+     * haven't yet been returned) then null will be returned.
+     *
+     * Does not transition state. To transition state call `previous` instead.
+     */
+    previousState(): CursorPaginationState | null {
+        if (this.previousCursor == null) {
+            return null;
+        }
+        return { ...this.currentState, cursor: this.previousCursor };
+    }
+
+    /**
+     * Go to the previous page.
+     *
+     * If the previous page is not yet known because results haven't been returned this function
+     * does nothing.
+     */
+    previous(): void {
+        const nextState = this.previousState();
+        if (nextState) {
+            this.setCurrentState(nextState);
+        }
     }
 
     getRequestInit({ query, ...options }): EndpointExecuteOptions {
@@ -89,26 +150,12 @@ export default class CursorPaginator extends Paginator {
         previousCursor?: string | null;
         pageSize?: number;
     }): void {
-        this.nextCursor = nextCursor == null ? null : nextCursor;
-        this.previousCursor = previousCursor == null ? null : previousCursor;
+        this.setInternalState({
+            nextCursor: nextCursor == null ? null : nextCursor,
+            previousCursor: previousCursor == null ? null : previousCursor,
+        });
         if (pageSize && this.currentState.pageSize !== pageSize) {
-            this.setState(currentState => ({ ...currentState, pageSize }));
-        }
-    }
-
-    syncState(state?: CursorPaginationState): void {
-        if (!state) {
-            return;
-        }
-        const nextState: CursorPaginationState = {};
-        if (state.pageSize && state.pageSize !== this.pageSize) {
-            nextState.pageSize = state.pageSize;
-        }
-        if (state.cursor && state.cursor !== this.cursor) {
-            nextState.cursor = state.cursor;
-        }
-        if (Object.keys(nextState).length > 0) {
-            this.setState(currentState => ({ ...currentState, ...nextState }));
+            this.setCurrentState({ ...this.currentState, pageSize });
         }
     }
 }

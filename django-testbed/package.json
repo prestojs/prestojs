@@ -90,6 +90,7 @@
     "invariant": "^2.2.4",
     "lodash": "^4.17.15",
     "prop-types": "^15.7.2",
+    "qs": "^6.9.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-hot-loader": "^4.12.19",
@@ -97,7 +98,6 @@
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
     "swr": "^0.1.16",
-    "qs": "^6.9.1",
     "whatwg-fetch": "^3.0.0"
   },
   "browserslist": [
