@@ -17,7 +17,7 @@ AUTOMATED_TESTS = True
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    get_env_setting("SERVER_HOSTNAME"),
+    get_env_setting("SERVER_HOSTNAME", ""),
 ]
 
 INSTALLED_APPS += TEST_MODEL_APPS
