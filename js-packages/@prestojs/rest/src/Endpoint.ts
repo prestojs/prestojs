@@ -2,6 +2,7 @@ import { UrlPattern } from '@prestojs/routing';
 import isEqual from 'lodash/isEqual';
 import InferredPaginator from './InferredPaginator';
 import defaultGetPaginationState from './getPaginationState';
+import PageNumberPaginator from './PageNumberPaginator';
 import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
 
 type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
@@ -259,14 +260,14 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  *
  * ## Pagination
  *
- * Pagination for an endpoint is handled by a `Paginator` class returned from the `createPaginator` method. The
+ * Pagination for an endpoint is handled by a `Paginator` class returned from the `getPaginatorClass` method. The
  * default implementation chooses the paginator based on the shape of the response (eg. if the response looks like
  * cursor based paginator it will use `CursorPaginator`, if page number based `PageNumberPaginator` or if limit/offset
  * use `LimitOffsetPaginator`). The pagination state as returned by the backend is stored on the instance of the
  * paginator:
  *
  * ```js
- * const paginator = endpoint.createPaginator();
+ * const paginator = usePaginator(endpoint);
  * // This returns the page of results
  * const results = await endpoint.execute({ paginator });
  * // This now has the total number of records (eg. if the paginator was PageNumberPaginator)
@@ -281,36 +282,7 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  * const results = await endpoint.execute({ paginator });
  * ```
  *
- * When using with React you'll likely want to store the state somewhere in React. To do this
- * you can pass a `onChange` function to `createPaginator` to synchronise changes that occur
- * internally within the paginator to the React state. If changes happen in React that need
- * to reflect in the paginator (eg. syncing state from the URL) then you need to call `syncState`
- * on the paginator.
- *
- * Example usage with React with a fictional `useUrlState` hook that works like `useState` but
- * reads and stores state in the URL instead:
- *
- * ```jsx
- * // Where the state for pagination will be synced to
- * const [paginationState, setPaginationState] = useUrlState();
- * // Create the paginator once. We pass the `setPaginationState` function which is called whenever
- * // pagination state changes. This triggers a re-render and API will be called.
- * const paginator = useMemo(() => endpoint.createPaginator(null, setPaginationState), [endpoint]);
- *
- * // Make sure state is always in sync so that if the URL is changed on the frontend it reflects
- * // in the paginator
- * paginator.syncState(paginationState);
- *
- * // Prepare takes into account the state of the paginator - when paginator state changes it returns
- * // a new action.
- * const preparedAction = endpoint.prepare({ paginator });
- *
- * // Fire the endpoint initially and whenever it changes.
- * const { data } = useSWR([preparedAction], action => action.execute())
- *
- * // You can now bind UI to the paginator actions, eg.
- * <>{paginator.total} records found. <Button onClick={() => paginator.next()}>Next Page</Button></>
- * ```
+ * See `usePaginator` for more details about how to use a paginator in React.
  *
  * @extract-docs
  */
@@ -349,9 +321,12 @@ export default class Endpoint {
         this.requestInit = requestInit;
     }
 
-    createPaginator(initialState = {}, onChange?): PaginatorInterface {
+    /**
+     * Get the Paginator class to use for this endpoint.
+     */
+    getPaginatorClass(): PaginatorInterfaceClass {
         const cls = Object.getPrototypeOf(this).constructor;
-        return new cls.defaultConfig.paginatorClass(initialState, onChange);
+        return cls.defaultConfig.paginatorClass;
     }
 
     /**
@@ -372,7 +347,7 @@ export default class Endpoint {
         if (options.paginator) {
             options = options.paginator.getRequestInit(options);
         }
-        const { urlArgs = {}, query, ...init } = options;
+        const { urlArgs = {}, query, paginator, ...init } = options;
         const url = this.urlPattern.resolve(urlArgs, { query });
         let cache = this.urlCache.get(url);
         if (!cache) {
@@ -384,7 +359,7 @@ export default class Endpoint {
                 return value;
             }
         }
-        const execute = new PreparedAction(this, { urlArgs, query }, init);
+        const execute = new PreparedAction(this, { urlArgs, query }, { ...init, paginator });
         cache.set(init, execute);
         return execute;
     }

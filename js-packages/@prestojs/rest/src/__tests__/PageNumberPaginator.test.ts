@@ -1,15 +1,21 @@
+import { useState } from 'react';
+import { renderHook, act } from '@testing-library/react-hooks';
 import PageNumberPaginator from '../PageNumberPaginator';
+
+function useTestHook(initialState = {}): PageNumberPaginator {
+    return new PageNumberPaginator(useState(initialState), useState());
+}
 
 test('should set page and pageSize in query', () => {
     // If no initial values provided should not add anything to query
     expect(
-        new PageNumberPaginator().getRequestInit({
+        renderHook(() => useTestHook()).result.current.getRequestInit({
             query: {},
         })
     ).toEqual({ query: {} });
 
     expect(
-        new PageNumberPaginator({ page: 2 }).getRequestInit({
+        renderHook(() => useTestHook({ page: 2 })).result.current.getRequestInit({
             query: {},
         })
     ).toEqual({
@@ -19,7 +25,7 @@ test('should set page and pageSize in query', () => {
     });
 
     expect(
-        new PageNumberPaginator({ pageSize: 10 }).getRequestInit({
+        renderHook(() => useTestHook({ pageSize: 10 })).result.current.getRequestInit({
             query: {},
         })
     ).toEqual({
@@ -29,7 +35,7 @@ test('should set page and pageSize in query', () => {
     });
 
     expect(
-        new PageNumberPaginator({ pageSize: 10, page: 2 }).getRequestInit({
+        renderHook(() => useTestHook({ pageSize: 10, page: 2 })).result.current.getRequestInit({
             query: {},
         })
     ).toEqual({
@@ -40,7 +46,7 @@ test('should set page and pageSize in query', () => {
     });
 
     expect(
-        new PageNumberPaginator({ pageSize: 10, page: 2 }).getRequestInit({
+        renderHook(() => useTestHook({ pageSize: 10, page: 2 })).result.current.getRequestInit({
             query: {
                 keywords: 'abc',
             },
@@ -55,82 +61,80 @@ test('should set page and pageSize in query', () => {
 });
 
 test('should handle changing pages', () => {
-    const paginator = new PageNumberPaginator();
+    const { result } = renderHook(() => useTestHook());
 
-    expect(paginator.currentState).toEqual({});
+    expect(result.current.currentState).toEqual({});
 
-    paginator.first();
-    expect(paginator.currentState).toEqual({ page: 1 });
+    act(() => result.current.first());
+    expect(result.current.currentState).toEqual({ page: 1 });
 
-    expect(() => paginator.last()).toThrowError(
-        /Cannot go to last page until pageSize and total number of results is known/
-    );
+    expect(result.current.lastState()).toBe(null);
 
-    paginator.setResponse({ total: 30, pageSize: 10 });
+    // no-op
+    act(() => result.current.last());
+    expect(result.current.currentState).toEqual({ page: 1 });
 
-    expect(paginator.currentState).toEqual({ page: 1, pageSize: 10 });
-    expect(paginator.total).toBe(30);
+    act(() => result.current.setResponse({ total: 30, pageSize: 10 }));
 
-    paginator.last();
-    expect(paginator.currentState).toEqual({ page: 3, pageSize: 10 });
+    expect(result.current.firstState()).toEqual({ page: 1, pageSize: 10 });
 
-    paginator.previous();
-    expect(paginator.currentState).toEqual({ page: 2, pageSize: 10 });
-    paginator.previous();
-    expect(paginator.currentState).toEqual({ page: 1, pageSize: 10 });
-    paginator.next();
-    expect(paginator.currentState).toEqual({ page: 2, pageSize: 10 });
-    paginator.gotoPage(1);
-    expect(paginator.currentState).toEqual({ page: 1, pageSize: 10 });
-    paginator.gotoPage(3);
-    expect(paginator.currentState).toEqual({ page: 3, pageSize: 10 });
+    expect(result.current.currentState).toEqual({ page: 1, pageSize: 10 });
+    expect(result.current.total).toBe(30);
 
-    expect(paginator.getRequestInit({ query: {} })).toEqual({
+    expect(result.current.lastState()).toEqual({ page: 3, pageSize: 10 });
+    act(() => result.current.last());
+    expect(result.current.currentState).toEqual({ page: 3, pageSize: 10 });
+
+    expect(result.current.previousState()).toEqual({ page: 2, pageSize: 10 });
+    act(() => result.current.previous());
+    expect(result.current.currentState).toEqual({ page: 2, pageSize: 10 });
+    act(() => result.current.previous());
+    expect(result.current.currentState).toEqual({ page: 1, pageSize: 10 });
+
+    expect(result.current.nextState()).toEqual({ page: 2, pageSize: 10 });
+    act(() => result.current.next());
+    expect(result.current.currentState).toEqual({ page: 2, pageSize: 10 });
+
+    expect(result.current.pageState(1)).toEqual({ page: 1, pageSize: 10 });
+    act(() => result.current.setPage(1));
+    expect(result.current.currentState).toEqual({ page: 1, pageSize: 10 });
+    expect(result.current.pageState(3)).toEqual({ page: 3, pageSize: 10 });
+    act(() => result.current.setPage(3));
+    expect(result.current.currentState).toEqual({ page: 3, pageSize: 10 });
+
+    expect(result.current.getRequestInit({ query: {} })).toEqual({
         query: {
             page: 3,
             pageSize: 10,
         },
     });
 
-    expect(() => paginator.gotoPage(0)).toThrowError(/Invalid page/);
+    expect(() => result.current.setPage(0)).toThrowError(/Invalid page/);
 });
 
 test('should handle changing page size', () => {
-    const paginator = new PageNumberPaginator();
-    expect(paginator.currentState).toEqual({});
-    paginator.setPageSize(10);
-    expect(paginator.currentState).toEqual({ pageSize: 10 });
-    paginator.setResponse({ total: 20 });
-    expect(paginator.currentState).toEqual({ pageSize: 10 });
-    paginator.setPageSize(5);
-    expect(paginator.currentState).toEqual({ pageSize: 5 });
-    paginator.gotoPage(2);
-    expect(paginator.currentState).toEqual({ pageSize: 5, page: 2 });
+    const { result } = renderHook(() => useTestHook());
+    expect(result.current.currentState).toEqual({});
+    act(() => result.current.setPageSize(10));
+    expect(result.current.pageSizeState(10)).toEqual({ pageSize: 10 });
+    expect(result.current.currentState).toEqual({ pageSize: 10 });
+    act(() => result.current.setResponse({ total: 20 }));
+    expect(result.current.currentState).toEqual({ pageSize: 10 });
+    act(() => result.current.setPageSize(5));
+    expect(result.current.currentState).toEqual({ pageSize: 5 });
+    act(() => result.current.setPage(2));
+    expect(result.current.currentState).toEqual({ pageSize: 5, page: 2 });
     // Page size same shouldn't change anything
-    paginator.setPageSize(5);
-    expect(paginator.currentState).toEqual({ pageSize: 5, page: 2 });
+    act(() => result.current.setPageSize(5));
+    expect(result.current.currentState).toEqual({ pageSize: 5, page: 2 });
     // Page size changed should reset to page 1
-    paginator.setPageSize(2);
-    expect(paginator.currentState).toEqual({ pageSize: 2, page: 3 });
+    act(() => result.current.setPageSize(2));
+    expect(result.current.pageSizeState(2)).toEqual({ pageSize: 2, page: 3 });
+    expect(result.current.currentState).toEqual({ pageSize: 2, page: 3 });
 
-    expect(() => paginator.setPageSize(0)).toThrowError(/Invalid/);
+    expect(() => result.current.setPageSize(0)).toThrowError(/Invalid/);
 
     // Setting to null should just reset to default
-    paginator.setPageSize(null);
-    expect(paginator.currentState).toEqual({});
-});
-
-test('should handle syncing state', () => {
-    const paginator = new PageNumberPaginator();
-
-    paginator.syncState({ page: 5 });
-    expect(paginator.currentState).toEqual({ page: 5 });
-    paginator.next();
-    expect(paginator.currentState).toEqual({ page: 6 });
-    const prevState = paginator.currentState;
-    paginator.syncState({ page: 6 });
-    expect(paginator.currentState).toBe(prevState);
-
-    paginator.syncState({ pageSize: 10 });
-    expect(paginator.currentState).toEqual({ page: 6, pageSize: 10 });
+    act(() => result.current.setPageSize(null));
+    expect(result.current.currentState).toEqual({});
 });

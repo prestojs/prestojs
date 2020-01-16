@@ -1,13 +1,24 @@
 import { EndpointExecuteOptions } from './Endpoint';
-import Paginator, { PaginationStateChangeListener } from './Paginator';
+import Paginator from './Paginator';
 
 export type PageNumberPaginationState = {
     page?: number;
     pageSize?: number;
 };
+export type InternalPageNumberPaginationState = {
+    total: number | null;
+};
 
-export default class PageNumberPaginator extends Paginator {
-    total: number | null = null;
+export default class PageNumberPaginator extends Paginator<
+    PageNumberPaginationState,
+    InternalPageNumberPaginationState
+> {
+    get total(): number | null {
+        if (this.internalState.total == null) {
+            return null;
+        }
+        return this.internalState.total;
+    }
 
     get totalPages(): number | null {
         if (null == this.total || null == this.pageSize) {
@@ -24,66 +35,128 @@ export default class PageNumberPaginator extends Paginator {
         return this.currentState.pageSize;
     }
 
-    constructor(
-        initialState: PageNumberPaginationState = {},
-        onChange?: PaginationStateChangeListener
-    ) {
-        super(initialState || {}, onChange);
-    }
-
-    gotoPage(page: number): void {
+    /**
+     * Return the state for the specified page number
+     *
+     * Does not transition state. To transition state call `setPage` instead.
+     */
+    pageState(page: number): PageNumberPaginationState {
         if (page < 1) {
             throw new Error(`Invalid page ${page} - should be >= 1`);
         }
-        this.setState(currentState => ({ ...currentState, page }));
+        return { ...this.currentState, page };
     }
 
-    setPageSize(pageSize: null | number): void {
+    setPage(page: number): void {
+        this.setCurrentState(this.pageState(page));
+    }
+
+    /**
+     * Return the state for the specified page size
+     *
+     * Does not transition state. To transition state call `setPageSize` instead.
+     */
+    pageSizeState(pageSize: null | number): PageNumberPaginationState {
         if (pageSize != null && pageSize < 1) {
             throw new Error(`Invalid pageSize ${pageSize} - should be >= 1`);
         }
-        this.setState((currentState: PageNumberPaginationState) => {
-            // When page size changes we need to alter the page
-            if (
-                pageSize != null &&
-                currentState.pageSize &&
-                currentState.pageSize !== pageSize &&
-                currentState.page
-            ) {
-                const page = Math.max(
-                    1,
-                    Math.ceil(((currentState.page - 1) * currentState.pageSize) / pageSize)
-                );
-                return { ...currentState, pageSize, page };
-            }
-            const nextState = { ...currentState, pageSize };
-            if (pageSize == null) {
-                delete nextState.page;
-                delete nextState.pageSize;
-            }
-            return nextState;
-        });
-    }
-
-    next(): void {
-        this.gotoPage((this.page || 1) + 1);
-    }
-
-    previous(): void {
-        this.gotoPage((this.page || 1) - 1);
-    }
-
-    first(): void {
-        this.gotoPage(1);
-    }
-
-    last(): void {
-        if (null == this.total || null == this.pageSize) {
-            throw new Error(
-                'Cannot go to last page until pageSize and total number of results is known'
+        // When page size changes we need to alter the page
+        if (
+            pageSize != null &&
+            this.currentState.pageSize &&
+            this.currentState.pageSize !== pageSize &&
+            this.currentState.page
+        ) {
+            const page = Math.max(
+                1,
+                Math.ceil(((this.currentState.page - 1) * this.currentState.pageSize) / pageSize)
             );
+            return { ...this.currentState, pageSize, page };
         }
-        this.gotoPage(Math.ceil(this.total / this.pageSize));
+        const nextState = { ...this.currentState, pageSize };
+        if (pageSize == null) {
+            delete nextState.page;
+            delete nextState.pageSize;
+        }
+        return nextState as PageNumberPaginationState;
+    }
+
+    setPageSize(pageSize: null | number): void {
+        this.setCurrentState(this.pageSizeState(pageSize));
+    }
+
+    /**
+     * Return the state for the next page
+     *
+     * Does not transition state. To transition state call `next` instead.
+     */
+    nextState(): PageNumberPaginationState {
+        return this.pageState((this.page || 1) + 1);
+    }
+
+    /**
+     * Go to the next page.
+     */
+    next(): void {
+        this.setCurrentState(this.nextState());
+    }
+
+    /**
+     * Return the state for the previous page
+     *
+     * Does not transition state. To transition state call `previous` instead.
+     */
+    previousState(): PageNumberPaginationState {
+        return this.pageState((this.page || 1) - 1);
+    }
+
+    /**
+     * Go to the previous page.
+     */
+    previous(): void {
+        this.setCurrentState(this.previousState());
+    }
+
+    /**
+     * Return the state for the first page
+     *
+     * Does not transition state. To transition state call `first` instead.
+     */
+    firstState(): PageNumberPaginationState {
+        return this.pageState(1);
+    }
+
+    /**
+     * Go to the first page.
+     */
+    first(): void {
+        this.setCurrentState(this.firstState());
+    }
+
+    /**
+     * Return the state for the first page
+     *
+     * Does not transition state. To transition state call `last` instead.
+     */
+    lastState(): PageNumberPaginationState | null {
+        if (null == this.total || null == this.pageSize) {
+            return null;
+        }
+        return this.pageState(Math.ceil(this.total / this.pageSize));
+    }
+
+    /**
+     * Go to the last page. If the last page isn't yet known (eg. results
+     * haven't yet been returned) then null will be returned.
+     *
+     * If the last page is not yet known because results haven't been returned this function
+     * does nothing.
+     */
+    last(): void {
+        const nextState = this.lastState();
+        if (nextState) {
+            this.setCurrentState(nextState);
+        }
     }
 
     getRequestInit({ query, ...options }): EndpointExecuteOptions {
@@ -101,25 +174,9 @@ export default class PageNumberPaginator extends Paginator {
     }
 
     setResponse({ total, pageSize }: { total: number; pageSize?: number }): void {
-        this.total = total;
+        this.setInternalState({ total });
         if (pageSize && this.currentState.pageSize !== pageSize) {
-            this.setState(currentState => ({ ...currentState, pageSize }));
-        }
-    }
-
-    syncState(state?: PageNumberPaginationState): void {
-        if (!state) {
-            return;
-        }
-        const nextState: PageNumberPaginationState = {};
-        if (state.pageSize && state.pageSize !== this.pageSize) {
-            nextState.pageSize = state.pageSize;
-        }
-        if (state.page && state.page !== this.page) {
-            nextState.page = state.page;
-        }
-        if (Object.keys(nextState).length > 0) {
-            this.setState(currentState => ({ ...currentState, ...nextState }));
+            this.setPageSize(pageSize);
         }
     }
 }
