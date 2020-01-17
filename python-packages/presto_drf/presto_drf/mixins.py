@@ -1,12 +1,15 @@
-from typing import List
+from typing import Collection
 
 
 class SerializerOptInFieldsMixin:
     """
     Regulates fields exposed by default & as requested based on query parameters or context.
 
-    Pass 'include_fields' / 'opt_in_fields' thru query params or context to use; multiple fields are separated by comma eg,
+    Pass 'include_fields' / 'opt_in_fields' thru query params or context to use.
+    multiple fields can either be separated by comma eg,
     /?include_fields=first_name,email&opt_in_fields=gait_recognition_prediction
+    or passed in the traditional list fashion eg,
+    /?include_fields=first_name&include_fields=email&opt_in_fields=gait_recognition_prediction
 
     1. By default, all "fields" defined in serializer, minus those listed in "opt_in_fields" would be returned.
     2. If "include_fields" is supplied, only fields requested this way would be returned.
@@ -15,7 +18,7 @@ class SerializerOptInFieldsMixin:
     Pinned fields are always returned. (currently pk only if pk exists)
     """
 
-    def get_pinned_fields(self) -> List:
+    def get_pinned_fields(self) -> Collection[str]:
         """
         Get by-default pinned fields. Pinned fields are fields always returned regardless of include_fields inclusions.
         Override on serializer to customize.
@@ -27,17 +30,16 @@ class SerializerOptInFieldsMixin:
 
         try:
             return [self.Meta.model._meta.pk.name]
-        except Exception:
+        except AttributeError:
             pass
         return []
 
     def __init__(self, *args, **kwargs):
-        result = super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-        if not hasattr(
-            self, "context"
-        ):  # serializer invoked without context - inspection?
-            return result
+        if not hasattr(self, "context"):
+            # serializer invoked without context - inspection?
+            return
 
         pinned_fields = self.get_pinned_fields()
 
@@ -53,7 +55,7 @@ class SerializerOptInFieldsMixin:
             or set(self.Meta.fields).difference(set(fields_to_exclude))
         )
 
-        if type(fields_to_include) == str:
+        if isinstance(fields_to_include, str):
             fields_to_include = fields_to_include.split(",")
 
         opt_in_fields_to_include = (
@@ -74,4 +76,4 @@ class SerializerOptInFieldsMixin:
             ):
                 del self.fields[f]
 
-        return result
+        return

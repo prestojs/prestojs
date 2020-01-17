@@ -10,7 +10,7 @@ class UserSerializer(SerializerOptInFieldsMixin, ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "first_name", "last_name", "email", "activated_at", "is_staff")
-        opt_in_only_fields = ["activated_at", "is_staff"]
+        opt_in_only_fields = ("activated_at", "is_staff")
 
 
 class MockRequest:
@@ -37,8 +37,25 @@ class OptinFieldMixinTestcase(TestCase):
         self.assertTrue("activated_at" not in serializer.fields)
         self.assertTrue("is_staff" not in serializer.fields)
 
+        context = {"request": MockRequest({"include_fields": "first_name"})}
+        serializer = UserSerializer(context=context)
+        self.assertTrue("id" in serializer.fields)
+        self.assertTrue("email" not in serializer.fields)
+        self.assertTrue("first_name" in serializer.fields)
+        self.assertTrue("activated_at" not in serializer.fields)
+        self.assertTrue("is_staff" not in serializer.fields)
+
     def test_only_include_fields_specified_are_returned_multiple(self):
         context = {"request": MockRequest({"include_fields": "email,first_name"})}
+        serializer = UserSerializer(context=context)
+        self.assertTrue("id" in serializer.fields)
+        self.assertTrue("email" in serializer.fields)
+        self.assertTrue("first_name" in serializer.fields)
+        self.assertTrue("activated_at" not in serializer.fields)
+        self.assertTrue("is_staff" not in serializer.fields)
+
+    def test_only_include_fields_specified_are_returned_multiple_via_list_entry(self):
+        context = {"request": MockRequest({"include_fields": ["email", "first_name"]})}
         serializer = UserSerializer(context=context)
         self.assertTrue("id" in serializer.fields)
         self.assertTrue("email" in serializer.fields)
