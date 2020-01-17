@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
+import { usePaginator } from '@prestojs/rest';
+import { useCallback } from 'react';
 import useSWR from 'swr';
 
 /**
@@ -9,8 +10,7 @@ import useSWR from 'swr';
  * can be used to execute the action directly, optionally with new arguments.
  */
 export default function useEndpoint(action, args, config) {
-    const [paginationState, setPaginationState] = useState();
-    const paginator = useMemo(() => action.createPaginator(null, setPaginationState), [action]);
+    const paginator = usePaginator(action.getPaginatorClass());
     const preparedAction = action ? action.prepare({ ...args, paginator }) : null;
     const execute = useCallback(init => preparedAction.execute(init), [preparedAction]);
     const result = useSWR(preparedAction && [preparedAction], act => act.execute({}), config);

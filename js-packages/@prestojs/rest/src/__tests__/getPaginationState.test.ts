@@ -1,7 +1,7 @@
 import getPaginationState from '../getPaginationState';
 import InferredPaginator from '../InferredPaginator';
 
-const paginator = new InferredPaginator();
+const paginator = new InferredPaginator([{}, (): {} => ({})], [{}, (): {} => ({})]);
 
 const defaultOptions = {
     url: 'a',

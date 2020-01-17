@@ -2,7 +2,6 @@ import { UrlPattern } from '@prestojs/routing';
 import isEqual from 'lodash/isEqual';
 import InferredPaginator from './InferredPaginator';
 import defaultGetPaginationState from './getPaginationState';
-import PageNumberPaginator from './PageNumberPaginator';
 import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
 
 type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
@@ -286,7 +285,7 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  *
  * @extract-docs
  */
-export default class Endpoint {
+export default class Endpoint<PaginatorT extends PaginatorInterface = PaginatorInterface> {
     static defaultConfig: {
         requestInit: RequestInit;
         getPaginationState: (
@@ -324,7 +323,7 @@ export default class Endpoint {
     /**
      * Get the Paginator class to use for this endpoint.
      */
-    getPaginatorClass(): PaginatorInterfaceClass {
+    getPaginatorClass(): PaginatorInterfaceClass<PaginatorT> {
         const cls = Object.getPrototypeOf(this).constructor;
         return cls.defaultConfig.paginatorClass;
     }
