@@ -2,6 +2,7 @@
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const transformDocsJson = require('./transform-docs-json');
 
 function digest(content) {
     return crypto
@@ -82,38 +83,59 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
     });
 
     const apiMenu = {};
-    const docsData = await graphql(`
-        query {
-            allTypeDocsJson(filter: { extractDocs: { eq: true } }) {
-                edges {
-                    node {
-                        id
-                        slug
-                        packageName
-                        name
-                    }
-                }
+    // const docsData = await graphql(`
+    //     query {
+    //         allTypeDocsJson(filter: { extractDocs: { eq: true } }) {
+    //             edges {
+    //                 node {
+    //                     id
+    //                     slug
+    //                     packageName
+    //                     name
+    //                 }
+    //             }
+    //         }
+    //     }
+    // `);
+    // if (docsData.errors) {
+    //     reporter.panicOnBuild('🚨  ERROR: Loading "typeDocsJson" query');
+    // }
+    const typeDocs = await transformDocsJson(require('./data/typeDocs.json'));
+    typeDocs.forEach(pkg => {
+        pkg.children.forEach(doc => {
+            if (!doc.extractDocs) {
+                return;
             }
-        }
-    `);
-    if (docsData.errors) {
-        reporter.panicOnBuild('🚨  ERROR: Loading "typeDocsJson" query');
-    }
-    for (const datum of docsData.data.allTypeDocsJson.edges) {
-        const { slug, packageName, name, id } = datum.node;
-        if (!apiMenu[packageName]) {
-            apiMenu[packageName] = [];
-        }
-        apiMenu[packageName].push({
-            title: name,
-            href: slug,
+            const { slug, packageName, name, id } = doc;
+            if (!apiMenu[packageName]) {
+                apiMenu[packageName] = [];
+            }
+            apiMenu[packageName].push({
+                title: name,
+                href: slug,
+            });
+            createPage({
+                path: slug,
+                component: apiTemplate,
+                context: doc,
+            });
         });
-        createPage({
-            path: slug,
-            component: apiTemplate,
-            context: { id, slug },
-        });
-    }
+    });
+    // for (const datum of docsData.data.allTypeDocsJson.edges) {
+    //     const { slug, packageName, name, id } = datum.node;
+    //     if (!apiMenu[packageName]) {
+    //         apiMenu[packageName] = [];
+    //     }
+    //     apiMenu[packageName].push({
+    //         title: name,
+    //         href: slug,
+    //     });
+    //     createPage({
+    //         path: slug,
+    //         component: apiTemplate,
+    //         context: { id, slug },
+    //     });
+    // }
     fs.writeFileSync('./data/apiMenu.json', JSON.stringify(apiMenu, null, 2));
 };
 
@@ -203,33 +225,37 @@ exports.createSchemaCustomization = ({ actions, schema }) => {
             };
         },
     });
-    actions.createTypes(`
-    type TypeDocsJsonDocumentation implements Node {
-        contents: Mdx @mdx
-    } 
-    type TypeDocsJsonComment implements Node {
-      text: Mdx @mdx
-      shortText: Mdx @mdx
-    }
-    type TypeDocsJsonSignaturesComment implements Node {
-      text: Mdx @mdx
-      shortText: Mdx @mdx
-    }
-    type TypeDocsJsonSignaturesParametersComment implements Node {
-      text: Mdx @mdx
-      shortText: Mdx @mdx
-    }
-    type TypeDocsJsonChildNodesComment implements Node {
-      text: Mdx @mdx
-      shortText: Mdx @mdx
-    }
-    type TypeDocsJsonChildNodesSignaturesComment implements Node {
-      text: Mdx @mdx
-      shortText: Mdx @mdx
-    }
-    type TypeDocsJsonChildNodesSignaturesParametersComment implements Node {
-      text: Mdx @mdx
-      shortText: Mdx @mdx
-    }
-  `);
+    //   actions.createTypes(`
+    //   type TypeDocsJsonDocumentation implements Node {
+    //     contents: Mdx @mdx
+    //   }
+    //   type TypeDocsJsonComment implements Node {
+    //     text: Mdx @mdx
+    //     shortText: Mdx @mdx
+    //   }
+    //   type TypeDocsJsonSignaturesComment implements Node {
+    //     text: Mdx @mdx
+    //     shortText: Mdx @mdx
+    //     returns: Mdx @mdx
+    //   }
+    //   type TypeDocsJsonSignaturesParametersComment implements Node {
+    //     text: Mdx @mdx
+    //     shortText: Mdx @mdx
+    //   }
+    //   type TypeDocsJsonChildNodesSignaturesParametersTypeDeclarationChildrenComment implements Node {
+    //       text: Mdx @mdx
+    //   }
+    //   type TypeDocsJsonChildNodesComment implements Node {
+    //     text: Mdx @mdx
+    //     shortText: Mdx @mdx
+    //   }
+    //   type TypeDocsJsonChildNodesSignaturesComment implements Node {
+    //     text: Mdx @mdx
+    //     shortText: Mdx @mdx
+    //   }
+    //   type TypeDocsJsonChildNodesSignaturesParametersComment implements Node {
+    //     text: Mdx @mdx
+    //     shortText: Mdx @mdx
+    //   }
+    // `);
 };

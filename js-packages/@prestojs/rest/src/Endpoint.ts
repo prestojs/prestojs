@@ -334,6 +334,8 @@ export default class Endpoint {
      * and `Endpoint.defaultConfig.requestInit`. Options passed here will take precedence. Only the `headers` key will be merged if it
      * exists in multiple places (eg. defaultConfig may include headers you want on every request). If you need to remove
      * a header entirely set the value to `undefined`.
+     *
+     * @returns A promise that resolves to transformed response
      */
     async execute({ urlArgs = {}, query, ...init }: PrepareOptions = {}): Promise<any> {
         const url = this.urlPattern.resolve(urlArgs, { query });

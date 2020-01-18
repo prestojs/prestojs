@@ -25,25 +25,54 @@ function CommentBlock({ comment }) {
     );
 }
 
+function ParameterName({ param }) {
+    if (param.name === '__namedParameters') {
+        const { children } = param.type.declaration;
+        return `{ ${children.map(child => child.name).join(', ')} }`;
+    }
+    return param.name;
+}
+
+function ParamaterDocBlock({ param }) {
+    if (param.name === '__namedParameters') {
+        const { children } = param.type.declaration;
+        return children
+            .filter(child => !!child.comment)
+            .map(child => <ParamaterDocBlock param={child} key={child.name} />);
+    }
+    if (!param.comment) {
+        return null;
+    }
+    return (
+        <>
+            <dt>{param.name}</dt>
+            <dd>
+                <CommentBlock comment={param.comment} />
+            </dd>
+        </>
+    );
+}
+
 function Signature({ signature }) {
-    const parameters = (signature.parameters && signature.parameters.filter(p => p.comment)) || [];
+    const parameters = signature.parameters || [];
     return (
         <>
             <h4>
                 {signature.name}(
-                {signature.parameters && signature.parameters.map(param => param.name).join(', ')})
+                {parameters.map((param, i) => (
+                    <>
+                        <ParameterName param={param} />
+                        {i < parameters.length - 1 ? ', ' : ''}
+                    </>
+                ))}
+                )
             </h4>
             <br />
             <CommentBlock comment={signature.comment} />
             {parameters.length > 0 && (
                 <dl>
                     {parameters.map(param => (
-                        <>
-                            <dt>{param.name}</dt>
-                            <dd>
-                                <CommentBlock comment={param.comment} />
-                            </dd>
-                        </>
+                        <ParamaterDocBlock param={param} key={param.name} />
                     ))}
                 </dl>
             )}
@@ -76,17 +105,9 @@ function ClassDoc({ doc }) {
         acc[group.title] = group;
         return acc;
     }, {});
-    const children = doc.childNodes.reduce((acc, child) => {
-        acc[child.id] = child;
-        return acc;
-    }, {});
-    const constructor = groups.Constructors && children[groups.Constructors.children[0]];
+    const constructor = groups.Constructors && groups.Constructors.children[0];
     const methods =
-        (groups.Methods &&
-            groups.Methods.children
-                .map(id => children[id])
-                .filter(method => !method.flags.isPrivate)) ||
-        [];
+        (groups.Methods && groups.Methods.children.filter(method => !method.flags.isPrivate)) || [];
     const direct = [];
     const inherited = [];
     for (const method of methods) {
@@ -104,13 +125,11 @@ function ClassDoc({ doc }) {
                 <>
                     <h3>Constructor</h3>
                     {constructor.signatures[0].parameters &&
-                        constructor.signatures[0].parameters
-                            .filter(p => p.comment)
-                            .map(p => (
-                                <p>
-                                    <strong>{p.name}</strong> <CommentBlock comment={p.comment} />
-                                </p>
-                            ))}
+                        constructor.signatures[0].parameters.map(p => (
+                            <p>
+                                <strong>{p.name}</strong> <CommentBlock comment={p.comment} />
+                            </p>
+                        ))}
                     {methods.length > 0 && (
                         <>
                             <h3>Methods</h3>
@@ -166,11 +185,10 @@ const ArticleWrapper = styled(Article)`
 `;
 
 const Api = props => {
-    const {
-        // if mdx is set that's considered an override (ie. there exists a file in data/ with same slug as this)
-        data: { typeDocsJson: doc, mdx },
-    } = props;
+    const { pageContext: doc } = props;
     const DocComponent = kindComponents[doc.kindString];
+    let mdx;
+    console.log(doc);
     return (
         <Layout>
             <Sidebar>
@@ -181,80 +199,93 @@ const Api = props => {
                 <ImportString>
                     {`import { ${doc.name} } from "@prestojs/${doc.packageName}";`}
                 </ImportString>
+                <CommentBlock comment={doc.comment} />
                 {mdx ? <MDXRenderer>{mdx.body}</MDXRenderer> : <DocComponent doc={doc} />}
             </ArticleWrapper>
         </Layout>
     );
 };
 
-export const pageQuery = graphql`
-    query APIDocs($slug: String) {
-        mdx(frontmatter: { slug: { eq: $slug } }) {
-            body
-        }
-        typeDocsJson(slug: { eq: $slug }) {
-            kindString
-            name
-            id
-            comment {
-                shortText {
-                    body
-                }
-                text {
-                    body
-                }
-            }
-            groups {
-                title
-                children
-            }
-            slug
-            packageName
-            signatures {
-                name
-                comment {
-                    shortText {
-                        body
-                    }
-                    text {
-                        body
-                    }
-                }
-            }
-            childNodes {
-                id
-                flags {
-                    isPrivate
-                }
-                signatures {
-                    name
-                    comment {
-                        shortText {
-                            body
-                        }
-                        text {
-                            body
-                        }
-                    }
-                    parameters {
-                        id
-                        name
-                        comment {
-                            shortText {
-                                body
-                            }
-                            text {
-                                body
-                            }
-                        }
-                    }
-                    inheritedFrom {
-                        name
-                    }
-                }
-            }
-        }
-    }
-`;
+// export const pageQuery = graphql`
+//     query APIDocs($slug: String) {
+//         mdx(frontmatter: { slug: { eq: $slug } }) {
+//             body
+//         }
+//         typeDocsJson(slug: { eq: $slug }) {
+//             kindString
+//             name
+//             id
+//             comment {
+//                 shortText {
+//                     body
+//                 }
+//                 text {
+//                     body
+//                 }
+//             }
+//             groups {
+//                 title
+//                 children
+//             }
+//             slug
+//             packageName
+//             signatures {
+//                 name
+//                 comment {
+//                     shortText {
+//                         body
+//                     }
+//                     text {
+//                         body
+//                     }
+//                 }
+//             }
+//             childNodes {
+//                 id
+//                 flags {
+//                     isPrivate
+//                 }
+//                 signatures {
+//                     name
+//                     comment {
+//                         shortText {
+//                             body
+//                         }
+//                         text {
+//                             body
+//                         }
+//                     }
+//                     parameters {
+//                         id
+//                         name
+//                         comment {
+//                             shortText {
+//                                 body
+//                             }
+//                             text {
+//                                 body
+//                             }
+//                         }
+//                         type {
+//                             declaration {
+//                                 children {
+//                                     name
+//                                     comment {
+//                                         text {
+//                                             body
+//                                         }
+//                                     }
+//                                 }
+//                             }
+//                         }
+//                     }
+//                     inheritedFrom {
+//                         name
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// `;
 
 export default Api;

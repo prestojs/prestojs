@@ -32,6 +32,7 @@ const Docs = props => {
     const {
         data: { mdx },
     } = props;
+    console.log(mdx);
     return (
         <Layout>
             <Sidebar>
