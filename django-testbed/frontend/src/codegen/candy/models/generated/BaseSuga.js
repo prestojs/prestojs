@@ -1,10 +1,9 @@
-import { IntegerField, CharField, BooleanField, ViewModel } from '@prestojs/viewmodel';
+import { CharField, BooleanField, IntegerField, ViewModel } from '@prestojs/viewmodel';
 
 export default class BaseSuga extends ViewModel {
     static pkFieldName = 'id';
     static label = 'Suga';
     static labelPlural = 'Piles Of Suga';
-
 
     static _fields = {
         color: new IntegerField({
@@ -14,7 +13,7 @@ export default class BaseSuga extends ViewModel {
             helpText: null,
             blank: true,
             blankAsNull: false,
-            choices: new Map(Object.entries({1: 'orange', 2: 'maple'})),
+            choices: new Map(Object.entries({ 1: 'orange', 2: 'maple' })),
         }),
         flavor: new CharField({
             label: 'Flavor',
@@ -23,7 +22,7 @@ export default class BaseSuga extends ViewModel {
             helpText: null,
             blank: true,
             blankAsNull: false,
-            choices: new Map(Object.entries({'Orange': 'Orange', 'Maple': 'Maple'})),
+            choices: new Map(Object.entries({ Orange: 'Orange', Maple: 'Maple' })),
         }),
         is_unistable: new BooleanField({
             label: 'Most important fact about a candy',
@@ -35,5 +34,3 @@ export default class BaseSuga extends ViewModel {
         }),
     };
 }
-
-

@@ -80,8 +80,8 @@ export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement
         extraProps.help = field.helpText;
         extraProps.label = field.label;
 
-        if (required == null && field.required) {
-            required = field.required;
+        if (required == null && field.blank !== undefined) {
+            required = !field.blank;
         }
         if (!children) {
             children = <FormField {...fieldProps} field={field} />;
