@@ -42,11 +42,24 @@ export default class Paginator<State, InternalState> implements PaginatorInterfa
         this.setInternalState = setInternalState;
     }
 
+    /**
+     * Return the options to use with `Endpoint.execute` or `Endpoint.prepare`. Usually
+     * this just involves setting `query` to the query string parameters for the paginator
+     * but can also provide custom headers or different URL resolve arguments.
+     *
+     * @param options The existing options for the endpoint
+     */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getRequestInit(options: EndpointExecuteOptions): EndpointExecuteOptions {
         throw new Error('Not implemented');
     }
 
+    /**
+     * This is called when an `Endpoint` has resolved and is passed the response from the
+     * endpoint. This is used to update the relevant paginator state  - eg. the total
+     * number of records, next & previous cursors etc.
+     * @param response The response as returned by the endpoint this paginator is used with.
+     */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setResponse(response: Record<string, any>): void {
         throw new Error('Not implemented');

@@ -27,12 +27,12 @@ export default class PageNumberPaginator extends Paginator<
         return Math.ceil(this.total / this.pageSize);
     }
 
-    get page(): number | null | undefined {
-        return this.currentState.page;
+    get page(): number | null {
+        return this.currentState.page ?? null;
     }
 
-    get pageSize(): number | null | undefined {
-        return this.currentState.pageSize;
+    get pageSize(): number | null {
+        return this.currentState.pageSize ?? null;
     }
 
     /**
