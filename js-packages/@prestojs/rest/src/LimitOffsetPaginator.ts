@@ -18,8 +18,8 @@ export default class LimitOffsetPaginator extends Paginator<
         return this.internalState.total ?? null;
     }
 
-    get limit(): number | null | undefined {
-        return this.currentState.limit;
+    get limit(): number | null {
+        return this.currentState.limit ?? null;
     }
 
     get offset(): number {

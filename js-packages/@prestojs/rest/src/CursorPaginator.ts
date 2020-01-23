@@ -23,12 +23,12 @@ export default class CursorPaginator extends Paginator<
         return this.internalState.previousCursor ?? null;
     }
 
-    get cursor(): string | null | undefined {
-        return this.currentState.cursor;
+    get cursor(): string | null {
+        return this.currentState.cursor ?? null;
     }
 
-    get pageSize(): number | null | undefined {
-        return this.currentState.pageSize;
+    get pageSize(): number | null {
+        return this.currentState.pageSize ?? null;
     }
 
     /**
