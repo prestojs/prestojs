@@ -78,6 +78,7 @@ export default function useViewModelCache<T extends ViewModel, ResultType>(
 
         // This catches any changes to cache that occur between initial render
         // and when the subscription is added here
+        // See "should handle updates between first render and subscription" test case
         checkForUpdates();
 
         return viewModel.cache.addListener(checkForUpdates);

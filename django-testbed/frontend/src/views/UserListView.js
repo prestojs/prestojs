@@ -29,7 +29,7 @@ export default function UserListView() {
         throw error;
     }
 
-    const records = useViewModelCache(User, cache => (data ? cache.getList(data) : null));
+    const records = useViewModelCache(User, cache => data && cache.getList(data));
     if (!records) {
         return null;
     }
