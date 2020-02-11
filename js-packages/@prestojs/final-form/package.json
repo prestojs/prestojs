@@ -22,14 +22,22 @@
   },
   "peerDependencies": {
     "@prestojs/ui": "^0.0.1",
-    "@prestojs/viewmodel": "^0.0.1"
+    "@prestojs/viewmodel": "^0.0.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
   },
   "dependencies": {
-    "final-form": "^4.18.6",
+    "final-form": "^4.18.7",
     "lodash": "^4.17.15",
-    "react-final-form": "^6.3.0"
+    "react-final-form": "^6.3.5"
   },
   "devDependencies": {
-    "typescript": "^3.7.2"
+    "@prestojs/ui": "*",
+    "@prestojs/viewmodel": "*",
+    "@testing-library/jest-dom": "^5.1.1",
+    "@testing-library/react": "^9.4.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "typescript": "^3.7.5"
   }
 }

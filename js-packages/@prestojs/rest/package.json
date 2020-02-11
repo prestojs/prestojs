@@ -22,9 +22,10 @@
   },
   "dependencies": {
     "@prestojs/routing": "^0.0.1",
-    "swr": "^0.1.12"
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "typescript": "^3.7.2"
+    "jest-fetch-mock": "^3.0.1",
+    "typescript": "^3.7.5"
   }
 }

@@ -21,7 +21,9 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "devDependencies": {
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "lodash": "^4.17.15"
+  }
 }

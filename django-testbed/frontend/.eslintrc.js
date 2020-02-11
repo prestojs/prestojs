@@ -12,9 +12,9 @@ const globals = react
       }
     : {};
 module.exports = {
-    parser: 'babel-eslint',
+    parser: require.resolve('babel-eslint'),
     extends: [
-        react ? '@alliance-software/eslint-config-react' : '@alliance-software/eslint-config',
+        react ? require.resolve('@alliance-software/eslint-config-react') : require.resolve('@alliance-software/eslint-config'),
     ],
     rules: {
         'import/no-unresolved': [

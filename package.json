@@ -7,68 +7,68 @@
   "private": true,
   "workspaces": [
     "js-packages/@prestojs/*",
-    "django-testbed",
-    "doc-site"
+    "django-testbed"
   ],
   "scripts": {
     "lint": "eslint js-packages --ext .js,.ts",
     "check-types": "tsc -b tsconfig.lint.json",
-    "clean": "lerna run clean --ignore django-testbed",
-    "prebuild": "lerna run clean",
-    "prepublish": "lerna run build",
-    "publish": "yarn clean && lerna publish",
+    "clean": "yarn workspaces foreach --exclude django-testbed run clean",
+    "prebuild": "yarn workspaces foreach run clean",
+    "prepublish": "yarn workspaces foreach run build",
     "test": "jest",
-    "dev": "lerna run --parallel 'dev'",
-    "build": "lerna run --parallel 'build' --ignore django-testbed",
-    "build:watch": "lerna run --parallel 'build:watch' --ignore django-testbed",
+    "dev": "yarn workspaces foreach -pvi -j 10 run dev",
+    "build": "yarn workspaces foreach --exclude django-testbed -ptv run build",
+    "build:watch": "yarn workspaces foreach --exclude django-testbed -p run 'build:watch'",
     "build:declarations": "tsc -b"
   },
   "devDependencies": {
+    "@babel/preset-react": "^7.8.3",
     "@strictsoftware/typedoc-plugin-monorepo": "^0.2.1",
-    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/jest-dom": "^5.1.1",
     "@testing-library/react": "^9.4.0",
-    "@types/jest": "^24.0.23",
-    "@typescript-eslint/eslint-plugin": "^2.7.0",
-    "@typescript-eslint/parser": "^2.7.0",
-    "babel-jest": "^24.9.0",
-    "babel-preset-gatsby": "^0.2.26",
+    "@types/jest": "^25.1.2",
+    "@types/node": "^13.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "@typescript-eslint/parser": "^2.19.0",
+    "babel-jest": "^25.1.0",
+    "babel-preset-gatsby": "^0.2.28",
     "commitizen": "^4.0.3",
     "cz-lerna-changelog": "^2.0.0",
-    "eslint": "^6.6.0",
-    "eslint-config-prettier": "^6.5.0",
-    "eslint-plugin-import": "^2.18.2",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-react-hooks": "^2.3.0",
-    "husky": "^3.0.9",
-    "jest": "^24.9.0",
-    "jest-fetch-mock": "^2.1.2",
-    "lerna": "^3.18.4",
-    "lint-staged": "^9.4.3",
+    "husky": "^4.2.1",
+    "jest": "^25.1.0",
+    "jest-diff": "^25.1.0",
+    "jest-fetch-mock": "^3.0.1",
+    "lint-staged": "^9.5.0",
+    "pnp-webpack-plugin": "^1.6.0",
     "prettier": "^1.19.1",
-    "ts-jest": "^24.1.0",
+    "ts-jest": "^25.2.0",
     "typedoc": "^0.15.2",
-    "typedoc-neo-theme": "^1.0.4"
+    "typedoc-neo-theme": "^1.0.4",
+    "typescript": "^3.7.5",
+    "yargs": "^15.1.0"
   },
   "dependencies": {
-    "@babel/cli": "^7.7.0",
-    "@babel/core": "^7.7.2",
-    "@babel/plugin-proposal-class-properties": "^7.7.0",
-    "@babel/plugin-proposal-numeric-separator": "^7.2.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
-    "@babel/preset-env": "^7.7.1",
-    "@babel/preset-typescript": "^7.7.2"
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.4",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-numeric-separator": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "@babel/preset-typescript": "^7.8.3",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
   },
   "husky": {
     "hooks": {
       "pre-commit": "yarn check-types && lint-staged",
       "pre-push": "LINT_PUSH=1 ./bin/lint/lint-general.py",
       "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
-    }
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-lerna-changelog"
     }
   }
 }
