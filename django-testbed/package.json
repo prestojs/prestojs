@@ -70,6 +70,9 @@
     "webpack-dev-server": "^3.10.2",
     "yargs": "^15.1.0"
   },
+  "peerDependencies": {
+    "@types/react": "*"
+  },
   "dependencies": {
     "@alliance-software/webpack-dev-utils": "^0.4.0",
     "@ant-design/icons": "^4.0.0-alpha.11",
