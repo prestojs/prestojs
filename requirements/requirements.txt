@@ -3,7 +3,7 @@
 # You should modify base.txt and then run freeze.sh
 # --------------------------------------------------------
 -e git+https://gitlab.alliancesoftware.com.au/alliance/alliance-django-utils.git@4bf7bc735550ec04ba722d1d78040a253dd74075#egg=allianceutils
-bleach==3.1.0
+bleach==3.1.1
 certifi==2019.11.28
 dj-database-url==0.5.0
 Django==2.2.9
