@@ -1,6 +1,15 @@
 {
+  "build": {
+    "env": {
+      "YARN_CHECKSUM_BEHAVIOR": "ignore"
+    }
+  },
   "version": 2,
-    "builds": [
-      { "src": "package.json", "use": "@now/static-build", "config": { "distDir": "doc-site/public/" } }
-    ]
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@now/static-build",
+      "config": { "distDir": "doc-site/public/" }
+    }
+  ]
 }
