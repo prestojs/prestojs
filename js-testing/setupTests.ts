@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { GlobalWithFetchMock } from 'jest-fetch-mock';
 import diff from 'jest-diff';
 

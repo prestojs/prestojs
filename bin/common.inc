@@ -46,6 +46,10 @@ function require_virtualenv() {
 			workon "$(<.venv)"
 		elif [[ -e "$virtualenvs_dir/$(<.venv)/bin/activate" ]] ; then
 			source "$virtualenvs_dir/$(<.venv)/bin/activate"
+		elif [[ -e venv/bin/activate ]] ; then
+			source venv/bin/activate
+		elif [[ -e .venv/bin/activate ]] ; then
+			source .venv/bin/activate
 		else
 			fail "No virtualenv is active (and couldn't find the right one)"
 		fi
@@ -78,8 +82,20 @@ function require_nodejs() {
 	fi
 }
 
+function set_python_target_vars() {
+	[[ -e .python-version ]] || fail "ERROR: Missing local .python-version file -- see pyenv documentation"
+
+	target_ver=$(< .python-version )
+	target_ver_short=$( cut -f-2 -d. < .python-version )
+	target_venv=$(<.venv)
+}
+
+COLOR_ERROR="\033[1;31m"	# red
+COLOR_WARN="\033[1;33m"		# yellow
+COLOR_RESET="\033[0m"
+
 function fail() {
-	echo "$@" >&2
+	echo -e "${COLOR_ERROR}$@${COLOR_RESET}" >&2
 	exit 1
 }
 
@@ -101,6 +117,15 @@ if [[ "$OSTYPE" =~ ^darwin ]] ; then
 	# -quit is a GNU findutils extension
 	$FIND -quit 2>/dev/null || fail "Missing GNU find; run 'brew install findutils'"
 fi
+
+# Core python packages that should not be removed or your virtualenv will probably break
+CORE_PYTHON_PACKAGES=(
+	pip
+	pkg-resources # ubuntu/debian bug: https://stackoverflow.com/questions/39577984/what-is-pkg-resources-0-0-0-in-output-of-pip-freeze-command
+	setuptools
+	venv-update
+	wheel
+)
 
 # BASE_DIR and PROJECT_DIR should resolve to the same thing as in the django settings file
 repo_dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")"

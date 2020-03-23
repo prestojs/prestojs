@@ -1,7 +1,7 @@
 import { RangedWidgetProps } from '@prestojs/ui';
 import { DatePicker } from 'antd';
 import React from 'react';
-import { DatePickerProps } from 'antd/lib/date-picker/interface';
+import { DatePickerProps } from 'antd/lib/date-picker';
 import RangeWidget from './RangeWidget';
 
 /**

@@ -76,7 +76,6 @@ export default class NamedUrlPatterns {
         if (!url) {
             throw new NamedUrlNotFoundError(name);
         }
-
         return url.resolve(kwargs, options);
     }
 }

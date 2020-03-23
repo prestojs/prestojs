@@ -82,16 +82,6 @@ module.exports = ({
     // Not done by default because it breaks IDE discoverability
     bootstrapSassIncludePath = false,
 
-    // Target browsers
-    //  affects css generation, babel code generation & polyfills
-    // https://github.com/ai/browserslist
-    browsers = [
-        '>1%',
-        'last 4 versions',
-        'Firefox ESR',
-        'not ie < 9', // React doesn't support IE8 anyway
-    ],
-
     // Include settings for react?
     react = false,
 
@@ -150,6 +140,7 @@ module.exports = ({
     const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
     const WriteJsonFilePlugin = require('./plugins/WriteJsonFilePlugin');
     const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+    const PnpWebpackPlugin = require(`pnp-webpack-plugin`);
 
     const assert = require('assert');
     const autoprefixer = require('autoprefixer');
@@ -229,7 +220,6 @@ module.exports = ({
     if (isDev && hotReload) {
         const makeHot = entry => {
             // HMR related loaders must come first
-            entry.unshift('webpack/hot/dev-server');
             if (react) {
                 entry.unshift(
                     require.resolve('@alliance-software/webpack-dev-utils/client/hot-client-errors')
@@ -290,9 +280,7 @@ module.exports = ({
                     // included in getCssLoader
                     postcss: function() {
                         return [
-                            autoprefixer({
-                                browsers,
-                            }),
+                            autoprefixer(),
                         ];
                     },
                 },
@@ -400,7 +388,16 @@ module.exports = ({
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
-            writeToDisk: true,
+        },
+        resolve: {
+            plugins: [
+                PnpWebpackPlugin,
+            ],
+        },
+        resolveLoader: {
+            plugins: [
+                PnpWebpackPlugin.moduleLoader(module),
+            ],
         },
     };
 
@@ -451,9 +448,6 @@ module.exports = ({
         [
             require.resolve('@babel/preset-env'),
             {
-                targets: {
-                    browsers,
-                },
                 useBuiltIns: 'entry',
                 corejs: 3,
                 // This enables webpack2 tree-shaking
@@ -619,7 +613,7 @@ module.exports = ({
             {
                 loader: require.resolve('postcss-loader'),
                 options: {
-                    plugins: () => [autoprefixer({ browsers })],
+                    plugins: () => [autoprefixer()],
                     sourceMap: cssSourceMaps,
                 },
             },
@@ -647,17 +641,6 @@ module.exports = ({
         // it from js
         const styleLoader = {
             loader: 'style-loader',
-            options: {
-                // Setting singleton: true can avoid flash of content in dev on load but has
-                // downsides:
-                // - Source maps no longer work
-                // - Hot reload is slower
-                // Note that the FOUC is cased by enabling source maps on css-loader - see
-                // https://github.com/webpack-contrib/css-loader/issues/613
-                // Possible solution is to switch to https://github.com/NeekSandhu/css-visor
-                singleton: false,
-                sourceMap: cssSourceMaps,
-            },
         };
         return !isDev ? [MiniCssExtractPlugin.loader, ...loaders] : [styleLoader, ...loaders];
     };

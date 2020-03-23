@@ -28,6 +28,7 @@ exclude_dirs=(
 	.git
 	.idea
 	node_modules
+	.yarn
 
 	# these will only be present on CI
 	venv

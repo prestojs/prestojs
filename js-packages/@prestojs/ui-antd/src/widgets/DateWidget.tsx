@@ -1,6 +1,6 @@
 import { WidgetProps } from '@prestojs/ui';
 import { DatePicker } from 'antd';
-import { DatePickerProps } from 'antd/lib/date-picker/interface';
+import { DatePickerProps } from 'antd/lib/date-picker';
 
 import React from 'react';
 
