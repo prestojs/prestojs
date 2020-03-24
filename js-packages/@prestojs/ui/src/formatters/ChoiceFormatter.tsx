@@ -5,6 +5,9 @@ export default function ChoiceFormatter<T>({
     value: T;
     choices: Array<[T, string]>;
 }): string | T {
+    if (value == null) {
+        return value;
+    }
     const choiceValue = Array.from(choices).find(choice => choice[0] === value);
     if (choiceValue === null || choiceValue === undefined) {
         console.warn(

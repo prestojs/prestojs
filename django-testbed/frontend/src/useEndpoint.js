@@ -10,7 +10,7 @@ import useSWR from 'swr';
  * can be used to execute the action directly, optionally with new arguments.
  */
 export default function useEndpoint(action, args, config) {
-    const paginator = usePaginator(action.getPaginatorClass());
+    const paginator = usePaginator(action && action.getPaginatorClass());
     const preparedAction = action ? action.prepare({ ...args, paginator }) : null;
     const execute = useCallback(init => preparedAction.execute(init), [preparedAction]);
     const result = useSWR(preparedAction && [preparedAction], act => act.execute({}), config);

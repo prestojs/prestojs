@@ -24,5 +24,5 @@ export default function FormWrapper(props): React.ReactElement {
                   },
               }
             : null;
-    return <Form layout={layout} {...formItemLayout} {...rest} />;
+    return <Form layout={layout} {...formItemLayout} {...rest} onFinish={rest.onSubmit} />;
 }
