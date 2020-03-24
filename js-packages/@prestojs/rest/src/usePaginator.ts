@@ -16,10 +16,6 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
     paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<T>,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): T {
-    const paginatorClass =
-        paginatorClassOrEndpoint instanceof Endpoint
-            ? paginatorClassOrEndpoint.getPaginatorClass()
-            : paginatorClassOrEndpoint;
     // Only used if currentStatePair is not provided. We have to create this regardless
     // as hooks can't be conditional.
     const defaultState = useState<PaginatorState>();
@@ -31,11 +27,25 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
     // As it is only readable it is not necessary to expose an interface for how this
     // state is stored - we can store it internally in this hook.
     const [internalState, setInternalState] = useState();
+
+    let paginatorClass;
+
+    if (paginatorClassOrEndpoint) {
+        paginatorClass =
+            paginatorClassOrEndpoint instanceof Endpoint
+                ? paginatorClassOrEndpoint.getPaginatorClass()
+                : paginatorClassOrEndpoint;
+    }
     // It's expected that the paginator will be recreated regularly (ie. after every
     // state change) but memo it so that outside of that it is cached.
     return useMemo(
         () =>
-            new paginatorClass([currentState, setCurrentState], [internalState, setInternalState]),
+            paginatorClass
+                ? new paginatorClass(
+                      [currentState, setCurrentState],
+                      [internalState, setInternalState]
+                  )
+                : null,
         [currentState, internalState, paginatorClass, setCurrentState]
     );
 }

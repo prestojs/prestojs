@@ -27,7 +27,10 @@ export default function Form({
     formProps,
     ...rest
 }: FormProps): React.ReactElement {
-    const { formComponent: FormComponent } = useUi();
+    let { formComponent: FormComponent } = useUi();
+    if (!FormComponent) {
+        FormComponent = 'form';
+    }
     if (initialValues instanceof ViewModel) {
         initialValues = initialValues.serializeToForm();
     }

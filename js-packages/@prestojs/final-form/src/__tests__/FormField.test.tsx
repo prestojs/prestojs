@@ -28,9 +28,9 @@ test('FormField should provide default widget when none specified', () => {
                 <Form onSubmit={jest.fn()}>
                     {({ handleSubmit }): React.ReactElement => (
                         <form onSubmit={handleSubmit}>
-                            <label>
+                            <label htmlFor="age">
                                 Age
-                                <Form.Field field={User.fields.age} {...props} />
+                                <Form.Field field={User.fields.age} {...props} id="age" />
                             </label>
                         </form>
                     )}
@@ -47,6 +47,6 @@ test('FormField should provide default widget when none specified', () => {
     expect(getByLabelText('Age').tagName).toBe('TEXTAREA');
     rerender(<TestWrapper render={(): React.ReactElement => <select />} />);
     expect(getByLabelText('Age').tagName).toBe('SELECT');
-    rerender(<TestWrapper>{(): React.ReactElement => <div />}</TestWrapper>);
+    rerender(<TestWrapper>{(): React.ReactElement => <div id="age" />}</TestWrapper>);
     expect(getByLabelText('Age').tagName).toBe('DIV');
 });
