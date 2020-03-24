@@ -1,9 +1,9 @@
+import { useViewModelCache } from '@prestojs/viewmodel';
 import { Button } from 'antd';
 import React from 'react';
 import { Form } from '@prestojs/final-form';
 
 import User from '../models/User';
-import useConnected from '../useConnected';
 import useEndpoint from '../useEndpoint';
 
 export function FieldErrors({ name }) {
@@ -37,7 +37,8 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
             return err.content;
         }
     }
-    const record = useConnected(data);
+    const fieldNames = ['first_name', 'last_name', 'email', 'region'];
+    const record = useViewModelCache(User, cache => data && cache.get(data.result, fieldNames));
     if (error) {
         return error.message;
     }

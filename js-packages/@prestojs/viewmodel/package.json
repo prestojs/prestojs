@@ -20,7 +20,15 @@
     "dev": "yarn build:watch",
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
+  "peerDependencies": {
+    "react": "^16.12.0"
+  },
   "devDependencies": {
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/react-hooks": "^3.2.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-test-renderer": "^16.12.0",
     "typescript": "^3.8.2"
   },
   "dependencies": {

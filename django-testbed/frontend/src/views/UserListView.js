@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'antd';
 import qs from 'qs';
-
 import { FieldFormatter } from '@prestojs/ui';
+import { useViewModelCache } from '@prestojs/viewmodel';
 
 import User from '../models/User';
-import useConnected from '../useConnected';
 import useEndpoint from '../useEndpoint';
 import UserCreateUpdateView from './UserCreateUpdateView';
 import UserFilterForm from './UserFilterForm';
@@ -29,8 +28,7 @@ export default function UserListView() {
     if (error) {
         throw error;
     }
-
-    const records = useConnected(data && data.result);
+    const records = useViewModelCache(User, cache => data && cache.getList(data.result));
     if (!records) {
         return null;
     }
