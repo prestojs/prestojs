@@ -14,15 +14,19 @@ export default function UserListView() {
     const { search, pathname, origin } = window.location;
     const { paginationType } = qs.parse(search, { ignoreQueryPrefix: true });
     const [filter, setFilter] = useNaviUrlQueryState();
+    const paginationStatePair = useNaviUrlQueryState({}, { prefix: 'p_' });
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
-    const { data, error, paginator} = useEndpoint(
+    const { data, error, paginator } = useEndpoint(
         User.endpoints.list,
         {
             query: {
-                ...filter,
+                filter,
                 paginationType,
             },
+        },
+        {
+            paginationStatePair,
         }
         // { refreshInterval: 10000 }
     );
@@ -36,7 +40,7 @@ export default function UserListView() {
     return (
         <>
             <div>
-                Pagination Type:
+                Pagination Type ({paginationType}):
                 {['limitOffset', 'pageNumber', 'cursor'].map(type => (
                     <Button
                         type="link"

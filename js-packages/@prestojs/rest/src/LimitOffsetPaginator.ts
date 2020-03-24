@@ -2,8 +2,8 @@ import { EndpointExecuteOptions } from './Endpoint';
 import Paginator from './Paginator';
 
 export type LimitOffsetPaginationState = {
-    limit?: number;
-    offset?: number;
+    limit?: number | string;
+    offset?: number | string;
 };
 
 export type InternalLimitOffsetPaginationState = {
@@ -19,11 +19,19 @@ export default class LimitOffsetPaginator extends Paginator<
     }
 
     get limit(): number | null {
-        return this.currentState.limit ?? null;
+        const limit = this.currentState.limit ?? null;
+        if (typeof limit === 'string') {
+            return Number(limit);
+        }
+        return limit;
     }
 
     get offset(): number {
-        return this.currentState.offset || 0;
+        const offset = this.currentState.offset || 0;
+        if (typeof offset === 'string') {
+            return Number(offset);
+        }
+        return offset;
     }
 
     /**

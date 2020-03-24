@@ -2,8 +2,8 @@ import { EndpointExecuteOptions } from './Endpoint';
 import Paginator from './Paginator';
 
 export type PageNumberPaginationState = {
-    page?: number;
-    pageSize?: number;
+    page?: string | number;
+    pageSize?: string | number;
 };
 export type InternalPageNumberPaginationState = {
     total: number | null;
@@ -28,11 +28,19 @@ export default class PageNumberPaginator extends Paginator<
     }
 
     get page(): number | null {
-        return this.currentState.page ?? null;
+        const page = this.currentState.page ?? null;
+        if (typeof page === 'string') {
+            return Number(page);
+        }
+        return page;
     }
 
     get pageSize(): number | null {
-        return this.currentState.pageSize ?? null;
+        const pageSize = this.currentState.pageSize ?? null;
+        if (typeof pageSize === 'string') {
+            return Number(pageSize);
+        }
+        return pageSize;
     }
 
     /**
