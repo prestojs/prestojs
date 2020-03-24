@@ -69,16 +69,8 @@ export default class PageNumberPaginator extends Paginator<
             throw new Error(`Invalid pageSize ${pageSize} - should be >= 1`);
         }
         // When page size changes we need to alter the page
-        if (
-            pageSize != null &&
-            this.currentState.pageSize &&
-            this.currentState.pageSize !== pageSize &&
-            this.currentState.page
-        ) {
-            const page = Math.max(
-                1,
-                Math.ceil(((this.currentState.page - 1) * this.currentState.pageSize) / pageSize)
-            );
+        if (pageSize != null && this.pageSize && this.pageSize !== pageSize && this.page) {
+            const page = Math.max(1, Math.ceil(((this.page - 1) * this.pageSize) / pageSize));
             return { ...this.currentState, pageSize, page };
         }
         const nextState = { ...this.currentState, pageSize };

@@ -44,8 +44,8 @@ export default class LimitOffsetPaginator extends Paginator<
             throw new Error(`Invalid limit ${limit} - should be >= 1`);
         }
         // When page size changes we need to adjust the offset
-        if (limit != null && this.currentState.limit !== limit && this.currentState.offset) {
-            const offset = Math.floor(this.currentState.offset / limit) * limit;
+        if (limit != null && this.limit !== limit && this.offset) {
+            const offset = Math.floor(this.offset / limit) * limit;
             return { ...this.currentState, limit, offset };
         }
         const nextState = { ...this.currentState, limit };
