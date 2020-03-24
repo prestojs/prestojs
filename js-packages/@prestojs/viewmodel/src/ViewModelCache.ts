@@ -19,20 +19,24 @@ class RecordPointer<T extends ViewModel> {
      * RecordPointer as that would be lower than doing it lazily - especially if you are updating
      * lots of records)
      */
-    currentValue?: null | T;
+    currentCachedRecord?: null | T;
     record: T;
-    constructor(currentValue: null | undefined | T | RecordPointer<T>, record: T) {
-        this.currentValue =
-            currentValue instanceof RecordPointer ? currentValue.currentValue : currentValue;
+    constructor(currentCachedValue: null | undefined | T | RecordPointer<T>, record: T) {
+        this.currentCachedRecord =
+            currentCachedValue instanceof RecordPointer
+                ? currentCachedValue.currentCachedRecord
+                : currentCachedValue;
         this.record = record;
     }
 
     clone(fieldNames: string[]): T {
+        // First clone existing record as list of field names may be a subset. When we compare
+        // values below we need to only compare the specified fields.
         const cloned = this.record.clone(fieldNames);
         // Check if the value has actually changed from what it used to be. If not we can return
         // the old value so that equality checks still hold.
-        if (this.currentValue && cloned.isEqual(this.currentValue)) {
-            return this.currentValue;
+        if (this.currentCachedRecord && cloned.isEqual(this.currentCachedRecord)) {
+            return this.currentCachedRecord;
         }
         return cloned;
     }
