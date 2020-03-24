@@ -1831,8 +1831,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@prestojs/viewmodel@workspace:js-packages/@prestojs/viewmodel"
   dependencies:
+    "@testing-library/react": ^9.4.0
+    "@testing-library/react-hooks": ^3.2.1
     lodash: ^4.17.15
+    react: ^16.12.0
+    react-dom: ^16.12.0
+    react-test-renderer: ^16.12.0
     typescript: ^3.8.2
+  peerDependencies:
+    react: ^16.12.0
   languageName: unknown
   linkType: soft
 
