@@ -40,6 +40,16 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.total;
     }
 
+    get totalPages(): number | null {
+        if (!this.paginator) {
+            return null;
+        }
+        if (!(this.paginator instanceof PageNumberPaginator)) {
+            return null;
+        }
+        return this.paginator.totalPages;
+    }
+
     get limit(): number | null {
         if (!this.paginator) {
             return null;
@@ -110,7 +120,21 @@ export default class InferredPaginator implements PaginatorInterface {
     setCurrentState: (nextValue: PaginatorState) => void;
     setInternalState: (set: (internalState: Record<string, any>) => Record<any, string>) => void;
 
-    constructor([currentState, setCurrentState], [internalState, setInternalState]) {
+    constructor(currentStatePair, internalStatePair) {
+        if ((currentStatePair || internalStatePair) && !(currentStatePair && internalStatePair)) {
+            throw new Error(
+                'If one of `currentStatePair` and `internalStatePair` are specified both must be'
+            );
+        }
+        if (currentStatePair && internalStatePair) {
+            this.replaceStateControllers(currentStatePair, internalStatePair);
+        }
+    }
+
+    replaceStateControllers(
+        [currentState, setCurrentState],
+        [internalState, setInternalState]
+    ): void {
         this.currentState = currentState || {};
         this.setCurrentState = setCurrentState;
         this.internalState = internalState || {};
@@ -124,6 +148,12 @@ export default class InferredPaginator implements PaginatorInterface {
                 paginatorClass,
             });
         };
+        if (this.paginator) {
+            this.paginator.replaceStateControllers(
+                [this.currentState, this.setCurrentState],
+                [this.internalState, this.setInternalState]
+            );
+        }
     }
 
     pageState(page: number): PageNumberPaginationState | null {
