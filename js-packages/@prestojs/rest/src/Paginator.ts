@@ -17,13 +17,28 @@ export default class Paginator<State, InternalState> implements PaginatorInterfa
     setCurrentState: (set: State) => void;
     setInternalState: (set: InternalState) => void;
 
+    constructor(currentStatePair = null, internalStatePair = null) {
+        if ((currentStatePair || internalStatePair) && !(currentStatePair && internalStatePair)) {
+            throw new Error(
+                'If one of `currentStatePair` and `internalStatePair` are specified both must be'
+            );
+        }
+        if (currentStatePair && internalStatePair) {
+            this.replaceStateControllers(currentStatePair, internalStatePair);
+        }
+    }
+
     /**
-     * Paginator received 2 tuples of a state and state setter pair. This is expected to
+     * Paginator receives 2 tuples of a state and state setter pair. This is expected to
      * match the same interface as `useState` in React. The following is a valid simple usage:
      *
      * ```js
-     * new Paginator(useState(), useState());
+     * const paginator = new Paginator(useState(), useState());
      * ```
+     *
+     * Note that we can also pass the state controllers in via `replaceStateControllers` rather
+     * than in the constructor. This is so we can memoize the `Paginator` instance which is desirable
+     * when using the paginator as a dependency to React hooks.
      *
      * As state is passed in and managed external to the class be aware that any data stored
      * on the class instance will be lost unless written with `setCurrentState` or `setInternalState`.
@@ -35,7 +50,10 @@ export default class Paginator<State, InternalState> implements PaginatorInterfa
      * @param internalState
      * @param setInternalState
      */
-    constructor([currentState, setCurrentState], [internalState, setInternalState]) {
+    replaceStateControllers(
+        [currentState, setCurrentState],
+        [internalState, setInternalState]
+    ): void {
         this.currentState = currentState || {};
         this.setCurrentState = setCurrentState;
         this.internalState = internalState || {};

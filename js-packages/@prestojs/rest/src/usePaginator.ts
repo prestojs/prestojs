@@ -36,16 +36,15 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
                 ? paginatorClassOrEndpoint.getPaginatorClass()
                 : paginatorClassOrEndpoint;
     }
-    // It's expected that the paginator will be recreated regularly (ie. after every
-    // state change) but memo it so that outside of that it is cached.
-    return useMemo(
-        () =>
-            paginatorClass
-                ? new paginatorClass(
-                      [currentState, setCurrentState],
-                      [internalState, setInternalState]
-                  )
-                : null,
-        [currentState, internalState, paginatorClass, setCurrentState]
+
+    // Only recreate the paginator class instance when necessary (eg. if the type changes)
+    const paginatorInstance = useMemo(() => (paginatorClass ? new paginatorClass() : null), [
+        paginatorClass,
+    ]);
+    paginatorInstance.replaceStateControllers(
+        [currentState, setCurrentState],
+        [internalState, setInternalState]
     );
+
+    return paginatorInstance;
 }
