@@ -298,11 +298,15 @@ export default class ViewModel extends FieldBinder {
             );
         }
         if (missing.length > 0) {
-            errors.push(`Missing value(s) for primary key(s) '${missing.join("', '")}'`);
+            errors.push(
+                `Missing value(s) for primary key(s) '${missing.join(
+                    "', '"
+                )}'. If this was constructed from data returned from an endpoint ensure it is setup to return these field(s).`
+            );
         }
 
         if (errors.length) {
-            throw new Error(errors.join(', '));
+            throw new Error(`(${this._model.name}): ${errors.join(', ')}`);
         }
 
         // TODO: Should partial fields be identified by absence of key?

@@ -252,7 +252,7 @@ test('should validate primary key is provided', () => {
         };
     }
 
-    expect(() => new A({})).toThrowError("Missing value(s) for primary key(s) 'id'");
+    expect(() => new A({})).toThrowError(/Missing value\(s\) for primary key\(s\) 'id'/);
     expect(() => new A({ id: null })).toThrowError(
         "Primary key(s) 'id' was provided but was null or undefined"
     );
@@ -267,17 +267,17 @@ test('should validate primary keys are provided', () => {
         };
     }
 
-    expect(() => new A({})).toThrowError("Missing value(s) for primary key(s) 'id1', 'id2'");
-    expect(() => new A({ id1: 1 })).toThrowError("Missing value(s) for primary key(s) 'id2'");
-    expect(() => new A({ id2: 1 })).toThrowError("Missing value(s) for primary key(s) 'id1'");
+    expect(() => new A({})).toThrowError(/Missing value\(s\) for primary key\(s\) 'id1', 'id2'/);
+    expect(() => new A({ id1: 1 })).toThrowError(/Missing value\(s\) for primary key\(s\) 'id2'/);
+    expect(() => new A({ id2: 1 })).toThrowError(/Missing value\(s\) for primary key\(s\) 'id1'/);
     expect(() => new A({ id1: null })).toThrowError(
-        "Primary key(s) 'id1' was provided but was null or undefined, Missing value(s) for primary key(s) 'id2'"
+        /Primary key\(s\) 'id1' was provided but was null or undefined, Missing value\(s\) for primary key\(s\) 'id2'/
     );
     expect(() => new A({ id2: null })).toThrowError(
-        "Primary key(s) 'id2' was provided but was null or undefined, Missing value(s) for primary key(s) 'id1'"
+        /Primary key\(s\) 'id2' was provided but was null or undefined, Missing value\(s\) for primary key\(s\) 'id1'/
     );
     expect(() => new A({ id1: null, id2: null })).toThrowError(
-        "Primary key(s) 'id1', 'id2' was provided but was null or undefined"
+        /Primary key\(s\) 'id1', 'id2' was provided but was null or undefined/
     );
 });
 
