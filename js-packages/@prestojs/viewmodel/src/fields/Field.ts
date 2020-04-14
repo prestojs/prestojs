@@ -28,7 +28,7 @@ export interface Props<T> {
     /**
      * Choices for this field. Should be a mapping of value to the label for the choice.
      */
-    choices?: Map<T, string>;
+    choices?: Map<T, string> | [T, string][];
     /**
      * True if field should be considered read only (eg. excluded from forms)
      */
