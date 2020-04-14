@@ -10,7 +10,7 @@ export interface Props<T> {
     // TODO: Best way to handle remote choices? Should this be part of this
     // interface, eg. make it async?
     // In djrad we had: choiceRefinementUrl
-    choices?: Map<T, string>;
+    choices?: Map<T, string> | [T, string][];
     readOnly?: boolean;
     writeOnly?: boolean;
 }
