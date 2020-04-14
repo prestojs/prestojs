@@ -13,6 +13,7 @@ type CommonProps = {
 type FormItemPropsNoField = {
     field: undefined;
     fieldProps: undefined;
+    widgetProps: undefined;
     name: string;
     children: React.ReactNode;
 } & CommonProps;
@@ -21,6 +22,7 @@ type FormItemPropsWithField<T> = {
     name: undefined;
     field: Field<T>;
     fieldProps: FieldProps<any, any>;
+    widgetProps?: Record<any, any>;
     children?: React.ReactNode;
 } & CommonProps;
 
@@ -73,7 +75,7 @@ export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement
             `formItemComponent must be specified in UiProvider in order to use Form.Item`
         );
     }
-    const { fieldProps, field, ...rest } = props;
+    const { fieldProps, widgetProps, field, ...rest } = props;
     let { required, children } = props;
     const extraProps: { help?: React.ReactNode; label?: React.ReactNode } = {};
     if (field) {
@@ -84,7 +86,7 @@ export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement
             required = field.required;
         }
         if (!children) {
-            children = <FormField {...fieldProps} field={field} />;
+            children = <FormField {...fieldProps} widgetProps={widgetProps} field={field} />;
         }
     } else if (!children) {
         throw new Error("When 'field' is not specified you must provide children to render");
