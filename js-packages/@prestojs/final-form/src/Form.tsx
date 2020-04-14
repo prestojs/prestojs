@@ -6,7 +6,7 @@ import FormField from './FormField';
 import FormItem from './FormItem';
 
 type FormProps<FormValues = object> = FinalFormProps<FormValues> & {
-    initialValues?: FormValues | ViewModel;
+    initialValues?: FormValues | ViewModel<any>;
     formProps?: Record<string, any>;
 };
 

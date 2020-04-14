@@ -1,9 +1,9 @@
 import isEqual from 'lodash/isEqual';
 import FieldBinder, { FieldsMapping } from './FieldBinder';
+import Field from './fields/Field';
 import NumberField from './fields/NumberField';
 import { freezeObject, isDev } from './util';
 import ViewModelCache from './ViewModelCache';
-import Field from './fields/Field';
 
 export type SinglePrimaryKey = string | number;
 export type CompoundPrimaryKey = { [fieldName: string]: SinglePrimaryKey };
@@ -37,7 +37,9 @@ export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
  *
  * @extract-docs
  */
-export default class ViewModel extends FieldBinder {
+export default class ViewModel<
+    FieldDataMap extends { [fieldName: string]: any }
+> extends FieldBinder {
     static label: string;
     static labelPlural: string;
 
@@ -204,8 +206,8 @@ export default class ViewModel extends FieldBinder {
         return super.bindFields(fields, bindTo);
     }
 
-    private static __cache: Map<typeof ViewModel, ViewModelCache<ViewModel>> = new Map();
-    public static get cache(): ViewModelCache<ViewModel> {
+    private static __cache: Map<typeof ViewModel, ViewModelCache<ViewModel<any>>> = new Map();
+    public static get cache(): ViewModelCache<ViewModel<any>> {
         // This is a getter so we can instantiate cache on each ViewModel independently without
         // having to have the descendant create the cache
         let cache = this.__cache.get(this);
@@ -216,7 +218,7 @@ export default class ViewModel extends FieldBinder {
         return cache;
     }
 
-    public static set cache(value: ViewModelCache<ViewModel>) {
+    public static set cache(value: ViewModelCache<ViewModel<any>>) {
         if (!(value instanceof ViewModelCache)) {
             throw new Error(`cache class must extend ViewModelCache. See ${this.name}.cache`);
         }
@@ -233,11 +235,6 @@ export default class ViewModel extends FieldBinder {
         }
         return pkFieldNames;
     }
-
-    // TODO: What's a better way to type the actual fields? Can't use [fieldName: string]: Field<any> here because
-    // then all the other properties have to match that type (eg. _model below will have an error as no assignable to
-    // Field<any>
-    [fieldName: string]: any;
 
     public get _model(): typeof ViewModel {
         return Object.getPrototypeOf(this).constructor;
@@ -268,9 +265,9 @@ export default class ViewModel extends FieldBinder {
      *
      * In general use toJS() instead.
      */
-    public _data: { [fieldName: string]: any };
+    public _data: FieldDataMap;
 
-    constructor(data: {}) {
+    constructor(data: { [K in keyof FieldDataMap]?: any }) {
         super();
         // Catch any improperly defined classes at this point. eg. if a class is defined as
         // class A extends ViewModel {
@@ -312,9 +309,8 @@ export default class ViewModel extends FieldBinder {
         // TODO: Should partial fields be identified by absence of key?
         const assignedFields: string[] = [];
         const fields = this._model.fields;
-        const assignedData = {};
-        for (const key of Object.keys(data)) {
-            const value = data[key];
+        const assignedData: Record<string, any> = {};
+        for (const [key, value] of Object.entries(data)) {
             const field = fields[key];
             // TODO: What about supporting things like:
             // group = new ForeignKey(...)
@@ -331,7 +327,7 @@ export default class ViewModel extends FieldBinder {
             }
         }
 
-        this._data = freezeObject(assignedData);
+        this._data = freezeObject(assignedData) as FieldDataMap;
         this._assignedFields = assignedFields;
         this._assignedFields.sort();
 
@@ -383,12 +379,12 @@ export default class ViewModel extends FieldBinder {
     /**
      * Return the data for this record as an object
      */
-    public toJS(): {} {
-        const data = {};
+    public toJS(): { [K in keyof FieldDataMap]: any } {
+        const data: Record<string, any> = {};
         for (const [fieldName, value] of Object.entries(this._data)) {
             data[fieldName] = this._model.fields[fieldName].toJS(value);
         }
-        return data;
+        return data as { [K in keyof FieldDataMap]: any };
     }
 
     /**
@@ -399,14 +395,15 @@ export default class ViewModel extends FieldBinder {
      *   considered different even if the common fields are the same and other fields are
      *   all null
      */
-    public isEqual(record: ViewModel): boolean {
+    public isEqual<T>(record: ViewModel<T>): boolean {
         if (record._model !== this._model) {
             return false;
         }
         if (!isEqual(record._assignedFields, this._assignedFields)) {
             return false;
         }
-        for (const fieldName of this._assignedFields) {
+        for (const f of this._assignedFields) {
+            const fieldName = f as string;
             const field = this._model.fields[fieldName];
             if (!field.isEqual(this[fieldName], record[fieldName])) {
                 return false;
@@ -418,9 +415,9 @@ export default class ViewModel extends FieldBinder {
     /**
      * Clone this record, optionally with only a subset of the fields
      */
-    public clone(fieldNames?: string[]): this {
+    public clone(fieldNames?: (keyof FieldDataMap)[]): this {
         const missingFieldNames = fieldNames
-            ? fieldNames.filter(fieldName => !this._assignedFields.includes(fieldName))
+            ? fieldNames.filter(fieldName => !this._assignedFields.includes(fieldName as string))
             : [];
         if (fieldNames && missingFieldNames.length > 0) {
             throw new Error(
@@ -435,14 +432,18 @@ export default class ViewModel extends FieldBinder {
             fieldNames = this._assignedFields;
         }
 
-        const data = {};
+        const data: { [K in keyof FieldDataMap]?: FieldDataMap[K] } = {};
         for (const fieldName of fieldNames) {
             // TODO: Unclear to me if this needs to call a method on the Field on not. Revisit this.
-            data[fieldName] = this[fieldName];
+            data[fieldName] = this._data[fieldName];
         }
 
         // Always clone primary keys
         const pkFieldNames = this._model.pkFieldNames;
+        // Not sure what the problem is with this...
+        // TS2536: Type 'string' cannot be used to index type '{ [K in keyof FieldSchema]?: FieldSchema[K] | undefined; }'.
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
         pkFieldNames.forEach(name => (data[name] = this[name]));
 
         // I don't know how to type this, error is:
@@ -453,4 +454,9 @@ export default class ViewModel extends FieldBinder {
         // @ts-ignore
         return new this._model(data);
     }
+
+    // TODO: When https://github.com/Microsoft/TypeScript/pull/26797 lands should be able to do
+    //   [fieldName: keyof FieldSchema]: FieldSchema[keyof FieldSchema]
+    [fieldName: string]: FieldDataMap[keyof FieldDataMap] &
+        ViewModel<FieldDataMap>[keyof ViewModel<FieldDataMap>];
 }

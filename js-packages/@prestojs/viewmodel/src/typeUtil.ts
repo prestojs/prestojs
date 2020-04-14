@@ -1,3 +1,4 @@
+import Field from './fields/Field';
 import ViewModel from './ViewModel';
 import ViewModelCache from './ViewModelCache';
 
@@ -29,10 +30,14 @@ export interface Class<T> extends Function {
  * others (incompatibility between ViewModelClass and typeof ViewModel in some cases).
  * Unclear why. Adding properties directly here though works... expand as required
  */
-export interface ViewModelClass<T extends ViewModel> extends Function {
+export interface ViewModelClass<T extends ViewModel<any>> extends Function {
     new (...args: any[]): T;
 
     pkFieldNames: string[];
     pkFieldName: string | string[];
     cache: ViewModelCache<T>;
 }
+
+export type FieldDataMapping<O extends { [_: string]: Field<any> }> = {
+    [K in keyof O]: O[K]['_type'];
+};

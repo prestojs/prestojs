@@ -1,13 +1,14 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { UiProvider } from '@prestojs/ui';
-import { NumberField, ViewModel } from '@prestojs/viewmodel';
+import { NumberField, ViewModel, FieldDataMapping } from '@prestojs/viewmodel';
 import Form from '../Form';
 
-class User extends ViewModel {
-    static _fields = {
-        age: new NumberField({ label: 'Age' }),
-    };
+const userFields = {
+    age: new NumberField({ label: 'Age' }),
+};
+class User extends ViewModel<FieldDataMapping<typeof userFields>> {
+    static _fields = userFields;
 }
 
 function Widget({ input }): React.ReactElement {

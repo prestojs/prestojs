@@ -29,4 +29,4 @@ export { default as URLField } from './fields/URLField';
 export { default as UUIDField } from './fields/UUIDField';
 export { default as useViewModelCache } from './useViewModelCache';
 
-export { Class } from './typeUtil';
+export { Class, FieldDataMapping } from './typeUtil';

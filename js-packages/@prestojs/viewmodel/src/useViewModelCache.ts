@@ -4,7 +4,7 @@ import { ViewModelClass } from './typeUtil';
 import ViewModel from './ViewModel';
 import ViewModelCache from './ViewModelCache';
 
-type Selector<T extends ViewModel, ResultType> = (cache: ViewModelCache<T>) => ResultType;
+type Selector<T extends ViewModel<any>, ResultType> = (cache: ViewModelCache<T>) => ResultType;
 
 /**
  * Select some data out of the cache for use in a component. Whenever the cache data
@@ -28,7 +28,7 @@ type Selector<T extends ViewModel, ResultType> = (cache: ViewModelCache<T>) => R
  *
  * @returns The data as returned by `selector`
  */
-export default function useViewModelCache<T extends ViewModel, ResultType>(
+export default function useViewModelCache<T extends ViewModel<any>, ResultType>(
     viewModel: ViewModelClass<T>,
     selector: Selector<T, ResultType>
 ): ResultType {

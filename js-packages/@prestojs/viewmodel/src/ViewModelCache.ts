@@ -8,7 +8,7 @@ import ViewModel, { PrimaryKey } from './ViewModel';
  * have to check if the _assignedFields is what we expect and then clone - it's easier and faster
  * to just check if it's an instanceof RecordPointer
  */
-class RecordPointer<T extends ViewModel> {
+class RecordPointer<T extends ViewModel<any>> {
     /**
      * This is the value that was replaced by this pointer in the cache. When we actually clone
      * the record we compare against this value - if it's the same we return the original object
@@ -42,7 +42,7 @@ class RecordPointer<T extends ViewModel> {
     }
 }
 
-function isEqual<T extends ViewModel>(
+function isEqual<T extends ViewModel<any>>(
     a: null | T | RecordPointer<T>,
     b: null | T | RecordPointer<T>
 ): boolean {
@@ -132,7 +132,7 @@ function getFieldNameCacheKey(fieldNames: string[], excludeFields: string[]): st
  *    and return it.
  * 4) Otherwise we return null
  **/
-class RecordCache<T extends ViewModel> {
+class RecordCache<T extends ViewModel<any>> {
     viewModel: ViewModelClass<T>;
     pkFieldNames: string[];
     cache: Map<FieldNameCacheKey, T | RecordPointer<T>>;
@@ -434,7 +434,7 @@ class RecordCache<T extends ViewModel> {
  *
  * @extract-docs
  */
-export default class ViewModelCache<T extends ViewModel> {
+export default class ViewModelCache<T extends ViewModel<any>> {
     cache: Map<PrimaryKeyCacheKey, RecordCache<T>>;
     viewModel: ViewModelClass<T>;
 

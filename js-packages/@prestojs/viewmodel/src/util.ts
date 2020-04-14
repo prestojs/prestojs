@@ -7,7 +7,7 @@ export const isDev = (): boolean =>
         ? process.env.NODE_ENV !== 'production'
         : verifyMinified.name === 'verifyMinified';
 
-export function freezeObject(obj: {}): {} {
+export function freezeObject<T extends {}>(obj: T): Readonly<T> {
     if (isDev()) {
         return Object.freeze(obj);
     }

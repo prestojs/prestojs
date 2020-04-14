@@ -26,6 +26,10 @@ class UnboundFieldError<T> extends Error {
  * Base Field
  */
 export default class Field<T> {
+    // This is just for internal usage with typescript
+    // eg. see FieldDataMapping in typeUtil.ts
+    _type: T;
+
     private _parent: typeof FieldBinder;
     public set parent(viewModel: typeof FieldBinder) {
         this._parent = viewModel;
