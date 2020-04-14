@@ -61,8 +61,12 @@ export default class NamedUrlPatterns {
      * Get the UrlPattern for the specified name
      * @param name Name of pattern to retrieve
      */
-    get(name: string): UrlPattern | null {
-        return this.urlPatterns[name];
+    get(name: string): UrlPattern {
+        const pattern = this.urlPatterns[name];
+        if (!pattern) {
+            throw new NamedUrlNotFoundError(name);
+        }
+        return pattern;
     }
 
     /**
@@ -73,9 +77,6 @@ export default class NamedUrlPatterns {
      */
     reverse(name: string, kwargs: {} = {}, options: ResolveOptions = {}): string {
         const url = this.get(name);
-        if (!url) {
-            throw new NamedUrlNotFoundError(name);
-        }
         return url.resolve(kwargs, options);
     }
 }
