@@ -15,8 +15,8 @@ export interface Props<T> {
     writeOnly?: boolean;
 }
 
-class UnboundFieldError<T> extends Error {
-    constructor(field: Field<T>) {
+class UnboundFieldError<T, K> extends Error {
+    constructor(field: Field<T, K>) {
         const msg = `Field ${field} has not been bound to it's parent. Check that the fields of the associated class are defined on the static '_fields' property and not 'fields'.`;
         super(msg);
     }
@@ -25,14 +25,18 @@ class UnboundFieldError<T> extends Error {
 /**
  * Base Field
  */
-export default class Field<T> {
+export default class Field<T, ParsableType extends any = T> {
+    // These are just for internal usage with typescript
+    __fieldValueType: T;
+    __parsableValueType: ParsableType;
+
     private _parent: typeof FieldBinder;
     public set parent(viewModel: typeof FieldBinder) {
         this._parent = viewModel;
     }
     public get parent(): typeof FieldBinder {
         if (!this._parent) {
-            throw new UnboundFieldError<T>(this);
+            throw new UnboundFieldError<T, ParsableType>(this);
         }
         return this._parent;
     }
@@ -43,7 +47,7 @@ export default class Field<T> {
     }
     public get name(): string {
         if (!this._name) {
-            throw new UnboundFieldError<T>(this);
+            throw new UnboundFieldError<T, ParsableType>(this);
         }
         return this._name;
     }
@@ -143,7 +147,7 @@ export default class Field<T> {
      * into a `Date`.
      * @param value
      */
-    public parse(value: any): T | null {
+    public parse(value: ParsableType): T | null {
         return value;
     }
 
