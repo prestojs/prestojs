@@ -1,26 +1,21 @@
 import Field from '../fields/Field';
 import { recordEqualTo } from '../../../../../js-testing/matchers';
-import ViewModel from '../ViewModel';
+import ViewModelFactory, { isViewModelInstance, ViewModelInterface } from '../ViewModelFactory';
 import ViewModelCache from '../ViewModelCache';
 
 function F<T>(name): Field<T> {
-    return new Field({ label: name });
+    return new Field<T>({ label: name });
 }
 
 test('should cache records from record instance', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-        };
-    }
-    class Test2 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+    }) {}
+    class Test2 extends ViewModelFactory({
+        id: F('id'),
+    }) {}
 
     const record1 = new Test1({ id: 5 });
-
     // Should always get independent caches
     expect(Test1.cache).not.toBe(Test2.cache);
 
@@ -34,23 +29,19 @@ test('should cache records from record instance', () => {
 });
 
 test('should cache records from plain object', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-        };
-    }
-    class Test2 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+    }) {}
+    class Test2 extends ViewModelFactory({
+        id: F('id'),
+    }) {}
 
     const record1Data = { id: 5 };
 
     const record1 = Test1.cache.add(record1Data);
 
     expect(record1).toBeInstanceOf(Test1);
-    expect(record1 instanceof ViewModel ? record1.toJS() : false).toEqual(record1Data);
+    expect(isViewModelInstance(record1) ? record1.toJS() : false).toEqual(record1Data);
 
     expect(Test1.cache.get(5, ['id'])).toBe(record1);
 
@@ -59,16 +50,12 @@ test('should cache records from plain object', () => {
 });
 
 test('should throw error if caching different ViewModel', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-        };
-    }
-    class Test2 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+    }) {}
+    class Test2 extends ViewModelFactory({
+        id: F('id'),
+    }) {}
 
     const record1 = new Test1({ id: 5 });
     const record2 = new Test2({ id: 5 });
@@ -80,14 +67,14 @@ test('should throw error if caching different ViewModel', () => {
 });
 
 test('should cache records with compound keys', () => {
-    class Test1 extends ViewModel {
-        static pkFieldName = ['id1', 'id2'];
-        static _fields = {
+    class Test1 extends ViewModelFactory(
+        {
             id1: F('id1'),
             id2: F('id2'),
             name: F('name'),
-        };
-    }
+        },
+        { pkFieldName: ['id1', 'id2'] }
+    ) {}
 
     const record1 = new Test1({ id1: 5, id2: 6, name: 'one' });
 
@@ -119,11 +106,9 @@ test('should cache records with compound keys', () => {
 });
 
 test('should validate pk(s)', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+    }) {}
     const record1 = new Test1({ id: 5 });
 
     Test1.cache.add(record1);
@@ -131,14 +116,16 @@ test('should validate pk(s)', () => {
         "Test1 has a single primary key named 'id' but an object was provided. This should be a number or string."
     );
 
-    class Test2 extends ViewModel {
-        static pkFieldName = ['id1', 'id2'];
-        static _fields = {
+    class Test2 extends ViewModelFactory(
+        {
             id1: F('id1'),
             id2: F('id2'),
             name: F('name'),
-        };
-    }
+        },
+        {
+            pkFieldName: ['id1', 'id2'],
+        }
+    ) {}
 
     const record2 = new Test2({ id1: 5, id2: 6, name: 'one' });
     Test2.cache.add(record2);
@@ -153,21 +140,21 @@ test('should validate pk(s)', () => {
 });
 
 test('should always use primary key in cache regardless of whether specified', () => {
-    class Test1 extends ViewModel {
-        static pkFieldName = ['id1', 'id2'];
-        static _fields = {
+    class Test1 extends ViewModelFactory(
+        {
             id1: F('id1'),
             id2: F('id2'),
             name: F('name'),
-        };
-    }
+        },
+        {
+            pkFieldName: ['id1', 'id2'],
+        }
+    ) {}
 
-    class Test2 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            name: F('name'),
-        };
-    }
+    class Test2 extends ViewModelFactory({
+        id: F('id'),
+        name: F('name'),
+    }) {}
 
     const record1 = new Test1({ id1: 5, id2: 6, name: 'one' });
 
@@ -205,13 +192,13 @@ test('should support custom cache', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        class TestBad extends ViewModel {
+        class TestBad extends ViewModelFactory({}) {
             static cache = new MyInvalidCache();
         }
     }).toThrowError('cache class must extend ViewModelCache');
 
-    class MyCache<T extends ViewModel> extends ViewModelCache<T> {}
-    class Test1 extends ViewModel {
+    class MyCache<T extends ViewModelInterface<any, any>> extends ViewModelCache<T> {}
+    class Test1 extends ViewModelFactory({}) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         static cache = new MyCache<Test1>(Test1);
@@ -221,14 +208,12 @@ test('should support custom cache', () => {
 });
 
 test('updating a record should result in cache for subset of fields being updated', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
     Test1.cache.add(new Test1({ id: 5, firstName: 'B' }));
     Test1.cache.add(new Test1({ id: 5, email: 'E' }));
     Test1.cache.add(new Test1({ id: 5, lastName: 'J' }));
@@ -288,14 +273,12 @@ test('updating a record should result in cache for subset of fields being update
     // This handles cases where you may try and access a cache for subset of fields that hasn't explicitly
     // been cached yet but is available as a superset of those fields. In those cases we expect the cache to
     // be populated lazily
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
 
     const record1 = new Test1({ id: 5, firstName: 'Bob', lastName: 'Jack', email: 'a@b.com' });
     Test1.cache.add(record1);
@@ -328,14 +311,12 @@ test('updating a record should result in cache for subset of fields being update
 });
 
 test('should use most recently set superset of fields', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
 
@@ -353,14 +334,12 @@ test('should use most recently set superset of fields', () => {
 });
 
 test('should support removing records from cache', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.delete(2);
@@ -371,14 +350,12 @@ test('should support removing records from cache', () => {
 });
 
 test('should support removing records from cache for only specified field names', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.delete(2, ['id', 'lastName', 'email']);
@@ -391,14 +368,12 @@ test('should support removing records from cache for only specified field names'
 });
 
 test('should support retrieving multiple records', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 3, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
@@ -425,14 +400,12 @@ test('should support retrieving multiple records', () => {
 });
 
 test('should notify listeners on add, change, delete', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
     const cb1 = jest.fn();
     Test1.cache.addListener(2, ['id', 'firstName'], cb1);
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
@@ -497,14 +470,12 @@ test('should notify listeners on add, change, delete', () => {
 });
 
 test('should not notify if identical record added', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
 
     const cb1 = jest.fn();
     Test1.cache.addListener(2, ['id', 'firstName', 'email'], cb1);
@@ -521,14 +492,12 @@ test('should not notify if identical record added', () => {
 });
 
 test('should support listening to multiple pks', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
     const cb1 = jest.fn();
     const unsubscribe = Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
     const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
@@ -555,14 +524,12 @@ test('should support listening to multiple pks', () => {
 });
 
 test('should support listening to multiple pks, batch notifications', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
 
     const cb1 = jest.fn();
     const cb2 = jest.fn();
@@ -581,14 +548,12 @@ test('should support listening to multiple pks, batch notifications', () => {
 });
 
 test('should support listening to multiple pks without specifying primary keys in field names', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
 
     const cb1 = jest.fn();
     Test1.cache.addListenerList([2, 3, 4], ['firstName', 'email'], cb1);
@@ -601,14 +566,12 @@ test('should support listening to multiple pks without specifying primary keys i
 });
 
 test('should support adding list of plain objects', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
 
     const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
     const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
@@ -623,14 +586,12 @@ test('should support adding list of plain objects', () => {
 });
 
 test('should support adding list of via add', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
 
     const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
     const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
@@ -651,14 +612,12 @@ test.each`
     ${true}
     ${false}
 `('Should support getting all records, listeners = $withListeners ', ({ withListeners }) => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
 
     const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
     const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
@@ -713,14 +672,12 @@ test.each`
 });
 
 test('should support listening all changes on a ViewModel', () => {
-    class Test1 extends ViewModel {
-        static _fields = {
-            id: F('id'),
-            firstName: F('firstName'),
-            lastName: F('lastName'),
-            email: F('email'),
-        };
-    }
+    class Test1 extends ViewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
 
     const cb1 = jest.fn();
     const cb2 = jest.fn();
