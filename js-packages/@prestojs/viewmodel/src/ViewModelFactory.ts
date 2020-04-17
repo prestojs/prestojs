@@ -35,7 +35,7 @@ export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
  *     // label is optional; will be generated as 'Last name'
  *     lastName: new CharField(),
  * };
- * // Options are all optional
+ * // Options are all optional and can be omitted entirely
  * const options = {
  *     // If not specified will create a default field called 'id'
  *     pkFieldName: 'userId',
@@ -145,10 +145,12 @@ interface ViewModelConstructor<
      * field that exists on the base class set it's value to null.
      *
      * @param newFields Map of field name to a `Field` instance (to add the field) or `null` (to remove the field)
+     * @param newOptions Provide optional overrides for the options that the original class was created with
      * @return A new ViewModel class with fields modified according to `newFields`.
      */
     augment<P extends FieldsMappingOrNull>(
-        newFields: P
+        newFields: P,
+        newOptions?: ViewModelOptions<FieldMappingType & P>
     ): ViewModelConstructor<FieldMappingType & P, PkFieldType, PkType>;
 }
 
@@ -168,7 +170,6 @@ type GetImplicitPkField<O extends FieldsMapping> =
 
 interface ViewModelOptions<O extends FieldsMapping> {
     baseClass?: ViewModelConstructor<FieldsMapping>;
-    fields: O;
     pkFieldName?: null | undefined | string | string[];
     getImplicitPkField?: null | undefined | GetImplicitPkField<O>;
 }
@@ -241,24 +242,29 @@ function defaultGetImplicitPkField<O extends FieldsMapping>(
 // Overloads here are so we can more accurately type the primary key and fields (specifically for default case we can
 // add the implicit 'id' field that will be created)
 export default function ViewModelFactory<O extends FieldsMapping>(
+    fields: O,
     options: ViewModelOptionsPkFieldNameSingle<O>
 ): ViewModelConstructor<O, string, SinglePrimaryKey>;
 export default function ViewModelFactory<O extends FieldsMapping>(
+    fields: O,
     options: ViewModelOptionsPkFieldNameCompound<O>
 ): ViewModelConstructor<O, string[], CompoundPrimaryKey>;
 export default function ViewModelFactory<O extends FieldsMapping>(
+    fields: O,
     options: ViewModelOptionsGetImplicitPkFieldSingle<O>
 ): ViewModelConstructor<O, string, SinglePrimaryKey>;
 export default function ViewModelFactory<O extends FieldsMapping>(
+    fields: O,
     options: ViewModelOptionsGetImplicitPkFieldCompound<O>
 ): ViewModelConstructor<O, string[], CompoundPrimaryKey>;
 export default function ViewModelFactory<O extends FieldsMapping>(
-    options: ViewModelOptions<O>
+    fields: O,
+    options?: ViewModelOptions<O>
 ): ViewModelConstructor<{ id: NumberField } & O, 'id', string | number>;
 export default function ViewModelFactory<O extends FieldsMapping>(
-    options: ViewModelOptions<O>
+    fields: O,
+    options: ViewModelOptions<O> = {}
 ): ViewModelConstructor<any, any> {
-    const { fields } = options;
     if (options.pkFieldName && options.getImplicitPkField) {
         throw new Error("Only one of 'pkFieldName' and 'getImplicitPkField' should be provided");
     }
@@ -568,9 +574,12 @@ export default function ViewModelFactory<O extends FieldsMapping>(
     // I can't work out proper explicit type, wasn't what I expected (ViewModelConstructor<O & P>) but it
     // infers it fine.
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    function augment<P extends FieldsMappingOrNull>(newFields: P) {
+    function augment<P extends FieldsMappingOrNull>(
+        newFields: P,
+        newOptions: ViewModelOptions<O & P> = {}
+    ) {
         const f: FieldsMapping = {
-            ...options.fields,
+            ...fields,
         };
         for (const [fieldName, field] of Object.entries(newFields)) {
             if (field) {
@@ -579,9 +588,9 @@ export default function ViewModelFactory<O extends FieldsMapping>(
                 delete f[fieldName];
             }
         }
-        return ViewModelFactory({
-            ...options,
-            fields: f as O & P,
+        return ViewModelFactory(f as O & P, {
+            ...(options as ViewModelOptions<O & P>),
+            ...newOptions,
             baseClass: this,
         });
     }
