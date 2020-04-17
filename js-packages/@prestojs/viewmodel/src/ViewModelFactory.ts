@@ -4,6 +4,7 @@ import isEqual from 'lodash/isEqual';
 import Field from './fields/Field';
 import NumberField from './fields/NumberField';
 import { freezeObject, isDev } from './util';
+import ViewModelCache from './ViewModelCache';
 
 // Fields are defined as an object mapping field name to a field instance
 type FieldsMapping = { [fieldName: string]: Field<any> };
@@ -17,7 +18,7 @@ type FieldDataMapping<O extends FieldsMapping> = {
 // Extract mapping of field name to it's parsable data type. For most fields
 // this is the same as the underlying type but could be something different, eg.
 // parsing a string => number
-type FieldDataMappingRaw<O extends FieldsMapping> = {
+export type FieldDataMappingRaw<O extends FieldsMapping> = {
     [K in keyof O]?: O[K]['__parsableValueType'];
 };
 
@@ -51,12 +52,13 @@ export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
  * }
  * ```
  */
-type ViewModelInterface<
+export type ViewModelInterface<
     FieldMappingType extends FieldsMapping,
     InstanceFieldMappingType extends FieldMappingType,
     PkFieldType extends string | string[] = string | string[],
     PkType extends PrimaryKey = PrimaryKey
 > = FieldDataMapping<FieldMappingType> & {
+    __instanceFieldMappingType: InstanceFieldMappingType;
     /**
      * Get the actual ViewModel class for this instance
      */
@@ -89,7 +91,7 @@ type ViewModelInterface<
     readonly _assignedFields: (keyof InstanceFieldMappingType)[];
 };
 
-interface ViewModelConstructor<
+export interface ViewModelConstructor<
     FieldMappingType extends FieldsMapping,
     PkFieldType extends string | string[] = string | string[],
     PkType extends PrimaryKey = PrimaryKey
@@ -139,6 +141,15 @@ interface ViewModelConstructor<
      * if provided otherwise a default field with name 'id' will be created.
      */
     readonly pkFieldName: PkFieldType;
+
+    /**
+     * Shortcut to get pkFieldName as an array always, even for non-compound keys
+     */
+    readonly pkFieldNames: string[];
+
+    readonly cache: ViewModelCache<
+        ViewModelInterface<FieldMappingType, FieldMappingType, PkFieldType, PkType>
+    >;
 
     /**
      * Create a new class that extends this class with the additional specified fields. To remove a
@@ -237,6 +248,16 @@ function defaultGetImplicitPkField<O extends FieldsMapping>(
     fields: O
 ): ['id', NumberField] {
     return ['id', fields.id || new NumberField()];
+}
+
+const IS_VIEW_MODEL = Symbol.for('@prestojs/IS_VIEW_MODEL');
+
+export function isViewModelInstance(view: any): view is ViewModelInterface<any, any> {
+    return !!(view && view.constructor && view.constructor[IS_VIEW_MODEL]);
+}
+
+export function isViewModelClass(view: any): view is ViewModelConstructor<any> {
+    return !!(view && view[IS_VIEW_MODEL]);
 }
 
 // Overloads here are so we can more accurately type the primary key and fields (specifically for default case we can
@@ -379,6 +400,8 @@ export default function ViewModelFactory<O extends FieldsMapping>(
     if (options.baseClass) {
         _Base.prototype = Object.create(options.baseClass.prototype);
     }
+
+    _Base[IS_VIEW_MODEL] = true;
 
     // Extend prototype to include required static properties/methods
     Object.defineProperties(_Base.prototype, {
@@ -545,6 +568,12 @@ export default function ViewModelFactory<O extends FieldsMapping>(
     );
 
     Object.defineProperties(_Base, {
+        __cache: {
+            value: new Map<
+                ViewModelConstructor<FinalFields>,
+                ViewModelCache<ViewModelInterface<FinalFields, FinalFields>>
+            >(),
+        },
         pkFieldNames: {
             /**
              * Shortcut to get pkFieldName as an array always, even for non-compound keys
@@ -567,6 +596,31 @@ export default function ViewModelFactory<O extends FieldsMapping>(
         fields: {
             get(): FinalFields {
                 return _bindFields(this)[0];
+            },
+        },
+        cache: {
+            get(): ViewModelCache<ViewModelInterface<FinalFields, FinalFields>> {
+                // This is a getter so we can instantiate cache on each ViewModel independently without
+                // having to have the descendant create the cache
+                let cache = this.__cache.get(this);
+                if (!cache) {
+                    cache = new ViewModelCache(this);
+                    this.__cache.set(this, cache);
+                }
+                return cache;
+            },
+            set(value: ViewModelCache<ViewModelInterface<FinalFields, FinalFields>>): void {
+                if (!(value instanceof ViewModelCache)) {
+                    throw new Error(
+                        `cache class must extend ViewModelCache. See ${this.name}.cache`
+                    );
+                }
+                this.__cache.set(this, value);
+            },
+        },
+        toString: {
+            value(): string {
+                return this.name;
             },
         },
     });

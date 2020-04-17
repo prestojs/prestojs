@@ -5,18 +5,16 @@ import { renderHook, act } from '@testing-library/react-hooks';
 import { recordEqualTo } from '../../../../../js-testing/matchers';
 import useViewModelCache from '../useViewModelCache';
 
-import ViewModel from '../ViewModel';
 import Field from '../fields/Field';
 import ViewModelCache from '../ViewModelCache';
+import ViewModelFactory from '../ViewModelFactory';
 
-class Test1 extends ViewModel {
-    static _fields = {
-        id: new Field(),
-        firstName: new Field(),
-        lastName: new Field(),
-        email: new Field(),
-    };
-}
+class Test1 extends ViewModelFactory({
+    id: new Field(),
+    firstName: new Field(),
+    lastName: new Field(),
+    email: new Field(),
+}) {}
 
 beforeEach(() => {
     Test1.cache = new ViewModelCache<Test1>(Test1);

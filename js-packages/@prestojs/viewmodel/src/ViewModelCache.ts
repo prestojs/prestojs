@@ -1,5 +1,5 @@
-import { Class, ViewModelClass } from './typeUtil';
-import ViewModel, { PrimaryKey } from './ViewModel';
+import { PrimaryKey } from './ViewModel';
+import { FieldDataMappingRaw, isViewModelInstance, ViewModelInterface } from './ViewModelFactory';
 
 /**
  * Points to a record that is cached already. The purpose of this is to have a single object
@@ -8,7 +8,7 @@ import ViewModel, { PrimaryKey } from './ViewModel';
  * have to check if the _assignedFields is what we expect and then clone - it's easier and faster
  * to just check if it's an instanceof RecordPointer
  */
-class RecordPointer<T extends ViewModel> {
+class RecordPointer<T extends ViewModelInterface<any, any>> {
     /**
      * This is the value that was replaced by this pointer in the cache. When we actually clone
      * the record we compare against this value - if it's the same we return the original object
@@ -42,7 +42,7 @@ class RecordPointer<T extends ViewModel> {
     }
 }
 
-function isEqual<T extends ViewModel>(
+function isEqual<T extends ViewModelInterface<any, any>>(
     a: null | T | RecordPointer<T>,
     b: null | T | RecordPointer<T>
 ): boolean {
@@ -132,8 +132,8 @@ function getFieldNameCacheKey(fieldNames: string[], excludeFields: string[]): st
  *    and return it.
  * 4) Otherwise we return null
  **/
-class RecordCache<T extends ViewModel> {
-    viewModel: ViewModelClass<T>;
+class RecordCache<T extends ViewModelInterface<any, any>> {
+    viewModel: T['_model'];
     pkFieldNames: string[];
     cache: Map<FieldNameCacheKey, T | RecordPointer<T>>;
     cacheListeners: Map<FieldNameCacheKey, ChangeListener<T>[]>;
@@ -141,7 +141,7 @@ class RecordCache<T extends ViewModel> {
     counter = 0;
     onAnyChange: () => void;
 
-    constructor(viewModel: ViewModelClass<T>, onAnyChange: () => void) {
+    constructor(viewModel: T['_model'], onAnyChange: () => void) {
         this.cache = new Map();
         this.cacheListeners = new Map();
         this.latestRecords = {};
@@ -235,7 +235,7 @@ class RecordCache<T extends ViewModel> {
      * that contains (a,b,c)
      */
     add(record: T): Map<string, T | RecordPointer<T>> | null {
-        const fieldNames = record._assignedFields;
+        const fieldNames = record._assignedFields as string[];
         const fieldsKey = this.getCacheKey(fieldNames);
         this.latestRecords[fieldsKey] = this.counter++;
         let anyChanges = false;
@@ -279,7 +279,7 @@ class RecordCache<T extends ViewModel> {
                     continue;
                 }
                 const underlyingRecord = record instanceof RecordPointer ? record.record : record;
-                if (isSubset(fieldNames, underlyingRecord._assignedFields)) {
+                if (isSubset(fieldNames, underlyingRecord._assignedFields as string[])) {
                     // Create a new record with subset of fields and cache
                     // it so that we maintain object equality if you fetch
                     // this entry from the cache multiple times
@@ -434,14 +434,14 @@ class RecordCache<T extends ViewModel> {
  *
  * @extract-docs
  */
-export default class ViewModelCache<T extends ViewModel> {
+export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
     cache: Map<PrimaryKeyCacheKey, RecordCache<T>>;
-    viewModel: ViewModelClass<T>;
+    viewModel: T['_model'];
 
     /**
      * @param viewModel The `ViewModel` this class is for
      */
-    constructor(viewModel: ViewModelClass<T>) {
+    constructor(viewModel: T['_model']) {
         this.viewModel = viewModel;
         this.cache = new Map();
     }
@@ -474,13 +474,18 @@ export default class ViewModelCache<T extends ViewModel> {
      * in which case each entry in the array will be converted to the view model if required
      * and returned.
      */
-    add(recordOrData: T | Record<string, any> | (T | Record<string, any>)[]): T | T[] {
+    add(
+        recordOrData:
+            | T
+            | FieldDataMappingRaw<T['__instanceFieldMappingType']>
+            | (T | FieldDataMappingRaw<T['__instanceFieldMappingType']>)[]
+    ): T | T[] {
         if (Array.isArray(recordOrData)) {
             return this.addList(recordOrData);
         }
         let record: T;
         if (!this.isInstanceOfModel(recordOrData)) {
-            if (recordOrData instanceof ViewModel) {
+            if (isViewModelInstance(recordOrData)) {
                 throw new Error(
                     `Attempted to cache ViewModel of type ${recordOrData._model} in cache for ${this.viewModel}`
                 );
@@ -511,7 +516,7 @@ export default class ViewModelCache<T extends ViewModel> {
      * notified once of the change to the list rather than for
      * each record in the list.
      */
-    addList(records: (T | Record<string, any>)[]): T[] {
+    addList(records: (T | FieldDataMappingRaw<T['__instanceFieldMappingType']>)[]): T[] {
         this.isAddingList = true;
         try {
             const ret = records.map(record => this.add(record)) as T[];
@@ -545,14 +550,14 @@ export default class ViewModelCache<T extends ViewModel> {
     get(pk: PrimaryKey, fieldNames: string[]): T | null;
     get(pkOrRecord: PrimaryKey | T, fieldNames?: string[]): T | null {
         let pk = pkOrRecord;
-        if (pk instanceof ViewModel) {
+        if (isViewModelInstance(pk)) {
             const { _model } = pk;
             if (!this.isInstanceOfModel(pk)) {
                 throw new Error(
                     `Attempted to get ViewModel of type ${_model} in cache for ${this.viewModel}`
                 );
             }
-            fieldNames = pk._assignedFields;
+            fieldNames = pk._assignedFields as string[];
             pk = pk._pk;
         }
         if (!fieldNames) {

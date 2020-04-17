@@ -2,7 +2,7 @@
 import CharField from '../fields/CharField';
 import Field from '../fields/Field';
 import NumberField from '../fields/NumberField';
-import ViewModelFactory from '../ViewModelFactory';
+import ViewModelFactory, { isViewModelClass, isViewModelInstance } from '../ViewModelFactory';
 
 test('_model property returns the class', () => {
     class A extends ViewModelFactory({
@@ -557,4 +557,30 @@ test('augment should support changing options', () => {
 
     expect(Object.keys(A.fields)).toEqual(['id', 'name']);
     expect(Object.keys(B.fields)).toEqual(['name', 'email', 'uuid']);
+});
+
+test('isViewModelInstance should identify ViewModel instances', () => {
+    class A extends ViewModelFactory({}) {}
+    expect(isViewModelInstance(A)).toBe(false);
+    expect(isViewModelInstance(new A({ id: 1 }))).toBe(true);
+    expect(isViewModelInstance(null)).toBe(false);
+
+    class B extends A.augment({}) {}
+    expect(isViewModelInstance(new B({ id: 1 }))).toBe(true);
+
+    class C extends B {}
+    expect(isViewModelInstance(new C({ id: 1 }))).toBe(true);
+});
+
+test('isViewModelClass should identify ViewModel classes', () => {
+    class A extends ViewModelFactory({}) {}
+    expect(isViewModelClass(A)).toBe(true);
+    expect(isViewModelClass(new A({ id: 1 }))).toBe(false);
+    expect(isViewModelClass(null)).toBe(false);
+
+    class B extends A.augment({}) {}
+    expect(isViewModelClass(B)).toBe(true);
+
+    class C extends B {}
+    expect(isViewModelClass(C)).toBe(true);
 });
