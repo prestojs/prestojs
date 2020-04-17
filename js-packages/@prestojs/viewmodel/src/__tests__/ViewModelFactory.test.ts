@@ -6,9 +6,7 @@ import ViewModelFactory from '../ViewModelFactory';
 
 test('_model property returns the class', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field(),
-        },
+        id: new Field(),
     }) {}
 
     class B extends A {}
@@ -22,17 +20,13 @@ test('_model property returns the class', () => {
 
 test('ViewModelFactory should ensure required properties are specified', () => {
     class Test1 extends ViewModelFactory({
-        fields: {
-            id: new Field(),
-        },
+        id: new Field(),
     }) {}
     expect(() => Test1.label).toThrow(/You must define/);
     expect(() => Test1.labelPlural).toThrow(/You must define/);
 
     class Test2 extends ViewModelFactory({
-        fields: {
-            id: new Field(),
-        },
+        id: new Field(),
     }) {
         static label = 'Test';
         static labelPlural = 'Tests';
@@ -43,10 +37,8 @@ test('ViewModelFactory should ensure required properties are specified', () => {
 
 test('ViewModel should be accessible via the field', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field(),
-            name: new Field(),
-        },
+        id: new Field(),
+        name: new Field(),
     }) {}
 
     expect(A.fields.name.parent).toBe(A);
@@ -68,15 +60,13 @@ test('ViewModel should be accessible via the field', () => {
 
 test('field name and label should be set automatically', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field(),
-            firstName: new Field(),
-            LastName: new Field(),
-            // eslint-disable-next-line @typescript-eslint/camelcase
-            email_address: new Field(),
-            CONTACT_NUMBER: new Field(),
-            age: new Field({ label: 'User Age' }),
-        },
+        id: new Field(),
+        firstName: new Field(),
+        LastName: new Field(),
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        email_address: new Field(),
+        CONTACT_NUMBER: new Field(),
+        age: new Field({ label: 'User Age' }),
     }) {}
     expect(A.fields.firstName.name).toBe('firstName');
     expect(A.fields.firstName.label).toBe('First Name');
@@ -91,31 +81,35 @@ test('field name and label should be set automatically', () => {
 });
 
 test('should generate pk automatically where possible', () => {
-    class A extends ViewModelFactory({ fields: {} }) {}
+    class A extends ViewModelFactory({}) {}
     expect(A.fields.id).toBeInstanceOf(NumberField);
     expect(A.pkFieldName).toBe('id');
 
-    class B extends ViewModelFactory({
-        fields: {},
-        getImplicitPkField(): [string, Field<any>] {
-            return ['EntityId', new CharField()];
-        },
-    }) {}
+    class B extends ViewModelFactory(
+        {},
+        {
+            getImplicitPkField(): [string, Field<any>] {
+                return ['EntityId', new CharField()];
+            },
+        }
+    ) {}
 
     expect(B.pkFieldName).toBe('EntityId');
     // We can't type dynamic pk field names - will ignore them throughout this method
     // @ts-ignore
     expect(B.fields.EntityId).toBeInstanceOf(CharField);
 
-    class C extends ViewModelFactory({
-        fields: {},
-        getImplicitPkField(): [string[], Field<any>[]] {
-            return [
-                ['model', 'uuid'],
-                [new CharField(), new NumberField()],
-            ];
-        },
-    }) {}
+    class C extends ViewModelFactory(
+        {},
+        {
+            getImplicitPkField(): [string[], Field<any>[]] {
+                return [
+                    ['model', 'uuid'],
+                    [new CharField(), new NumberField()],
+                ];
+            },
+        }
+    ) {}
     expect(C.pkFieldName).toEqual(['model', 'uuid']);
     // @ts-ignore
     expect(C.fields.model).toBeInstanceOf(CharField);
@@ -123,25 +117,25 @@ test('should generate pk automatically where possible', () => {
     expect(C.fields.uuid).toBeInstanceOf(NumberField);
 
     class D extends ViewModelFactory({
-        fields: {
-            id: new CharField(),
-        },
+        id: new CharField(),
     }) {}
     expect(D.fields.id).toBeInstanceOf(CharField);
     expect(D.pkFieldName).toBe('id');
 
-    class DynamicBase extends ViewModelFactory({
-        fields: {},
-        getImplicitPkField(model, fields): [string, Field<any>] {
-            if ('EntityId' in fields) {
-                // @ts-ignore
-                return ['EntityId', fields.EntityId];
-            }
-            // Generate a name base on model, eg. `userId`
-            const name = model.name[0].toLowerCase() + model.name.slice(1);
-            return [`${name}Id`, new NumberField()];
-        },
-    }) {}
+    class DynamicBase extends ViewModelFactory(
+        {},
+        {
+            getImplicitPkField(model, fields): [string, Field<any>] {
+                if ('EntityId' in fields) {
+                    // @ts-ignore
+                    return ['EntityId', fields.EntityId];
+                }
+                // Generate a name base on model, eg. `userId`
+                const name = model.name[0].toLowerCase() + model.name.slice(1);
+                return [`${name}Id`, new NumberField()];
+            },
+        }
+    ) {}
 
     class User extends DynamicBase {}
     expect(User.pkFieldName).toEqual('userId');
@@ -171,13 +165,15 @@ test('should generate pk automatically where possible', () => {
 
 test('should error if pkFieldName and getImplicitPkField provided', () => {
     expect(() => {
-        class A extends ViewModelFactory({
-            fields: {},
-            pkFieldName: ['id'],
-            getImplicitPkField(): [string, Field<any>] {
-                return ['EntityId', new CharField()];
-            },
-        }) {}
+        class A extends ViewModelFactory(
+            {},
+            {
+                pkFieldName: 'id',
+                getImplicitPkField(): [string, Field<any>] {
+                    return ['EntityId', new CharField()];
+                },
+            }
+        ) {}
     }).toThrow(/Only one of 'pkFieldName' and 'getImplicitPkField' should be provided/);
 });
 
@@ -185,26 +181,30 @@ test('ViewModel should validate primary key fields exist when binding fields', (
     // Passing data for fields that don't exist triggers a warning; suppress them for this test
     // eslint-disable-next-line
     const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
-    class A extends ViewModelFactory({ fields: {} }) {}
+    class A extends ViewModelFactory({}) {}
     const record1 = new A({ id: 1 });
 
     expect(record1._pk).toBe(1);
 
-    class B extends ViewModelFactory({
-        fields: {},
-        pkFieldName: ['id1', 'id2'],
-    }) {}
+    class B extends ViewModelFactory(
+        {},
+        {
+            pkFieldName: ['id1', 'id2'],
+        }
+    ) {}
 
     expect(() => B.fields).toThrow(
         /B has 'pkFieldName' set to 'id1, id2' but the field\(s\) 'id1, id2'/
     );
 
-    class C extends ViewModelFactory({
-        pkFieldName: ['id1', 'id2'],
-        fields: {
+    class C extends ViewModelFactory(
+        {
             id1: new Field({ label: 'Id' }),
         },
-    }) {}
+        {
+            pkFieldName: ['id1', 'id2'],
+        }
+    ) {}
 
     expect(() => C.fields).toThrow(
         /C has 'pkFieldName' set to 'id1, id2' but the field\(s\) 'id2'/
@@ -215,21 +215,21 @@ test('ViewModel should validate primary key fields exist when binding fields', (
 
 test('_pk should return primary key', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field({ label: 'Id' }),
-        },
+        id: new Field({ label: 'Id' }),
     }) {}
 
     const record1 = new A({ id: 1 });
     expect(record1._pk).toBe(1);
 
-    class B extends ViewModelFactory({
-        pkFieldName: ['id1', 'id2'],
-        fields: {
+    class B extends ViewModelFactory(
+        {
             id1: new Field({ label: 'Id' }),
             id2: new Field({ label: 'Id' }),
         },
-    }) {}
+        {
+            pkFieldName: ['id1', 'id2'],
+        }
+    ) {}
 
     const record2 = new B({ id1: 1, id2: 2 });
     expect(record2._pk).toEqual({ id1: 1, id2: 2 });
@@ -237,9 +237,7 @@ test('_pk should return primary key', () => {
 
 test('should validate primary key is provided', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field({ label: 'Id' }),
-        },
+        id: new Field({ label: 'Id' }),
     }) {}
 
     expect(() => new A({})).toThrowError("Missing value(s) for primary key(s) 'id'");
@@ -249,13 +247,15 @@ test('should validate primary key is provided', () => {
 });
 
 test('should validate primary keys are provided', () => {
-    class A extends ViewModelFactory({
-        pkFieldName: ['id1', 'id2'],
-        fields: {
+    class A extends ViewModelFactory(
+        {
             id1: new Field({ label: 'Id1' }),
             id2: new Field({ label: 'Id2' }),
         },
-    }) {}
+        {
+            pkFieldName: ['id1', 'id2'],
+        }
+    ) {}
 
     expect(() => new A({})).toThrowError("Missing value(s) for primary key(s) 'id1', 'id2'");
     expect(() => new A({ id1: 1 })).toThrowError("Missing value(s) for primary key(s) 'id2'");
@@ -273,11 +273,9 @@ test('should validate primary keys are provided', () => {
 
 test('_assignedFields should be based on passed data', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field({ label: 'Id' }),
-            name: new Field({ label: 'Name' }),
-            email: new Field({ label: 'Email' }),
-        },
+        id: new Field({ label: 'Id' }),
+        name: new Field({ label: 'Name' }),
+        email: new Field({ label: 'Email' }),
     }) {}
 
     let record = new A({ id: 1 });
@@ -291,11 +289,9 @@ test('_assignedFields should be based on passed data', () => {
 
 test('toJS() should be return assigned data', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field({ label: 'Id' }),
-            name: new Field({ label: 'Name' }),
-            email: new Field({ label: 'Email' }),
-        },
+        id: new Field({ label: 'Id' }),
+        name: new Field({ label: 'Name' }),
+        email: new Field({ label: 'Email' }),
     }) {}
 
     let record = new A({ id: 1 });
@@ -314,11 +310,9 @@ test('toJS() should support custom field behaviour', () => {
         }
     }
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field({ label: 'Id' }),
-            name: new Field({ label: 'Name' }),
-            email: new LowerField({ label: 'Email' }),
-        },
+        id: new Field({ label: 'Id' }),
+        name: new Field({ label: 'Name' }),
+        email: new LowerField({ label: 'Email' }),
     }) {}
 
     const record = new A({ id: 1, name: 'Dave', email: 'A@B.COM' });
@@ -332,11 +326,9 @@ test('ViewModel should use normalize() from field', () => {
         }
     }
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field({ label: 'Id' }),
-            name: new Field({ label: 'Name' }),
-            email: new LowerField({ label: 'Email' }),
-        },
+        id: new Field({ label: 'Id' }),
+        name: new Field({ label: 'Name' }),
+        email: new LowerField({ label: 'Email' }),
     }) {}
 
     const record = new A({ id: 1, name: 'Dave', email: 'A@B.COM' });
@@ -350,12 +342,10 @@ test('Should be able to compare if two records are equal', () => {
         }
     }
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field({ label: 'Id' }),
-            name: new Field({ label: 'Name' }),
-            email: new Field({ label: 'Email' }),
-            createdAt: new TestDateField({ label: 'Created At' }),
-        },
+        id: new Field({ label: 'Id' }),
+        name: new Field({ label: 'Name' }),
+        email: new Field({ label: 'Email' }),
+        createdAt: new TestDateField({ label: 'Created At' }),
     }) {}
 
     expect(new A({ id: 1 }).isEqual(new A({ id: 1 }))).toBe(true);
@@ -373,12 +363,10 @@ test('Should be able to compare if two records are equal', () => {
     ).toBe(false);
 
     class B extends ViewModelFactory({
-        fields: {
-            id: new Field({ label: 'Id' }),
-            name: new Field({ label: 'Name' }),
-            email: new Field({ label: 'Email' }),
-            createdAt: new TestDateField({ label: 'Created At' }),
-        },
+        id: new Field({ label: 'Id' }),
+        name: new Field({ label: 'Name' }),
+        email: new Field({ label: 'Email' }),
+        createdAt: new TestDateField({ label: 'Created At' }),
     }) {}
     const data = {
         id: 1,
@@ -390,11 +378,9 @@ test('Should be able to compare if two records are equal', () => {
 
 test('should clone a ViewModel record', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field({ label: 'Id' }),
-            name: new Field({ label: 'Name' }),
-            email: new Field({ label: 'Email' }),
-        },
+        id: new Field({ label: 'Id' }),
+        name: new Field({ label: 'Name' }),
+        email: new Field({ label: 'Email' }),
     }) {}
 
     const record1 = new A({
@@ -448,11 +434,9 @@ describe('env tests', () => {
     test('should error when accessing unfetched fields', () => {
         process.env.NODE_ENV = 'development';
         class A extends ViewModelFactory({
-            fields: {
-                id: new Field({ label: 'Id' }),
-                name: new Field({ label: 'Name' }),
-                email: new Field({ label: 'Email' }),
-            },
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
         }) {}
         const record1 = new A({
             id: 1,
@@ -481,11 +465,9 @@ describe('env tests', () => {
     test('should error if attempt to set a field', () => {
         process.env.NODE_ENV = 'development';
         class A extends ViewModelFactory({
-            fields: {
-                id: new Field({ label: 'Id' }),
-                name: new Field({ label: 'Name' }),
-                email: new Field({ label: 'Email' }),
-            },
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
         }) {}
         const record1 = new A({
             id: 1,
@@ -526,10 +508,8 @@ describe('env tests', () => {
 
 test('augmenting should extend the source class', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field(),
-            name: new Field(),
-        },
+        id: new Field(),
+        name: new Field(),
     }) {}
 
     class B extends A.augment({ email: new Field() }) {}
@@ -551,10 +531,8 @@ test('augmenting should extend the source class', () => {
 
 test('augment should support removing fields', () => {
     class A extends ViewModelFactory({
-        fields: {
-            id: new Field(),
-            name: new Field(),
-        },
+        id: new Field(),
+        name: new Field(),
     }) {}
 
     class B extends A.augment({ email: new Field(), name: null }) {}
@@ -564,12 +542,19 @@ test('augment should support removing fields', () => {
     expect(Object.keys(A.fields)).toEqual(['id', 'name']);
     expect(Object.keys(B.fields)).toEqual(['id', 'email']);
     expect(Object.keys(C.fields)).toEqual(['id', 'phone']);
+});
 
-    const record1 = new B({ id: 1 });
-    expect(record1).toBeInstanceOf(A);
-    expect(record1).toBeInstanceOf(B);
-    const record2 = new C({ id: 1 });
-    expect(record2).toBeInstanceOf(A);
-    expect(record2).toBeInstanceOf(B);
-    expect(record2).toBeInstanceOf(C);
+test('augment should support changing options', () => {
+    class A extends ViewModelFactory({
+        id: new Field(),
+        name: new Field(),
+    }) {}
+
+    class B extends A.augment(
+        { email: new Field(), id: null, uuid: new Field() },
+        { pkFieldName: 'uuid' }
+    ) {}
+
+    expect(Object.keys(A.fields)).toEqual(['id', 'name']);
+    expect(Object.keys(B.fields)).toEqual(['name', 'email', 'uuid']);
 });
