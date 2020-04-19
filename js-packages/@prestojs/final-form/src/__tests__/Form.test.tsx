@@ -5,14 +5,12 @@ import { NumberField, ViewModel, Field } from '@prestojs/viewmodel';
 
 import Form from '../Form';
 
-class User extends ViewModel {
+class User extends ViewModel({
+    age: new NumberField({ label: 'Age' }),
+    email: new Field({ label: 'Email' }),
+}) {
     static label = 'User';
     static labelPlural = 'Users';
-
-    static _fields = {
-        age: new NumberField({ label: 'Age' }),
-        email: new Field({ label: 'Email' }),
-    };
 }
 
 function Widget({ input }): React.ReactElement {

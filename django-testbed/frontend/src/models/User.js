@@ -24,7 +24,29 @@ function transformAndCacheUser(data) {
     return user;
 }
 
-export default class User extends BaseUser {
+export default class User extends BaseUser.augment({
+    region: new IntegerField({
+        label: 'region',
+        required: true,
+        helpText: 'Region Coding of the user',
+        choices: [
+            [1, 'Oceania'],
+            [2, 'Asia'],
+            [3, 'Africa'],
+            [4, 'America'],
+            [5, 'Europe'],
+            [6, 'Antarctica'],
+            [7, 'Atlantis'],
+        ],
+    }),
+    photo: new ImageField({
+        label: 'Photo',
+        helpText: 'foooo towwww',
+    }),
+    adult: new NullableBooleanField({
+        label: 'Adult',
+    }),
+}) {
     // TODO: Not sure if we want this to be the convention. Maybe best to just
     // export as mapping of endpoints somewhere?
     static endpoints = {
@@ -43,34 +65,10 @@ export default class User extends BaseUser {
             method: 'post',
         }),
     };
-
-    static _fields = {
-        ...BaseUser._fields,
-        region: new IntegerField({
-            label: 'region',
-            required: true,
-            helpText: 'Region Coding of the user',
-            choices: [
-                [1, 'Oceania'],
-                [2, 'Asia'],
-                [3, 'Africa'],
-                [4, 'America'],
-                [5, 'Europe'],
-                [6, 'Antarctica'],
-                [7, 'Atlantis'],
-            ],
-        }),
-        photo: new ImageField({
-            label: 'Photo',
-            helpText: 'foooo towwww',
-        }),
-        adult: new NullableBooleanField({
-            label: 'Adult',
-        }),
-    };
 }
 
 window.User = User;
+window.BaseUser = BaseUser;
 
 export class UserFilterSet extends FilterSet {
     static _model = User;

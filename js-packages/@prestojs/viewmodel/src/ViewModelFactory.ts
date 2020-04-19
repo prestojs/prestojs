@@ -7,11 +7,11 @@ import { freezeObject, isDev } from './util';
 import ViewModelCache from './ViewModelCache';
 
 // Fields are defined as an object mapping field name to a field instance
-type FieldsMapping = { [fieldName: string]: Field<any> };
-type FieldsMappingOrNull = { [fieldName: string]: Field<any> | null };
+export type FieldsMapping = { [fieldName: string]: Field<any> };
+export type FieldsMappingOrNull = { [fieldName: string]: Field<any> | null };
 
 // Extract mapping of field name to it's underlying data type
-type FieldDataMapping<O extends FieldsMapping> = {
+export type FieldDataMapping<O extends FieldsMapping> = {
     readonly [K in keyof O]: O[K]['__fieldValueType'];
 };
 
