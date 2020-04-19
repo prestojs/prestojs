@@ -213,6 +213,8 @@ function defineRequiredGetter(base: {}, name: string, errorMessage: string): voi
         // call the setter but this probably also depends on the build setup.
         set(label): void {
             Object.defineProperty(base, name, {
+                configurable: true,
+                writable: true,
                 value: label,
             });
         },
@@ -398,6 +400,9 @@ export default function ViewModelFactory<O extends FieldsMapping>(
     }
 
     if (options.baseClass) {
+        // TODO: Not entirely sure what's correct here. setPrototypeOf made it such that static properties
+        // from base class were also available. Object.create made instanceof work properly.
+        Object.setPrototypeOf(_Base, options.baseClass);
         _Base.prototype = Object.create(options.baseClass.prototype);
     }
 
@@ -560,12 +565,18 @@ export default function ViewModelFactory<O extends FieldsMapping>(
         return f;
     }
 
-    defineRequiredGetter(_Base, 'label', "You must define a static property 'label' on your class");
-    defineRequiredGetter(
-        _Base,
-        'labelPlural',
-        "You must define a static property 'labelPlural' on your class"
-    );
+    if (!options.baseClass) {
+        defineRequiredGetter(
+            _Base,
+            'label',
+            "You must define a static property 'label' on your class"
+        );
+        defineRequiredGetter(
+            _Base,
+            'labelPlural',
+            "You must define a static property 'labelPlural' on your class"
+        );
+    }
 
     Object.defineProperties(_Base, {
         __cache: {
