@@ -1,4 +1,4 @@
-export { default as ViewModel } from './ViewModel';
+export { default as ViewModel } from './ViewModelFactory';
 export { default as FilterSet } from './FilterSet';
 export { default as Field } from './fields/Field';
 
@@ -28,5 +28,7 @@ export { default as TimeField } from './fields/TimeField';
 export { default as URLField } from './fields/URLField';
 export { default as UUIDField } from './fields/UUIDField';
 export { default as useViewModelCache } from './useViewModelCache';
+
+export { isViewModelInstance, isViewModelClass } from './ViewModelFactory';
 
 export { Class } from './typeUtil';

@@ -1,12 +1,13 @@
 import { useUi } from '@prestojs/ui';
 import React from 'react';
-import { ViewModel } from '@prestojs/viewmodel';
+import { isViewModelInstance } from '@prestojs/viewmodel';
+import { ViewModelInterface } from '@prestojs/viewmodel/ViewModelFactory';
 import { Form as FinalForm, FormProps as FinalFormProps } from 'react-final-form';
 import FormField from './FormField';
 import FormItem from './FormItem';
 
 type FormProps<FormValues = object> = FinalFormProps<FormValues> & {
-    initialValues?: FormValues | ViewModel;
+    initialValues?: FormValues | ViewModelInterface<any, any>;
     formProps?: Record<string, any>;
 };
 
@@ -31,7 +32,7 @@ export default function Form({
     if (!FormComponent) {
         FormComponent = 'form';
     }
-    if (initialValues instanceof ViewModel) {
+    if (isViewModelInstance(initialValues)) {
         initialValues = initialValues.serializeToForm();
     }
     if (typeof children !== 'function') {

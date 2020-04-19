@@ -1,5 +1,9 @@
-import { PrimaryKey } from './ViewModel';
-import { FieldDataMappingRaw, isViewModelInstance, ViewModelInterface } from './ViewModelFactory';
+import {
+    PrimaryKey,
+    FieldDataMappingRaw,
+    isViewModelInstance,
+    ViewModelInterface,
+} from './ViewModelFactory';
 
 /**
  * Points to a record that is cached already. The purpose of this is to have a single object
