@@ -510,15 +510,27 @@ test('augmenting should extend the source class', () => {
     class A extends ViewModelFactory({
         id: new Field(),
         name: new Field(),
-    }) {}
+    }) {
+        static label = 'A';
+        static labelPlural = 'As';
+    }
 
     class B extends A.augment({ email: new Field() }) {}
 
-    class C extends B.augment({ phone: new Field() }) {}
+    class C extends B.augment({ phone: new Field() }) {
+        static label = 'C';
+        static labelPlural = 'Cs';
+    }
 
     expect(Object.keys(A.fields)).toEqual(['id', 'name']);
     expect(Object.keys(B.fields)).toEqual(['id', 'name', 'email']);
     expect(Object.keys(C.fields)).toEqual(['id', 'name', 'email', 'phone']);
+    expect(A.label).toBe('A');
+    expect(A.labelPlural).toBe('As');
+    expect(B.label).toBe('A');
+    expect(B.labelPlural).toBe('As');
+    expect(C.label).toBe('C');
+    expect(C.labelPlural).toBe('Cs');
 
     const record1 = new B({ id: 1 });
     expect(record1).toBeInstanceOf(A);
