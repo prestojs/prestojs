@@ -1,4 +1,4 @@
-import { WidgetProps } from '@prestojs/ui';
+import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
 import { DatePicker } from 'antd';
 import { DatePickerProps } from 'antd/lib/date-picker';
 

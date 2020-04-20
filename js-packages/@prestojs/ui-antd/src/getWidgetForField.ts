@@ -1,5 +1,5 @@
 import React from 'react';
-import { FieldWidgetType } from '@prestojs/ui';
+import { FieldWidgetType } from '@prestojs/ui/FieldWidgetInterface';
 import { Field } from '@prestojs/viewmodel';
 
 // RangeField is not included: its not meant to be used directly - TODO: mark it abstract?

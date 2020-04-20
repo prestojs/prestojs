@@ -4,7 +4,8 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "./src",
-    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "/tmp/tsc-output/@prestojs/routing.tsbuildinfo",
+    "outDir": "/tmp/tsc-output/@prestojs/routing"
   },
   "references": [],
 

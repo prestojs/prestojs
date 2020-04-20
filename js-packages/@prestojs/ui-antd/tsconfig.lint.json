@@ -4,11 +4,15 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "./src",
-    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "/tmp/tsc-output/@prestojs/ui-antd.tsbuildinfo",
+    "outDir": "/tmp/tsc-output/@prestojs/ui-antd"
   },
   "references": [
     {
       "path": "../viewmodel/tsconfig.lint.json"
+    },
+    {
+      "path": "../ui/tsconfig.lint.json"
     }
   ],
 

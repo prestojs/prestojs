@@ -1,4 +1,4 @@
-import { WidgetProps } from '@prestojs/ui';
+import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
 import { TimePicker } from 'antd';
 import React from 'react';
 import { TimePickerProps } from 'antd/lib/time-picker';

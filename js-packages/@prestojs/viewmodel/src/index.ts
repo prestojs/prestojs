@@ -30,5 +30,3 @@ export { default as UUIDField } from './fields/UUIDField';
 export { default as useViewModelCache } from './useViewModelCache';
 
 export { isViewModelInstance, isViewModelClass } from './ViewModelFactory';
-
-export { Class } from './typeUtil';
