@@ -17,13 +17,13 @@
       "path": "./js-packages/@prestojs/codegen/tsconfig.lint.json"
     },
     {
-      "path": "./js-packages/@prestojs/ui/tsconfig.json"
+      "path": "./js-packages/@prestojs/ui/tsconfig.lint.json"
     },
     {
-      "path": "./js-packages/@prestojs/ui-antd/tsconfig.json"
+      "path": "./js-packages/@prestojs/ui-antd/tsconfig.lint.json"
     },
     {
-      "path": "./js-packages/@prestojs/final-form/tsconfig.json"
+      "path": "./js-packages/@prestojs/final-form/tsconfig.lint.json"
     }
   ]
 }

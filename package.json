@@ -12,7 +12,7 @@
   "scripts": {
     "lint": "eslint js-packages --ext .js,.ts",
     "check-types": "pnpify tsc -b tsconfig.lint.json",
-    "clean": "yarn workspaces foreach --exclude django-testbed run clean",
+    "clean": "rm -rf /tmp/tsc-output/@prestojs && yarn workspaces foreach --exclude django-testbed run clean",
     "prebuild": "yarn workspaces foreach run clean",
     "prepublish": "yarn workspaces foreach run build",
     "test": "jest",

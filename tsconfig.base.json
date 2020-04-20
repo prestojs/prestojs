@@ -10,12 +10,19 @@
     "baseUrl": ".",
     "paths": {
       "@prestojs/viewmodel": ["./js-packages/@prestojs/viewmodel/src/"],
+      "@prestojs/viewmodel/*": ["./js-packages/@prestojs/viewmodel/src/*"],
       "@prestojs/codegen": ["./js-packages/@prestojs/codegen/src/"],
+      "@prestojs/codegen/*": ["./js-packages/@prestojs/codegen/src/*"],
       "@prestojs/ui": ["./js-packages/@prestojs/ui/src/"],
-      "@prestojs/ui-antd": ["./js-packages/@prestojs/ui-antd/src/"],
+      "@prestojs/ui/*": ["./js-packages/@prestojs/ui/src/*"],
+      "@prestojs/ui-antd": ["./js-packages/@prestojs/ui-antd/src"],
+      "@prestojs/ui-antd/*": ["./js-packages/@prestojs/ui-antd/src/*"],
       "@prestojs/final-form": ["./js-packages/@prestojs/final-form/src/"],
+      "@prestojs/final-form/*": ["./js-packages/@prestojs/final-form/src/*"],
       "@prestojs/routing": ["./js-packages/@prestojs/routing/src/"],
-      "@prestojs/rest": ["./js-packages/@prestojs/rest/src/"]
+      "@prestojs/routing/*": ["./js-packages/@prestojs/routing/src/*"],
+      "@prestojs/rest": ["./js-packages/@prestojs/rest/src/"],
+      "@prestojs/rest/*": ["./js-packages/@prestojs/rest/src/*"]
     }
   },
   "references": [

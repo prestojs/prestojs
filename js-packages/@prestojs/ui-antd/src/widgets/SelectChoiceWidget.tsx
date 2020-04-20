@@ -1,4 +1,4 @@
-import { InputProps, WidgetProps } from '@prestojs/ui';
+import { InputProps, WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
 import { Select } from 'antd';
 import React from 'react';
 import { SelectProps } from 'antd/lib/select';

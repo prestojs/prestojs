@@ -1,4 +1,4 @@
-import { RangedWidgetProps } from '@prestojs/ui';
+import { RangedWidgetProps } from '@prestojs/ui/FieldWidgetInterface';
 import { Input } from 'antd';
 import React from 'react';
 

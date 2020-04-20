@@ -1,4 +1,4 @@
-import { WidgetProps } from '@prestojs/ui';
+import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
 import React from 'react';
 import RadioChoiceWidget from './RadioChoiceWidget';
 import SelectChoiceWidget from './SelectChoiceWidget';
