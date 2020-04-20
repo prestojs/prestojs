@@ -120,6 +120,9 @@ export default class InferredPaginator implements PaginatorInterface {
     setCurrentState: (nextValue: PaginatorState) => void;
     setInternalState: (set: (internalState: Record<string, any>) => Record<any, string>) => void;
 
+    /**
+     * @see documentation for `replaceStateControllers` for what `currentStatePair` and `internalStatePair` are
+     */
     constructor(currentStatePair, internalStatePair) {
         if ((currentStatePair || internalStatePair) && !(currentStatePair && internalStatePair)) {
             throw new Error(
@@ -131,6 +134,9 @@ export default class InferredPaginator implements PaginatorInterface {
         }
     }
 
+    /**
+     * @see `Paginator.replaceStateControllers`
+     */
     replaceStateControllers(
         [currentState, setCurrentState],
         [internalState, setInternalState]

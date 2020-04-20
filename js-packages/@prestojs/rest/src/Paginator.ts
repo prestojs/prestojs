@@ -17,6 +17,9 @@ export default class Paginator<State, InternalState> implements PaginatorInterfa
     setCurrentState: (set: State) => void;
     setInternalState: (set: InternalState) => void;
 
+    /**
+     * @see documentation for `replaceStateControllers` for what `currentStatePair` and `internalStatePair` are
+     */
     constructor(currentStatePair = null, internalStatePair = null) {
         if ((currentStatePair || internalStatePair) && !(currentStatePair && internalStatePair)) {
             throw new Error(
@@ -45,15 +48,17 @@ export default class Paginator<State, InternalState> implements PaginatorInterfa
      * This design is a compromise between allowing a clear interface for how paginators should
      * be defined and allowing the state to be managed externally (eg. using React state).
      *
-     * @param currentState
-     * @param setCurrentState
-     * @param internalState
-     * @param setInternalState
+     * @param currentStatePair The state object and setter (eg. from `useState`) that is used to store
+     * and transition pagination state. Using this you can do things like easily store state in the URL
+     * (eg. using `useUrlQueryState`) or other data sources.
+     * @param internalStatePair The state object and setter that is used for internal state. Internal state
+     * is stored separately as it does not need to be restored (eg. if you refresh the page). It is used
+     * to store things like the total number of results or the current cursor. Passing `useState` here is
+     * fine.
      */
-    replaceStateControllers(
-        [currentState, setCurrentState],
-        [internalState, setInternalState]
-    ): void {
+    replaceStateControllers(currentStatePair, internalStatePair): void {
+        const [currentState, setCurrentState] = currentStatePair;
+        const [internalState, setInternalState] = internalStatePair;
         this.currentState = currentState || {};
         this.setCurrentState = setCurrentState;
         this.internalState = internalState || {};
