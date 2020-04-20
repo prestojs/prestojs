@@ -189,6 +189,44 @@ test('useUrlQueryState should support controlledKeys option', () => {
     expectHook2.queryStateEquals({ y: 'ten', another: 'test' });
 });
 
+test('useUrlQueryState should support controlledKeys=true', () => {
+    const identity = <T>(value: T): T => value;
+    const hook1 = renderUrlQueryStateHook(
+        { a: 'one' },
+        { params: { a: identity }, controlledKeys: true }
+    );
+    const hook2 = renderUrlQueryStateHook(
+        { z: 'ten' },
+        { params: { y: identity, z: identity, another: identity }, controlledKeys: true }
+    );
+    const expectHook1 = expect(hook1);
+    const expectHook2 = expect(hook2);
+    const setHook1QueryState = (nextState: {}): void => hook1.result.current[1](nextState);
+    const setHook2QueryState = (nextState: {}): void => hook2.result.current[1](nextState);
+    expect(navigation.search).queryStateEquals({ a: 'one', z: 'ten' });
+    expectHook1.queryStateEquals({ a: 'one' });
+    expectHook2.queryStateEquals({ z: 'ten' });
+    act(() => setHook1QueryState({ a: 'two' }));
+    expectHook1.queryStateEquals({ a: 'two' });
+    expectHook2.queryStateEquals({ z: 'ten' });
+    expect(navigation.search).queryStateEquals({ a: 'two', z: 'ten' });
+    act(() => setHook2QueryState({ y: 'ten', z: 'eleven' }));
+    expectHook1.queryStateEquals({ a: 'two' });
+    expectHook2.queryStateEquals({ y: 'ten', z: 'eleven' });
+    expect(navigation.search).queryStateEquals({ a: 'two', y: 'ten', z: 'eleven' });
+    act(() => navigation.push('/?a=three&y=ten&another=test'));
+    expect(navigation.search).queryStateEquals({ a: 'three', y: 'ten', another: 'test' });
+    expectHook1.queryStateEquals({ a: 'three' });
+    expectHook2.queryStateEquals({ y: 'ten', another: 'test' });
+});
+
+test('useUrlQueryState should error if controlledKeys=true and wildcard specified', () => {
+    const identity = <T>(value: T): T => value;
+    expect(() =>
+        useUrlQueryState({ a: 'one' }, { params: { '*': identity }, controlledKeys: true })
+    ).toThrow(/controlledKeys=true cannot be used with a wildcard/);
+});
+
 test('useUrlQueryState controlledKeys option should respect initial entries', () => {
     navigation.pathname = '/test/';
     navigation.search = '?a=1&b=2&c=3&p_a=one';
@@ -294,38 +332,59 @@ test('useUrlQueryState should support changing prefix', () => {
     expect(navigation.search).queryStateEquals({ a: '1', b: '2', c: '3', c_a: 'one', c_b: 'two' });
 });
 
-test('useUrlQueryState should support custom parse rules', () => {
+test('useUrlQueryState should support custom decode rules', () => {
     navigation.pathname = '/test/';
     navigation.search = '?a=1';
-    const hookStatus = renderUrlQueryStateHook({ q: '1' }, { parse: value => Number(value) });
-    const setQueryState = (nextState: {}): void => hookStatus.result.current[1](nextState);
-    expect(hookStatus).queryStateEquals({ a: 1, q: 1 });
-    act(() => setQueryState({ a: 0, q: 2 }));
-    expect(hookStatus).queryStateEquals({ a: 0, q: 2 });
-    act(() => setQueryState({ q: '3' }));
-    expect(hookStatus).queryStateEquals({ q: 3 });
-    act(() => navigation.push('/?a=5&b=2'));
-    expect(hookStatus).queryStateEquals({ a: 5, b: 2 });
-});
-
-test('useUrlQueryState should support custom stringify rules', () => {
-    navigation.pathname = '/test/';
-    navigation.search = '?a={}';
     const hookStatus = renderUrlQueryStateHook(
-        { q: { test: 1 } },
+        { q: '1', wow: 'hi' },
         {
-            parse: value => JSON.parse(value),
-            stringify: value => JSON.stringify(value),
+            params: {
+                // Catch all
+                '*': (value): number => Number(value),
+                // Specific param value, decode only
+                bool: (value): boolean => Number(value) !== 0 || value === 'true',
+                // Specific param value, encode & decode
+                wow: [(value): string => value + '!', (value): any => value],
+            },
         }
     );
     const setQueryState = (nextState: {}): void => hookStatus.result.current[1](nextState);
-    expect(hookStatus).queryStateEquals({ a: {}, q: { test: 1 } });
+    expect(hookStatus).queryStateEquals({ a: 1, q: 1, wow: 'hi!' });
+    act(() => setQueryState({ a: 0, q: 2 }));
+    expect(hookStatus).queryStateEquals({ a: 0, q: 2 });
+    act(() => setQueryState({ q: '3', bool: 1 }));
+    expect(hookStatus).queryStateEquals({ q: 3, bool: true });
+    act(() => navigation.push('/?a=5&b=2&bool=0&wow=ok'));
+    expect(hookStatus).queryStateEquals({ a: 5, b: 2, bool: false, wow: 'ok!' });
+});
+
+test('useUrlQueryState should support custom parse rules', () => {
+    navigation.pathname = '/test/';
+    navigation.search = '?a={}';
+    const hookStatus = renderUrlQueryStateHook(
+        { q: { test: 1 }, bool: '1' },
+        {
+            params: {
+                '*': [(value): {} => JSON.parse(value), (value): string => JSON.stringify(value)],
+                bool: [
+                    (value): boolean => Number(value) !== 0,
+                    (value: boolean): string => (value ? '1' : '0'),
+                ],
+            },
+        }
+    );
+    const setQueryState = (nextState: {}): void => hookStatus.result.current[1](nextState);
+    expect(hookStatus).queryStateEquals({ a: {}, q: { test: 1 }, bool: true });
+    expect(navigation.search).toBe('q=%7B%22test%22%3A1%7D&bool=1&a=%7B%7D');
     act(() => setQueryState({ a: { ok: 'yes' }, q: { test: [1] } }));
     expect(hookStatus).queryStateEquals({ a: { ok: 'yes' }, q: { test: [1] } });
+    expect(navigation.search).toBe('a=%7B%22ok%22%3A%22yes%22%7D&q=%7B%22test%22%3A%5B1%5D%7D');
     act(() => setQueryState({ q: [] }));
     expect(hookStatus).queryStateEquals({ q: [] });
+    expect(navigation.search).toBe('q=%5B%5D');
     act(() => navigation.push('/?a=[1,2,3]'));
     expect(hookStatus).queryStateEquals({ a: [1, 2, 3] });
+    expect(navigation.search).toBe('a=[1,2,3]');
 });
 
 test('useUrlQueryState should memoize return value', () => {

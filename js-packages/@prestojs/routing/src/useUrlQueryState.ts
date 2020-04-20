@@ -4,25 +4,29 @@ import pickBy from 'lodash/pickBy';
 import isEqual from 'lodash/isEqual';
 import qs from 'qs';
 
-type Parse = (value: string, paramName: string) => any;
-type Stringify = (value: any, paramName: string) => string;
+type Decode = (value: string, paramName: string) => any;
+type Encode = (value: any, paramName: string) => string;
+
+type EncodeDecode = [Decode, Encode];
+
+type ParamsEncodeDecode = Record<string, EncodeDecode | Decode>;
 
 type Options = {
     /**
-     * A function used to parse query values to transform them to a certain type or shape.
+     * An object mapping a key name to either a 2-tuple of a decode & encode function or
+     * a single decode function.
      *
-     * It is passed 2 arguments; the value to transform and the name of the parameter.
+     * The decode function is used to parse query values to transform them to a certain type or shape.
      *
-     * eg. Calling `setUrlState({ count: 1, name: 'test' });` would call `parse`
-     * twice, once with `1, 'count'` and once with `'test', name`.
+     * The encode function is used stringify a value to be stored in the URL. When using the
+     * single function form (just the decode function) then the encode function is the equivalent
+     * of calling the toString() method on the value.
+     *
+     * Both encode and decode are passed 2 arguments; the value to transform and the name of the parameter.
+     *
+     * A special key '*' can be set to define the fallback behaviour for all keys not explicitly defined.
      */
-    parse?: Parse;
-    /**
-     * A function used to stringify a value to be stored in the URL. If not specified the value's toString() method will be called. This could be useful if needing to store a complex object in the query string.
-     *
-     * It is passed 2 arguments; the value to stringify and the name of the parameter.
-     */
-    stringify?: Stringify;
+    params?: ParamsEncodeDecode;
     /**
      * A value to prefix query param keys with. The returned state object
      * contains the un-prefixed keys.
@@ -36,7 +40,7 @@ type Options = {
      * If specified only these keys will be synced to and read from the request
      * URL. Any other keys will be ignored.
      */
-    controlledKeys?: Array<string>;
+    controlledKeys?: Array<string> | true;
     /**
      * The current location. This depends on your router integration.
      */
@@ -50,6 +54,9 @@ type Options = {
     replaceUrl?: (url: string) => void;
 };
 
+// Wildcard used to indicate all fields in `params` option
+const WILDCARD = '*';
+
 /**
  * Create new object from `obj` without keys `withoutKeys`
  */
@@ -57,6 +64,25 @@ const pickWithoutKeys = (
     obj: Record<string, any>,
     withoutKeys: Array<string>
 ): Record<string, any> => pickBy(obj, (value: any, key: string) => !withoutKeys.includes(key));
+
+function encode(key: string, value: any, params: ParamsEncodeDecode): string {
+    const p = params[key] || params[WILDCARD];
+    if (!p || !Array.isArray(p)) {
+        return value;
+    }
+    return p[1](value, key);
+}
+
+function decode(key: string, value: any, params: ParamsEncodeDecode): string {
+    const p = params[key] || params[WILDCARD];
+    if (!p) {
+        return value;
+    }
+    if (Array.isArray(p)) {
+        return p[0](value, key);
+    }
+    return p(value, key);
+}
 
 /**
  * Build query params object to set in URL.
@@ -67,12 +93,15 @@ const pickWithoutKeys = (
 const buildQueryForUrl = (
     obj: {},
     prefix: string,
-    stringify: Stringify,
-    controlledKeys?: string[]
+    params: ParamsEncodeDecode,
+    controlledKeys?: string[] | true
 ): Record<string, string> => {
     return Object.entries(obj).reduce((acc, [key, value]) => {
-        if (!controlledKeys || controlledKeys.includes(key)) {
-            acc[prefix + key] = stringify(value, key);
+        if (
+            !controlledKeys ||
+            (Array.isArray(controlledKeys) ? controlledKeys.includes(key) : key in params)
+        ) {
+            acc[prefix + key] = encode(key, value, params);
         }
         return acc;
     }, {});
@@ -87,28 +116,31 @@ const buildQueryForUrl = (
 const buildQueryForState = (
     obj: Record<string, any>,
     prefix: string,
-    parse: Parse,
-    controlledKeys?: string[]
+    params: ParamsEncodeDecode,
+    controlledKeys?: string[] | true
 ): Record<string, any> => {
     return Object.entries(obj).reduce((acc, [key, value]) => {
         if (key.startsWith(prefix)) {
             const unprefixedKey = key.substr(prefix.length);
-            if (!controlledKeys || controlledKeys.includes(unprefixedKey)) {
-                acc[unprefixedKey] = parse(value, key);
+            if (
+                !controlledKeys ||
+                (Array.isArray(controlledKeys)
+                    ? controlledKeys.includes(unprefixedKey)
+                    : unprefixedKey in params)
+            ) {
+                acc[unprefixedKey] = decode(key, value, params);
             }
         }
         return acc;
     }, {});
 };
 
-function identity<T>(a: T): T {
-    return a;
-}
-
 // TODO: Should the default parse actually do something special here? eg. if it's
 // 'true' or 'false' transform to bool? if it looks like a number convert to number?
 // Date handling?
-// TODO: Should stringify have any special cases? Dates?
+// TODO: Should stringify have any special cases? Dates? Arrays? Nested objects?
+
+const DEFAULT_PARAMS = {};
 
 /**
  * Use URL query string as state. This is like `useState` except the state value
@@ -218,24 +250,14 @@ function identity<T>(a: T): T {
  * ```jslive
  * # OPTIONS: {"fakeBrowser": true }
  * function ExampleUrlSyncControlled() {
- *   const parse = (value, key) => {
- *       if (key === 'count') {
- *           return Number(value);
- *       }
- *       if (key === 'data') {
- *           return JSON.parse(value);
- *       }
- *       return value;
- *   }
- *   const stringify = (value, key) => {
- *       if (key === 'data') {
- *           return JSON.stringify(value);
- *       }
- *       return value;
- *   }
  *   const [urlState, setUrlState] = useUrlQueryState(
  *     { data: { name: 'Dave', email: '' }, count: 1 },
- *     { parse, stringify }
+ *     {
+ *         params: {
+ *             count: value => Number(value),
+ *             data: [value => JSON.parse(value), value => JSON.stringify(value)],
+ *         },
+ *     }
  *   );
  *   const onClick = () => setUrlState(s => ({ ...s, count: s.count + 1 }));
  *   const { data = {} } = urlState;
@@ -281,7 +303,8 @@ export default function useUrlQueryState(
     /**
      * State transition function. Accepts either the state object to transition
      * to OR a function that is passed the current state and should return the
-     * new state to transition to.
+     * new state to transition to. Passing the function returned by `useState`
+     * is compatible with this.
      *
      * The state specified always replaces the current state - it is not merged
      * except with the caveats noted below.
@@ -328,9 +351,8 @@ export default function useUrlQueryState(
     ) => void
 ] {
     const {
-        parse = identity,
-        stringify = identity,
         prefix = '',
+        params = DEFAULT_PARAMS,
         controlledKeys,
         location = typeof window != 'undefined' && window.location,
         replaceUrl = typeof window != 'undefined' &&
@@ -338,6 +360,9 @@ export default function useUrlQueryState(
     } = options;
     if (!location || !replaceUrl) {
         throw new Error('The url and replaceUrl options must be provided');
+    }
+    if (controlledKeys === true && params[WILDCARD]) {
+        throw new Error('controlledKeys=true cannot be used with a wildcard in `params`');
     }
     const { search, pathname } = location;
 
@@ -348,7 +373,10 @@ export default function useUrlQueryState(
         const query = qs.parse(search, { ignoreQueryPrefix: true });
         const invalidKeys: string[] = [];
         const missingKeys = Object.keys(initialState).filter(key => {
-            if (controlledKeys && !controlledKeys.includes(key)) {
+            if (
+                controlledKeys &&
+                !(Array.isArray(controlledKeys) ? controlledKeys.includes(key) : key in params)
+            ) {
                 invalidKeys.push(key);
                 return false;
             }
@@ -365,7 +393,7 @@ export default function useUrlQueryState(
         if (missingKeys.length > 0) {
             replaceUrl(
                 `${pathname}?${qs.stringify({
-                    ...buildQueryForUrl(initialState, prefix, stringify, missingKeys),
+                    ...buildQueryForUrl(initialState, prefix, params, missingKeys),
                     ...query,
                 })}`
             );
@@ -386,12 +414,12 @@ export default function useUrlQueryState(
             return;
         }
         const query = qs.parse(search, { ignoreQueryPrefix: true });
-        const existingQuery = buildQueryForState(query, prefixCache.current, parse);
+        const existingQuery = buildQueryForState(query, prefixCache.current, params);
         const keys = Object.keys(query).filter(key => key.startsWith(prefixCache.current));
         replaceUrl(
             `${pathname}?${qs.stringify({
                 ...pickWithoutKeys(query, keys),
-                ...buildQueryForUrl(existingQuery, prefix, stringify),
+                ...buildQueryForUrl(existingQuery, prefix, params),
             })}`
         );
         prefixCache.current = prefix;
@@ -403,10 +431,10 @@ export default function useUrlQueryState(
             buildQueryForState(
                 qs.parse(search, { ignoreQueryPrefix: true }),
                 prefix,
-                parse,
+                params,
                 controlledKeys
             ),
-        [controlledKeys, search, parse, prefix]
+        [controlledKeys, search, params, prefix]
     );
 
     // Build the state transition callback. This will make sure the URL matches
@@ -418,8 +446,16 @@ export default function useUrlQueryState(
             if (typeof nextQuery === 'function') {
                 nextQuery = nextQuery(unPrefixedQueryObject);
             }
-            const keys = controlledKeys || Object.keys(query).filter(key => key.startsWith(prefix));
-            if (controlledKeys) {
+            let keys;
+            if (controlledKeys === true) {
+                keys = Object.keys(params).filter(k => k !== WILDCARD);
+            } else if (Array.isArray(controlledKeys)) {
+                keys = controlledKeys;
+            }
+            if (!keys) {
+                keys = Object.keys(query).filter(key => key.startsWith(prefix));
+            }
+            if (Array.isArray(controlledKeys)) {
                 const invalidKeys = Object.keys(nextQuery).filter(
                     key => !controlledKeys.includes(key)
                 );
@@ -434,13 +470,13 @@ export default function useUrlQueryState(
             }
             const finalQuery = {
                 ...pickWithoutKeys(query, keys),
-                ...buildQueryForUrl(nextQuery, prefix, stringify, controlledKeys),
+                ...buildQueryForUrl(nextQuery, prefix, params, controlledKeys),
             };
             if (!isEqual(finalQuery, query)) {
                 replaceUrl(`${pathname}?${qs.stringify(finalQuery)}`);
             }
         },
-        [search, controlledKeys, prefix, stringify, unPrefixedQueryObject, replaceUrl, pathname]
+        [search, controlledKeys, prefix, params, unPrefixedQueryObject, replaceUrl, pathname]
     );
 
     return [unPrefixedQueryObject, setUrlState];
