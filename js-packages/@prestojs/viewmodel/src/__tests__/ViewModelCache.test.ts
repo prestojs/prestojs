@@ -198,6 +198,7 @@ test('should support custom cache', () => {
     }).toThrowError('cache class must extend ViewModelCache');
 
     class MyCache<T extends ViewModelInterface<any, any>> extends ViewModelCache<T> {}
+    class MyCache2<T extends ViewModelInterface<any, any>> extends ViewModelCache<T> {}
     class Test1 extends ViewModelFactory({}) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
@@ -205,6 +206,28 @@ test('should support custom cache', () => {
     }
 
     expect(Test1.cache).toBeInstanceOf(MyCache);
+
+    // Make sure inheritance results in correct caches for everything
+    class Test2 extends Test1.augment({}) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        static cache = new MyCache2<Test2>(Test2);
+    }
+
+    expect(Test1.cache).toBeInstanceOf(MyCache);
+    expect(Test2.cache).toBeInstanceOf(MyCache2);
+    expect(Test1.cache).not.toBe(Test2.cache);
+
+    class Test3 extends Test1 {}
+    expect(Test1.cache).not.toBe(Test3.cache);
+
+    class Test4 extends Test1 {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        static cache = new MyCache2<Test4>(Test4);
+    }
+    expect(Test1.cache).not.toBe(Test4.cache);
+    expect(Test4.cache).toBeInstanceOf(MyCache2);
 });
 
 test('updating a record should result in cache for subset of fields being updated', () => {
