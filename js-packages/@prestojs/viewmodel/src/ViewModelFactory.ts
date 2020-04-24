@@ -11,15 +11,15 @@ export type FieldsMapping = { [fieldName: string]: Field<any> };
 export type FieldsMappingOrNull = { [fieldName: string]: Field<any> | null };
 
 // Extract mapping of field name to it's underlying data type
-export type FieldDataMapping<O extends FieldsMapping> = {
-    readonly [K in keyof O]: O[K]['__fieldValueType'];
+export type FieldDataMapping<T extends FieldsMapping> = {
+    readonly [K in keyof T]: T[K]['__fieldValueType'];
 };
 
 // Extract mapping of field name to it's parsable data type. For most fields
 // this is the same as the underlying type but could be something different, eg.
 // parsing a string => number
-export type FieldDataMappingRaw<O extends FieldsMapping> = {
-    [K in keyof O]?: O[K]['__parsableValueType'];
+export type FieldDataMappingRaw<T extends FieldsMapping> = {
+    [K in keyof T]?: T[K]['__parsableValueType'];
 };
 
 export type SinglePrimaryKey = string | number;
@@ -87,7 +87,18 @@ export type ViewModelInterface<
      * for using the primary key field name(s) directly.
      */
     readonly _pk: PkType;
+
+    /**
+     * The assigned data for this record. You usually don't need to access this directly; values
+     * for a field can be retrieved from the record directly using the field name
+     */
     readonly _data: FieldDataMapping<InstanceFieldMappingType>;
+
+    /**
+     * List of field names with data available on this instance.
+     *
+     * @type-name string[]
+     */
     readonly _assignedFields: (keyof InstanceFieldMappingType)[];
 };
 
@@ -165,43 +176,48 @@ export interface ViewModelConstructor<
     ): ViewModelConstructor<FieldMappingType & P, PkFieldType, PkType>;
 }
 
-type GetImplicitPkFieldCompound<O extends FieldsMapping> = (
-    model: ViewModelConstructor<O>,
-    fields: O
+type GetImplicitPkFieldCompound<T extends FieldsMapping> = (
+    model: ViewModelConstructor<T>,
+    fields: T
 ) => [string[], Field<any>[]];
 
-type GetImplicitPkFieldSingle<O extends FieldsMapping> = (
-    model: ViewModelConstructor<O>,
-    fields: O
+type GetImplicitPkFieldSingle<T extends FieldsMapping> = (
+    model: ViewModelConstructor<T>,
+    fields: T
 ) => [string, Field<any>];
 
-type GetImplicitPkField<O extends FieldsMapping> =
-    | GetImplicitPkFieldCompound<O>
-    | GetImplicitPkFieldSingle<O>;
+type GetImplicitPkField<T extends FieldsMapping> =
+    | GetImplicitPkFieldCompound<T>
+    | GetImplicitPkFieldSingle<T>;
 
-interface ViewModelOptions<O extends FieldsMapping> {
+interface ViewModelOptions<T extends FieldsMapping> {
     baseClass?: ViewModelConstructor<FieldsMapping>;
     pkFieldName?: null | undefined | string | string[];
-    getImplicitPkField?: null | undefined | GetImplicitPkField<O>;
+    getImplicitPkField?: null | undefined | GetImplicitPkField<T>;
 }
 
-interface ViewModelOptionsPkFieldNameSingle<O extends FieldsMapping> extends ViewModelOptions<O> {
+interface ViewModelOptionsPkFieldNameSingle<T extends FieldsMapping> extends ViewModelOptions<T> {
     pkFieldName: string;
 }
-interface ViewModelOptionsPkFieldNameCompound<O extends FieldsMapping> extends ViewModelOptions<O> {
+interface ViewModelOptionsPkFieldNameCompound<T extends FieldsMapping> extends ViewModelOptions<T> {
     pkFieldName: string[];
 }
 
-interface ViewModelOptionsGetImplicitPkFieldSingle<O extends FieldsMapping>
-    extends ViewModelOptions<O> {
-    getImplicitPkField: GetImplicitPkFieldSingle<O>;
+interface ViewModelOptionsGetImplicitPkFieldSingle<T extends FieldsMapping>
+    extends ViewModelOptions<T> {
+    getImplicitPkField: GetImplicitPkFieldSingle<T>;
 }
 
-interface ViewModelOptionsGetImplicitPkFieldCompound<O extends FieldsMapping>
-    extends ViewModelOptions<O> {
-    getImplicitPkField: GetImplicitPkFieldCompound<O>;
+interface ViewModelOptionsGetImplicitPkFieldCompound<T extends FieldsMapping>
+    extends ViewModelOptions<T> {
+    getImplicitPkField: GetImplicitPkFieldCompound<T>;
 }
 
+/**
+ * Defines a getter on `base` for `name` that throws `errorMessage`. If this property isn't
+ * overridden then when it's accessed the error will be thrown (eg. for static properties
+ * like `label` & `labelPlural`.
+ */
 function defineRequiredGetter(base: {}, name: string, errorMessage: string): void {
     Object.defineProperty(base, name, {
         configurable: true,
@@ -224,7 +240,7 @@ function defineRequiredGetter(base: {}, name: string, errorMessage: string): voi
 /**
  * Generate a label for a field based on its name
  */
-function generateFieldLabel(name: string): string {
+function getImplicitFieldLabel(name: string): string {
     // Inner startCase splits into words and lowercases it:
     // EMAIL_ADDRESS => email address
     // Outer one converts first letter of each word:
@@ -267,22 +283,22 @@ function buildFieldGetterSetter(fieldName: string): { set(value: any): any; get:
     };
 }
 
-function bindFields<O extends FieldsMapping>(fields: O, bindTo: ViewModelConstructor<O>): O {
+function bindFields<T extends FieldsMapping>(fields: T, bindTo: ViewModelConstructor<T>): T {
     const newFields = Object.entries(fields).reduce((acc, [fieldName, field]) => {
         acc[fieldName] = field.clone();
         acc[fieldName].parent = bindTo;
         acc[fieldName].name = fieldName;
         if (acc[fieldName].label === undefined) {
-            acc[fieldName].label = generateFieldLabel(fieldName);
+            acc[fieldName].label = getImplicitFieldLabel(fieldName);
         }
         return acc;
     }, {});
-    return freezeObject(newFields) as O;
+    return freezeObject(newFields) as T;
 }
 
-function defaultGetImplicitPkField<O extends FieldsMapping>(
-    model: ViewModelConstructor<O>,
-    fields: O
+function defaultGetImplicitPkField<T extends FieldsMapping>(
+    model: ViewModelConstructor<T>,
+    fields: T
 ): ['id', NumberField] {
     return ['id', fields.id || new NumberField()];
 }
@@ -297,31 +313,31 @@ export function isViewModelClass(view: any): view is ViewModelConstructor<any> {
     return !!(view && view[IS_VIEW_MODEL]);
 }
 
-// Overloads here are so we can more accurately type the primary key and fields (specifically for default case we can
-// add the implicit 'id' field that will be created)
-export default function ViewModelFactory<O extends FieldsMapping>(
-    fields: O,
-    options: ViewModelOptionsPkFieldNameSingle<O>
-): ViewModelConstructor<O, string, SinglePrimaryKey>;
-export default function ViewModelFactory<O extends FieldsMapping>(
-    fields: O,
-    options: ViewModelOptionsPkFieldNameCompound<O>
-): ViewModelConstructor<O, string[], CompoundPrimaryKey>;
-export default function ViewModelFactory<O extends FieldsMapping>(
-    fields: O,
-    options: ViewModelOptionsGetImplicitPkFieldSingle<O>
-): ViewModelConstructor<O, string, SinglePrimaryKey>;
-export default function ViewModelFactory<O extends FieldsMapping>(
-    fields: O,
-    options: ViewModelOptionsGetImplicitPkFieldCompound<O>
-): ViewModelConstructor<O, string[], CompoundPrimaryKey>;
-export default function ViewModelFactory<O extends FieldsMapping>(
-    fields: O,
-    options?: ViewModelOptions<O>
-): ViewModelConstructor<{ id: NumberField } & O, 'id', string | number>;
-export default function ViewModelFactory<O extends FieldsMapping>(
-    fields: O,
-    options: ViewModelOptions<O> = {}
+// Using very strongly typed overloads instead a single type with optional properties so we can more accurately type
+// the primary key and fields (specifically for default case we can add the implicit 'id' field that will be created)
+export default function ViewModelFactory<T extends FieldsMapping>(
+    fields: T,
+    options: ViewModelOptionsPkFieldNameSingle<T>
+): ViewModelConstructor<T, string, SinglePrimaryKey>;
+export default function ViewModelFactory<T extends FieldsMapping>(
+    fields: T,
+    options: ViewModelOptionsPkFieldNameCompound<T>
+): ViewModelConstructor<T, string[], CompoundPrimaryKey>;
+export default function ViewModelFactory<T extends FieldsMapping>(
+    fields: T,
+    options: ViewModelOptionsGetImplicitPkFieldSingle<T>
+): ViewModelConstructor<T, string, SinglePrimaryKey>;
+export default function ViewModelFactory<T extends FieldsMapping>(
+    fields: T,
+    options: ViewModelOptionsGetImplicitPkFieldCompound<T>
+): ViewModelConstructor<T, string[], CompoundPrimaryKey>;
+export default function ViewModelFactory<T extends FieldsMapping>(
+    fields: T,
+    options?: ViewModelOptions<T>
+): ViewModelConstructor<{ id: NumberField } & T, 'id', string | number>;
+export default function ViewModelFactory<T extends FieldsMapping>(
+    fields: T,
+    options: ViewModelOptions<T> = {}
 ): ViewModelConstructor<any, any> {
     if (options.pkFieldName && options.getImplicitPkField) {
         throw new Error("Only one of 'pkFieldName' and 'getImplicitPkField' should be provided");
@@ -331,17 +347,17 @@ export default function ViewModelFactory<O extends FieldsMapping>(
     // getImplicitPkField will create a new field if specified but we can't type it so we ignore it
     // (nested ternary is unavoidable to use the typescripts `extends` behaviour)
     type FinalFields = typeof options.pkFieldName extends string | string[]
-        ? O
+        ? T
         : typeof options.getImplicitPkField extends Function
-        ? O
-        : { id: NumberField } & O;
+        ? T
+        : { id: NumberField } & T;
     type PkFieldType = typeof options.pkFieldName extends string
         ? string
         : typeof options.pkFieldName extends string[]
         ? string[]
-        : typeof options.getImplicitPkField extends GetImplicitPkFieldCompound<O>
+        : typeof options.getImplicitPkField extends GetImplicitPkFieldCompound<T>
         ? string[]
-        : typeof options.getImplicitPkField extends GetImplicitPkFieldSingle<O>
+        : typeof options.getImplicitPkField extends GetImplicitPkFieldSingle<T>
         ? string
         : 'id';
 
@@ -349,9 +365,9 @@ export default function ViewModelFactory<O extends FieldsMapping>(
         ? SinglePrimaryKey
         : typeof options.pkFieldName extends string[]
         ? CompoundPrimaryKey
-        : typeof options.getImplicitPkField extends GetImplicitPkFieldCompound<O>
+        : typeof options.getImplicitPkField extends GetImplicitPkFieldCompound<T>
         ? CompoundPrimaryKey
-        : typeof options.getImplicitPkField extends GetImplicitPkFieldSingle<O>
+        : typeof options.getImplicitPkField extends GetImplicitPkFieldSingle<T>
         ? SinglePrimaryKey
         : SinglePrimaryKey;
 
@@ -485,12 +501,6 @@ export default function ViewModelFactory<O extends FieldsMapping>(
                 const pkFieldNames = this._model.pkFieldNames;
                 pkFieldNames.forEach(name => (data[name] = this[name]));
 
-                // I don't know how to type this, error is:
-                // TS2322: Type 'ViewModel' is not assignable to type 'this'.
-                // 'ViewModel' is assignable to the constraint of type 'this', but 'this' could be instantiated with a different subtype of constraint 'ViewModel'.
-                // I could type return as `ViewModel` but then usages of it will be wrong (eg. clone() will be from a more general ViewModel to a specific implementation)
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-                // @ts-ignore
                 return new this._model(data);
             },
         },
@@ -508,7 +518,7 @@ export default function ViewModelFactory<O extends FieldsMapping>(
         [FinalFields, string | string[]]
     > = new Map();
 
-    function _bindFields(modelClass: ViewModelConstructor<O>): [FinalFields, string | string[]] {
+    function _bindFields(modelClass: ViewModelConstructor<T>): [FinalFields, string | string[]] {
         let f = boundFields.get(modelClass as ViewModelConstructor<FinalFields>);
         if (!f) {
             const toBind = { ...fields };
@@ -654,7 +664,7 @@ export default function ViewModelFactory<O extends FieldsMapping>(
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     function augment<P extends FieldsMappingOrNull>(
         newFields: P,
-        newOptions: ViewModelOptions<O & P> = {}
+        newOptions: ViewModelOptions<T & P> = {}
     ) {
         const f: FieldsMapping = {
             ...fields,
@@ -666,8 +676,8 @@ export default function ViewModelFactory<O extends FieldsMapping>(
                 delete f[fieldName];
             }
         }
-        return ViewModelFactory(f as O & P, {
-            ...(options as ViewModelOptions<O & P>),
+        return ViewModelFactory(f as T & P, {
+            ...(options as ViewModelOptions<T & P>),
             ...newOptions,
             baseClass: this,
         });
