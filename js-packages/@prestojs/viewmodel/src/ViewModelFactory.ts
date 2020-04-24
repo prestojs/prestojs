@@ -313,6 +313,15 @@ export function isViewModelClass(view: any): view is ViewModelConstructor<any> {
     return !!(view && view[IS_VIEW_MODEL]);
 }
 
+const reservedFieldNames = ['toJS', 'clone', 'isEqual'];
+
+function checkReservedFieldNames(fields): void {
+    reservedFieldNames.forEach(fieldName => {
+        if (fields[fieldName]) {
+            throw new Error(`${fieldName} is reserved and cannot be used as a field name`);
+        }
+    });
+}
 // Using very strongly typed overloads instead a single type with optional properties so we can more accurately type
 // the primary key and fields (specifically for default case we can add the implicit 'id' field that will be created)
 export default function ViewModelFactory<T extends FieldsMapping>(
@@ -342,6 +351,7 @@ export default function ViewModelFactory<T extends FieldsMapping>(
     if (options.pkFieldName && options.getImplicitPkField) {
         throw new Error("Only one of 'pkFieldName' and 'getImplicitPkField' should be provided");
     }
+    checkReservedFieldNames(fields);
     // If pkFieldName isn't specified it will be created automatically as 'id'
     // Otherwise the field name will be included in `fields` and we don't need to modify the type.
     // getImplicitPkField will create a new field if specified but we can't type it so we ignore it
@@ -557,6 +567,7 @@ export default function ViewModelFactory<T extends FieldsMapping>(
                             buildFieldGetterSetter(fieldName)
                         );
                     });
+                    checkReservedFieldNames(extraFields);
                     Object.assign(toBind, extraFields);
                 }
                 finalPkFieldName = pkFieldName;
