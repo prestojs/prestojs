@@ -465,7 +465,6 @@ describe('env tests', () => {
     test('should error if attempt to set a field', () => {
         process.env.NODE_ENV = 'development';
         class A extends ViewModelFactory({
-            id: new Field({ label: 'Id' }),
             name: new Field({ label: 'Name' }),
             email: new Field({ label: 'Email' }),
         }) {}
@@ -476,6 +475,9 @@ describe('env tests', () => {
         });
         // @ts-ignore
         expect(() => (record1.email = 'test')).toThrowError('email is read only');
+        // Make sure auto field is also read only
+        // @ts-ignore
+        expect(() => (record1.id = 5)).toThrowError('id is read only');
 
         process.env.NODE_ENV = 'production';
 

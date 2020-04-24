@@ -1,5 +1,5 @@
-import startCase from 'lodash/startCase';
 import isEqual from 'lodash/isEqual';
+import startCase from 'lodash/startCase';
 
 import Field from './fields/Field';
 import NumberField from './fields/NumberField';
@@ -232,6 +232,41 @@ function generateFieldLabel(name: string): string {
     return startCase(startCase(name).toLowerCase());
 }
 
+/**
+ * Add getters for fields along with some traps for bad usage
+ * - If attempts to set a field throw an error in dev or log warning otherwise
+ * - If attempts to get a field that does exist but wasn't passed in `data` then
+ *   throw an error in dev or log a warning otherwise.
+ */
+function buildFieldGetterSetter(fieldName: string): { set(value: any): any; get: () => any } {
+    return {
+        set(): void {
+            const msg = `${fieldName} is read only`;
+            if (isDev()) {
+                throw new Error(msg);
+            } else {
+                console.warn(msg);
+            }
+        },
+        get(): any {
+            if (!this._assignedFields.includes(fieldName)) {
+                const msg = `'${fieldName}' accessed on ${
+                    this._model.name
+                } but was not instantiated with it. Available fields are: ${this._assignedFields.join(
+                    ', '
+                )}`;
+                if (isDev()) {
+                    throw new Error(msg);
+                } else {
+                    console.warn(msg);
+                }
+            } else {
+                return this._data[fieldName];
+            }
+        },
+    };
+}
+
 function bindFields<O extends FieldsMapping>(fields: O, bindTo: ViewModelConstructor<O>): O {
     const newFields = Object.entries(fields).reduce((acc, [fieldName, field]) => {
         acc[fieldName] = field.clone();
@@ -361,41 +396,6 @@ export default function ViewModelFactory<O extends FieldsMapping>(
         this._assignedFields.sort();
         this._data = freezeObject(assignedData);
 
-        // Add getters for fields along with some traps for bad usage
-        // - If attempts to set a field throw an error in dev or log warning otherwise
-        // - If attempts to get a field that does exist but wasn't passed in `data` then
-        //   throw an error in dev or log a warning otherwise.
-        for (const fieldName of Object.keys(fields)) {
-            const definition: { set(value: any): any; get: () => any } = {
-                set(): void {
-                    const msg = `${fieldName} is read only`;
-                    if (isDev()) {
-                        throw new Error(msg);
-                    } else {
-                        console.warn(msg);
-                    }
-                },
-                get(): any {
-                    return assignedData[fieldName];
-                },
-            };
-            if (!this._assignedFields.includes(fieldName)) {
-                definition.get = (): void => {
-                    const msg = `'${fieldName}' accessed on ${
-                        this._model.name
-                    } but was not instantiated with it. Available fields are: ${this._assignedFields.join(
-                        ', '
-                    )}`;
-                    if (isDev()) {
-                        throw new Error(msg);
-                    } else {
-                        console.warn(msg);
-                    }
-                };
-            }
-            Object.defineProperty(this, fieldName, definition);
-        }
-
         return this;
     }
 
@@ -409,7 +409,7 @@ export default function ViewModelFactory<O extends FieldsMapping>(
     _Base[IS_VIEW_MODEL] = true;
 
     // Extend prototype to include required static properties/methods
-    Object.defineProperties(_Base.prototype, {
+    const properties = {
         _model: {
             get(): typeof _Base {
                 return Object.getPrototypeOf(this).constructor;
@@ -494,7 +494,13 @@ export default function ViewModelFactory<O extends FieldsMapping>(
                 return new this._model(data);
             },
         },
+    };
+    // Build getter/setter for all known fields. Note that we need to do this in _bindFields below as well in the
+    // case that primary key fields are created.
+    Object.keys(fields).forEach(fieldName => {
+        properties[fieldName] = buildFieldGetterSetter(fieldName);
     });
+    Object.defineProperties(_Base.prototype, properties);
 
     // Store bound fields and primary key name for all models in the hierarchy
     const boundFields: Map<
@@ -534,6 +540,13 @@ export default function ViewModelFactory<O extends FieldsMapping>(
                     extraFields[pkFieldName] = pkField;
                 }
                 if (Object.keys(extraFields).length > 0) {
+                    Object.keys(extraFields).map(fieldName => {
+                        Object.defineProperty(
+                            modelClass.prototype,
+                            fieldName,
+                            buildFieldGetterSetter(fieldName)
+                        );
+                    });
                     Object.assign(toBind, extraFields);
                 }
                 finalPkFieldName = pkFieldName;
