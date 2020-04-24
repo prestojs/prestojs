@@ -598,3 +598,26 @@ test('isViewModelClass should identify ViewModel classes', () => {
     class C extends B {}
     expect(isViewModelClass(C)).toBe(true);
 });
+
+test('should disallow naming fields one of reserved names', () => {
+    const reservedNames = ['toJS', 'clone', 'isEqual'];
+    for (const name of reservedNames) {
+        expect(() => {
+            class A extends ViewModelFactory({
+                [name]: new Field(),
+            }) {}
+        }).toThrow(/is reserved and cannot be used as a field name/);
+
+        expect(() => {
+            class A extends ViewModelFactory(
+                {},
+                {
+                    getImplicitPkField(): [string, Field<any>] {
+                        return [name, new CharField()];
+                    },
+                }
+            ) {}
+            A.pkFieldNames;
+        }).toThrow(/is reserved and cannot be used as a field name/);
+    }
+});
