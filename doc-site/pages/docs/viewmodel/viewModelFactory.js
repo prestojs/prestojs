@@ -1,0 +1,137 @@
+import Head from 'next/head';
+import React from 'react';
+import defaultGetStaticProps, { prepareDocs } from '../../../getStaticProps';
+import MethodDoc from '../../../api-docs/MethodDoc';
+import SignatureDoc from '../../../components/api-docs/SignatureDoc';
+import VariableDoc from '../../../components/api-docs/VariableDoc';
+import ApiDocHeader from '../../../components/ApiDocHeader';
+import Article from '../../../components/Article';
+import MainMenuSidebar from '../../../components/MainMenuSidebar';
+import Sidebar from '../../../components/Sidebar';
+
+export default function Doc({ docs, extraNodes }) {
+    prepareDocs(docs, extraNodes);
+    const staticGroups = docs.ViewModelConstructor.groups.reduce((acc, group) => {
+        acc[group.title] = group;
+        return acc;
+    }, {});
+    const staticChildren = docs.ViewModelConstructor.children.reduce((acc, child) => {
+        acc[child.id] = child;
+        return acc;
+    }, {});
+    const staticMethods = staticGroups.Methods.children
+        .map(id => staticChildren[id])
+        .filter(method => !method.flags.isPrivate);
+    const staticProperties = staticGroups.Properties.children
+        .map(id => staticChildren[id])
+        .filter(method => !method.flags.isPrivate);
+    const instanceDef = docs.ViewModelInterface.type.types.filter(t => t.type === 'reflection')[0]
+        .declaration;
+    const instanceGroups = instanceDef.groups.reduce((acc, group) => {
+        acc[group.title] = group;
+        return acc;
+    }, {});
+    const instanceChildren = instanceDef.children.reduce((acc, child) => {
+        acc[child.id] = child;
+        return acc;
+    }, {});
+    const instanceMethods = instanceGroups.Functions.children
+        .map(id => instanceChildren[id])
+        .filter(method => !method.flags.isPrivate);
+    const instanceProperties = instanceGroups.Variables.children
+        .map(id => instanceChildren[id])
+        .filter(method => !method.flags.isPrivate);
+    return (
+        <>
+            <Head>
+                <title>Presto - ViewModel</title>
+            </Head>
+            <MainMenuSidebar />
+            <Article>
+                <ApiDocHeader
+                    doc={{
+                        name: 'viewModelFactory',
+                        packageName: 'viewmodel',
+                        sources: docs.viewModelFactory.sources,
+                    }}
+                />
+                <SignatureDoc
+                    signature={
+                        docs.viewModelFactory.signatures[
+                            docs.viewModelFactory.signatures.length - 1
+                        ]
+                    }
+                    anchorLink="method-viewmodel"
+                />
+                <h3 className="text-4xl">Static Class Methods</h3>
+                {staticMethods.map(method => (
+                    <MethodDoc key={method.name} method={method} />
+                ))}
+                <h3 className="text-4xl mt-10">Static Class Properties</h3>
+                {staticProperties.map(prop => (
+                    <VariableDoc key={prop.name} doc={prop} />
+                ))}
+                <h3 className="text-4xl mt-10">Instance Methods</h3>
+                {instanceMethods.map(method => (
+                    <MethodDoc key={method.name} method={method} />
+                ))}
+                <h3 className="text-4xl mt-10">Instance Properties</h3>
+                {instanceProperties.map(prop => (
+                    <VariableDoc key={prop.name} doc={prop} />
+                ))}
+            </Article>
+            <Sidebar currentTitle="On This Page">
+                <Sidebar.LinksSection
+                    title="On this page"
+                    links={[
+                        {
+                            title: 'ViewModel',
+                            href: `#method-viewmodel`,
+                        },
+                    ]}
+                />
+                <Sidebar.LinksSection
+                    title="Static Methods"
+                    links={staticMethods.map(prop => ({
+                        title: prop.name,
+                        href: `#method-${prop.name}`,
+                    }))}
+                />
+                <Sidebar.LinksSection
+                    title="Static Properties"
+                    links={staticProperties.map(prop => ({
+                        title: prop.name,
+                        href: `#var-${prop.name}`,
+                    }))}
+                />
+                <Sidebar.LinksSection
+                    title="Instance Methods"
+                    links={instanceMethods.map(prop => ({
+                        title: prop.name,
+                        href: `#method-${prop.name}`,
+                    }))}
+                />
+                <Sidebar.LinksSection
+                    title="Instance Properties"
+                    links={instanceProperties.map(prop => ({
+                        title: prop.name,
+                        href: `#var-${prop.name}`,
+                    }))}
+                />
+            </Sidebar>
+        </>
+    );
+}
+
+export async function getStaticProps(context) {
+    return defaultGetStaticProps(
+        context,
+        datum =>
+            ['viewModelFactory', 'ViewModelInterface', 'ViewModelConstructor'].includes(datum.name),
+        items =>
+            items.reduce((acc, item) => {
+                acc[item.name] = item;
+                return acc;
+            }, {})
+    );
+}

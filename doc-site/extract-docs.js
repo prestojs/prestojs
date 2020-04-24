@@ -38,48 +38,32 @@ function extractChildren(node) {
     if (rest.kindString === 'Function' && rest.signatures && rest.signatures.length > 0) {
         comment = rest.signatures[0].comment;
     }
-    if (comment && comment.tags && comment.tags) {
-        extractDocs = comment.tags.filter(tag => tag.tag === 'extract-docs').length > 0;
+    if (comment && comment.tags) {
+        const tagsByName = comment.tags.reduce((acc, tag) => {
+            acc[tag.tag] = tag.text.trim();
+            return acc;
+        }, {});
+        extractDocs = 'extract-docs' in tagsByName;
+        comment.tagsByName = tagsByName;
     }
     rest.extractDocs = extractDocs;
-    if (extractDocs) {
-        const { fileName } = rest.sources[0];
-        const importPath = fileName
-            .replace('js-packages/', '')
-            .replace('src/', '')
-            .split('.')[0];
-        const slug = [...importPath.split('/').slice(0, -1), rest.name].join('/');
-        const permaLink = `/api/${slug}.html`;
-        const [, packageName, ...names] = slug.split('/');
-        rest.slug = permaLink;
-        rest.packageName = packageName;
-
-        // const name = names.pop();
-        // const extra = names;
-        //         const text = comment.text;
-        //         if (text) {
-        //             let dir = `./doc-site/data/${packageName}/`;
-        //             if (extra.length > 0) {
-        //                 dir += `${extra.join('/')}/`;
-        //             }
-        //             if (!fs.existsSync(dir)) {
-        //                 fs.mkdirSync(dir, { recursive: true });
-        //             }
-        //             const contents = `---
-        // id: ${String(rest.id)}
-        // title: ${name}
-        // slug: ${permaLink}
-        // ---
-        //
-        // ${text}
-        // `;
-        //             fs.writeFileSync(`${dir}${name}.mdx`, contents);
-        //         }
-    }
+    const { fileName } = rest.sources[0];
+    const importPath = fileName
+        .replace('js-packages/', '')
+        .replace('src/', '')
+        .split('.')[0];
+    const slug = [...importPath.split('/').slice(0, -1), rest.name].join('/');
+    const permaLink = slug
+        .split('/')
+        .slice(1)
+        .join('/');
+    const [, packageName, ...names] = slug.split('/');
+    rest.slug = permaLink;
+    rest.packageName = packageName;
     if (children) {
         rest.childIds = children.map(child => child.id);
     }
-    rest.children = rest.childNodes = children;
+    rest.children = children;
     if (!node.children) {
         return [rest];
     }
@@ -92,14 +76,67 @@ function extractChildren(node) {
     );
 }
 
-fs.writeFileSync(
-    './data/typeDocs.json',
-    JSON.stringify(
-        transformedData.reduce((acc, child) => {
-            acc.push(...extractChildren(child));
+const finalData = transformedData.reduce((acc, child) => {
+    acc.push(...extractChildren(child));
+    return acc;
+}, []);
+
+const byId = finalData.reduce((acc, node) => {
+    acc[node.id] = node;
+    return acc;
+}, {});
+
+function updateObjects(obj, fn) {
+    if (fn(obj)) {
+        return;
+    }
+    for (const value of Object.values(obj)) {
+        if (Array.isArray(value)) {
+            for (const v of value) {
+                if (value && typeof value == 'object') {
+                    updateObjects(v, fn);
+                }
+            }
+        } else if (value && typeof value == 'object') {
+            updateObjects(value, fn);
+        }
+    }
+    return obj;
+}
+
+updateObjects(byId, obj => {
+    if (obj.type === 'reference' && byId[obj.id] && byId[obj.id].extractDocs) {
+        obj.referenceSlug = byId[obj.id].slug;
+    }
+    if (obj.tags) {
+        obj.tagsByName = obj.tags.reduce((acc, tag) => {
+            acc[tag.tag] = tag.text.trim();
+            if (acc[tag.tag] === '') {
+                acc[tag.tag] = true;
+            }
+            if (tag.tag === 'expand-properties' && acc[tag.tag] !== true) {
+                // Hack to have mdx transform work on it
+                acc[tag.tag] = {
+                    comment: { text: acc[tag.tag] },
+                };
+            }
             return acc;
-        }, []),
-        null,
-        2
-    )
-);
+        }, {});
+    }
+});
+
+fs.writeFileSync('./data/typeDocs.json', JSON.stringify(finalData, null, 2));
+
+const menuByName = {};
+for (const datum of finalData) {
+    if (datum.extractDocs) {
+        const slug = datum.slug.split('/').filter(Boolean);
+        menuByName[datum.packageName] = menuByName[datum.packageName] || [];
+        menuByName[datum.packageName].push({
+            title: datum.name,
+            slug: slug.join('/'),
+        });
+    }
+}
+
+fs.writeFileSync('./data/apiMenu.json', JSON.stringify(menuByName, null, 2));

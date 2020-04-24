@@ -1,5 +1,8 @@
 import Field, { Props } from './Field';
 
+/**
+ * @expand-properties
+ */
 type CharFieldProps = Props<string> & { maxLength?: number };
 
 /**

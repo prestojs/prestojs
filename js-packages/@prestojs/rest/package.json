@@ -12,8 +12,8 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build:declaration": "tsc --project tsconfig.json",
-    "build": "yarn build:esmodule && yarn build:commonjs",
+    "build:declaration": "tsc --project tsconfig.json --outDir build/cjs && tsc --project tsconfig.json --outDir build/module",
+    "build": "yarn build:esmodule && yarn build:commonjs && yarn build:declaration",
     "build:esmodule": "BABEL_MODULES=esmodule BABEL_ENV=build babel src --root-mode upward --out-dir build/module --source-maps --extensions .ts,.tsx --delete-dir-on-start",
     "build:commonjs": "BABEL_MODULES=commonjs BABEL_ENV=build babel src --root-mode upward --out-dir build/cjs --source-maps --extensions .ts,.tsx --delete-dir-on-start",
     "build:watch": "yarn build:esmodule --watch",

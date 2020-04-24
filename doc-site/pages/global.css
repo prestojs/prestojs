@@ -1,0 +1,51 @@
+@tailwind base;
+
+h1 {
+    @apply text-2xl;
+}
+h2 {
+    @apply text-xl;
+}
+h3 {
+    @apply text-lg;
+}
+
+html {
+    @apply bg-white antialiased;
+}
+
+@tailwind components;
+
+.anchor-link {
+    position: relative;
+    margin-left: -1em;
+    padding-left: 1em;
+}
+.anchor-link::before {
+    display: block;
+    height: 5rem;
+    margin-top: -5rem;
+    visibility: hidden;
+    content: '';
+}
+.anchor-link-a {
+    top: 5rem;
+    left: 0;
+}
+.anchor-link:hover .anchor-link-a {
+    display: block;
+}
+
+.table-mdx p {
+    margin: 0;
+}
+.table-mdx a {
+    @apply text-blue-800;
+    @apply underline;
+}
+
+.table-mdx a:hover {
+    @apply text-blue-900;
+}
+
+@tailwind utilities;

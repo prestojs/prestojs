@@ -8,7 +8,7 @@ module.exports = api => {
             [
                 '@babel/preset-env',
                 {
-                    modules,
+                    modules: false,
                     targets: !modules
                         ? {
                               esmodules: true,
@@ -29,11 +29,12 @@ module.exports = api => {
             '@babel/preset-react',
         ],
         plugins: [
+            modules === 'commonjs' && '@babel/plugin-transform-modules-commonjs',
             '@babel/proposal-class-properties',
             '@babel/proposal-object-rest-spread',
             '@babel/plugin-proposal-nullish-coalescing-operator',
             '@babel/plugin-proposal-optional-chaining',
-        ],
+        ].filter(Boolean),
         ignore: isTest ? [] : ['**/__tests__'],
     };
 };

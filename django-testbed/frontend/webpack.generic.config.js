@@ -140,7 +140,6 @@ module.exports = ({
     const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
     const WriteJsonFilePlugin = require('./plugins/WriteJsonFilePlugin');
     const SentryWebpackPlugin = require('@sentry/webpack-plugin');
-    const PnpWebpackPlugin = require(`pnp-webpack-plugin`);
 
     const assert = require('assert');
     const autoprefixer = require('autoprefixer');
@@ -279,9 +278,7 @@ module.exports = ({
                     // Autoprefixing is done with postcss - postcss-loader
                     // included in getCssLoader
                     postcss: function() {
-                        return [
-                            autoprefixer(),
-                        ];
+                        return [autoprefixer()];
                     },
                 },
             }),
@@ -388,16 +385,6 @@ module.exports = ({
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
-        },
-        resolve: {
-            plugins: [
-                PnpWebpackPlugin,
-            ],
-        },
-        resolveLoader: {
-            plugins: [
-                PnpWebpackPlugin.moduleLoader(module),
-            ],
         },
     };
 

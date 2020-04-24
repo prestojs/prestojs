@@ -34,7 +34,7 @@ export default function useViewModelCache<T extends ViewModelInterface<any, any>
     selector: Selector<T, ResultType>
 ): ResultType {
     // Implementation is based on https://github.com/reduxjs/react-redux/blob/master/src/hooks/useSelector.js
-    const [, forceRender] = useReducer(i => !i, true);
+    const [, forceRender] = useReducer<React.Reducer<boolean, {}>>(i => !i, true);
     const latestSubscriptionCallbackError = useRef<Error>();
     const lastSelector = useRef<Selector<T, ResultType>>();
     const lastValue = useRef<ResultType>();

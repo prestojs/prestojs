@@ -7,23 +7,27 @@
   "private": true,
   "workspaces": [
     "js-packages/@prestojs/*",
+    "doc-site",
     "django-testbed"
   ],
   "scripts": {
     "lint": "eslint js-packages --ext .js,.ts",
-    "check-types": "pnpify tsc -b tsconfig.lint.json",
-    "clean": "rm -rf /tmp/tsc-output/@prestojs && yarn workspaces foreach --exclude django-testbed run clean",
-    "prebuild": "yarn workspaces foreach run clean",
-    "prepublish": "yarn workspaces foreach run build",
+    "check-types": "tsc -b tsconfig.lint.json",
+    "clean": "rm -rf /tmp/tsc-output/@prestojs && wsrun -x doc-site -x django-testbed -m clean",
+    "docs": "yarn workspace doc-site run develop",
+    "extract-docs": "yarn node doc-site/extract-docs",
+    "prebuild": "wsrun -m -x doc-site clean",
     "test": "jest",
-    "dev": "yarn workspaces foreach -pvi -j 10 run dev",
-    "build": "yarn workspaces foreach --exclude django-testbed -ptv run build",
-    "build:watch": "yarn workspaces foreach --exclude django-testbed -p run 'build:watch'",
-    "build:declarations": "pnpify tsc -b"
+    "dev": "wsrun dev",
+    "build": "yarn workspace @prestojs/routing run build && yarn workspace @prestojs/viewmodel run build && yarn workspace @prestojs/ui run build && yarn workspace @prestojs/rest run build && yarn workspace @prestojs/final-form run build && yarn workspace @prestojs/ui-antd run build",
+    "build:docs": "yarn workspace doc-site run build",
+    "build:watch": "wsrun --exclude django-testbed 'build:watch'",
+    "build:declarations": "tsc -b"
   },
   "devDependencies": {
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.7.4",
     "@babel/plugin-proposal-optional-chaining": "^7.7.5",
+    "@babel/plugin-transform-modules-commonjs": "^7.9.0",
     "@babel/preset-react": "^7.8.3",
     "@strictsoftware/typedoc-plugin-monorepo": "^0.2.1",
     "@testing-library/jest-dom": "^5.1.1",
@@ -36,9 +40,7 @@
     "@typescript-eslint/parser": "^2.19.0",
     "@yarnpkg/pnpify": "^2.0.0-rc.18",
     "babel-jest": "^25.1.0",
-    "babel-preset-gatsby": "^0.2.28",
     "commitizen": "^4.0.3",
-    "cz-lerna-changelog": "^2.0.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.1",
@@ -72,13 +74,15 @@
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-typescript": "^7.8.3",
     "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react-dom": "^16.12.0",
+    "wsrun": "^5.2.0"
   },
   "husky": {
     "hooks": {
       "pre-commit": "yarn check-types && lint-staged",
       "pre-push": "LINT_PUSH=1 ./bin/lint/lint-general.py",
-      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+      "commit-msg": "./bin/git-hooks/commit-msg $HUSKY_GIT_PARAMS",
+      "prepare-commit-msg": "./bin/git-hooks/prepare-commit-msg $HUSKY_GIT_PARAMS"
     }
   }
 }
