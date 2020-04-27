@@ -381,7 +381,9 @@ export default function ViewModelFactory<T extends FieldsMapping>(
         ? SinglePrimaryKey
         : SinglePrimaryKey;
 
-    // This is the constructor function for the created class
+    // This is the constructor function for the created class. We aren't using an ES6 class
+    // here as I couldn't get types to work nicely (possibly ignorance on my behalf - can look
+    // to refactor down the track)
     function _Base<T extends FinalFields = FinalFields>(
         data: FieldDataMappingRaw<T>
     ): FieldDataMapping<T> {
@@ -528,6 +530,16 @@ export default function ViewModelFactory<T extends FieldsMapping>(
         [FinalFields, string | string[]]
     > = new Map();
 
+    /**
+     * Helper to bind fields to the specific ViewModel class. This happens once per class and happens
+     * for every class in a hierarchy (eg. if B extends A they may have the same fields but there is
+     * a copy for A & B that are bound to the correct parent class).
+     *
+     * Binding just means the `name` of a field has been set and the `parent` link is set to the owning
+     * class.
+     *
+     * The return value is a 2-tuple of the field mapping object and the primary key name(s).
+     */
     function _bindFields(modelClass: ViewModelConstructor<T>): [FinalFields, string | string[]] {
         let f = boundFields.get(modelClass as ViewModelConstructor<FinalFields>);
         if (!f) {
