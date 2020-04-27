@@ -621,3 +621,22 @@ test('should disallow naming fields one of reserved names', () => {
         }).toThrow(/is reserved and cannot be used as a field name/);
     }
 });
+
+test('should bind fields to _f', () => {
+    class A extends ViewModelFactory({
+        id: new Field({ label: 'Id' }),
+        name: new Field({ label: 'Name' }),
+        email: new Field({ label: 'Email' }),
+    }) {}
+
+    const record1 = new A({
+        id: 1,
+        name: 'bob',
+        email: 'a@b',
+    });
+
+    expect(record1._f.name).toBeInstanceOf(Field);
+    expect(record1._f.name.value).toBe('bob');
+    expect(record1._f.email.value).toBe('a@b');
+    expect(record1._f.id.value).toBe(1);
+});
