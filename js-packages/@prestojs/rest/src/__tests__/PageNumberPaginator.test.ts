@@ -3,6 +3,8 @@ import { renderHook, act } from '@testing-library/react-hooks';
 import PageNumberPaginator from '../PageNumberPaginator';
 
 function useTestHook(initialState = {}): PageNumberPaginator {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     return new PageNumberPaginator(useState(initialState), useState());
 }
 
