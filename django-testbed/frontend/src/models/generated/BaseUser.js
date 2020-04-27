@@ -1,6 +1,6 @@
-import { CharField, EmailField, ViewModel, NumberField } from '@prestojs/viewmodel';
+import { CharField, EmailField, viewModelFactory, NumberField } from '@prestojs/viewmodel';
 
-export default class Base extends ViewModel({
+export default class Base extends viewModelFactory({
     id: new NumberField({
         label: 'Id',
     }),
