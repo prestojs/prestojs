@@ -41,7 +41,7 @@ export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
  *     // If not specified will create a default field called 'id'
  *     pkFieldName: 'userId',
  * };
- * class User extends ViewModel(fields, options) {
+ * class User extends viewModelFactory(fields, options) {
  *     // Optional; default cache is usually sufficient
  *     static cache = new MyCustomCache();
  *
@@ -127,7 +127,7 @@ export interface ViewModelConstructor<
      * The singular label for this ViewModel. This should be set by extending the created class.
      *
      * ```js
-     * class User extends ViewModel(fields) {
+     * class User extends viewModelFactory(fields) {
      *     static label = 'User';
      * }
      * ```
@@ -138,7 +138,7 @@ export interface ViewModelConstructor<
      * The label used to describe an indeterminate number of this ViewModel. This should be set by extending the created class.
      *
      * ```js
-     * class User extends ViewModel(fields) {
+     * class User extends viewModelFactory(fields) {
      *     static labelPlural = 'Users';
      * }
      * ```
@@ -305,6 +305,7 @@ function defaultGetImplicitPkField<T extends FieldsMapping>(
 
 const IS_VIEW_MODEL = Symbol.for('@prestojs/IS_VIEW_MODEL');
 
+// TODO: Refactor so we use a real base class and can use instanceof directly instead, see https://github.com/prestojs/prestojs/issues/41
 export function isViewModelInstance(view: any): view is ViewModelInterface<any, any> {
     return !!(view && view.constructor && view.constructor[IS_VIEW_MODEL]);
 }

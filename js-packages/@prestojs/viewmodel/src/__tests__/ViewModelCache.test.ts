@@ -1,6 +1,6 @@
 import Field from '../fields/Field';
 import { recordEqualTo } from '../../../../../js-testing/matchers';
-import ViewModelFactory, { isViewModelInstance, ViewModelInterface } from '../ViewModelFactory';
+import viewModelFactory, { isViewModelInstance, ViewModelInterface } from '../ViewModelFactory';
 import ViewModelCache from '../ViewModelCache';
 
 function F<T>(name): Field<T> {
@@ -8,10 +8,10 @@ function F<T>(name): Field<T> {
 }
 
 test('should cache records from record instance', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
     }) {}
-    class Test2 extends ViewModelFactory({
+    class Test2 extends viewModelFactory({
         id: F('id'),
     }) {}
 
@@ -29,10 +29,10 @@ test('should cache records from record instance', () => {
 });
 
 test('should cache records from plain object', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
     }) {}
-    class Test2 extends ViewModelFactory({
+    class Test2 extends viewModelFactory({
         id: F('id'),
     }) {}
 
@@ -50,10 +50,10 @@ test('should cache records from plain object', () => {
 });
 
 test('should throw error if caching different ViewModel', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
     }) {}
-    class Test2 extends ViewModelFactory({
+    class Test2 extends viewModelFactory({
         id: F('id'),
     }) {}
 
@@ -67,7 +67,7 @@ test('should throw error if caching different ViewModel', () => {
 });
 
 test('should cache records with compound keys', () => {
-    class Test1 extends ViewModelFactory(
+    class Test1 extends viewModelFactory(
         {
             id1: F('id1'),
             id2: F('id2'),
@@ -106,7 +106,7 @@ test('should cache records with compound keys', () => {
 });
 
 test('should validate pk(s)', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
     }) {}
     const record1 = new Test1({ id: 5 });
@@ -116,7 +116,7 @@ test('should validate pk(s)', () => {
         "Test1 has a single primary key named 'id' but an object was provided. This should be a number or string."
     );
 
-    class Test2 extends ViewModelFactory(
+    class Test2 extends viewModelFactory(
         {
             id1: F('id1'),
             id2: F('id2'),
@@ -140,7 +140,7 @@ test('should validate pk(s)', () => {
 });
 
 test('should always use primary key in cache regardless of whether specified', () => {
-    class Test1 extends ViewModelFactory(
+    class Test1 extends viewModelFactory(
         {
             id1: F('id1'),
             id2: F('id2'),
@@ -151,7 +151,7 @@ test('should always use primary key in cache regardless of whether specified', (
         }
     ) {}
 
-    class Test2 extends ViewModelFactory({
+    class Test2 extends viewModelFactory({
         id: F('id'),
         name: F('name'),
     }) {}
@@ -192,14 +192,14 @@ test('should support custom cache', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        class TestBad extends ViewModelFactory({}) {
+        class TestBad extends viewModelFactory({}) {
             static cache = new MyInvalidCache();
         }
     }).toThrowError('cache class must extend ViewModelCache');
 
     class MyCache<T extends ViewModelInterface<any, any>> extends ViewModelCache<T> {}
     class MyCache2<T extends ViewModelInterface<any, any>> extends ViewModelCache<T> {}
-    class Test1 extends ViewModelFactory({}) {
+    class Test1 extends viewModelFactory({}) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         static cache = new MyCache<Test1>(Test1);
@@ -231,7 +231,7 @@ test('should support custom cache', () => {
 });
 
 test('updating a record should result in cache for subset of fields being updated', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -296,7 +296,7 @@ test('updating a record should result in cache for subset of fields being update
     // This handles cases where you may try and access a cache for subset of fields that hasn't explicitly
     // been cached yet but is available as a superset of those fields. In those cases we expect the cache to
     // be populated lazily
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -334,7 +334,7 @@ test('updating a record should result in cache for subset of fields being update
 });
 
 test('should use most recently set superset of fields', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -357,7 +357,7 @@ test('should use most recently set superset of fields', () => {
 });
 
 test('should support removing records from cache', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -373,7 +373,7 @@ test('should support removing records from cache', () => {
 });
 
 test('should support removing records from cache for only specified field names', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -391,7 +391,7 @@ test('should support removing records from cache for only specified field names'
 });
 
 test('should support retrieving multiple records', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -423,7 +423,7 @@ test('should support retrieving multiple records', () => {
 });
 
 test('should notify listeners on add, change, delete', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -493,7 +493,7 @@ test('should notify listeners on add, change, delete', () => {
 });
 
 test('should not notify if identical record added', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -515,7 +515,7 @@ test('should not notify if identical record added', () => {
 });
 
 test('should support listening to multiple pks', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -547,7 +547,7 @@ test('should support listening to multiple pks', () => {
 });
 
 test('should support listening to multiple pks, batch notifications', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -571,7 +571,7 @@ test('should support listening to multiple pks, batch notifications', () => {
 });
 
 test('should support listening to multiple pks without specifying primary keys in field names', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -589,7 +589,7 @@ test('should support listening to multiple pks without specifying primary keys i
 });
 
 test('should support adding list of plain objects', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -609,7 +609,7 @@ test('should support adding list of plain objects', () => {
 });
 
 test('should support adding list of via add', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -635,7 +635,7 @@ test.each`
     ${true}
     ${false}
 `('Should support getting all records, listeners = $withListeners ', ({ withListeners }) => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
@@ -695,7 +695,7 @@ test.each`
 });
 
 test('should support listening all changes on a ViewModel', () => {
-    class Test1 extends ViewModelFactory({
+    class Test1 extends viewModelFactory({
         id: F('id'),
         firstName: F('firstName'),
         lastName: F('lastName'),
