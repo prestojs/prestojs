@@ -58,6 +58,7 @@ export type ViewModelInterface<
     PkFieldType extends string | string[] = string | string[],
     PkType extends PrimaryKey = PrimaryKey
 > = FieldDataMapping<FieldMappingType> & {
+    /** @private */
     __instanceFieldMappingType: InstanceFieldMappingType;
     /**
      * Get the actual ViewModel class for this instance
@@ -158,6 +159,17 @@ export interface ViewModelConstructor<
      */
     readonly pkFieldNames: string[];
 
+    /**
+     * Shortcut to get the names of all fields excluding primary keys.
+     *
+     * If you want all fields including primary key do:
+     *
+     * ```js
+     * model.fieldNames.concat(model.pkFieldNames);
+     * ```
+     */
+    readonly fieldNames: string[];
+
     readonly cache: ViewModelCache<
         ViewModelInterface<FieldMappingType, FieldMappingType, PkFieldType, PkType>
     >;
@@ -165,6 +177,55 @@ export interface ViewModelConstructor<
     /**
      * Create a new class that extends this class with the additional specified fields. To remove a
      * field that exists on the base class set it's value to null.
+     *
+     * ```js
+     * class Base extends viewModelFactory({
+     *   id: new NumberField({
+     *     label: 'Id',
+     *   }),
+     *   firstName: new CharField({
+     *     label: 'First Name',
+     *   }),
+     *   lastName: new CharField({
+     *     label: 'Last Name',
+     *   }),
+     *   email: new EmailField({
+     *     label: 'Email',
+     *   }),
+     * }) {
+     *   static label = 'User';
+     *   static labelPlural = 'Users';
+     * }
+     *
+     * class User extends BaseUser.augment({
+     *   region: new IntegerField({
+     *     label: 'region',
+     *     required: true,
+     *     helpText: 'Region Coding of the user',
+     *     choices: [
+     *       [1, 'Oceania'],
+     *       [2, 'Asia'],
+     *       [3, 'Africa'],
+     *       [4, 'America'],
+     *       [5, 'Europe'],
+     *       [6, 'Antarctica'],
+     *       [7, 'Atlantis'],
+     *     ],
+     *   }),
+     *   photo: new ImageField({
+     *     helpText: 'Will be cropped to 400x400',
+     *   }),
+     * }) {
+     * }
+     *
+     * // true
+     * User instanceof BaseUser
+     * // true
+     * User.label === 'User'
+     *
+     * // ['firstName, 'lastName', 'email', 'region', 'photo]
+     * User.fieldNames
+     * ```
      *
      * @param newFields Map of field name to a `Field` instance (to add the field) or `null` (to remove the field)
      * @param newOptions Provide optional overrides for the options that the original class was created with
@@ -190,9 +251,33 @@ type GetImplicitPkField<T extends FieldsMapping> =
     | GetImplicitPkFieldCompound<T>
     | GetImplicitPkFieldSingle<T>;
 
+/**
+ * @expand-properties
+ */
 interface ViewModelOptions<T extends FieldsMapping> {
-    baseClass?: ViewModelConstructor<FieldsMapping>;
+    /**
+     * Optional base class to extend. When calling `augment` this is set the augmented class.
+     *
+     * @type-name ?Class
+     */
+    baseClass?: ViewModelConstructor<T>;
+    /**
+     * Primary key name(s) to use. There should be field(s) with the corresponding name in the
+     * provided `fields`.
+     *
+     * Only `pkFieldName` or `getImplicitPkField` should be provided. If neither are provided then
+     * a field called `id` will be used and created if not provided in `fields`.
+     *
+     * @type-name ?string|string[]
+     */
     pkFieldName?: null | undefined | string | string[];
+    /**
+     * A function to generate field(s) to use for the primary key. It is passed the model class and
+     * the fields on the model. It should return an array of size 2 - first element should be the
+     * field name and the second an instance of `Field`.
+     *
+     * @type-name ?Function
+     */
     getImplicitPkField?: null | undefined | GetImplicitPkField<T>;
 }
 
@@ -325,27 +410,70 @@ function checkReservedFieldNames(fields): void {
 }
 // Using very strongly typed overloads instead a single type with optional properties so we can more accurately type
 // the primary key and fields (specifically for default case we can add the implicit 'id' field that will be created)
-export default function ViewModelFactory<T extends FieldsMapping>(
+export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options: ViewModelOptionsPkFieldNameSingle<T>
 ): ViewModelConstructor<T, string, SinglePrimaryKey>;
-export default function ViewModelFactory<T extends FieldsMapping>(
+export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options: ViewModelOptionsPkFieldNameCompound<T>
 ): ViewModelConstructor<T, string[], CompoundPrimaryKey>;
-export default function ViewModelFactory<T extends FieldsMapping>(
+export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options: ViewModelOptionsGetImplicitPkFieldSingle<T>
 ): ViewModelConstructor<T, string, SinglePrimaryKey>;
-export default function ViewModelFactory<T extends FieldsMapping>(
+export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options: ViewModelOptionsGetImplicitPkFieldCompound<T>
 ): ViewModelConstructor<T, string[], CompoundPrimaryKey>;
-export default function ViewModelFactory<T extends FieldsMapping>(
+export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options?: ViewModelOptions<T>
 ): ViewModelConstructor<{ id: NumberField } & T, 'id', string | number>;
-export default function ViewModelFactory<T extends FieldsMapping>(
+/**
+ * Creates a ViewModel class with the specified fields.
+ *
+ * ```js
+ * const fields = {
+ *     userId: new IntegerField({ label: 'User ID' })
+ *     firstName: new CharField({ label: 'First Name' }),
+ *     // label is optional; will be generated as 'Last name'
+ *     lastName: new CharField(),
+ * };
+ * // Options are all optional and can be omitted entirely
+ * const options = {
+ *     // Only one of pkFieldName or getImplicitPkField can be defined.
+ *     // If neither are provided a default field called 'id' will be created.
+ *     pkFieldName: 'userId',
+ *     // Multiple names can be specified for compound keys
+ *     pkFieldName: ['organisationId', 'departmentId']
+ *     // You can also specify a function to create the primary key
+ *     getImplicitPkField(model, fields) {
+ *          if ('EntityId' in fields) {
+ *              return ['EntityId', fields.EntityId];
+ *          }
+ *          // Generate a name base on model, eg. `userId`
+ *          const name = model.name[0].toLowerCase() + model.name.slice(1);
+ *          return [`${name}Id`, new NumberField()];
+ *      },
+ *      // Optionally can specify a baseClass for this model. When using `augment`
+ *      // this is automatically set to the class being augmented.
+ *      baseClass: BaseViewModel,
+ * };
+ * class User extends viewModelFactory(fields, options) {
+ *     // Optional; default cache is usually sufficient
+ *     static cache = new MyCustomCache();
+ *
+ *     // Used to describe a single user
+ *     static label = 'User';
+ *     // User to describe an indeterminate number of users
+ *     static labelPlural = 'Users';
+ * }
+ * ```
+ *
+ * @param fields A map of field name to an instance of `Field`
+ */
+export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options: ViewModelOptions<T> = {}
 ): ViewModelConstructor<any, any> {
@@ -651,6 +779,12 @@ export default function ViewModelFactory<T extends FieldsMapping>(
                 return _bindFields(this)[1];
             },
         },
+        fieldNames: {
+            get(): string[] {
+                const pkFieldNames = this.pkFieldNames;
+                return Object.keys(this.fields).filter(name => !pkFieldNames.includes(name));
+            },
+        },
         fields: {
             get(): FinalFields {
                 return _bindFields(this)[0];
@@ -700,7 +834,7 @@ export default function ViewModelFactory<T extends FieldsMapping>(
                 delete f[fieldName];
             }
         }
-        return ViewModelFactory(f as T & P, {
+        return viewModelFactory(f as T & P, {
             ...(options as ViewModelOptions<T & P>),
             ...newOptions,
             baseClass: this,

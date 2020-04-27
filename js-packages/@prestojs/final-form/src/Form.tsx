@@ -6,8 +6,19 @@ import { Form as FinalForm, FormProps as FinalFormProps } from 'react-final-form
 import FormField from './FormField';
 import FormItem from './FormItem';
 
+/**
+ * @expand-properties Any of the final-form [FormProps](https://final-form.org/docs/react-final-form/types/FormProps) and the options shown below
+ */
 type FormProps<FormValues = object> = FinalFormProps<FormValues> & {
+    /**
+     * Initial values for the form. Either an object or a `ViewModel` record.
+     */
     initialValues?: FormValues | ViewModelInterface<any, any>;
+    /**
+     * Any extra props to pass through to the underlying form component. The form component
+     * used is determined by the `formComponent` passed to [UiProvider](doc:UiProvider) or
+     * `form` if none is passed.
+     */
     formProps?: Record<string, any>;
 };
 
@@ -22,12 +33,8 @@ type FormProps<FormValues = object> = FinalFormProps<FormValues> & {
  *
  * @extract-docs
  */
-export default function Form({
-    initialValues,
-    children,
-    formProps,
-    ...rest
-}: FormProps): React.ReactElement {
+export default function Form(props: FormProps): React.ReactElement {
+    let { initialValues, children, formProps, ...rest } = props;
     let { formComponent: FormComponent } = useUi();
     if (!FormComponent) {
         FormComponent = 'form';

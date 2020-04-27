@@ -41,7 +41,7 @@ test('should accept paginator class', async () => {
 test('should accept state', async () => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     function useTestHook() {
-        const [state, setState] = useState();
+        const [state, setState] = useState<{ page: number; pageSize: number }>();
         const paginator = usePaginator(PageNumberPaginator, [state, setState]);
         return {
             state,

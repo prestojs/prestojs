@@ -110,6 +110,8 @@ test('should support merging global headers with action specific headers', async
     fetchMock.mockResponse('');
     const expectHeadersEqual = (headers2): void => {
         const headers1 = new Headers(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+            // @ts-ignore
             fetchMock.mock.calls[fetchMock.mock.calls.length - 1][1].headers
         );
         headers2 = new Headers(headers2);

@@ -1,17 +1,41 @@
 import FieldBinder from '../FieldBinder';
 
+/**
+ * @expand-properties
+ */
 export interface Props<T> {
+    /**
+     * True if field is required when creating or updating a model
+     */
     required?: boolean;
+    /**
+     * Label for this field. If not specified will be generated from the name.
+     */
     label?: string;
+    /**
+     * Optional help text for this field that might be shown on a form
+     */
     helpText?: string;
+    /**
+     * Default value for this field
+     */
     defaultValue?: T | (() => Promise<T>);
     // A field can have choices regardless of it's type.
     // eg. A CharField and IntegerField might both optionally have choices
     // TODO: Best way to handle remote choices? Should this be part of this
     // interface, eg. make it async?
     // In djrad we had: choiceRefinementUrl
+    /**
+     * Choices for this field. Should be a mapping of value to the label for the choice.
+     */
     choices?: Map<T, string>;
+    /**
+     * True if field should be considered read only (eg. excluded from forms)
+     */
     readOnly?: boolean;
+    /**
+     * True if field should be considered write only (eg. excluded from detail views)
+     */
     writeOnly?: boolean;
 }
 
@@ -24,6 +48,8 @@ class UnboundFieldError<T, K> extends Error {
 
 /**
  * Base Field
+ *
+ * @extract-docs
  */
 export default class Field<T, ParsableType extends any = T> {
     // These are just for internal usage with typescript
