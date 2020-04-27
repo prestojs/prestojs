@@ -3,6 +3,8 @@ import { useState } from 'react';
 import CursorPaginator from '../CursorPaginator';
 
 function useTestHook(initialState = {}): CursorPaginator {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     return new CursorPaginator(useState(initialState), useState());
 }
 

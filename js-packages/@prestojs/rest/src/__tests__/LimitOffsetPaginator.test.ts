@@ -3,6 +3,8 @@ import { useState } from 'react';
 import LimitOffsetPaginator from '../LimitOffsetPaginator';
 
 function useTestHook(initialState = {}): LimitOffsetPaginator {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     return new LimitOffsetPaginator(useState(initialState), useState());
 }
 
