@@ -11,6 +11,9 @@ type EncodeDecode = [Decode, Encode];
 
 type ParamsEncodeDecode = Record<string, EncodeDecode | Decode>;
 
+/**
+ * @expand-properties
+ */
 type Options = {
     /**
      * An object mapping a key name to either a 2-tuple of a decode & encode function or
@@ -38,7 +41,8 @@ type Options = {
     prefix?: string;
     /**
      * If specified only these keys will be synced to and read from the request
-     * URL. Any other keys will be ignored.
+     * URL. Any other keys will be ignored. If `true` is passed then all the fields specified in `params`
+     * will be used as the value (`params` must be supplied in this case).`
      */
     controlledKeys?: Array<string> | true;
     /**
@@ -68,7 +72,7 @@ const pickWithoutKeys = (
 function encode(key: string, value: any, params: ParamsEncodeDecode): string {
     const p = params[key] || params[WILDCARD];
     if (!p || !Array.isArray(p)) {
-        return value;
+        return value == null ? value : value.toString();
     }
     return p[1](value, key);
 }
@@ -193,7 +197,6 @@ const DEFAULT_PARAMS = {};
  * @param {Object} initialState The initial state values. If any of the specified
  * keys don't exist in the URL already the URL will be changed such that they
  * do. If all the keys do exist in the URL already this option has no effect.
- * @param {Options} options @expand
  *
  * @example
  *
@@ -288,6 +291,8 @@ const DEFAULT_PARAMS = {};
  * }
  * <ExampleUrlSyncControlled />
  * ```
+ *
+ * @extract-docs
  */
 export default function useUrlQueryState(
     initialState: {} = {},
@@ -302,9 +307,10 @@ export default function useUrlQueryState(
     Record<string, any>,
     /**
      * State transition function. Accepts either the state object to transition
-     * to OR a function that is passed the current state and should return the
-     * new state to transition to. Passing the function returned by `useState`
-     * is compatible with this.
+     * to OR a transition function.
+     *
+     * A transition function should accept the current state and return the new
+     * state (eg. same as `useState`).
      *
      * The state specified always replaces the current state - it is not merged
      * except with the caveats noted below.
