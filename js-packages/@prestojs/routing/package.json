@@ -20,11 +20,21 @@
     "dev": "yarn build:watch",
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
+  "peerDependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  },
   "dependencies": {
+    "lodash": "^4.17.15",
     "path-to-regexp": "^6.1.0",
     "qs": "^6.9.1"
   },
   "devDependencies": {
+    "@testing-library/react-hooks": "^3.2.1",
+    "jest-diff": "^25.1.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-test-renderer": "^16.12.0",
     "typescript": "^3.8.2"
   }
 }
