@@ -25,7 +25,9 @@ export default function Doc({ docs, extraNodes }) {
     const staticProperties = staticGroups.Properties.children
         .map(id => staticChildren[id])
         .filter(method => !method.flags.isPrivate);
-    const instanceDef = docs.ViewModelInterface.type.types.filter(t => t.type === 'reflection')[0]
+    // There's 2 type definitions here; one the indexable signature which we don't care about and one for the
+    // actual interface. Identify interface by existing of children.
+    const instanceDef = docs.ViewModelInterface.type.types.filter(t => !!t.declaration.children)[0]
         .declaration;
     const instanceGroups = instanceDef.groups.reduce((acc, group) => {
         acc[group.title] = group;

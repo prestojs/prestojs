@@ -49,6 +49,9 @@ export interface TopLevelUiContextValue {
 
 export const UiContext = React.createContext<UiContextValue | null>(null);
 
+/**
+ * @expand-properties
+ */
 type Props = {
     /**
      * Children to render
