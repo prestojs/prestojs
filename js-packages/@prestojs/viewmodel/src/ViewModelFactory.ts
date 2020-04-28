@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import startCase from 'lodash/startCase';
 
-import Field from './fields/Field';
+import Field, { RecordBoundField } from './fields/Field';
 import NumberField from './fields/NumberField';
 import { freezeObject, isDev } from './util';
 import ViewModelCache from './ViewModelCache';
@@ -54,12 +54,19 @@ export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
  */
 export type ViewModelInterface<
     FieldMappingType extends FieldsMapping,
-    InstanceFieldMappingType extends FieldMappingType,
+    IncomingData extends FieldDataMappingRaw<FieldMappingType>,
     PkFieldType extends string | string[] = string | string[],
     PkType extends PrimaryKey = PrimaryKey
-> = FieldDataMapping<FieldMappingType> & {
+> = {
+    readonly [K in Extract<
+        keyof IncomingData,
+        keyof FieldMappingType
+    >]: FieldMappingType[K]['__fieldValueType'];
+} & {
     /** @private */
-    __instanceFieldMappingType: InstanceFieldMappingType;
+    __instanceFieldMappingType: {
+        [k in Extract<keyof IncomingData, keyof FieldMappingType>]: FieldMappingType[k];
+    };
     /**
      * Get the actual ViewModel class for this instance
      */
@@ -76,13 +83,37 @@ export type ViewModelInterface<
      *   considered different even if the common fields are the same and other fields are
      *   all null
      */
-    isEqual(record: ViewModelInterface<FieldMappingType, InstanceFieldMappingType>): boolean;
+    isEqual(record: ViewModelInterface<FieldMappingType, IncomingData>): boolean;
+
     /**
      * Clone this record, optionally with only a subset of the fields
      */
     clone(
         fieldNames?: string[]
-    ): ViewModelInterface<FieldMappingType, InstanceFieldMappingType, PkFieldType, PkType>;
+    ): ViewModelInterface<FieldMappingType, IncomingData, PkFieldType, PkType>;
+
+    /**
+     * Access record bound fields. A record bound field is a normal field with it's `value` property
+     * set to the corresponding value for that field on the record. This is useful as a shortcut
+     * to get both the field and it's value.
+     *
+     * ```js
+     * class User extends viewModelFactory({ username: CharField() }) {}
+     *
+     * const admin = new User({ id: 1, username: 'admin' });
+     *
+     * // true
+     * admin._f.username instanceof CharField();
+     * admin._f.username.value === 'admin'
+     * ```
+     */
+    readonly _f: {
+        readonly [K in Extract<keyof IncomingData, keyof FieldMappingType>]: RecordBoundField<
+            FieldMappingType[K]['__fieldValueType'],
+            FieldMappingType[K]['__parsableValueType']
+        >;
+    };
+
     /**
      * Returns the primary key value(s) for this instance. This is a shortcut
      * for using the primary key field name(s) directly.
@@ -93,14 +124,19 @@ export type ViewModelInterface<
      * The assigned data for this record. You usually don't need to access this directly; values
      * for a field can be retrieved from the record directly using the field name
      */
-    readonly _data: FieldDataMapping<InstanceFieldMappingType>;
+    readonly _data: {
+        [k in Extract<
+            keyof IncomingData,
+            keyof FieldMappingType
+        >]: FieldMappingType[k]['__fieldValueType'];
+    };
 
     /**
      * List of field names with data available on this instance.
      *
      * @type-name string[]
      */
-    readonly _assignedFields: (keyof InstanceFieldMappingType)[];
+    readonly _assignedFields: (keyof FieldMappingType)[];
 };
 
 export interface ViewModelConstructor<
@@ -108,9 +144,17 @@ export interface ViewModelConstructor<
     PkFieldType extends string | string[] = string | string[],
     PkType extends PrimaryKey = PrimaryKey
 > {
-    new <IncomingFieldsType extends FieldMappingType = FieldMappingType>(
-        data: FieldDataMappingRaw<IncomingFieldsType>
-    ): ViewModelInterface<FieldMappingType, IncomingFieldsType, PkFieldType, PkType>;
+    /** @private */
+    __pkFieldType: PkFieldType;
+    /** @private */
+    __pkType: PkType;
+    new <
+        IncomingData extends FieldDataMappingRaw<FieldMappingType> = FieldDataMappingRaw<
+            FieldMappingType
+        >
+    >(
+        data: IncomingData
+    ): ViewModelInterface<FieldMappingType, IncomingData, PkFieldType, PkType>;
 
     /**
      * The bound fields for this ViewModel. These will match the `fields` passed in to `ViewModel` with the
@@ -170,9 +214,7 @@ export interface ViewModelConstructor<
      */
     readonly fieldNames: string[];
 
-    readonly cache: ViewModelCache<
-        ViewModelInterface<FieldMappingType, FieldMappingType, PkFieldType, PkType>
-    >;
+    readonly cache: ViewModelCache<ViewModelInterface<any, any>>;
 
     /**
      * Create a new class that extends this class with the additional specified fields. To remove a
@@ -513,9 +555,11 @@ export default function viewModelFactory<T extends FieldsMapping>(
     // This is the constructor function for the created class. We aren't using an ES6 class
     // here as I couldn't get types to work nicely (possibly ignorance on my behalf - can look
     // to refactor down the track)
-    function _Base<T extends FinalFields = FinalFields>(
-        data: FieldDataMappingRaw<T>
-    ): FieldDataMapping<T> {
+    function _Base<IncomingData extends FieldDataMappingRaw<FinalFields>>(
+        data: IncomingData
+    ): {
+        [k in Extract<keyof IncomingData, keyof FinalFields>]: FinalFields[k]['__fieldValueType'];
+    } {
         const pkFieldNames = this._model.pkFieldNames;
         const missing = pkFieldNames.filter(name => !(name in data));
         const empty = pkFieldNames.filter(name => name in data && data[name] == null);
@@ -649,6 +693,52 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 return new this._model(data);
             },
         },
+        _f: {
+            /**
+             * Get fields bound to this record instance. Each field behaves the same as accessing it via ViewModel.fields but
+             * has a `value` property that contains the value for that field on this record.
+             *
+             * This is useful when you need to know both the field on the ViewModel and the value on a record (eg. when formatting
+             * a value from a record
+             *
+             * ```js
+             * const user = new User({ name: 'Jon Snow' });
+             * user.name
+             * // Jon Snow
+             * user._f.name
+             * // CharField({ name: 'name', label: 'Label' });
+             * user._f.name.value
+             * // Jon Snow
+             * ```
+             */
+
+            get<IncomingData extends FieldDataMappingRaw<FinalFields>>(): {
+                readonly [K in Extract<keyof IncomingData, keyof FinalFields>]: RecordBoundField<
+                    FinalFields[K]['__fieldValueType'],
+                    FinalFields[K]['__parsableValueType']
+                >;
+            } {
+                if (!this.__recordBoundFields) {
+                    const { fields } = this._model;
+                    const { _data } = this;
+                    this.__recordBoundFields = this._assignedFields.reduce((acc, fieldName) => {
+                        acc[fieldName] = new Proxy(fields[fieldName], {
+                            get(target, prop): any {
+                                if (prop === 'value') {
+                                    return _data[fieldName];
+                                }
+                                if (prop === 'isBound') {
+                                    return true;
+                                }
+                                return target[prop];
+                            },
+                        });
+                        return acc;
+                    }, {});
+                }
+                return this.__recordBoundFields;
+            },
+        },
     };
     // Build getter/setter for all known fields. Note that we need to do this in _bindFields below as well in the
     // case that primary key fields are created.
@@ -761,7 +851,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
         __cache: {
             value: new Map<
                 ViewModelConstructor<FinalFields>,
-                ViewModelCache<ViewModelInterface<FinalFields, FinalFields>>
+                ViewModelCache<ViewModelInterface<any, any>>
             >(),
         },
         pkFieldNames: {
@@ -795,7 +885,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
             },
         },
         cache: {
-            get(): ViewModelCache<ViewModelInterface<FinalFields, FinalFields>> {
+            get(): ViewModelCache<ViewModelInterface<any, any>> {
                 // This is a getter so we can instantiate cache on each ViewModel independently without
                 // having to have the descendant create the cache
                 let cache = this.__cache.get(this);
@@ -805,7 +895,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 }
                 return cache;
             },
-            set(value: ViewModelCache<ViewModelInterface<FinalFields, FinalFields>>): void {
+            set(value: ViewModelCache<ViewModelInterface<any, any>>): void {
                 if (!(value instanceof ViewModelCache)) {
                     throw new Error(
                         `cache class must extend ViewModelCache. See ${this.name}.cache`

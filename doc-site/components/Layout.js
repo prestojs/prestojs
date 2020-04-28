@@ -13,7 +13,7 @@ import mdxComponents from './mdxComponents';
 import Sidebar from './Sidebar';
 import { MdxScopeContext } from './useMdxScope';
 
-function MDXWrapper({ metadata = {}, ...props }) {
+function MDXWrapper({ metadata = {}, children, ...props }) {
     const { scope = {} } = metadata;
     return (
         <MdxScopeContext.Provider value={scope}>
@@ -29,7 +29,9 @@ function MDXWrapper({ metadata = {}, ...props }) {
                         <Sidebar.LinksSection key={i} title={section.title} links={section.links} />
                     ))}
             </MainMenuSidebar>
-            <Article {...props} />
+            <Article {...props}>
+                <div className="mdx">{children}</div>
+            </Article>
         </MdxScopeContext.Provider>
     );
 }

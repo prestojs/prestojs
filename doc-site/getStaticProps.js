@@ -55,10 +55,14 @@ export default function getStaticProps(context, filter, transform = id => id) {
     const extraNodes = {};
     function LinkWrapper(props) {
         if (props.href.startsWith('doc:')) {
-            const name = props.href.split(':')[1];
+            const [name, hash] = props.href.split(':')[1].split('#');
             const target = data.filter(datum => datum.name === name)[0];
             if (target) {
-                return <a {...props} href={`/docs/${target.slug}/`} />;
+                let href = `/docs/${target.slug}/`;
+                if (hash) {
+                    href += `#${hash}`;
+                }
+                return <a {...props} href={href} />;
             }
         }
         return <a {...props} />;

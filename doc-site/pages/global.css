@@ -39,13 +39,17 @@ html {
 .table-mdx p {
     margin: 0;
 }
-.table-mdx a {
+.mdx a {
     @apply text-blue-800;
     @apply underline;
 }
 
-.table-mdx a:hover {
+.mdx a:hover {
     @apply text-blue-900;
+}
+.mdx code {
+    @apply p-1;
+    @apply bg-yellow-200;
 }
 
 @tailwind utilities;

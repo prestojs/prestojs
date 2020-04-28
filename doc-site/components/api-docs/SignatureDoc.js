@@ -6,15 +6,16 @@ import SignatureDefinition from './SignatureDefinition';
 import TypeDesc from './TypeDesc';
 
 const expandProperties = (param, force) => {
-    if (force && param.declaration?.children) {
-        return [param.name, param.declaration.children];
+    const paramType = param.type || param;
+    if (force && paramType.declaration?.children) {
+        return [param.name, paramType.declaration.children];
     }
 
     if (
-        param.type?.referencedType?.()?.comment?.tagsByName?.['expand-properties'] ||
+        paramType?.referencedType?.()?.comment?.tagsByName?.['expand-properties'] ||
         (force && param.referencedType?.())
     ) {
-        const t = param.type?.referencedType?.() || param.referencedType?.();
+        const t = paramType?.referencedType?.() || param.referencedType?.();
         const desc = t.comment?.tagsByName['expand-properties']?.mdx;
         if (t.type?.type === 'intersection') {
             const children = [];
@@ -26,10 +27,14 @@ const expandProperties = (param, force) => {
             }
             return [param.name, children, desc];
         }
+        if (!t.children) {
+            const [, c] = expandProperties(t, true);
+            return [param.name, c];
+        }
         return [param.name, t.children || []];
     }
     if (param.name === '__namedParameters') {
-        return ['props', param.type.declaration.children.filter(f => f.name !== 'rest')];
+        return ['props', paramType.declaration.children.filter(f => f.name !== 'rest')];
     }
 };
 
