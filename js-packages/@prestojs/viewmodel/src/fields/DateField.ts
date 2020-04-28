@@ -12,8 +12,18 @@ import Field from './Field';
  *
  * @extract-docs
  */
-export default class DateField extends Field<Date> {
+export default class DateField extends Field<Date, string | Date> {
     parse(value: any): Date | null {
+        if (Number.isNaN(Date.parse(value))) {
+            return null;
+        }
+        return new Date(value);
+    }
+
+    normalize(value: string | Date): Date | null {
+        if (value instanceof Date) {
+            return value;
+        }
         if (Number.isNaN(Date.parse(value))) {
             return null;
         }

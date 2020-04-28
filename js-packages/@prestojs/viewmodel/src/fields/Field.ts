@@ -202,7 +202,7 @@ export default class Field<T, ParsableType extends any = T> {
      *
      * @param value
      */
-    public normalize(value: any): T {
+    public normalize(value: ParsableType): T | null {
         return value;
     }
 
