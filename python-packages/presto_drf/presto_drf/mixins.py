@@ -62,8 +62,8 @@ class SerializerOptInFieldsMixin:
 
         fields_to_include_list = []
         for f in fields_to_include:
-            if f.find(',') != -1:
-                fields_to_include_list += f.split(',')
+            if f.find(",") != -1:
+                fields_to_include_list += f.split(",")
             else:
                 fields_to_include_list.append(f)
 
