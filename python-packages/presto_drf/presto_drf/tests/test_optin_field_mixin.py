@@ -63,6 +63,16 @@ class OptinFieldMixinTestcase(TestCase):
         self.assertTrue("activated_at" not in serializer.fields)
         self.assertTrue("is_staff" not in serializer.fields)
 
+    def test_only_include_fields_specified_are_returned_multiple_via_mixed_entry(self):
+        context = {"request": MockRequest({"include_fields": ["email", "first_name,last_name"]})}
+        serializer = UserSerializer(context=context)
+        self.assertTrue("id" in serializer.fields)
+        self.assertTrue("email" in serializer.fields)
+        self.assertTrue("first_name" in serializer.fields)
+        self.assertTrue("last_name" in serializer.fields)
+        self.assertTrue("activated_at" not in serializer.fields)
+        self.assertTrue("is_staff" not in serializer.fields)
+
     def test_only_include_fields_specified_are_returned_including_opt_in(self):
         context = {"request": MockRequest({"include_fields": "email,is_staff"})}
         serializer = UserSerializer(context=context)
