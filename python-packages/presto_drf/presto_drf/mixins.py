@@ -10,6 +10,8 @@ class SerializerOptInFieldsMixin:
     /?include_fields=first_name,email&opt_in_fields=gait_recognition_prediction
     or passed in the traditional list fashion eg,
     /?include_fields=first_name&include_fields=email&opt_in_fields=gait_recognition_prediction
+    or mixed eg,
+    /?include_fields=first_name,email&include_fields=boo
 
     1. By default, all "fields" defined in serializer, minus those listed in "opt_in_fields" would be returned.
     2. If "include_fields" is supplied, only fields requested this way would be returned.
@@ -56,7 +58,14 @@ class SerializerOptInFieldsMixin:
         )
 
         if isinstance(fields_to_include, str):
-            fields_to_include = fields_to_include.split(",")
+            fields_to_include = [fields_to_include]
+
+        fields_to_include_list = []
+        for f in fields_to_include:
+            if f.find(',') != -1:
+                fields_to_include_list += f.split(',')
+            else:
+                fields_to_include_list.append(f)
 
         opt_in_fields_to_include = (
             (
@@ -71,7 +80,7 @@ class SerializerOptInFieldsMixin:
         for f in list(self.fields.keys()):
             if (
                 f not in pinned_fields
-                and f not in fields_to_include
+                and f not in fields_to_include_list
                 and f not in opt_in_fields_to_include
             ):
                 del self.fields[f]
