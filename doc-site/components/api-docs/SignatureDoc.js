@@ -34,11 +34,12 @@ const expandProperties = (param, force) => {
         return [param.name, t.children || []];
     }
     if (param.name === '__namedParameters') {
-        return ['props', paramType.declaration.children.filter(f => f.name !== 'rest')];
+        return ['props', paramType.declaration.children];
     }
 };
 
 export default function SignatureDoc({ signature, method, anchorLink }) {
+    const restPropName = signature.comment?.tagsByName?.['rest-prop-name'];
     const parameters = (signature.parameters || []).reduce((acc, param) => {
         const t = expandProperties(param);
         if (t) {
@@ -49,12 +50,24 @@ export default function SignatureDoc({ signature, method, anchorLink }) {
                     mdx: desc,
                 });
             }
-            acc.push(
-                ...children.map(p => ({
-                    ...p,
-                    name: `${name}.${p.name}`,
-                }))
-            );
+            let restChild;
+            for (const child of children) {
+                if (child.name === restPropName) {
+                    restChild = {
+                        ...child,
+                        name: '...rest',
+                    };
+                } else {
+                    acc.push({
+                        ...child,
+                        name: `${name}.${child.name}`,
+                    });
+                }
+            }
+            // Always make sure the ...rest comes last in the param table
+            if (restChild) {
+                acc.push(restChild);
+            }
         } else {
             acc.push(param);
         }

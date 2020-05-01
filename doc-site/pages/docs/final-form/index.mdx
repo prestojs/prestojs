@@ -3,3 +3,14 @@ export const metadata = {
 }
 
 # Final Form
+
+
+## Default Values
+
+Default values can be specified at the field level with [FormField](/docs/final-form/FormField/) (either explicitly with `defaultValue`
+or implicitly from `field.defaultValue`) or with `initialValues` passed to [Form](/docs/final-form/FormField/). For more
+details see the final-form [defaultValue](https://final-form.org/docs/react-final-form/types/FieldProps#defaultvalue) and [initialValues](https://final-form.org/docs/react-final-form/types/FormProps#initialvalues)
+documentation.
+
+Defining field defaults can be done on the view model by passing the `defaultValue` option to [Field](/docs/viewmodel/fields/Field/). This can either be
+a function that returns a value (useful for returning dynamic like the current time) or a static value directly.
