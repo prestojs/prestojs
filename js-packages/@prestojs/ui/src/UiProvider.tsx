@@ -1,5 +1,5 @@
-import React, { useContext, useMemo } from 'react';
 import { Field } from '@prestojs/viewmodel';
+import React, { useContext, useMemo } from 'react';
 import { FieldWidgetType } from './FieldWidgetInterface';
 
 type GetWidgetForField = <FieldValue, T extends HTMLElement>(
@@ -19,9 +19,15 @@ type GetFormatterForFieldWithNull = <FieldValue, T extends HTMLElement>(
 ) => string | React.ComponentType<T> | [React.ComponentType<T>, object] | null;
 
 export interface FormItemProps {
+    children: React.ReactNode;
     required: boolean;
     help?: React.ReactNode;
     label?: React.ReactNode;
+    // Field name, if known. This is only applicable when a field has been passed through
+    // to a FormItem.
+    fieldName?: string;
+    // Any other props
+    [x: string]: any;
 }
 
 export interface FormProps {
