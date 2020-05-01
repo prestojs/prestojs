@@ -30,3 +30,22 @@ export { default as UUIDField } from './fields/UUIDField';
 export { default as useViewModelCache } from './useViewModelCache';
 
 export { isViewModelInstance, isViewModelClass } from './ViewModelFactory';
+
+import type { FieldProps, RecordBoundField } from './fields/Field';
+import type {
+    FieldDataMapping,
+    FieldDataMappingRaw,
+    FieldsMapping,
+    ViewModelConstructor,
+    ViewModelInterface,
+} from './ViewModelFactory';
+
+export type {
+    ViewModelInterface,
+    ViewModelConstructor,
+    FieldProps,
+    FieldsMapping,
+    FieldDataMapping,
+    FieldDataMappingRaw,
+    RecordBoundField
+};
