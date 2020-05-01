@@ -8,8 +8,17 @@ import Field from './Field';
  *
  * Invalid datetimes are treated as Null.
  */
-export default class DateTimeField extends Field<Date> {
+export default class DateTimeField extends Field<Date, string | Date> {
     parse(value: any): Date | null {
+        if (Number.isNaN(Date.parse(value))) {
+            return null;
+        }
+        return new Date(value);
+    }
+    normalize(value: string | Date): Date | null {
+        if (value instanceof Date) {
+            return value;
+        }
         if (Number.isNaN(Date.parse(value))) {
             return null;
         }
