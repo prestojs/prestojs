@@ -13,9 +13,26 @@ import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
  * is handled internally in usePaginator. You can pass `useState()` to this parameter.
  */
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<T>,
+    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any, T>,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
-): T {
+): T;
+export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
+    paginatorClassOrEndpoint: null,
+    currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
+): null;
+// This is only necessary because the type is inferred as PaginatorInterfaceClass<T> | null here
+// instead of refining it based on endpoint
+// export function ExampleComponent({ endpoint }: { endpoint: Endpoint | null }) {
+//     usePaginator(endpoint && endpoint.getPaginatorClass());
+// }
+export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
+    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any, T> | null,
+    currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
+): T | null;
+export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
+    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any, T> | null,
+    currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
+): T | null {
     // Only used if currentStatePair is not provided. We have to create this regardless
     // as hooks can't be conditional.
     const defaultState = useState<PaginatorState>();
@@ -38,13 +55,16 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
     }
 
     // Only recreate the paginator class instance when necessary (eg. if the type changes)
-    const paginatorInstance = useMemo(() => (paginatorClass ? new paginatorClass() : null), [
-        paginatorClass,
-    ]);
-    paginatorInstance.replaceStateControllers(
-        [currentState, setCurrentState],
-        [internalState, setInternalState]
+    const paginatorInstance = useMemo<T | null>(
+        () => (paginatorClass ? new paginatorClass() : null),
+        [paginatorClass]
     );
+    if (paginatorInstance) {
+        paginatorInstance.replaceStateControllers(
+            [currentState, setCurrentState],
+            [internalState, setInternalState]
+        );
+    }
 
     return paginatorInstance;
 }
