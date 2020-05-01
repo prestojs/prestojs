@@ -11,11 +11,11 @@ type NumberFieldProps<T> = FieldProps<T> & {
  * Other numeric fields (IntegerField, DecimalField, FloatField...) will extend this.
  *
  */
-export default class NumberField<T = string | number> extends Field<string | number> {
+export default class NumberField<T = string | number> extends Field<T> {
     public minValue?: number;
     public maxValue?: number;
 
-    constructor(values: NumberFieldProps = {}) {
+    constructor(values: NumberFieldProps<T> = {}) {
         const { minValue, maxValue, ...rest } = values;
 
         if (minValue !== undefined && typeof minValue !== 'number')
