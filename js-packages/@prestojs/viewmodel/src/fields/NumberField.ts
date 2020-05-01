@@ -1,6 +1,6 @@
-import Field, { Props } from './Field';
+import Field, { FieldProps } from './Field';
 
-type NumberFieldProps = Props<string | number> & {
+type NumberFieldProps<T> = FieldProps<T> & {
     minValue?: number;
     maxValue?: number;
 };

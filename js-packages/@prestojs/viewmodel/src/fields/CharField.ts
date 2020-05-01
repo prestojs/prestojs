@@ -1,9 +1,9 @@
-import Field, { Props } from './Field';
+import Field, { FieldProps } from './Field';
 
 /**
  * @expand-properties
  */
-type CharFieldProps = Props<string> & { maxLength?: number };
+type CharFieldProps = FieldProps<string> & { maxLength?: number };
 
 /**
  * Base class for string fields
