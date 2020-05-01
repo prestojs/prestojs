@@ -1,3 +1,4 @@
+import { FormItemProps } from '@prestojs/ui';
 import { Form } from 'antd';
 import React from 'react';
 
@@ -9,6 +10,10 @@ import React from 'react';
  *
  * @extract-docs
  */
-export default function FormItemWrapper(props): React.ReactElement {
+export default function FormItemWrapper({
+    // Don't pass this through to the underlying ant Form.Item
+    fieldName,
+    ...props
+}: FormItemProps): React.ReactElement {
     return <Form.Item {...props} />;
 }
