@@ -1,15 +1,15 @@
 import { useUi } from '@prestojs/ui';
-import React from 'react';
 import { isViewModelInstance } from '@prestojs/viewmodel';
 import { ViewModelInterface } from '@prestojs/viewmodel/ViewModelFactory';
-import { Form as FinalForm, FormProps as FinalFormProps } from 'react-final-form';
+import React from 'react';
+import { AnyObject, Form as FinalForm, FormProps as FinalFormProps } from 'react-final-form';
 import FormField from './FormField';
 import FormItem from './FormItem';
 
 /**
  * @expand-properties Any of the final-form [FormProps](https://final-form.org/docs/react-final-form/types/FormProps) and the options shown below
  */
-type FormProps<FormValues = object> = FinalFormProps<FormValues> & {
+type FormProps<FormValues = AnyObject> = FinalFormProps<FormValues> & {
     /**
      * Initial values for the form. Either an object or a `ViewModel` record.
      */
@@ -33,7 +33,9 @@ type FormProps<FormValues = object> = FinalFormProps<FormValues> & {
  *
  * @extract-docs
  */
-export default function Form(props: FormProps): React.ReactElement {
+export default function Form<FormValues = AnyObject>(
+    props: FormProps<FormValues>
+): React.ReactElement {
     let { initialValues, children, formProps, ...rest } = props;
     let { formComponent: FormComponent } = useUi();
     if (!FormComponent) {
