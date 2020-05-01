@@ -1,11 +1,12 @@
-import React from 'react';
-import { render } from '@testing-library/react';
 import { UiProvider } from '@prestojs/ui';
 import { NumberField, viewModelFactory } from '@prestojs/viewmodel';
+import { fireEvent, render } from '@testing-library/react';
+import React from 'react';
 import Form from '../Form';
 
 class User extends viewModelFactory({
-    age: new NumberField({ label: 'Age' }),
+    age: new NumberField({ label: 'Age', defaultValue: 5 }),
+    name: new NumberField({ label: 'Name', defaultValue: (): string => 'dynamic' }),
 }) {
     static label = 'User';
     static labelPlural = 'Users';
@@ -47,4 +48,59 @@ test('FormField should provide default widget when none specified', () => {
     expect(getByLabelText('Age').tagName).toBe('SELECT');
     rerender(<TestWrapper>{(): React.ReactElement => <div id="age" />}</TestWrapper>);
     expect(getByLabelText('Age').tagName).toBe('DIV');
+});
+
+test('FormField should use field default', () => {
+    const onSubmit = jest.fn();
+    function TestWrapper({
+        initialValues,
+        defaultValue,
+    }: { initialValues?: {}; defaultValue?: number } = {}): React.ReactElement {
+        return (
+            <UiProvider getWidgetForField={getWidgetForField}>
+                <Form onSubmit={onSubmit} initialValues={initialValues}>
+                    {({ handleSubmit }): React.ReactElement => (
+                        <form onSubmit={handleSubmit}>
+                            <label htmlFor="age">
+                                Age
+                                <Form.Field
+                                    field={User.fields.age}
+                                    defaultValue={defaultValue}
+                                    id="age"
+                                />
+                            </label>
+                            <label htmlFor="name">
+                                Name
+                                <Form.Field field={User.fields.name} id="name" />
+                            </label>
+                            <button type="submit">Submit</button>
+                        </form>
+                    )}
+                </Form>
+            </UiProvider>
+        );
+    }
+    const { rerender, getByText } = render(<TestWrapper />);
+    fireEvent.click(getByText('Submit'));
+    expect(onSubmit).toHaveBeenLastCalledWith(
+        { age: 5, name: 'dynamic' },
+        expect.any(Object),
+        expect.any(Function)
+    );
+    rerender(<TestWrapper defaultValue={666} />);
+    fireEvent.click(getByText('Submit'));
+    expect(onSubmit).toHaveBeenLastCalledWith(
+        { age: 666, name: 'dynamic' },
+        expect.any(Object),
+        expect.any(Function)
+    );
+
+    // Override field specific with initialValues
+    rerender(<TestWrapper key="force-reinit" initialValues={{ age: 20 }} />);
+    fireEvent.click(getByText('Submit'));
+    expect(onSubmit).toHaveBeenLastCalledWith(
+        { age: 20, name: 'dynamic' },
+        expect.any(Object),
+        expect.any(Function)
+    );
 });

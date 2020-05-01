@@ -3,7 +3,7 @@ import FieldBinder from '../FieldBinder';
 /**
  * @expand-properties
  */
-export interface Props<T> {
+export interface FieldProps<T> {
     /**
      * True if field is required when creating or updating a model
      */
@@ -17,9 +17,9 @@ export interface Props<T> {
      */
     helpText?: string;
     /**
-     * Default value for this field
+     * Default value for this field. This can either be a fucntion that returns a value or the value directly.
      */
-    defaultValue?: T | (() => Promise<T>);
+    defaultValue?: T | (() => Promise<T> | T);
     // A field can have choices regardless of it's type.
     // eg. A CharField and IntegerField might both optionally have choices
     // TODO: Best way to handle remote choices? Should this be part of this
@@ -106,9 +106,9 @@ export default class Field<T, ParsableType extends any = T> {
      */
     public writeOnly: boolean;
 
-    protected _defaultValue?: T | (() => Promise<T>);
+    protected _defaultValue?: T | (() => Promise<T> | T);
 
-    constructor(values: Props<T> = {}) {
+    constructor(values: FieldProps<T> = {}) {
         const {
             required = false,
             label,
@@ -216,14 +216,13 @@ export default class Field<T, ParsableType extends any = T> {
     }
 
     /**
-     * Get the default value for this field. Note that this returns a promise that resolve to the default value
-     * as some default values may need to resolve data from a backend.
+     * Get the default value for this field.
      */
-    get defaultValue(): Promise<T | null | undefined> {
+    get defaultValue(): Promise<T | null | undefined> | T | null | undefined {
         if (this._defaultValue instanceof Function) {
             return this._defaultValue();
         }
-        return Promise.resolve(this._defaultValue);
+        return this._defaultValue;
     }
 
     toString(): string {
