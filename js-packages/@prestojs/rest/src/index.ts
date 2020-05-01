@@ -9,5 +9,9 @@ export { default as getPaginationState } from './getPaginationState';
 import type { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
 import type { EndpointExecuteOptions, ExecuteReturnVal } from './Endpoint';
 
-
-export type { PaginatorInterface, PaginatorInterfaceClass, EndpointExecuteOptions, ExecuteReturnVal };
+export type {
+    PaginatorInterface,
+    PaginatorInterfaceClass,
+    EndpointExecuteOptions,
+    ExecuteReturnVal,
+};
