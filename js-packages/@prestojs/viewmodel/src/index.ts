@@ -47,5 +47,5 @@ export type {
     FieldsMapping,
     FieldDataMapping,
     FieldDataMappingRaw,
-    RecordBoundField
+    RecordBoundField,
 };
