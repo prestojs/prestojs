@@ -9,9 +9,9 @@ import Paginator from './Paginator';
  * The default implementation is for use in conjunction with InferredPaginator where the pagination type
  * isn't known upfront but is inferred from the shape of the response.
  */
-export default function getPaginationState<State, InternalState>(
+export default function getPaginationState<State, InternalState, Data>(
     paginator: Paginator<State, InternalState> | InferredPaginator,
-    { query, decodedBody }: ExecuteReturnVal
+    { query, decodedBody }: ExecuteReturnVal<Data>
 ): Record<string, any> | false {
     // If it's an array then it's assumed to be unpaginated data
     if (Array.isArray(decodedBody) || !decodedBody) {

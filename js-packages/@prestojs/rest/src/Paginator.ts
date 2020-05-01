@@ -4,6 +4,8 @@ export interface PaginatorInterface {
     getRequestInit(options: EndpointExecuteOptions): EndpointExecuteOptions;
 
     setResponse(response: Record<string, any>): void;
+
+    replaceStateControllers(currentStatePair, internalStatePair): void;
 }
 
 export interface PaginatorInterfaceClass<T extends PaginatorInterface = PaginatorInterface>

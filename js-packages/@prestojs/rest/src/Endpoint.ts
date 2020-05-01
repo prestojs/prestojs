@@ -1,12 +1,12 @@
 import { UrlPattern } from '@prestojs/routing';
 import isEqual from 'lodash/isEqual';
-import InferredPaginator from './InferredPaginator';
 import defaultGetPaginationState from './getPaginationState';
+import InferredPaginator from './InferredPaginator';
 import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
 
 type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
     headers?: HeadersInit | Record<string, undefined | string>;
-    paginator?: PaginatorInterface;
+    paginator?: PaginatorInterface | null;
 };
 
 type EndpointOptions = ExecuteInitOptions & {
@@ -19,14 +19,14 @@ type UrlResolveOptions = {
     query?: Record<string, boolean | string | null | number>;
 };
 
-export type ExecuteReturnVal = {
+export type ExecuteReturnVal<T> = {
     url: string;
     urlArgs?: Record<string, any>;
     query?: Record<string, boolean | string | null | number>;
     requestInit: ExecuteInitOptions;
     response?: Response;
     decodedBody?: any;
-    result: any;
+    result: T | null;
 };
 
 export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
@@ -285,12 +285,15 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  *
  * @extract-docs
  */
-export default class Endpoint<PaginatorT extends PaginatorInterface = PaginatorInterface> {
+export default class Endpoint<
+    ReturnT = any,
+    PaginatorT extends PaginatorInterface = PaginatorInterface
+> {
     static defaultConfig: {
         requestInit: RequestInit;
         getPaginationState: (
             paginator: PaginatorInterface,
-            executeReturnVal: ExecuteReturnVal
+            executeReturnVal: ExecuteReturnVal<any>
         ) => Record<string, any> | false;
         paginatorClass: PaginatorInterfaceClass;
     } = {
@@ -395,7 +398,7 @@ export default class Endpoint<PaginatorT extends PaginatorInterface = PaginatorI
      * exists in multiple places (eg. defaultConfig may include headers you want on every request). If you need to remove
      * a header entirely set the value to `undefined`.
      */
-    async execute(options: EndpointExecuteOptions = {}): Promise<ExecuteReturnVal> {
+    async execute(options: EndpointExecuteOptions = {}): Promise<ExecuteReturnVal<ReturnT>> {
         if (options.paginator) {
             options = options.paginator.getRequestInit(options);
         }
@@ -408,7 +411,7 @@ export default class Endpoint<PaginatorT extends PaginatorInterface = PaginatorI
                 this.requestInit,
                 init
             );
-            const returnVal: ExecuteReturnVal = {
+            const returnVal: ExecuteReturnVal<ReturnT> = {
                 url,
                 urlArgs,
                 query,
