@@ -1,6 +1,6 @@
-import Field, { Props } from './Field';
+import Field, { FieldProps } from './Field';
 
-interface Boundary<T> extends Props<T> {
+interface Boundary<T> extends FieldProps<T> {
     lowerBound: T | null | undefined;
     upperBound: T | null | undefined;
     separator: string | undefined;
