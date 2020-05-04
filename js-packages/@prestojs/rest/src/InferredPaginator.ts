@@ -4,7 +4,7 @@ import LimitOffsetPaginator, { LimitOffsetPaginationState } from './LimitOffsetP
 import PageNumberPaginator, { PageNumberPaginationState } from './PageNumberPaginator';
 import { PaginatorInterface } from './Paginator';
 
-type PaginatorState =
+export type PaginatorState =
     | PageNumberPaginationState
     | CursorPaginationState
     | LimitOffsetPaginationState;
