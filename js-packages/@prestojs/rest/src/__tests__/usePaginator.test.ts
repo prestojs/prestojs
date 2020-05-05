@@ -85,3 +85,27 @@ test('should accept state with initial state', async () => {
     expect(result.current.paginator.pageSize).toBe(10);
     expect(result.current.paginator.page).toBe(1);
 });
+
+test('should accept no value', async () => {
+    let action1: null | Endpoint = null;
+    const { result, rerender } = renderHook(() => usePaginator(action1));
+
+    expect(result.current).toBe(null);
+
+    action1 = new Endpoint(new UrlPattern('/whatever/'));
+    rerender();
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    act(() => result.current.setResponse({ total: 10, pageSize: 5 }));
+
+    expect(((result.current as InferredPaginator).paginator as PageNumberPaginator).pageSize).toBe(
+        5
+    );
+
+    act(() => (result.current as InferredPaginator).next());
+    expect((result.current as InferredPaginator).currentState).toEqual({
+        pageSize: 5,
+        page: 2,
+    });
+});
