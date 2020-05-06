@@ -1,5 +1,6 @@
 import { FieldFormatter } from '@prestojs/ui';
-import { useViewModelCache, useViewModelChangeEffect } from '@prestojs/viewmodel';
+import { useListChangeObserver } from '@prestojs/util';
+import { useViewModelCache } from '@prestojs/viewmodel';
 import { Button, Modal } from 'antd';
 import qs from 'qs';
 import React, { useState } from 'react';
@@ -39,7 +40,7 @@ export default function UserListView() {
 
     // Refetch data whenever underlying cache changes
     const allRecords = useViewModelCache(User, cache => cache.getAll(fieldList));
-    useViewModelChangeEffect(!isValidating && allRecords, revalidate);
+    useListChangeObserver(!isValidating && allRecords, revalidate);
 
     const records = useViewModelCache(User, cache => data && cache.getList(data.result));
     if (!records) {
