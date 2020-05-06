@@ -24,6 +24,9 @@
     },
     {
       "path": "./js-packages/@prestojs/final-form/tsconfig.lint.json"
+    },
+    {
+      "path": "./js-packages/@prestojs/util/tsconfig.lint.json"
     }
   ]
 }
