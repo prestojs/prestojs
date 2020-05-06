@@ -66,7 +66,7 @@ export default function MainMenuSidebar({ children }) {
                 { href: '/docs/routing', title: 'Routing' },
                 { href: '/docs/ui', title: 'UI' },
                 { href: '/docs/ui-antd', title: 'UI ANTD' },
-                { href: '/docs/utils', title: 'Util' },
+                { href: '/docs/util', title: 'Util' },
             ]}
         >
             {currentMenu && <Sidebar.LinksSection title={currentPackageName} links={currentMenu} />}

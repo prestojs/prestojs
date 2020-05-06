@@ -63,7 +63,7 @@ type Change<T> = {
 };
 
 /**
- * Call a function whenever values in a list change. This differs from from `useChangeObserver` by
+ * Call a function whenever values in a list change. This differs from `useChangeObserver` by
  * allowing you to choose what changes you get (additions, updates, deletions) and to be passed the
  * changed items in the callback. In order to achieve this each item in the array needs to have a
  * unique ID which is obtained by calling the `options.getId` function. The default implementation will
@@ -76,7 +76,13 @@ type Change<T> = {
  *   const { data, revalidate, isValidating } = useEndpoint(User.endpoints.list);
  *   // Refetch data whenever underlying cache changes
  *   const allRecords = useViewModelCache(User, cache => cache.getAll(fieldList));
- *   // Note that we pass false while data is being fetched from the backend
+ *   // NOTE: Usually you don't want multiple useListChangeObserver's on the exact same
+ *   // subset of data as you will trigger redundant ajax queries.
+ *   // if a record is updated & saved elsewhere, then useViewModelCache will return new
+ *   // data which triggers useListChangeObserver. We still want useListChangeObserver()
+ *   // to trigger the useEndpoint() revalidate because that record update may have changed the
+ *   // order of records or caused it to [no longer] appear in a filtered list of data.
+ *   // Also note that we pass false while data is being fetched from the backend
  *   useListChangeObserver(!isValidating && allRecords, revalidate);
  *   return <ListView records={data} />;
  * }
