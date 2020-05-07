@@ -6,13 +6,31 @@ import Paginator from './Paginator';
 /**
  * Return the state for a paginator based on the response itself.
  *
- * The default implementation is for use in conjunction with InferredPaginator where the pagination type
- * isn't known upfront but is inferred from the shape of the response.
+ * This is the default implementation used by [Endpoint](doc:Endpoint) to provide pagination state expected by
+ * [InferredPaginator](doc:InferredPaginator).
+ *
+ * To provide your own:
+ *
+ * ```js
+ *import { Endpoint } from '@prestojs/rest';
+ *
+ * function getPaginationState(paginator, { query, decodedBody }) {
+ *    ....
+ * }
+ *
+ * Endpoint.defaultConfig.getPaginationState = getPaginationState;
+ * ```
+ *
+ * @param paginator The paginator instance
+ *
+ * @menu-group Pagination
+ * @extract-docs
  */
 export default function getPaginationState<State, InternalState, Data>(
     paginator: Paginator<State, InternalState> | InferredPaginator,
-    { query, decodedBody }: ExecuteReturnVal<Data>
+    execReturnVal: ExecuteReturnVal<Data>
 ): Record<string, any> | false {
+    const { query, decodedBody } = execReturnVal;
     // If it's an array then it's assumed to be unpaginated data
     if (Array.isArray(decodedBody) || !decodedBody) {
         return false;

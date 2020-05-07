@@ -15,6 +15,7 @@ import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
  * The default is [InferredPaginator](doc:InferredPaginator) which will try to
  * infer the type of pagination in use based on the response.
  *
+ * @menu-group Endpoint
  * @extract-docs
  */
 export default class PaginatedEndpoint<

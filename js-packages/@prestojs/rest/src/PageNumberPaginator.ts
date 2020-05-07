@@ -9,10 +9,23 @@ export type InternalPageNumberPaginationState = {
     total: number | null;
 };
 
+/**
+ * Page number based paginator
+ *
+ * Expects a `total` and optional `pageSize` key in the response. `total` should be the total number of records
+ * available. See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation
+ * differs.
+ *
+ * @menu-group Pagination
+ * @extract-docs
+ */
 export default class PageNumberPaginator extends Paginator<
     PageNumberPaginationState,
     InternalPageNumberPaginationState
 > {
+    /**
+     * The total number of results available on the backend
+     */
     get total(): number | null {
         if (this.internalState.total == null) {
             return null;
@@ -20,6 +33,9 @@ export default class PageNumberPaginator extends Paginator<
         return this.internalState.total;
     }
 
+    /**
+     * The total number of pages
+     */
     get totalPages(): number | null {
         if (null == this.total || null == this.pageSize) {
             return null;
@@ -27,6 +43,9 @@ export default class PageNumberPaginator extends Paginator<
         return Math.ceil(this.total / this.pageSize);
     }
 
+    /**
+     * The current page
+     */
     get page(): number | null {
         const page = this.currentState.page ?? null;
         if (typeof page === 'string') {
@@ -35,6 +54,9 @@ export default class PageNumberPaginator extends Paginator<
         return page;
     }
 
+    /**
+     * The current page size (if known).
+     */
     get pageSize(): number | null {
         const pageSize = this.currentState.pageSize ?? null;
         if (typeof pageSize === 'string') {
@@ -55,6 +77,9 @@ export default class PageNumberPaginator extends Paginator<
         return { ...this.currentState, page };
     }
 
+    /**
+     * Change to the specified page
+     */
     setPage(page: number): void {
         this.setCurrentState(this.pageState(page));
     }
@@ -81,6 +106,9 @@ export default class PageNumberPaginator extends Paginator<
         return nextState as PageNumberPaginationState;
     }
 
+    /**
+     * Change to the specified page size
+     */
     setPageSize(pageSize: null | number): void {
         this.setCurrentState(this.pageSizeState(pageSize));
     }
@@ -159,6 +187,9 @@ export default class PageNumberPaginator extends Paginator<
         }
     }
 
+    /**
+     * Adds `page` and `pageSize` into query options passed through to the endpoint
+     */
     getRequestInit({ query, ...options }): EndpointExecuteOptions {
         const newQuery = { ...query };
         if (this.currentState.pageSize) {
@@ -173,6 +204,13 @@ export default class PageNumberPaginator extends Paginator<
         };
     }
 
+    /**
+     * Sets the internal data based on response. Expects `total` and optionally `pageSize` to be in
+     * response data.
+     *
+     * See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation
+     * differs.
+     */
     setResponse({ total, pageSize }: { total: number; pageSize?: number }): void {
         this.setInternalState({ total });
         if (pageSize && this.currentState.pageSize !== pageSize) {
