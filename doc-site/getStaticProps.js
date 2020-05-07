@@ -68,11 +68,13 @@ export default function getStaticProps(context, filter, transform = id => id) {
         return <a {...props} />;
     }
     function transformComment(obj) {
-        if (obj.comment) {
+        if (obj.comment && (obj.comment.shortText || obj.comment.text)) {
             obj.mdx = ReactDOMServer.renderToStaticMarkup(
                 <MDXProvider components={{ ...mdxComponents, a: LinkWrapper }}>
-                    {obj.comment.shortText && <MDX>{obj.comment.shortText.trim()}</MDX>}
-                    {obj.comment.text && <MDX>{obj.comment.text.trim()}</MDX>}
+                    <div className="mdx">
+                        {obj.comment.shortText && <MDX>{obj.comment.shortText.trim()}</MDX>}
+                        {obj.comment.text && <MDX>{obj.comment.text.trim()}</MDX>}
+                    </div>
                 </MDXProvider>
             );
         }

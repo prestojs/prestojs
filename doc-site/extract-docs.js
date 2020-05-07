@@ -34,6 +34,8 @@ const transformedData = data.children.filter(child => child.name.startsWith('@pr
 function extractChildren(node) {
     const { children, ...rest } = node;
     let extractDocs = false;
+    let menuGroup;
+
     let { comment } = rest;
     if (rest.kindString === 'Function' && rest.signatures && rest.signatures.length > 0) {
         comment = rest.signatures[0].comment;
@@ -44,19 +46,15 @@ function extractChildren(node) {
             return acc;
         }, {});
         extractDocs = 'extract-docs' in tagsByName;
+        menuGroup = tagsByName['menu-group'] || 'default';
         comment.tagsByName = tagsByName;
     }
     rest.extractDocs = extractDocs;
+    rest.menuGroup = menuGroup;
     const { fileName } = rest.sources[0];
-    const importPath = fileName
-        .replace('js-packages/', '')
-        .replace('src/', '')
-        .split('.')[0];
+    const importPath = fileName.replace('js-packages/', '').replace('src/', '').split('.')[0];
     const slug = [...importPath.split('/').slice(0, -1), rest.name].join('/');
-    const permaLink = slug
-        .split('/')
-        .slice(1)
-        .join('/');
+    const permaLink = slug.split('/').slice(1).join('/');
     const [, packageName, ...names] = slug.split('/');
     rest.slug = permaLink;
     rest.packageName = packageName;
@@ -131,8 +129,10 @@ const menuByName = {};
 for (const datum of finalData) {
     if (datum.extractDocs) {
         const slug = datum.slug.split('/').filter(Boolean);
-        menuByName[datum.packageName] = menuByName[datum.packageName] || [];
-        menuByName[datum.packageName].push({
+        const groupName = datum.menuGroup;
+        menuByName[datum.packageName] = menuByName[datum.packageName] || {};
+        menuByName[datum.packageName][groupName] = menuByName[datum.packageName][groupName] || [];
+        menuByName[datum.packageName][groupName].push({
             title: datum.name,
             slug: slug.join('/'),
         });

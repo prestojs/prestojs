@@ -11,22 +11,101 @@ function NavItem({ href, children, as }) {
     );
 }
 
-function LinksSection({ title, links }) {
+function Links({ links }) {
+    return links.map((m, i) => (
+        <li key={i}>
+            <Link href={m.href} as={m.as}>
+                <a className="hover:underline text-gray-800">{m.title}</a>
+            </Link>
+        </li>
+    ));
+}
+
+function LinksSection_({ title, links }) {
     return (
         <div className="mb-8">
-            <h5 className="mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-sm lg:text-xs">
-                {title}
-            </h5>
+            {title && (
+                <h5 className="mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-sm lg:text-xs">
+                    {title}
+                </h5>
+            )}
             <ul>
-                {links.map((m, i) => (
-                    <li key={i}>
-                        <Link href={m.href} as={m.as}>
-                            <a className="hover:underline text-gray-800">{m.title}</a>
-                        </Link>
-                    </li>
-                ))}
+                <Links links={links} />
             </ul>
         </div>
+    );
+}
+
+/**
+ * Section of links. Can contain sub sections. Valid shape:
+ *
+ * Grouped:
+ *
+ * ```
+ * [
+ * // These are not nested under a sub section
+ *   {
+ *      "isDefault": true,
+ *      "items": [
+ *          ....
+ *      ]
+ *    },
+ *   {
+ *      "title": "Sub Section 1",
+ *      "items": [
+ *          ...
+ *      ]
+ *    },
+ *   {
+ *      "title": "Sub Section 2",
+ *      "items": [
+ *          ...
+ *      ]
+ *    }
+ *   ]
+ * ```
+ *
+ *  Or flat
+ *
+ *  ```
+ *  [
+ *   {
+ *      "title": "ApiError",
+ *      "href": "/docs/[...slug]/",
+ *      "as": "/docs/rest/ApiError/"
+ *   },
+ *   {
+ *      "title": "Endpoint",
+ *      "href": "/docs/[...slug]/",
+ *      "as": "/docs/rest/Endpoint/"
+ *    },
+ *  ]
+ *  ```
+ */
+function LinksSection({ title, links }) {
+    const defaultSection = [];
+    const sections = [];
+    for (const linkOrSection of links) {
+        if (linkOrSection.items) {
+            if (linkOrSection.isDefault) {
+                defaultSection.push(...linkOrSection.items);
+            } else {
+                sections.push(linkOrSection);
+            }
+        } else {
+            defaultSection.push(linkOrSection);
+        }
+    }
+    return (
+        <>
+            <h5 className="mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-md lg:text-sm">
+                {title}
+            </h5>
+            {defaultSection.length > 0 && <LinksSection_ links={defaultSection} />}
+            {sections.map((section, i) => (
+                <LinksSection_ key={i} title={section.title} links={section.items} />
+            ))}
+        </>
     );
 }
 
