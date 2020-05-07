@@ -2,11 +2,11 @@ import fs from 'fs';
 import Head from 'next/head';
 import path from 'path';
 import React from 'react';
-import defaultGetStaticProps, { prepareDocs } from '../../getStaticProps';
 import ClassDoc from '../../components/api-docs/ClassDoc';
 import FunctionDoc from '../../components/api-docs/FunctionDoc';
 import VariableDoc from '../../components/api-docs/VariableDoc';
 import MainMenuSidebar from '../../components/MainMenuSidebar';
+import defaultGetStaticProps, { prepareDocs } from '../../getStaticProps';
 
 const kindComponents = {
     Function: FunctionDoc,
@@ -31,8 +31,7 @@ export default function Doc({ docs, extraNodes }) {
 
 export async function getStaticProps(context) {
     const slug = context.params.slug.join('/');
-    console.log(slug);
-    return defaultGetStaticProps(context, datum => datum.slug === slug);
+    return defaultGetStaticProps(context, datum => datum.extractDocs && datum.slug === slug);
 }
 
 export function getStaticPaths() {

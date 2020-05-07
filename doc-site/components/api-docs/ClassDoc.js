@@ -7,6 +7,14 @@ import Sidebar from '../Sidebar';
 import SignatureDefinition from './SignatureDefinition';
 import SignatureDoc from './SignatureDoc';
 
+function transformParameters(p) {
+    return {
+        ...p,
+        // Don't show __namedParameters which is just a spread element extracted by typedoc
+        name: p.name === '__namedParameters' ? 'params' : p.name,
+    };
+}
+
 export default function ClassDoc({ doc }) {
     const groups = doc.groups.reduce((acc, group) => {
         acc[group.title] = group;
@@ -36,14 +44,19 @@ export default function ClassDoc({ doc }) {
         <>
             <Article>
                 <ApiDocHeader doc={doc} />
-                {doc.mdx && <div dangerouslySetInnerHTML={{ __html: doc.mdx }} />}
+                {doc.mdx && <div className="mb-20" dangerouslySetInnerHTML={{ __html: doc.mdx }} />}
                 {constructor && (
                     <>
                         <AnchorLink id="constructor" Component="h3" className="text-4xl">
                             Constructor
                         </AnchorLink>
                         {constructor.signatures.map((sig, i) => (
-                            <SignatureDoc key={i} signature={sig} method={constructor} />
+                            <SignatureDoc
+                                key={i}
+                                signature={sig}
+                                method={constructor}
+                                isConstructor
+                            />
                         ))}
                     </>
                 )}
@@ -59,7 +72,7 @@ export default function ClassDoc({ doc }) {
                         )}
                         {inherited.length > 0 && (
                             <>
-                                <h3 className="text-4xl">Inherited Methods</h3>
+                                <h3 className="text-4xl mt-10">Inherited Methods</h3>
                                 {inherited.map(method => (
                                     <MethodDoc key={method.name} method={method} />
                                 ))}
@@ -85,7 +98,9 @@ export default function ClassDoc({ doc }) {
                                     title: (
                                         <SignatureDefinition
                                             name={sig.name}
-                                            parameters={sig.parameters || []}
+                                            parameters={(sig.parameters || []).map(
+                                                transformParameters
+                                            )}
                                         />
                                     ),
                                 });
@@ -99,7 +114,12 @@ export default function ClassDoc({ doc }) {
                         title="Inherited Methods"
                         links={inherited.map(method => ({
                             href: `#method-${method.name}`,
-                            title: method.name,
+                            title: (
+                                <SignatureDefinition
+                                    name={method.name}
+                                    parameters={(method.parameters || []).map(transformParameters)}
+                                />
+                            ),
                         }))}
                     />
                 )}

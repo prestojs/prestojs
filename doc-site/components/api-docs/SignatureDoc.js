@@ -6,7 +6,7 @@ import SignatureDefinition from './SignatureDefinition';
 import TypeDesc from './TypeDesc';
 
 const expandProperties = (param, force) => {
-    const paramType = param.type || param;
+    const paramType = param.type && typeof param.type == 'object' ? param.type : param;
     if (force && paramType.declaration?.children) {
         return [param.name, paramType.declaration.children];
     }
@@ -33,12 +33,12 @@ const expandProperties = (param, force) => {
         }
         return [param.name, t.children || []];
     }
-    if (param.name === '__namedParameters') {
+    if (param.name === '__namedParameters' && paramType.declaration) {
         return ['props', paramType.declaration.children];
     }
 };
 
-export default function SignatureDoc({ signature, method, anchorLink }) {
+export default function SignatureDoc({ signature, method, anchorLink, isConstructor }) {
     const restPropName = signature.comment?.tagsByName?.['rest-prop-name'];
     const parameters = (signature.parameters || []).reduce((acc, param) => {
         const t = expandProperties(param);
@@ -77,7 +77,7 @@ export default function SignatureDoc({ signature, method, anchorLink }) {
     const sigName = (
         <span className="flex items-center justify-between">
             <SignatureDefinition
-                returnType={signature.type}
+                returnType={isConstructor ? null : signature.type}
                 name={signature.name}
                 parameters={(signature.parameters || []).map(p => ({
                     ...p,
