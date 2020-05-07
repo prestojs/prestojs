@@ -11,22 +11,44 @@ export type InternalCursorPaginatorState = {
     previousCursor?: string | null;
 };
 
+/**
+ * Cursor based paginator
+ *
+ * Expects a `nextCursor`, `previousCursor` and optional `pageSize` key in the response. See
+ * [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation
+ * differs.
+ *
+ * @menu-group Pagination
+ * @extract-docs
+ */
 export default class CursorPaginator extends Paginator<
     CursorPaginationState,
     InternalCursorPaginatorState
 > {
+    /**
+     * The next cursor (if any)
+     */
     get nextCursor(): string | null {
         return this.internalState.nextCursor ?? null;
     }
 
+    /**
+     * THe previous cursor (if any)
+     */
     get previousCursor(): string | null {
         return this.internalState.previousCursor ?? null;
     }
 
+    /**
+     * The current cursor. This will be null before the first response is received.
+     */
     get cursor(): string | null {
         return this.currentState.cursor ?? null;
     }
 
+    /**
+     * The current page size, if known
+     */
     get pageSize(): number | null {
         return this.currentState.pageSize ?? null;
     }
@@ -52,6 +74,9 @@ export default class CursorPaginator extends Paginator<
         return nextState as CursorPaginationState;
     }
 
+    /**
+     * Set the page size
+     */
     setPageSize(pageSize: null | number): void {
         this.setCurrentState(this.pageSizeState(pageSize));
     }
@@ -141,6 +166,13 @@ export default class CursorPaginator extends Paginator<
         };
     }
 
+    /**
+     * Sets the internal data based on response. Expects `nextCursor`, `previousCursor` and optionally `pageSize` to be in
+     * response data.
+     *
+     * See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation
+     * differs.
+     */
     setResponse({
         nextCursor,
         previousCursor,

@@ -16,9 +16,9 @@ type FormFieldProps<T> =
  * based on the field type.
  *
  * If `field` is passed through `defaultValue` will be populated unless otherwise specified. Note that
- * if the same field is specified in `initialValues` in [Form](docs:Form) then that takes precedence.
+ * if the same field is specified in `initialValues` in [Form](doc:Form) then that takes precedence.
  *
- * @param field The [field](docs:Field) to get name, widget and default value from. If not specified you must provide one of
+ * @param field The [field](doc:Field) to get name, widget and default value from. If not specified you must provide one of
  * `component`, `children` or `render`.
  * @param widgetProps Optional props to pass through to the inferred widget. This is only used if `field` is provided
  * and none of `component`, `render` or `children` are provided.

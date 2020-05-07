@@ -10,14 +10,29 @@ export type InternalLimitOffsetPaginationState = {
     total?: number | null;
 };
 
+/**
+ * Limit & offset based paginator
+ *
+ * Expects a `limit` key in the response. See [getPaginationState](doc:getPaginationState) for how
+ * to customise this if your backend implementation differs.
+ *
+ * @menu-group Pagination
+ * @extract-docs
+ */
 export default class LimitOffsetPaginator extends Paginator<
     LimitOffsetPaginationState,
     InternalLimitOffsetPaginationState
 > {
+    /**
+     * The total number of records available. This will be null before the first response is received.
+     */
     get total(): number | null {
         return this.internalState.total ?? null;
     }
 
+    /**
+     * The current limit
+     */
     get limit(): number | null {
         const limit = this.currentState.limit ?? null;
         if (typeof limit === 'string') {
@@ -26,6 +41,9 @@ export default class LimitOffsetPaginator extends Paginator<
         return limit;
     }
 
+    /**
+     * The current offset
+     */
     get offset(): number {
         const offset = this.currentState.offset || 0;
         if (typeof offset === 'string') {
@@ -56,6 +74,9 @@ export default class LimitOffsetPaginator extends Paginator<
         return nextState as LimitOffsetPaginationState;
     }
 
+    /**
+     * Set the limit
+     */
     setLimit(limit: number | null): void {
         this.setCurrentState(this.limitState(limit));
     }
@@ -188,6 +209,12 @@ export default class LimitOffsetPaginator extends Paginator<
         };
     }
 
+    /**
+     * Sets the internal data based on response. Expects `limit` to be in response data.
+     *
+     * See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation
+     * differs.
+     */
     setResponse({ limit, total }): void {
         this.setInternalState({ total });
         if (limit && this.currentState.limit !== limit) {

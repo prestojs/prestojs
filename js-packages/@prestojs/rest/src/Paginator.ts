@@ -13,7 +13,13 @@ export interface PaginatorInterfaceClass<T extends PaginatorInterface = Paginato
     new (...args: any[]): T;
 }
 
-export default class Paginator<State, InternalState> implements PaginatorInterface {
+/**
+ * Base class for a paginator.
+ *
+ * @menu-group Pagination
+ * @extract-docs
+ */
+export default abstract class Paginator<State, InternalState> implements PaginatorInterface {
     currentState: State;
     internalState: InternalState;
     setCurrentState: (set: State) => void;

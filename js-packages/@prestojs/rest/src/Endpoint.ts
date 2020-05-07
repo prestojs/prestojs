@@ -5,12 +5,35 @@ import InferredPaginator from './InferredPaginator';
 import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
 
 type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
+    /**
+     * Any headers to add to the request. You can unset default headers that might be specified in the default
+     * `Endpoint.defaultConfig.requestInit` by setting the value to `undefined`.
+     */
     headers?: HeadersInit | Record<string, undefined | string>;
+    /**
+     * The paginator instance to use. This can be provided in the constructor to use by default for all executions
+     * of this endpoint or provided for each call to the endpoint.
+     */
     paginator?: PaginatorInterface | null;
 };
 
+/**
+ * @expand-properties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
+ */
 type EndpointOptions = ExecuteInitOptions & {
+    /**
+     * Method to decode body based on response. The default implementation looks at the content type of the
+     * response and processes it accordingly (eg. handles JSON and text responses) and is suitable for most cases.
+     * If you just need to transform the decoded body (eg. change the decoded JSON object) then use `transformResponseBody`
+     * instead.
+     */
     decodeBody?: (res: Response) => any;
+    /**
+     * If provided the value returned from `decodeBody` is passed to this function. If you need to do something
+     * with the decoded body (eg. change the shape of the returned JSON) then use this function rather than
+     * `decodeBody`. In most cases the default `decodeBody` is suitable.
+     * @param data
+     */
     transformResponseBody?: (data: any) => any;
 };
 
@@ -19,13 +42,38 @@ type UrlResolveOptions = {
     query?: Record<string, boolean | string | null | number>;
 };
 
+/**
+ * @expand-properties
+ */
 export type ExecuteReturnVal<T> = {
+    /**
+     * The url that the endpoint was called with
+     */
     url: string;
+    /**
+     * Any arguments that were used to resolve the URL.
+     */
     urlArgs?: Record<string, any>;
+    /**
+     * Any query string parameters
+     */
     query?: Record<string, boolean | string | null | number>;
+    /**
+     * The options used to execute the endpoint with
+     */
     requestInit: ExecuteInitOptions;
+    /**
+     * The response as returned by fetch
+     */
     response?: Response;
+    /**
+     * The value returned by `decodedBody`
+     */
     decodedBody?: any;
+    /**
+     * The value returned by `transformResponseBody` (if provided). If `transformResponseBody` hasn't been provided
+     * then this will be the same as `decodedBody`.
+     */
     result: T | null;
 };
 
@@ -115,6 +163,7 @@ class PreparedAction {
 /**
  * Indicates a response outside the 200 range
  *
+ * @menu-group Endpoint
  * @extract-docs
  */
 export class ApiError extends Error {
@@ -284,6 +333,7 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  *
  * See `usePaginator` for more details about how to use a paginator in React.
  *
+ * @menu-group Endpoint
  * @extract-docs
  */
 export default class Endpoint<
@@ -309,14 +359,11 @@ export default class Endpoint<
     decodeBody: (res: Response) => any;
     requestInit: ExecuteInitOptions;
 
-    constructor(
-        urlPattern: UrlPattern,
-        {
-            decodeBody = defaultDecodeBody,
-            transformResponseBody,
-            ...requestInit
-        }: EndpointOptions = {}
-    ) {
+    /**
+     * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint
+     */
+    constructor(urlPattern: UrlPattern, options: EndpointOptions = {}) {
+        const { decodeBody = defaultDecodeBody, transformResponseBody, ...requestInit } = options;
         this.urlPattern = urlPattern;
         this.transformResponseBody = transformResponseBody;
         this.urlCache = new Map();

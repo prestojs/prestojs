@@ -9,9 +9,48 @@ export type PaginatorState =
     | CursorPaginationState
     | LimitOffsetPaginationState;
 
+/**
+ * Class that infers the specific type of pagination based on the response.
+ *
+ * Supports [PageNumberPaginator](doc:PageNumberPaginator), [LimitOffsetPaginator](LimitOffsetPaginator) and
+ * [CursorPaginator](doc:CursorPaginator) with the following rules based on the response data:
+ *
+ * * If response contains `nextCursor` or `previousCursor` value paginator is set to [CursorPaginator](doc:CursorPaginator)
+ * * If response contains `limit` then paginator is set to  [LimitOffsetPaginator](LimitOffsetPaginator)
+ * * If response contains `total` then paginator is set to [PageNumberPaginator](doc:PageNumberPaginator)
+ *
+ * If your backend differs from this implementation then you can transform the shape of your response to conform with
+ * the above by providing your own `getPaginationState`
+ *
+ * ```js
+ * import { Endpoint } from '@prestojs/rest';
+ *
+ * function getPaginationState(paginator, { query, decodedBody }) {
+ *    ....
+ * }
+ *
+ * Endpoint.defaultConfig.getPaginationState = getPaginationState;
+ * ```
+ *
+ * See [getPaginationState](doc:getPaginationState) for default implementation used.
+ *
+ * Alternatively if you only use one type of paginator everywhere in a project you can change the default from
+ * `InferredPaginator` in your project entry point (ie. it should happen before any `Endpoint` is used):
+ *
+ * ```js
+ * import { Endpoint } from '@prestojs/rest';
+ *
+ * Endpoint.defaultConfig.paginatorClass = PageNumberPaginator;
+ * ```
+ * @menu-group Pagination
+ * @extract-docs
+ */
 export default class InferredPaginator implements PaginatorInterface {
     __paginator?: CursorPaginator | PageNumberPaginator | LimitOffsetPaginator;
 
+    /**
+     * The underlying inferred paginator instance (if known). Only available after `setResponse` has been called.
+     */
     get paginator(): undefined | CursorPaginator | PageNumberPaginator | LimitOffsetPaginator {
         if (!this.__paginator && this.internalState.paginatorClass) {
             this.paginator = new this.internalState.paginatorClass(
@@ -30,6 +69,9 @@ export default class InferredPaginator implements PaginatorInterface {
         this.__paginator = paginator;
     }
 
+    /**
+     * The total number of records available. Not valid if inferred paginator is [CursorPaginator](doc:CursorPaginator).
+     */
     get total(): number | null {
         if (!this.paginator) {
             return null;
@@ -40,6 +82,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.total;
     }
 
+    /**
+     * The total number of records available. Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).
+     */
     get totalPages(): number | null {
         if (!this.paginator) {
             return null;
@@ -50,6 +95,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.totalPages;
     }
 
+    /**
+     * The current limit. Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).
+     */
     get limit(): number | null {
         if (!this.paginator) {
             return null;
@@ -60,6 +108,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.limit;
     }
 
+    /**
+     * The current offset. Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).
+     */
     get offset(): number | null {
         if (!this.paginator || !(this.paginator instanceof LimitOffsetPaginator)) {
             return null;
@@ -67,6 +118,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.offset;
     }
 
+    /**
+     * The next cursor. Only valid if inferred paginator is [CursorPaginator](doc:CursorPaginator).
+     */
     get nextCursor(): string | null {
         if (!this.paginator || !(this.paginator instanceof CursorPaginator)) {
             return null;
@@ -74,6 +128,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.nextCursor;
     }
 
+    /**
+     * The previous cursor. Only valid if inferred paginator is [CursorPaginator](doc:CursorPaginator).
+     */
     get previousCursor(): string | null {
         if (!this.paginator) {
             return null;
@@ -85,6 +142,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.previousCursor;
     }
 
+    /**
+     * The current cursor. Only valid if inferred paginator is [CursorPaginator](doc:CursorPaginator).
+     */
     get cursor(): string | null {
         if (!this.paginator) {
             return null;
@@ -95,6 +155,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.cursor;
     }
 
+    /**
+     * The current page number. Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).
+     */
     get page(): number | null {
         if (!this.paginator) {
             return null;
@@ -105,6 +168,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.page;
     }
 
+    /**
+     * The current page size. Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).
+     */
     get pageSize(): number | null {
         if (!this.paginator) {
             return null;
@@ -162,6 +228,11 @@ export default class InferredPaginator implements PaginatorInterface {
         }
     }
 
+    /**
+     * Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).
+     *
+     * See [PageNumberPaginator.pageState](doc:PageNumberPaginator#method-pageState)
+     */
     pageState(page: number): PageNumberPaginationState | null {
         if (!this.paginator) {
             return null;
@@ -172,6 +243,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.pageState(page);
     }
 
+    /**
+     * Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).
+     *
+     * See [PageNumberPaginator.setPage](doc:PageNumberPaginator#method-setPage)
+     */
     setPage(page: number): void {
         if (!this.paginator) {
             throw new Error(
@@ -184,6 +260,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.setPage(page);
     }
 
+    /**
+     * Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).
+     *
+     * See [PageNumberPaginator.pageSizeState](doc:PageNumberPaginator#method-pageSizeState)
+     */
     pageSizeState(
         pageSize: number | null
     ): CursorPaginationState | PageNumberPaginationState | null {
@@ -196,6 +277,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.pageSizeState(pageSize);
     }
 
+    /**
+     * Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).
+     *
+     * See [PageNumberPaginator.setPageSize](doc:PageNumberPaginator#method-setPageSize)
+     */
     setPageSize(pageSize: number | null): void {
         if (!this.paginator) {
             throw new Error(
@@ -208,6 +294,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.setPageSize(pageSize);
     }
 
+    /**
+     * Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).
+     *
+     * See [LimitOffsetPaginator.limitState](doc:LimitOffsetPaginator#method-limitState)
+     */
     limitState(limit: number | null): LimitOffsetPaginationState | null {
         if (!this.paginator) {
             return null;
@@ -218,6 +309,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.limitState(limit);
     }
 
+    /**
+     * Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).
+     *
+     * See [LimitOffsetPaginator.setLimit](doc:LimitOffsetPaginator#method-setLimit)
+     */
     setLimit(limit: number | null): void {
         if (!this.paginator) {
             throw new Error(
@@ -230,6 +326,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.setLimit(limit);
     }
 
+    /**
+     * Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).
+     *
+     * See [LimitOffsetPaginator.offsetState](doc:LimitOffsetPaginator#method-offsetState)
+     */
     offsetState(offset: number | null): LimitOffsetPaginationState | null {
         if (!this.paginator) {
             return null;
@@ -240,6 +341,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.offsetState(offset);
     }
 
+    /**
+     * Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).
+     *
+     * See [LimitOffsetPaginator.setOffset](doc:LimitOffsetPaginator#method-setOffset)
+     */
     setOffset(offset: number | null): void {
         if (!this.paginator) {
             throw new Error(
@@ -252,6 +358,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.setOffset(offset);
     }
 
+    /**
+     * Return the state for the next page
+     *
+     * Does not transition state. To transition state call `next` instead.
+     */
     nextState():
         | LimitOffsetPaginationState
         | CursorPaginationState
@@ -263,6 +374,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.nextState();
     }
 
+    /**
+     * Go to the next page.
+     */
     next(): void {
         if (!this.paginator) {
             throw new Error(
@@ -272,6 +386,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.next();
     }
 
+    /**
+     * Return the state for the previous page
+     *
+     * Does not transition state. To transition state call `previous` instead.
+     */
     previousState():
         | LimitOffsetPaginationState
         | CursorPaginationState
@@ -283,6 +402,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.previousState();
     }
 
+    /**
+     * Go to the previous page.
+     */
     previous(): void {
         if (!this.paginator) {
             throw new Error(
@@ -292,6 +414,11 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.previous();
     }
 
+    /**
+     * Return the state for the first page
+     *
+     * Does not transition state. To transition state call `first` instead.
+     */
     firstState():
         | LimitOffsetPaginationState
         | CursorPaginationState
@@ -303,6 +430,9 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.firstState();
     }
 
+    /**
+     * Go to the first page.
+     */
     first(): void {
         if (!this.paginator) {
             throw new Error(
@@ -312,6 +442,13 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.first();
     }
 
+    /**
+     * Return the state for the first page
+     *
+     * Does not transition state. To transition state call `last` instead.
+     *
+     * Not valid for [CursorPaginator](doc:CursorPaginator)
+     */
     lastState(): LimitOffsetPaginationState | PageNumberPaginationState | null {
         if (!this.paginator) {
             return null;
@@ -322,6 +459,14 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.lastState();
     }
 
+    /**
+     * Go to the last page. If the last page isn't yet known (eg. results
+     * haven't yet been returned) then null will be returned.
+     *
+     * If the last page is not yet known because results haven't been returned this function
+     * does nothing.
+     * Not valid for [CursorPaginator](doc:CursorPaginator)
+     */
     last(): void {
         if (!this.paginator) {
             throw new Error(
@@ -347,6 +492,13 @@ export default class InferredPaginator implements PaginatorInterface {
         };
     }
 
+    /**
+     * Sets the internal data based on response. This is where the paginator is inferred based on values in the
+     * `response`.
+     *
+     * See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation
+     * differs.
+     */
     setResponse(response: Record<string, any>): void {
         // TODO: Detect change of paginator?
         if (!this.paginator) {

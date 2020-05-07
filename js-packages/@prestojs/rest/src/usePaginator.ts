@@ -11,6 +11,9 @@ import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
  * is called - or a  Paginator class. This class defines how paginator is handled.
  * @param currentStatePair A tuple of current state and a state setter function. If not provided state
  * is handled internally in usePaginator. You can pass `useState()` to this parameter.
+ *
+ * @menu-group Pagination
+ * @extract-docs
  */
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
     paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any, T>,
