@@ -259,11 +259,12 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  *
  * ## Pagination
  *
- * Pagination for an endpoint is handled by a `Paginator` class returned from the `getPaginatorClass` method. The
- * default implementation chooses the paginator based on the shape of the response (eg. if the response looks like
+ * Pagination for an endpoint is handled by a `Paginator` class returned from the `getPaginatorClass` method. The base
+ * `Endpoint` class defaults to using no pagination. [PaginatedEndpoint](doc:PaginatedEndpoint) is provided with a
+ * default implementation that chooses the paginator based on the shape of the response (eg. if the response looks like
  * cursor based paginator it will use `CursorPaginator`, if page number based `PageNumberPaginator` or if limit/offset
- * use `LimitOffsetPaginator`). The pagination state as returned by the backend is stored on the instance of the
- * paginator:
+ * use `LimitOffsetPaginator` - see [InferredPaginator](doc:InferredPaginator). The pagination state as returned by the
+ * backend is stored on the instance of the paginator:
  *
  * ```js
  * const paginator = usePaginator(endpoint);
@@ -325,6 +326,9 @@ export default class Endpoint<
 
     /**
      * Get the Paginator class to use for this endpoint.
+     *
+     * `Endpoint` defaults to no paginator. See [PaginatedEndpoint](doc:PaginatedEndpoint)
+     * for class that provides default paginator.
      */
     getPaginatorClass(): PaginatorInterfaceClass<PaginatorT> {
         const cls = Object.getPrototypeOf(this).constructor;
