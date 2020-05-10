@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.json",
+
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./build/module",
+    "rootDir": "./src"
+  },
+  "references": [
+    {
+      "path": "../viewmodel/tsconfig.json"
+    }
+  ],
+
+  "include": ["src/**/*"]
+}

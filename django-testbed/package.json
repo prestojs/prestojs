@@ -82,6 +82,7 @@
     "@prestojs/ui": "*",
     "@prestojs/ui-antd": "*",
     "@prestojs/viewmodel": "*",
+    "@prestojs/util": "*",
     "antd": "^4.0.4",
     "classnames": "^2.2.6",
     "core-js": "^3.6.4",
