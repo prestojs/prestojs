@@ -377,9 +377,8 @@ export default class Endpoint<
      * `Endpoint` defaults to no paginator. See [PaginatedEndpoint](doc:PaginatedEndpoint)
      * for class that provides default paginator.
      */
-    getPaginatorClass(): PaginatorInterfaceClass<PaginatorT> {
-        const cls = Object.getPrototypeOf(this).constructor;
-        return cls.defaultConfig.paginatorClass;
+    getPaginatorClass(): null | PaginatorInterfaceClass<PaginatorT> {
+        return null;
     }
 
     /**

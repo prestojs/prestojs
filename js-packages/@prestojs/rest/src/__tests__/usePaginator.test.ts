@@ -1,13 +1,13 @@
 import { UrlPattern } from '@prestojs/routing';
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useState } from 'react';
-import Endpoint from '../Endpoint';
 import InferredPaginator from '../InferredPaginator';
 import PageNumberPaginator from '../PageNumberPaginator';
+import PaginatedEndpoint from '../PaginatedEndpoint';
 import usePaginator from '../usePaginator';
 
 test('should accept endpoint', async () => {
-    const action1 = new Endpoint(new UrlPattern('/whatever/'));
+    const action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
     const { result } = renderHook(() => usePaginator(action1));
 
     act(() => result.current.setResponse({ total: 10, pageSize: 5 }));
@@ -87,12 +87,12 @@ test('should accept state with initial state', async () => {
 });
 
 test('should accept no value', async () => {
-    let action1: null | Endpoint = null;
+    let action1: null | PaginatedEndpoint = null;
     const { result, rerender } = renderHook(() => usePaginator(action1));
 
     expect(result.current).toBe(null);
 
-    action1 = new Endpoint(new UrlPattern('/whatever/'));
+    action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
     rerender();
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

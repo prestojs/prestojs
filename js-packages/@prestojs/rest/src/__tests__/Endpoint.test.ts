@@ -8,6 +8,7 @@ import getPaginationState from '../getPaginationState';
 import InferredPaginator from '../InferredPaginator';
 import LimitOffsetPaginator from '../LimitOffsetPaginator';
 import PageNumberPaginator from '../PageNumberPaginator';
+import PaginatedEndpoint from '../PaginatedEndpoint';
 import { PaginatorInterface, PaginatorInterfaceClass } from '../Paginator';
 
 const fetchMock = fetch as FetchMock;
@@ -228,7 +229,7 @@ test('should raise ApiError on non-2xx response', async () => {
 });
 
 test('should update paginator state on response', async () => {
-    const action1 = new Endpoint(new UrlPattern('/whatever/'));
+    const action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
     let { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
     const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));
@@ -287,7 +288,7 @@ test('should support changing paginatorClass & getPaginationState', async () => 
             pageSize,
         };
     };
-    const action1 = new Endpoint(new UrlPattern('/whatever/'));
+    const action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
     const { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
     const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));
