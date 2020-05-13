@@ -149,3 +149,38 @@ test('should accept extra args', () => {
     rerender({ fieldNames: ['email'] });
     expect(result.current).toEqual([recordEqualTo({ id: 1, email: 'a@b.com' })]);
 });
+
+test('should allow custom equality checks', () => {
+    const Test1 = createModel();
+    Test1.cache.add({ id: 1, firstName: 'Bob', email: 'a@b.com' });
+    Test1.cache.add({ id: 2, firstName: 'Bob', email: 'anotherbob@b.com' });
+    Test1.cache.add({ id: 3, firstName: 'Sam', email: 'sam@b.com' });
+    const selector = jest.fn(cache =>
+        cache.getAll(['firstName']).reduce((acc, record) => {
+            acc[record.firstName] = acc[record.firstName] || [];
+            acc[record.firstName].push(record.id);
+            return acc;
+        }, {})
+    );
+
+    const { result, rerender } = renderHook(() =>
+        useViewModelCache(Test1, selector, [], deepEqual)
+    );
+    const last = result.current;
+    expect(last).toEqual({ Bob: [1, 2], Sam: [3] });
+    act(() => {
+        // Add same value again to trigger listener to rerender
+        Test1.cache.add({ id: 1, firstName: 'Bob', email: 'a@b.com' });
+    });
+    expect(result.current).toBe(last);
+    rerender();
+    expect(result.current).toBe(last);
+    act(() => {
+        Test1.cache.add({ id: 4, firstName: 'Bob', email: 'bob@b.com' });
+    });
+    expect(result.current).not.toBe(last);
+    expect(result.current).toEqual({
+        Bob: [1, 2, 4],
+        Sam: [3],
+    });
+});
