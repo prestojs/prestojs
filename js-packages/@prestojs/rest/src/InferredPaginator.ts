@@ -484,11 +484,11 @@ export default class InferredPaginator implements PaginatorInterface {
             return this.paginator.getRequestInit(currentInit);
         }
         return {
+            ...currentInit,
             query: {
                 ...this.currentState,
                 ...currentInit.query,
             },
-            ...currentInit,
         };
     }
 

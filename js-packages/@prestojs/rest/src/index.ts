@@ -1,4 +1,5 @@
 export { default as Endpoint, ApiError, RequestError } from './Endpoint';
+export { default as PaginatedEndpoint } from './PaginatedEndpoint';
 export { default as usePaginator } from './usePaginator';
 export { default as InferredPaginator } from './InferredPaginator';
 export { default as PageNumberPaginator } from './PageNumberPaginator';
