@@ -1,3 +1,4 @@
+import { ViewModelConstructor } from '@prestojs/viewmodel/ViewModelFactory';
 import FieldBinder from '../FieldBinder';
 import { AsyncChoicesInterface } from './AsyncChoices';
 
@@ -302,6 +303,16 @@ export default class Field<T, ParsableType extends any = T> {
     public get value(): undefined | T {
         console.warn('Accessed value on unbound field - this will never return a value');
         return undefined;
+    }
+
+    /**
+     * Called after fields are attached to a ViewModel.
+     *
+     * By default this does nothing but can be used by fields to attach extra properties or validate
+     * against the final view model (for example checking that another field does / does not exist).
+     */
+    public contributeToClass(viewModel: ViewModelConstructor<any>): void {
+        // Do nothing by default
     }
 }
 

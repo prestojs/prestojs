@@ -17,7 +17,7 @@
     "docs": "yarn workspace doc-site run develop",
     "extract-docs": "yarn node doc-site/extract-docs",
     "prebuild": "wsrun -m -x doc-site clean",
-    "test": "jest",
+    "test": "# Always runInBand so performance tests are more consistent\njest --runInBand",
     "dev": "wsrun dev",
     "build": "wsrun -t -x doc-site -x django-testbed build",
     "build:docs": "yarn workspace doc-site run build",
