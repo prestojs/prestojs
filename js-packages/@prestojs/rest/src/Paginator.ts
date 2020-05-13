@@ -1,6 +1,10 @@
 import { EndpointExecuteOptions } from './Endpoint';
 
-export interface PaginatorInterface {
+export interface PaginatorInterface<State = {}, InternalState = {}> {
+    currentState: State;
+    internalState: InternalState;
+    setCurrentState: (set: State) => void;
+    setInternalState: (set: InternalState) => void;
     getRequestInit(options: EndpointExecuteOptions): EndpointExecuteOptions;
 
     setResponse(response: Record<string, any>): void;
@@ -19,7 +23,8 @@ export interface PaginatorInterfaceClass<T extends PaginatorInterface = Paginato
  * @menu-group Pagination
  * @extract-docs
  */
-export default abstract class Paginator<State, InternalState> implements PaginatorInterface {
+export default abstract class Paginator<State extends {}, InternalState extends {}>
+    implements PaginatorInterface<State, InternalState> {
     currentState: State;
     internalState: InternalState;
     setCurrentState: (set: State) => void;

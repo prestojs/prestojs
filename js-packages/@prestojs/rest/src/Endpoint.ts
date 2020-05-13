@@ -336,10 +336,7 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
  * @menu-group Endpoint
  * @extract-docs
  */
-export default class Endpoint<
-    ReturnT = any,
-    PaginatorT extends PaginatorInterface = PaginatorInterface
-> {
+export default class Endpoint<ReturnT = any> {
     static defaultConfig: {
         requestInit: RequestInit;
         getPaginationState: (
@@ -377,7 +374,7 @@ export default class Endpoint<
      * `Endpoint` defaults to no paginator. See [PaginatedEndpoint](doc:PaginatedEndpoint)
      * for class that provides default paginator.
      */
-    getPaginatorClass(): null | PaginatorInterfaceClass<PaginatorT> {
+    getPaginatorClass(): PaginatorInterfaceClass<any> | null {
         return null;
     }
 

@@ -1,5 +1,5 @@
 import Endpoint from './Endpoint';
-import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
+import { PaginatorInterfaceClass } from './Paginator';
 
 /**
  * Extension of [Endpoint](doc:Endpoint) that provides a default paginator. This
@@ -18,16 +18,13 @@ import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
  * @menu-group Endpoint
  * @extract-docs
  */
-export default class PaginatedEndpoint<
-    ReturnT = any,
-    PaginatorT extends PaginatorInterface = PaginatorInterface
-> extends Endpoint<ReturnT, PaginatorT> {
+export default class PaginatedEndpoint<ReturnT = any> extends Endpoint<ReturnT> {
     /**
      * Returns the class to use for pagination as specified by `Endpoint.defaultConfig.paginatorClass`.
      *
      * Defaults to [InferredPaginator](doc:InferredPaginator)
      */
-    getPaginatorClass(): PaginatorInterfaceClass<PaginatorT> {
+    getPaginatorClass(): PaginatorInterfaceClass<any> {
         const cls = Object.getPrototypeOf(this).constructor;
         return cls.defaultConfig.paginatorClass;
     }

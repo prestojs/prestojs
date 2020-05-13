@@ -16,7 +16,7 @@ import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
  * @extract-docs
  */
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any, T>,
+    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any>,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): T;
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
@@ -29,11 +29,11 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
 //     usePaginator(endpoint && endpoint.getPaginatorClass());
 // }
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any, T> | null,
+    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any> | null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): T | null;
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any, T> | null,
+    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any> | null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): T | null {
     // Only used if currentStatePair is not provided. We have to create this regardless
