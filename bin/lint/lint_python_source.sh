@@ -71,7 +71,7 @@ function lint_python_source() {
 	fi
 
 	if $files_all; then
-		flake8 --config=.flake8.cfg --format="$flake8_format" ./django-root ./bin *.py
+		flake8 --config=.flake8.cfg --format="$flake8_format" ./django-testbed/django-root ./bin *.py
 	else
 		flake8 --config=.flake8.cfg --format="$flake8_format" "${files_py[@]}"
 	fi

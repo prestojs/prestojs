@@ -1,6 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
-
 from django_filters import rest_framework as filters
 from rest_framework.pagination import CursorPagination
 from rest_framework.pagination import LimitOffsetPagination

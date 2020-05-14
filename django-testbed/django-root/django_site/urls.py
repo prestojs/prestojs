@@ -1,5 +1,4 @@
 from allianceutils.api.permissions import SimpleDjangoObjectPermissions
-from authtools.views import LoginView
 from authtools.views import LogoutView
 from django.conf import settings
 from django.conf.urls import include

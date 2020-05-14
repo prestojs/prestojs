@@ -28,11 +28,11 @@ if __name__ == "__main__":
 
     error = 0
 
-    error = os.system(f"bin/lint/lint-general.py") or error
-    error = os.system(f"bin/lint/lint_python_source.sh") or error
-    error = os.system(f"bin/lint/lint_sh.sh") or error
+    error = os.system("bin/lint/lint-general.py") or error
+    error = os.system("bin/lint/lint_python_source.sh") or error
+    error = os.system("bin/lint/lint_sh.sh") or error
     # error = os.system(f"bin/lint/lint_json_and_less.sh") or error
-    error = os.system(f"bin/lint/lint_js.sh") or error
+    error = os.system("bin/lint/lint_js.sh") or error
 
     print(f'{"👻" if error else "✅"} Linting Done. Error code: {error}')  # noqa
     exit(1 if error else 0)

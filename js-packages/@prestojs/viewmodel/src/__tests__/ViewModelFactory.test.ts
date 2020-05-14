@@ -165,7 +165,7 @@ test('should generate pk automatically where possible', () => {
 
 test('should error if pkFieldName and getImplicitPkField provided', () => {
     expect(() => {
-        class A extends ViewModelFactory(
+        ViewModelFactory(
             {},
             {
                 pkFieldName: 'id',
@@ -173,7 +173,7 @@ test('should error if pkFieldName and getImplicitPkField provided', () => {
                     return ['EntityId', new CharField()];
                 },
             }
-        ) {}
+        );
     }).toThrow(/Only one of 'pkFieldName' and 'getImplicitPkField' should be provided/);
 });
 
@@ -603,9 +603,9 @@ test('should disallow naming fields one of reserved names', () => {
     const reservedNames = ['toJS', 'clone', 'isEqual'];
     for (const name of reservedNames) {
         expect(() => {
-            class A extends ViewModelFactory({
+            ViewModelFactory({
                 [name]: new Field(),
-            }) {}
+            });
         }).toThrow(/is reserved and cannot be used as a field name/);
 
         expect(() => {

@@ -24,7 +24,6 @@ class FrontendView(TemplateView):
         }
 
     def get_app_context(self, request):
-        initial_model_data = []
         return {
             "basename": self.basename,
             "baseUrl": "{}://{}{}".format(
