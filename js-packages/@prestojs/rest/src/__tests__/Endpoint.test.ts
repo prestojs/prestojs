@@ -358,3 +358,197 @@ test('should support custom URL resolve function', () => {
     expect(fetchMock.mock.calls.length).toEqual(4);
     expect(fetchMock.mock.calls[3][0]).toEqual('/whatever/?a=b&always=1');
 });
+
+test('should be possible to implement auth replay middleware', async () => {
+    // This test simulates middleware that catches response failures
+    // due to a 401 response (eg. users session has expired). It captures
+    // this and returns a new promise that only resolves after successful
+    // login occurs and original request is replayed.
+    const emitter = {
+        listeners: [],
+        addListener(cb: () => void): void {
+            this.listeners.push(cb);
+        },
+        resolve(): void {
+            this.listeners.forEach(cb => cb());
+        },
+    };
+    // For testing purposes we need to know when the first response has finished
+    // Once this has resolved the original promise from `execute` will still be
+    // pending.
+    let resolveOuter;
+    let outer = new Promise(resolve => {
+        resolveOuter = resolve;
+    });
+    const middleware1Start = jest.fn();
+    const middleware1End = jest.fn();
+    const middleware3Start = jest.fn();
+    const middleware3End = jest.fn();
+    Endpoint.defaultConfig.middleware = [
+        async (url, requestInit, next): Promise<any> => {
+            middleware1Start();
+            const r = await next(url, requestInit);
+            middleware1End();
+            return r;
+        },
+        async (url, requestInit, next, { execute }): Promise<any> => {
+            try {
+                return await next(url, requestInit);
+            } catch (e) {
+                resolveOuter();
+                if (e.status === 401) {
+                    return new Promise(resolve => {
+                        emitter.addListener(async () => {
+                            resolve(await execute());
+                        });
+                    });
+                }
+                throw e;
+            }
+        },
+        async (url, requestInit, next): Promise<any> => {
+            middleware3Start();
+            let r;
+            try {
+                r = await next(url, requestInit);
+            } catch (e) {
+                middleware3End();
+                throw e;
+            }
+            middleware3End();
+            return r;
+        },
+    ];
+    fetchMock.mockResponseOnce('', { status: 401 });
+    const action1 = new Endpoint(new UrlPattern('/whatever/'));
+    const p = action1.prepare().execute();
+    await outer;
+    expect(middleware1Start).toHaveBeenCalledTimes(1);
+    expect(middleware1End).not.toHaveBeenCalled();
+    expect(middleware3Start).toHaveBeenCalledTimes(1);
+    expect(middleware3End).toHaveBeenCalledTimes(1);
+    [middleware1Start, middleware1End, middleware3Start, middleware3End].forEach(fn =>
+        fn.mockReset()
+    );
+    fetchMock.mockResponseOnce('hello world', {
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+    });
+    // This triggers the refetch in the middleware
+    emitter.resolve();
+    // Finally the original promise should resolve to the final response
+    expect((await p).result).toBe('hello world');
+    expect(middleware1Start).toHaveBeenCalledTimes(1);
+    // NOTE: middleware1End is called 2 times - chain gets unwound when Promise returned by
+    // middleware 2 is finally resolved but it has since been called again due to the
+    // context.execute() call. There's no way around that with this kind of middleware
+    // design. So the flow is:
+    //  middleware 1 - start
+    //  middleware 2 - start
+    //  middleware 3 - start
+    //  middleware 3 - end (error)
+    //  middleware 2 - end
+    //  EXECUTE STARTS
+    //  middleware 1 - start
+    //  middleware 2 - start
+    //  middleware 3 - start
+    //  middleware 3 - end
+    //  middleware 2 - end
+    //  middleware 1 - end
+    //  middleware 1 - end
+    expect(middleware1End).toHaveBeenCalledTimes(2);
+    expect(middleware3Start).toHaveBeenCalledTimes(1);
+    expect(middleware3End).toHaveBeenCalledTimes(1);
+});
+
+test('middleware should be able to de-dupe requests', async () => {
+    const requestsInFlight = {};
+    const middleware = [
+        async (url, requestInit, next): Promise<any> => {
+            // For simplicity sake just cache by URL here - real implementation would consider headers, query string etc
+            if (requestsInFlight[url]) {
+                return requestsInFlight[url];
+            } else {
+                requestsInFlight[url] = next(url, requestInit);
+                const promise = requestsInFlight[url];
+                try {
+                    const r = await promise;
+                    delete requestsInFlight[url];
+                    return r;
+                } catch (err) {
+                    delete requestsInFlight[url];
+                    throw err;
+                }
+            }
+        },
+    ];
+    fetchMock.mockResponse('hello world', {
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+    });
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), { middleware });
+    const p1 = action1.prepare().execute();
+    const p2 = action1.prepare().execute();
+    expect((await p1).result).toBe('hello world');
+    expect((await p2).result).toBe('hello world');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect((await action1.prepare().execute()).result).toBe('hello world');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+});
+
+test('middleware should detect bad implementations', async () => {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    function badMiddleware1(url, requestInit, next) {
+        return next();
+    }
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), { middleware: [badMiddleware1] });
+    expect(action1.execute()).rejects.toThrowError(
+        /Bad middleware implementation; invalid arguments/
+    );
+
+    fetchMock.mockResponse('hello world', {
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+    });
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    function badMiddleware2(url, requestInit, next) {
+        next(url, requestInit);
+    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    const action2 = new Endpoint(new UrlPattern('/whatever/'), { middleware: [badMiddleware2] });
+    expect(action2.execute()).rejects.toThrowError(
+        /Bad middleware implementation; function did not return anything/
+    );
+});
+
+test('middleware header mutations should not mutate source objects', async () => {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    function customHeaderMiddleware(url, requestInit, next) {
+        requestInit.headers.set('X-ClientId', 'ABC123');
+        return next(url, requestInit);
+    }
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [customHeaderMiddleware],
+    });
+    fetchMock.mockResponse('hello world', {
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+    });
+    const headers = new Headers({ 'x-csrf': '42' });
+    await action1.execute({ headers });
+    expect([...headers.keys()]).toEqual(['x-csrf']);
+    const defaultHeaders = new Headers({ token: 'a' });
+    Endpoint.defaultConfig.requestInit = {
+        headers: defaultHeaders,
+    };
+    const action2 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [customHeaderMiddleware],
+    });
+    await action2.execute({ headers });
+    expect([...defaultHeaders.keys()]).toEqual(['token']);
+});

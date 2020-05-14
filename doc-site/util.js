@@ -134,13 +134,14 @@ export function getClassDetails(doc) {
                 .map(id => children[id])
                 .filter(method => !method.flags.isPrivate)) ||
         [];
+    let groupProperties = groups.Properties?.children || [];
+    if (groups['Object literals']?.children) {
+        groupProperties.push(...groups['Object literals'].children);
+    }
     const properties =
-        (groups.Properties &&
-            groups.Properties.children
-                .map(id => children[id])
-                .filter(prop => !prop.flags.isPrivate && !prop.name.startsWith('__'))) ||
-        [];
-
+        [...new Set(groupProperties)]
+            .map(id => children[id])
+            .filter(prop => !prop.flags.isPrivate && !prop.name.startsWith('__')) || [];
     return {
         constructor,
         methods: getMethods(methods, false),

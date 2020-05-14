@@ -25,7 +25,7 @@ export default function ClassDetails({
             )}
             {methods.direct.length > 0 && (
                 <>
-                    <h3 className="text-4xl">Methods</h3>
+                    <h3 className="text-4xl mt-10">Methods</h3>
                     {methods.direct.map(method => (
                         <MethodDoc key={method.name} method={method} />
                     ))}
@@ -33,7 +33,7 @@ export default function ClassDetails({
             )}
             {staticMethods.direct.length > 0 && (
                 <>
-                    <h3 className="text-4xl">Static Methods</h3>
+                    <h3 className="text-4xl mt-10">Static Methods</h3>
                     {staticMethods.direct.map(method => (
                         <MethodDoc key={method.name} method={method} anchorPrefix="static-method" />
                     ))}
@@ -41,7 +41,7 @@ export default function ClassDetails({
             )}
             {properties.direct.length > 0 && (
                 <>
-                    <h3 className="text-4xl">Properties</h3>
+                    <h3 className="text-4xl mt-10">Properties</h3>
                     {properties.direct.map(prop => (
                         <VariableDoc key={prop.name} doc={prop} />
                     ))}
@@ -49,7 +49,7 @@ export default function ClassDetails({
             )}
             {staticProperties.direct.length > 0 && (
                 <>
-                    <h3 className="text-4xl">Static Properties</h3>
+                    <h3 className="text-4xl mt-10">Static Properties</h3>
                     {staticProperties.direct.map(prop => (
                         <VariableDoc key={prop.name} doc={prop} anchorPrefix="static-var" />
                     ))}
