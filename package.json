@@ -58,7 +58,7 @@
     "ts-jest": "^25.2.1",
     "typedoc": "^0.15.2",
     "typedoc-neo-theme": "^1.0.4",
-    "typescript": "^3.8.2",
+    "typescript": "^3.9.2",
     "yargs": "^15.1.0"
   },
   "peerDependencies": {

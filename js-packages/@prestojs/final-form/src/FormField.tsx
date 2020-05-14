@@ -3,9 +3,12 @@ import { Field } from '@prestojs/viewmodel';
 import React from 'react';
 import { Field as FinalFormField, FieldProps } from 'react-final-form';
 
-type FormFieldProps<T> =
-    | FieldProps<any, any>
-    | (Omit<FieldProps<any, any>, 'name'> & { field: Field<T>; widgetProps?: Record<any, any> });
+type FormFieldPropsWithField<T> = Omit<FieldProps<any, any>, 'name'> & {
+    field: Field<T>;
+    widgetProps?: Record<any, any>;
+};
+
+type FormFieldProps<T> = FieldProps<any, any> | FormFieldPropsWithField<T>;
 
 /**
  * Wrapper around Field from react-final-form that determines the widget to use based on the field.
@@ -22,6 +25,8 @@ type FormFieldProps<T> =
  * `component`, `children` or `render`.
  * @param widgetProps Optional props to pass through to the inferred widget. This is only used if `field` is provided
  * and none of `component`, `render` or `children` are provided.
+ * @param name The name of the field. If not specified defaults to `field.name`. If `field` is not specified you must
+ * provide this.
  * @param fieldProps Any other props to pass through to [Field](https://final-form.org/docs/react-final-form/api/Field)
  *
  * @rest-prop-name fieldProps
@@ -30,6 +35,7 @@ type FormFieldProps<T> =
 export default function FormField<T>({
     field,
     widgetProps,
+    name,
     ...fieldProps
 }: FormFieldProps<T>): React.ReactElement {
     const requireModelWidget = !fieldProps.component && !fieldProps.render && !fieldProps.children;
@@ -48,9 +54,6 @@ export default function FormField<T>({
                     'the component to use will be inferred from the field type.'
             );
         }
-        if (!fieldProps.name) {
-            fieldProps.name = field.name;
-        }
         if (fieldProps.defaultValue === undefined) {
             let { defaultValue } = field;
             if (
@@ -68,6 +71,12 @@ export default function FormField<T>({
         fieldProps.render = (props): React.ReactElement => (
             <FieldWidget field={field} {...props} {...widgetProps} />
         );
+    }
+    if (!name) {
+        if (!field) {
+            throw new Error("'name' or 'field' must be specified");
+        }
+        name = field.name;
     }
     return <FinalFormField name={name} {...fieldProps} />;
 }

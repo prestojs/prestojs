@@ -174,7 +174,7 @@ export default class Field<T, ParsableType extends any = T> {
      * @param value
      */
     public parse(value: ParsableType): T | null {
-        return value;
+        return value as T;
     }
 
     /**
@@ -203,7 +203,7 @@ export default class Field<T, ParsableType extends any = T> {
      * @param value
      */
     public normalize(value: ParsableType): T | null {
-        return value;
+        return value as T;
     }
 
     /**
