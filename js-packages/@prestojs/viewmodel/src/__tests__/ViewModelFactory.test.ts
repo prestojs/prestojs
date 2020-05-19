@@ -374,6 +374,11 @@ test('Should be able to compare if two records are equal', () => {
         email: 'a@b.com',
     };
     expect(new A(data).isEqual(new B(data))).toBe(false);
+    expect(new A(data).isEqual(null)).toBe(false);
+    // @ts-ignore
+    expect(new A(data).isEqual(1)).toBe(false);
+    // @ts-ignore
+    expect(new A(data).isEqual('string')).toBe(false);
 });
 
 test('should clone a ViewModel record', () => {

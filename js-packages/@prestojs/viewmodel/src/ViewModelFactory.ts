@@ -83,7 +83,7 @@ export type ViewModelInterface<
      *   considered different even if the common fields are the same and other fields are
      *   all null
      */
-    isEqual(record: ViewModelInterface<FieldMappingType, IncomingData>): boolean;
+    isEqual(record: ViewModelInterface<FieldMappingType, IncomingData> | null): boolean;
 
     /**
      * Clone this record, optionally with only a subset of the fields
@@ -643,8 +643,11 @@ export default function viewModelFactory<T extends FieldsMapping>(
         },
         isEqual: {
             value(
-                record: ViewModelInterface<FieldsMapping, { [fieldName: string]: any }>
+                record: ViewModelInterface<FieldsMapping, { [fieldName: string]: any }> | null
             ): boolean {
+                if (!record) {
+                    return false;
+                }
                 if (record._model !== this._model) {
                     return false;
                 }
