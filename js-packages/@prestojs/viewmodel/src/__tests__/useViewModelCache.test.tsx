@@ -1,23 +1,28 @@
-import React from 'react';
 import { render } from '@testing-library/react';
-import { renderHook, act } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-hooks';
+import React from 'react';
 
 import { recordEqualTo } from '../../../../../js-testing/matchers';
-import useViewModelCache from '../useViewModelCache';
 
 import Field from '../fields/Field';
+import useViewModelCache from '../useViewModelCache';
 import ViewModelCache from '../ViewModelCache';
-import ViewModelFactory from '../ViewModelFactory';
+import ViewModelFactory, { ViewModelConstructor } from '../ViewModelFactory';
 
-class Test1 extends ViewModelFactory({
+// eslint-disable-next-line @typescript-eslint/class-name-casing
+class _Test1 extends ViewModelFactory({
     id: new Field(),
     firstName: new Field(),
     lastName: new Field(),
     email: new Field(),
 }) {}
-
+const Test1 = (_Test1 as unknown) as ViewModelConstructor<
+    typeof _Test1.fields,
+    typeof _Test1['__pkFieldType'],
+    typeof _Test1['__pkType']
+>;
 beforeEach(() => {
-    Test1.cache = new ViewModelCache<Test1>(Test1);
+    Test1.cache = new ViewModelCache(Test1);
 });
 
 test('should select initial state', () => {

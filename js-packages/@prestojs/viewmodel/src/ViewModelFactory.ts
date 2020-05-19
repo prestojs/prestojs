@@ -214,7 +214,17 @@ export interface ViewModelConstructor<
      */
     readonly fieldNames: string[];
 
-    readonly cache: ViewModelCache<ViewModelInterface<any, any>>;
+    /**
+     * The cache instance for this ViewModel. A default instance of [ViewModelCache](doc:ViewModelCache)
+     * is created when first accessed or you can explicitly assign a cache:
+     *
+     * ```js
+     * class User extends viewModelFactory(fields) {
+     *     static cache = new MyCustomCache(User);
+     * }
+     * ```
+     */
+    cache: ViewModelCache<ViewModelInterface<any, any>>;
 
     /**
      * Create a new class that extends this class with the additional specified fields. To remove a
