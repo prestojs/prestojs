@@ -232,7 +232,7 @@ def _parse_csv(
                 }
 
         if len(perm_group_details) == 0:
-            raise RuntimeError(f"Empty permissions file")
+            raise RuntimeError("Empty permissions file")
 
         return perm_is_global, perm_group_details
 

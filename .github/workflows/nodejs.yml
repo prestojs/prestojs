@@ -31,8 +31,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install Dependencies
-        # TODO: Testing if this fixes issue... can't replicate checksum mismatches outside of ci
-        run: YARN_CHECKSUM_BEHAVIOR=ignore yarn install
+        run: yarn install
 
       - name: Build
         run: yarn build

@@ -59,7 +59,6 @@ jobs:
         NOVENV: 1
         DB_PORT: ${{ job.services.postgres.ports[5432] }} # get randomly assigned published port
       run: |
-        YARN_CHECKSUM_BEHAVIOR=ignore yarn install
         bin/lint.py
         ( cd django-testbed/django-root && ./manage.py makemigrations --check --dry-run ) || { echo 'Missing migrations!'; false; }
 
