@@ -35,6 +35,21 @@ type EndpointOptions = ExecuteInitOptions & {
      * @param data
      */
     transformResponseBody?: (data: any) => any;
+    /**
+     * A function to resolve the URL. It is passed the URL pattern object, any
+     * arguments for the URL and any query string parameters.
+     *
+     * If not provided defaults to:
+     *
+     * ```js
+     * urlPattern.resolve(urlArgs, { query });
+     * ```
+     */
+    resolveUrl?: (
+        urlPattern: UrlPattern,
+        urlArgs?: Record<string, any>,
+        query?: Record<string, boolean | string | null | number>
+    ) => string;
 };
 
 type UrlResolveOptions = {
@@ -223,6 +238,14 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
     return response;
 }
 
+function defaultResolveUrl(
+    urlPattern: UrlPattern,
+    urlArgs?: Record<string, any>,
+    query?: Record<string, boolean | string | null | number>
+): string {
+    return this.urlPattern.resolve(urlArgs, { query });
+}
+
 /**
  * Describe an REST API endpoint that can then be executed.
  *
@@ -360,17 +383,28 @@ export default class Endpoint<ReturnT = any> {
     urlCache: Map<string, Map<{}, PreparedAction>>;
     decodeBody: (res: Response) => any;
     requestInit: ExecuteInitOptions;
+    resolveUrl: (
+        urlPattern: UrlPattern,
+        urlArgs?: Record<string, any>,
+        query?: Record<string, boolean | string | null | number>
+    ) => string;
 
     /**
      * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint
      */
     constructor(urlPattern: UrlPattern, options: EndpointOptions = {}) {
-        const { decodeBody = defaultDecodeBody, transformResponseBody, ...requestInit } = options;
+        const {
+            decodeBody = defaultDecodeBody,
+            transformResponseBody,
+            resolveUrl = defaultResolveUrl,
+            ...requestInit
+        } = options;
         this.urlPattern = urlPattern;
         this.transformResponseBody = transformResponseBody;
         this.urlCache = new Map();
         this.decodeBody = decodeBody;
         this.requestInit = requestInit;
+        this.resolveUrl = resolveUrl;
     }
 
     /**
@@ -402,7 +436,7 @@ export default class Endpoint<ReturnT = any> {
             options = options.paginator.getRequestInit(options);
         }
         const { urlArgs = {}, query, paginator, ...init } = options;
-        const url = this.urlPattern.resolve(urlArgs, { query });
+        const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         let cache = this.urlCache.get(url);
         if (!cache) {
             cache = new Map();
@@ -455,7 +489,7 @@ export default class Endpoint<ReturnT = any> {
             options = options.paginator.getRequestInit(options);
         }
         const { urlArgs = {}, query, paginator, ...init } = options;
-        const url = this.urlPattern.resolve(urlArgs, { query });
+        const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         try {
             const cls = Object.getPrototypeOf(this).constructor;
             const requestInit = mergeRequestInit(
