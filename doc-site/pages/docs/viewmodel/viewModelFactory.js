@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import React from 'react';
-import defaultGetStaticProps, { prepareDocs } from '../../../getStaticProps';
 import MethodDoc from '../../../api-docs/MethodDoc';
 import SignatureDoc from '../../../components/api-docs/SignatureDoc';
 import VariableDoc from '../../../components/api-docs/VariableDoc';
@@ -8,6 +7,7 @@ import ApiDocHeader from '../../../components/ApiDocHeader';
 import Article from '../../../components/Article';
 import MainMenuSidebar from '../../../components/MainMenuSidebar';
 import Sidebar from '../../../components/Sidebar';
+import defaultGetStaticProps, { prepareDocs } from '../../../getStaticProps';
 
 export default function Doc({ docs, extraNodes }) {
     prepareDocs(docs, extraNodes);
@@ -131,9 +131,12 @@ export async function getStaticProps(context) {
         datum =>
             ['viewModelFactory', 'ViewModelInterface', 'ViewModelConstructor'].includes(datum.name),
         items =>
-            items.reduce((acc, item) => {
-                acc[item.name] = item;
-                return acc;
-            }, {})
+            items.reduce(
+                (acc, item) => {
+                    acc[item.name] = item;
+                    return acc;
+                },
+                { standalonePage: true }
+            )
     );
 }

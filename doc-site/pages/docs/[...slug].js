@@ -15,6 +15,12 @@ const kindComponents = {
 };
 
 export default function Doc({ docs, extraNodes }) {
+    if (docs.standalonePage) {
+        // In dev you end up here instead of in viewModelFactory.js but only when you
+        // navigate to the page via frontend routing. Refresh page to make it work.
+        window.location.reload();
+        return;
+    }
     prepareDocs(docs, extraNodes);
     const doc = docs[0];
     const DocComponent = kindComponents[doc.kindString];

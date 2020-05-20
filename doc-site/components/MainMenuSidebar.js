@@ -17,8 +17,8 @@ if (!menuByName[DEFAULTS_PROCESSED]) {
 function mapMenu(menu) {
     return {
         title: menu.title,
-        href: '/docs/[...slug]/',
-        as: `/docs/${menu.slug}/`,
+        href: '/docs/[...slug]',
+        as: `/docs/${menu.slug}`,
     };
 }
 
