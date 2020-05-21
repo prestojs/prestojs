@@ -19,7 +19,7 @@ export default function Doc({ docs, extraNodes }) {
         // In dev you end up here instead of in viewModelFactory.js but only when you
         // navigate to the page via frontend routing. Refresh page to make it work.
         window.location.reload();
-        return;
+        return null;
     }
     prepareDocs(docs, extraNodes);
     const doc = docs[0];
