@@ -48,6 +48,21 @@ test('prepare should maintain equality based on inputs', () => {
     const f = action.prepare(fArgs);
     expect(f).toBe(action.prepare(fArgs));
     expect(e).not.toBe(a);
+
+    // Paginator should be factored into equality checks
+    const noop = (): void => undefined;
+    const gArgs = {
+        urlArgs: { id: 1 },
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        paginator: new PageNumberPaginator([{}, noop], [{}, noop]),
+    };
+    const g = action.prepare(gArgs);
+    expect(g).toBe(action.prepare(gArgs));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    gArgs.paginator = new PageNumberPaginator([{}, noop], [{}, noop]);
+    expect(g).not.toBe(action.prepare(gArgs));
 });
 
 test('should resolve URLs', () => {
