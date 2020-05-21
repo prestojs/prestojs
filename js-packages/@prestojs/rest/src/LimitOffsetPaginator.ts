@@ -221,4 +221,15 @@ export default class LimitOffsetPaginator extends Paginator<
             this.setLimit(limit);
         }
     }
+
+    /**
+     * Returns true if there's more results after the current page
+     */
+    hasNextPage(): boolean {
+        const nextState = this.nextState();
+        if (nextState?.offset == null || this.internalState.total == null) {
+            return false;
+        }
+        return nextState.offset < this.internalState.total;
+    }
 }

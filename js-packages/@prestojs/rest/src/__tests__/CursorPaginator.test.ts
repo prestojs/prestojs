@@ -118,3 +118,28 @@ test('should handle changing page size', () => {
     act(() => result.current.setPageSize(null));
     expect(result.current.currentState).toEqual({ cursor: 'abc123' });
 });
+
+test('should set responseSet', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+    expect(result.current.responseSet).toBe(false);
+    act(() => result.current.setResponse({ nextCursor: 'abc123', pageSize: 10 }));
+    expect(result.current.responseSet).toBe(true);
+});
+
+test('should support hasNextPage', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+
+    expect(result.current.hasNextPage()).toBe(false);
+
+    act(() => result.current.setResponse({ nextCursor: 'abc123', pageSize: 10 }));
+
+    expect(result.current.hasNextPage()).toBe(true);
+
+    act(() => result.current.next());
+    act(() => result.current.setResponse({ pageSize: 10 }));
+    expect(result.current.hasNextPage()).toBe(false);
+});

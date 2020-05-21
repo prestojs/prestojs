@@ -217,4 +217,16 @@ export default class PageNumberPaginator extends Paginator<
             this.setPageSize(pageSize);
         }
     }
+
+    /**
+     * Returns true if there's more results after the current page
+     */
+    hasNextPage(): boolean {
+        const { page = 1, pageSize } = this.currentState;
+        // Without pageSize can't know if there's another page
+        if (!pageSize || !this.internalState.total) {
+            return false;
+        }
+        return Number(page) * Number(pageSize) < this.internalState.total;
+    }
 }

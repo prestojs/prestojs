@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
+import { useState } from 'react';
+import CursorPaginator from '../CursorPaginator';
 import InferredPaginator from '../InferredPaginator';
 import LimitOffsetPaginator from '../LimitOffsetPaginator';
 import PageNumberPaginator from '../PageNumberPaginator';
-import CursorPaginator from '../CursorPaginator';
 
 function useTestHook(initialState = {}): InferredPaginator {
     return new InferredPaginator(useState(initialState), useState());
@@ -85,4 +85,30 @@ test('should infer underlying paginator based on response', () => {
     expect(result.current.previousState()).toEqual({ cursor: 'def456' });
     act(() => result.current.previous());
     expect(result.current.currentState).toEqual({ cursor: 'def456' });
+});
+
+test('should set responseSet', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+    expect(result.current.responseSet).toBe(false);
+    act(() => result.current.setResponse({ total: 30, pageSize: 10 }));
+    expect(result.current.responseSet).toBe(true);
+});
+
+test('should support hasNextPage', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+
+    expect(result.current.hasNextPage()).toBe(false);
+
+    act(() => result.current.setResponse({ total: 30, pageSize: 10 }));
+    expect(result.current.hasNextPage()).toBe(true);
+    act(() => result.current.next());
+    expect(result.current.hasNextPage()).toBe(true);
+    act(() => result.current.next());
+    expect(result.current.hasNextPage()).toBe(false);
+    act(() => result.current.first());
+    expect(result.current.hasNextPage()).toBe(true);
 });
