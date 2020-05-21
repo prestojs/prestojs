@@ -242,6 +242,20 @@ function defaultResolveUrl(
 }
 
 /**
+ * Equality function used to compare keys used in `prepare`.
+ *
+ * We do deep equality on everything except the `paginator` key - for that we
+ * do strict equality check as we want it to fail if they are different instances
+ * even if they have the same internal state.
+ */
+function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolean {
+    if (a.paginator !== b.paginator) {
+        return false;
+    }
+    return isEqual(a, b);
+}
+
+/**
  * Describe an REST API endpoint that can then be executed.
  *
  * Accepts a `UrlPattern` and optionally a `decodeBody` function which decodes the `Response` body as returned by
@@ -430,7 +444,7 @@ export default class Endpoint<ReturnT = any> {
         if (options.paginator) {
             options = options.paginator.getRequestInit(options);
         }
-        const { urlArgs = {}, query, paginator, ...init } = options;
+        const { urlArgs = {}, query, ...init } = options;
         const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         let cache = this.urlCache.get(url);
         if (!cache) {
@@ -438,11 +452,11 @@ export default class Endpoint<ReturnT = any> {
             this.urlCache.set(url, cache);
         }
         for (const [key, value] of cache.entries()) {
-            if (isEqual(key, init)) {
+            if (isEqualPrepareKey(key, init)) {
                 return value;
             }
         }
-        const execute = new PreparedAction(this, { urlArgs, query }, { ...init, paginator });
+        const execute = new PreparedAction(this, { urlArgs, query }, init);
         cache.set(init, execute);
         return execute;
     }
