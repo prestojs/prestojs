@@ -190,4 +190,11 @@ export default class CursorPaginator extends Paginator<
             this.setCurrentState({ ...this.currentState, pageSize });
         }
     }
+
+    /**
+     * Returns true if there's more results after the current page
+     */
+    hasNextPage(): boolean {
+        return !!this.internalState.nextCursor;
+    }
 }

@@ -5,6 +5,14 @@ export interface PaginatorInterface<State = {}, InternalState = {}> {
     internalState: InternalState;
     setCurrentState: (set: State) => void;
     setInternalState: (set: InternalState) => void;
+    responseSet: boolean;
+    hasNextPage(): boolean;
+    first(): void;
+    firstState(): State | null;
+    next(): void;
+    nextState(): State | null;
+    previous(): void;
+    previousState(): State | null;
     getRequestInit(options: EndpointExecuteOptions): EndpointExecuteOptions;
 
     setResponse(response: Record<string, any>): void;
@@ -26,9 +34,16 @@ export interface PaginatorInterfaceClass<T extends PaginatorInterface = Paginato
 export default abstract class Paginator<State extends {}, InternalState extends {}>
     implements PaginatorInterface<State, InternalState> {
     currentState: State;
-    internalState: InternalState;
+    internalState: InternalState & { responseSet?: boolean };
     setCurrentState: (set: State) => void;
     setInternalState: (set: InternalState) => void;
+
+    /**
+     * True once setResponse has been called and pagination state is known.
+     */
+    get responseSet(): boolean {
+        return !!this.internalState.responseSet;
+    }
 
     /**
      * @see documentation for `replaceStateControllers` for what `currentStatePair` and `internalStatePair` are
@@ -75,7 +90,12 @@ export default abstract class Paginator<State extends {}, InternalState extends 
         this.currentState = currentState || {};
         this.setCurrentState = setCurrentState;
         this.internalState = internalState || {};
-        this.setInternalState = setInternalState;
+        this.setInternalState = (nextState): void => {
+            setInternalState({
+                ...nextState,
+                responseSet: true,
+            });
+        };
     }
 
     /**
@@ -98,6 +118,61 @@ export default abstract class Paginator<State extends {}, InternalState extends 
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setResponse(response: Record<string, any>): void {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * Go to the first page.
+     */
+    first(): void {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * Return the state for the first page
+     *
+     * Does not transition state. To transition state call `first` instead.
+     */
+    firstState(): State {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * Go to the next page.
+     */
+    next(): void {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * Return the state for the next page
+     *
+     * Does not transition state. To transition state call `next` instead.
+     */
+    nextState(): State | null {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * Go to the previous page.
+     */
+    previous(): void {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * Return the state for the previous page
+     *
+     * Does not transition state. To transition state call `previous` instead.
+     */
+    previousState(): State | null {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * Returns true if there's more results after the current page
+     */
+    hasNextPage(): boolean {
         throw new Error('Not implemented');
     }
 }
