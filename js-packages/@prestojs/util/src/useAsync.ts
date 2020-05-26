@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual';
 import isPlainObject from 'lodash/isPlainObject';
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { isEqual as isEqualShallow } from './comparison';
-import isPromise from './misc';
+import { isPromise } from './misc';
 import useMemoOne from './useMemoOne';
 
 type ReducerState<ResponseT, ErrorT> = {
