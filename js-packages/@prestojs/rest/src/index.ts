@@ -7,7 +7,6 @@ export { default as LimitOffsetPaginator } from './LimitOffsetPaginator';
 export { default as CursorPaginator } from './CursorPaginator';
 export { default as Paginator } from './Paginator';
 export { default as getPaginationState } from './getPaginationState';
-export { default as EndpointAsyncChoices } from './EndpointAsyncChoices';
 export { default as useAsyncLookup } from './useAsyncLookup';
 export { default as useAsyncValue } from './useAsyncValue';
 

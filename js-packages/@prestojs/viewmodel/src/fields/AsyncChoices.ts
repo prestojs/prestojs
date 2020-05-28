@@ -26,7 +26,7 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
 
 type AsyncChoicesOptions<ItemType, ValueType> = Omit<
     AsyncChoicesInterface<ItemType, ValueType>,
-    'getChoices'
+    'getChoices' | 'useListDeps' | 'useRetrieveDeps'
 > &
     Partial<
         Pick<
@@ -39,7 +39,7 @@ class AsyncChoices<ItemType, ValueType> implements AsyncChoicesInterface<ItemTyp
     options: AsyncChoicesOptions<ItemType, ValueType>;
     multiple: ValueType extends Array<any> ? true : false;
 
-    constructor(options: AsyncChoicesInterface<ItemType, ValueType>) {
+    constructor(options: AsyncChoicesOptions<ItemType, ValueType>) {
         this.options = options;
         this.multiple = options.multiple;
     }

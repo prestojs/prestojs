@@ -28,9 +28,4 @@ Endpoint.defaultConfig.requestInit = {
     credentials: 'include',
 };
 
-render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>,
-    document.getElementById('root')
-);
+render(<App />, document.getElementById('root'));

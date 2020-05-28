@@ -27,11 +27,15 @@ export type SelectChoiceProps<T> = SelectProps<T> &
 
 function getLabeledValue({ rawValue, allItems, selected, asyncChoices }) {
     if (Array.isArray(rawValue)) {
-        return rawValue.map((v, i) =>
+        const selectedById = (selected || []).reduce((acc, item) => {
+            acc[asyncChoices.getValue(item)] = item;
+            return acc;
+        }, {});
+        return rawValue.map(v =>
             getLabeledValue({
                 rawValue: v,
                 allItems,
-                selected: selected?.[i],
+                selected: selectedById[v],
                 asyncChoices,
             })
         );
@@ -111,7 +115,7 @@ const SelectAsyncChoiceWidget = React.forwardRef(
         // but aren't in the returned data (eg. they aren't on the current page)
         // need to be shown regardless otherwise when you change selection it
         // will unselect them.
-        const extraOptions = [];
+        const extraOptions: Choice<T>[] = [];
         if (Array.isArray(rawValue)) {
             value = [];
             for (const [v, isInOptions] of x) {
@@ -123,7 +127,6 @@ const SelectAsyncChoiceWidget = React.forwardRef(
         } else {
             value = x[0];
         }
-        if (asyncChoices.multiple) console.log(rawValue, value);
         const { onChange } = input;
         const wrappedOnChange = useCallback(
             value => {
@@ -149,6 +152,7 @@ const SelectAsyncChoiceWidget = React.forwardRef(
                 showSearch
                 onSearch={debouncedSetKeywords}
                 filterOption={false}
+                disabled={selected.isLoading}
                 {...input}
                 {...rest}
                 onChange={wrappedOnChange}
