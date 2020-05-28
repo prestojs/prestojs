@@ -1,4 +1,5 @@
 import FieldBinder from '../FieldBinder';
+import { AsyncChoicesInterface } from './AsyncChoices';
 
 /**
  * @expand-properties
@@ -29,6 +30,12 @@ export interface FieldProps<T> {
      * Choices for this field. Should be a mapping of value to the label for the choice.
      */
     choices?: Map<T, string> | [T, string][];
+    /**
+     * Asynchronous choices for this field.
+     *
+     * Only one of `asyncChoices` and `choices` should be passed.
+     */
+    asyncChoices?: AsyncChoicesInterface<any>;
     /**
      * True if field should be considered read only (eg. excluded from forms)
      */
@@ -96,6 +103,10 @@ export default class Field<T, ParsableType extends any = T> {
     // In djrad we had: choiceRefinementUrl
     public choices?: Map<T, string>;
     /**
+     * Async choices for this field.
+     */
+    public asyncChoices?: AsyncChoicesInterface<any>;
+    /**
      * Indicates this field should only be read, not written. Not enforced but can be used by components to adjust their
      * output accordingly (eg. exclude it from a form or show it on a form with a read only input)
      */
@@ -115,9 +126,14 @@ export default class Field<T, ParsableType extends any = T> {
             helpText,
             defaultValue,
             choices,
+            asyncChoices,
             readOnly = false,
             writeOnly = false,
         } = values;
+
+        if (choices && asyncChoices) {
+            throw new Error("Only one of 'choices' and 'asyncChoices' should be provided");
+        }
 
         if (required !== undefined && typeof required !== 'boolean')
             throw new Error(`"required" should be a boolean, received: ${required}`);
@@ -138,6 +154,7 @@ export default class Field<T, ParsableType extends any = T> {
                     'helpText',
                     'defaultValue',
                     'choices',
+                    'asyncChoices',
                     'readOnly',
                     'writeOnly',
                 ].includes(key)
@@ -151,6 +168,7 @@ export default class Field<T, ParsableType extends any = T> {
         this.label = label;
         this.helpText = helpText;
         this._defaultValue = defaultValue;
+        this.asyncChoices = asyncChoices;
         if (choices) {
             this.choices = !(choices instanceof Map) ? new Map(choices) : choices;
         }

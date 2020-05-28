@@ -91,6 +91,7 @@ export default function getStaticProps(context, filter, transform = id => id) {
         props: {
             docs,
             extraNodes,
+            slug: context.params?.slug.join('/') || null,
         }, // will be passed to the page component as props
     };
 }

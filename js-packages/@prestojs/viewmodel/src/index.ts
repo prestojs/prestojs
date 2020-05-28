@@ -29,9 +29,12 @@ export { default as TimeField } from './fields/TimeField';
 export { default as URLField } from './fields/URLField';
 export { default as UUIDField } from './fields/UUIDField';
 export { default as useViewModelCache } from './useViewModelCache';
+export { default as AsyncChoices } from './fields/AsyncChoices';
+export { default as useAsyncChoices } from './useAsyncChoices';
 
 export { isViewModelInstance, isViewModelClass } from './ViewModelFactory';
 
+import type { AsyncChoicesInterface, Choice, ChoicesGrouped } from './fields/AsyncChoices';
 import type { FieldProps, RecordBoundField } from './fields/Field';
 import type {
     FieldDataMapping,
@@ -49,4 +52,7 @@ export type {
     FieldDataMapping,
     FieldDataMappingRaw,
     RecordBoundField,
+    ChoicesGrouped,
+    AsyncChoicesInterface,
+    Choice,
 };

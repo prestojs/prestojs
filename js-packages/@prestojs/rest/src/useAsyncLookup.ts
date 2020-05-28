@@ -6,7 +6,7 @@ import { PaginatorInterface } from './Paginator';
 /**
  * @expand-properties
  */
-type UseAsyncLookupProps<T> = {
+export type UseAsyncLookupProps<T> = {
     /**
      * When to trigger the fetch. Defaults to `SHALLOW` which means whenever `query`
      * or `paginator` state changes it will refetch.
@@ -50,7 +50,7 @@ type UseAsyncLookupProps<T> = {
     }) => Promise<T>;
 };
 
-type UseAsyncLookupReturn<T> = {
+export type UseAsyncLookupReturn<T> = {
     result: T | null;
     /**
      * True while `execute` call is in progress.

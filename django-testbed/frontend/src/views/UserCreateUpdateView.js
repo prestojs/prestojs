@@ -1,7 +1,7 @@
+import { Form } from '@prestojs/final-form';
 import { useViewModelCache } from '@prestojs/viewmodel';
 import { Button } from 'antd';
 import React from 'react';
-import { Form } from '@prestojs/final-form';
 
 import User from '../models/User';
 import useEndpoint from '../useEndpoint';
@@ -13,6 +13,8 @@ export function FieldErrors({ name }) {
         </Form.Field>
     );
 }
+
+const defaultFriends = [40, 55];
 
 export default function UserCreateUpdateView({ userId, onSuccess }) {
     // only relevant if userId is set
@@ -57,21 +59,35 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
             {/* eslint-disable-next-line no-console */}
             <Form
                 onSubmit={onSubmit}
-                initialValues={record && record.toJS()}
+                initialValues={{
+                    referredBy: 96,
+                    referredByGrouped: 65,
+                    friends: defaultFriends,
+                }}
                 formProps={{ layout: 'horizontal' }}
             >
-                <Form.Item field={User.fields.first_name} />
-                <FieldErrors name="first_name" />
-                <Form.Item field={User.fields.last_name} />
-                <FieldErrors name="last_name" />
-                <Form.Item field={User.fields.email} />
-                <FieldErrors name="email" />
-                <Form.Item field={User.fields.region} />
-                <FieldErrors name="region" />
-                <hr />
-                <Button htmlType="submit" type="primary">
-                    Save
-                </Button>
+                {({ handleSubmit, form }) => {
+                    window.form = form;
+                    return (
+                        <form onSubmit={handleSubmit}>
+                            <Form.Item field={User.fields.first_name} />
+                            <FieldErrors name="first_name" />
+                            <Form.Item field={User.fields.last_name} />
+                            <FieldErrors name="last_name" />
+                            <Form.Item field={User.fields.email} />
+                            <FieldErrors name="email" />
+                            <Form.Item field={User.fields.region} />
+                            <FieldErrors name="region" />
+                            <Form.Item field={User.fields.referredBy} />
+                            <Form.Item field={User.fields.referredByGrouped} />
+                            <Form.Item field={User.fields.friends} />
+                            <hr />
+                            <Button htmlType="submit" type="primary">
+                                Save
+                            </Button>
+                        </form>
+                    );
+                }}
             </Form>
         </>
     );
