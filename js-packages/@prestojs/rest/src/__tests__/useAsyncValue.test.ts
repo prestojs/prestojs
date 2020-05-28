@@ -200,7 +200,7 @@ test('useAsyncValue should respect trigger', async () => {
             ...rest
         }: {
             id: number | null;
-            trigger: 'MANUAL' | 'SHALLOW';
+            trigger: 'MANUAL' | 'DEEP';
             existingValues?: typeof testData;
         }) =>
             useAsyncValue({
@@ -214,7 +214,7 @@ test('useAsyncValue should respect trigger', async () => {
     expect(resolve).toHaveBeenCalledTimes(0);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toBe(null);
-    rerender({ id: 1, trigger: 'SHALLOW' });
+    rerender({ id: 1, trigger: 'DEEP' });
     expect(result.current.isLoading).toBe(true);
     expect(resolve).toHaveBeenCalledTimes(1);
     await act(async () => {
@@ -226,7 +226,7 @@ test('useAsyncValue should respect trigger', async () => {
     expect(resolve).toHaveBeenCalledTimes(1);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual(null);
-    rerender({ id: 6, trigger: 'SHALLOW' });
+    rerender({ id: 6, trigger: 'DEEP' });
     expect(result.current.isLoading).toBe(true);
     expect(resolve).toHaveBeenCalledTimes(2);
     await act(async () => {
@@ -240,7 +240,7 @@ test('useAsyncValue should respect trigger', async () => {
     expect(resolve).toHaveBeenCalledTimes(2);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual({ name: 'Item 10', _pk: 10 });
-    rerender({ id: 10, trigger: 'SHALLOW', existingValues: testData });
+    rerender({ id: 10, trigger: 'DEEP', existingValues: testData });
     expect(resolve).toHaveBeenCalledTimes(2);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual({ name: 'Item 10', _pk: 10 });
@@ -309,4 +309,49 @@ test('useAsyncValue should support reset', async () => {
     });
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual({ name: 'Item 5', _pk: 5 });
+});
+
+test('useAsyncValue should cache values', async () => {
+    jest.useFakeTimers();
+    const resolve = jest.fn(resolveMulti);
+    const { result, rerender } = renderHook(
+        ({ ids, existingValues }: { ids: number[] | null; existingValues?: TestDataItem[] }) =>
+            useAsyncValue({
+                ids,
+                resolve,
+                existingValues,
+            }),
+        { initialProps: { ids: [1, 2] } }
+    );
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual([
+        { name: 'Item 1', _pk: 1 },
+        { name: 'Item 2', _pk: 2 },
+    ]);
+    rerender({ ids: [1, 2, 5], existingValues: [testData[5]] });
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual([
+        { name: 'Item 1', _pk: 1 },
+        { name: 'Item 2', _pk: 2 },
+        { name: 'Item 5', _pk: 5 },
+    ]);
+    rerender({ ids: [1, 2, 5, 6], existingValues: [testData[5]] });
+    expect(resolve).toHaveBeenCalledTimes(2);
+    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual([
+        { name: 'Item 1', _pk: 1 },
+        { name: 'Item 2', _pk: 2 },
+        { name: 'Item 5', _pk: 5 },
+        { name: 'Item 6', _pk: 6 },
+    ]);
 });
