@@ -27,19 +27,19 @@ type CommonProps<T, U extends Id> = {
      */
     getId?: (item: T) => U;
     /**
-     * When to trigger the fetch. Defaults to `SHALLOW` which means whenever `id`
+     * When to trigger the fetch. Defaults to `DEEP` which means whenever `id`
      * or `ids` changed it will refetch if the value hasn't already been resolved.
      *
-     * If set to `MANUAL` nothing will happen until it changes to `SHALLOW`. You
+     * If set to `MANUAL` nothing will happen until it changes to `DEEP`. You
      * can use this to defer execution until the value is required.
      */
-    trigger?: 'MANUAL' | 'SHALLOW';
+    trigger?: 'MANUAL' | 'DEEP';
 };
 
 /**
  * @expand-properties
  */
-type UseAsyncValuePropsSingle<T, U extends Id> = CommonProps<T, U> & {
+export type UseAsyncValuePropsSingle<T, U extends Id> = CommonProps<T, U> & {
     /**
      * Single `id` for value to fetch or null if nothing yet to resolve.
      *
@@ -57,7 +57,7 @@ type UseAsyncValuePropsSingle<T, U extends Id> = CommonProps<T, U> & {
 /**
  * @expand-properties
  */
-type UseAsyncValuePropsMulti<T, U extends Id> = CommonProps<T, U> & {
+export type UseAsyncValuePropsMulti<T, U extends Id> = CommonProps<T, U> & {
     /**
      * Array of ids to resolve values for or null if nothing yet to resolve
      *
@@ -72,7 +72,7 @@ type UseAsyncValuePropsMulti<T, U extends Id> = CommonProps<T, U> & {
     resolve: (ids: U[]) => Promise<T[]>;
 };
 
-type UseAsyncValueReturn<T> = {
+export type UseAsyncValueReturn<T> = {
     /**
      * Set to the rejected value of the promise. Only one of `error` and `value` can be set. If
      * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
@@ -86,7 +86,7 @@ type UseAsyncValueReturn<T> = {
     /**
      * The resolved value
      */
-    value: T;
+    value: T | null;
     /**
      * A function to manually trigger the action. If `options.trigger` is `MANUAL`
      * calling this function is the only way to trigger the action.
@@ -149,28 +149,37 @@ export default function useAsyncValue<T, U extends Id>(
         resolve: (idOrIds: U | U[]) => Promise<T[] | T>;
     }
 ): UseAsyncValueReturn<T | T[]> {
-    const { id, ids, existingValues, getId, resolve, trigger } = props;
+    const { id, ids, getId, resolve, trigger } = props;
     if (id && ids) {
         throw new Error("Only one of 'id' and 'ids' should be provided");
     }
     const idRef = useRef(id || ids);
     const resolveRef = useRef(resolve);
+    const cache = useRef(new Map<string, T>());
     resolveRef.current = resolve;
     let valueInChoices;
-    if (existingValues && (id || ids)) {
+    const existingValues = props.existingValues || [];
+    if (id || ids) {
         if (ids) {
             const existingIds = existingValues.reduce((acc, item) => {
                 acc[hashId(identifiableGetId(item, getId))] = item;
                 return acc;
             }, {});
             valueInChoices = [];
-            for (const id in ids) {
-                const item = existingIds[hashId(id)];
-                if (!item) {
-                    valueInChoices = null;
-                    break;
+            for (const id of ids) {
+                const hashedId = hashId(id);
+                const item = existingIds[hashedId];
+                if (item) {
+                    valueInChoices.push(item);
+                } else {
+                    const cachedItem = cache.current.get(hashedId);
+                    if (cachedItem) {
+                        valueInChoices.push(cachedItem);
+                    }
                 }
-                valueInChoices.push(item);
+            }
+            if (valueInChoices.length !== ids.length) {
+                valueInChoices = null;
             }
         } else {
             for (const item of existingValues) {
@@ -179,14 +188,35 @@ export default function useAsyncValue<T, U extends Id>(
                     break;
                 }
             }
+            if (!valueInChoices && id) {
+                const hashedId = hashId(id);
+                const cachedItem = cache.current.get(hashedId);
+                if (cachedItem) {
+                    valueInChoices = cachedItem;
+                }
+            }
         }
     }
     const isValueMissing = (id || ids) && !valueInChoices;
     const execute = useCallback(id => resolveRef.current(id), []);
-    const { run, reset, isLoading, error, response: resolvedValue } = useAsync(execute, {
-        args: [id || ids],
-        trigger: isValueMissing ? trigger || useAsync.SHALLOW : useAsync.MANUAL,
-    });
+    const { run, reset: resetDefault, isLoading, error, response: resolvedValue } = useAsync(
+        execute,
+        {
+            args: [id || ids],
+            trigger: isValueMissing ? trigger || useAsync.DEEP : useAsync.MANUAL,
+            onSuccess(response) {
+                const r = Array.isArray(response) ? response : [response];
+                r.forEach(item => {
+                    cache.current.set(hashId(identifiableGetId(item, getId)), item);
+                });
+            },
+        }
+    );
+
+    const reset = useCallback(() => {
+        resetDefault();
+        cache.current = new Map();
+    }, [resetDefault]);
 
     useEffect(() => {
         if (!isEqual(id || ids, idRef.current) && trigger === useAsync.MANUAL) {
@@ -195,10 +225,20 @@ export default function useAsyncValue<T, U extends Id>(
         idRef.current = id || ids;
     }, [id, ids, reset, trigger]);
 
+    const resolvedValueInSync = isEqual(id || ids, idRef.current) && resolvedValue;
+
     // If we don't have id/ids or if trigger is async we should never return a value
     // Otherwise return the value if it exists in existingChoices otherwise value
     // returned from `resolve` (if any)
-    const finalValue = id || ids ? resolvedValue || valueInChoices : null;
+    let finalValue = null;
+    if (id || ids) {
+        if (resolvedValueInSync) {
+            finalValue = resolvedValue;
+        } else {
+            finalValue = valueInChoices;
+        }
+    }
+
     return {
         run,
         reset,
