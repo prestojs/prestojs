@@ -1,7 +1,7 @@
 import {
-    PrimaryKey,
     FieldDataMappingRaw,
     isViewModelInstance,
+    PrimaryKey,
     ViewModelInterface,
 } from './ViewModelFactory';
 

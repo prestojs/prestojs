@@ -53,3 +53,7 @@ html {
 }
 
 @tailwind utilities;
+
+.max-w-screen-2xl {
+    max-width: 1600px;
+}

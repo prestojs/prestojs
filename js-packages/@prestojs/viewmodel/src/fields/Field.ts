@@ -17,7 +17,7 @@ export interface FieldProps<T> {
      */
     helpText?: string;
     /**
-     * Default value for this field. This can either be a fucntion that returns a value or the value directly.
+     * Default value for this field. This can either be a function that returns a value or the value directly.
      */
     defaultValue?: T | (() => Promise<T> | T);
     // A field can have choices regardless of it's type.

@@ -1,7 +1,7 @@
-import Head from 'next/head';
 import { MDXProvider } from '@mdx-js/react';
 import { UiProvider } from '@prestojs/ui';
 import { FormItemWrapper, FormWrapper } from '@prestojs/ui-antd';
+import Head from 'next/head';
 import React from 'react';
 import getFormatterForField from '../getFormatterForField';
 
@@ -54,7 +54,7 @@ export default function Layout({ children }) {
                 formComponent={FormWrapper}
             >
                 <Header />
-                <div className="w-full max-w-screen-xl mx-auto px-6">
+                <div className="w-full max-w-screen-2xl mx-auto px-6">
                     <div className="lg:flex -mx-6">
                         {children}
                         <footer>© {new Date().getFullYear()}</footer>

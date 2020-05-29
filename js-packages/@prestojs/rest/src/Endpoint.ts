@@ -77,6 +77,9 @@ export type ExecuteReturnVal<T> = {
     result: T | null;
 };
 
+/**
+ * @expand-properties
+ */
 export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
 
 /**
@@ -130,8 +133,10 @@ function mergeRequestInit(...args: ExecuteInitOptions[]): RequestInit {
     }, {});
 }
 
-// If we pass an object to useSWR it uses it as the key but if we pass a function (eg. execute) then
-// it will call that to generate the key... which is not what we want
+/**
+ * @extract-docs
+ * @menu-group Endpoint
+ */
 class PreparedAction {
     action: Endpoint;
     options: EndpointExecuteOptions;
