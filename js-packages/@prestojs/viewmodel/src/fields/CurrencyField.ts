@@ -6,5 +6,6 @@ import DecimalField from './DecimalField';
  * Extends DecimalField for precision, TODO - should store additional info on currency types (eg, USD, JPY).
  *
  * @extract-docs
+ * @menu-group Fields
  */
 export default class CurrencyField extends DecimalField {}

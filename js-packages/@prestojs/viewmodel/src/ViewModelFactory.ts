@@ -51,6 +51,8 @@ export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
  *     static labelPlural = 'Users';
  * }
  * ```
+ *
+ * @type-name ViewModel
  */
 export type ViewModelInterface<
     FieldMappingType extends FieldsMapping,
@@ -74,7 +76,7 @@ export type ViewModelInterface<
     /**
      * Return the data for this record as an object
      */
-    toJS(): () => FieldDataMapping<FieldMappingType>;
+    toJS(): FieldDataMapping<FieldMappingType>;
     /**
      * Compares two records to see if they are equivalent.
      *
@@ -106,6 +108,8 @@ export type ViewModelInterface<
      * admin._f.username instanceof CharField();
      * admin._f.username.value === 'admin'
      * ```
+     *
+     * @type-name Object
      */
     readonly _f: {
         readonly [K in Extract<keyof IncomingData, keyof FieldMappingType>]: RecordBoundField<
@@ -123,6 +127,8 @@ export type ViewModelInterface<
     /**
      * The assigned data for this record. You usually don't need to access this directly; values
      * for a field can be retrieved from the record directly using the field name
+     *
+     * @type-name Object
      */
     readonly _data: {
         [k in Extract<
@@ -139,6 +145,9 @@ export type ViewModelInterface<
     readonly _assignedFields: (keyof FieldMappingType)[];
 };
 
+/**
+ * @type-name ViewModel Class
+ */
 export interface ViewModelConstructor<
     FieldMappingType extends FieldsMapping,
     PkFieldType extends string | string[] = string | string[],

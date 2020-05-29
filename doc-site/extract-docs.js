@@ -40,9 +40,17 @@ function extractChildren(node) {
     if (rest.kindString === 'Function' && rest.signatures && rest.signatures.length > 0) {
         comment = rest.signatures[0].comment;
     }
+    const paramTags = {};
+    let returnTagText;
     if (comment && comment.tags) {
         const tagsByName = comment.tags.reduce((acc, tag) => {
             acc[tag.tag] = tag.text.trim();
+            if (tag.tag === 'param') {
+                paramTags[tag.param] = tag.text;
+            }
+            if (tag.tag === 'return' || tag.tag === 'returns') {
+                returnTagText = tag.text;
+            }
             return acc;
         }, {});
         extractDocs = 'extract-docs' in tagsByName;
@@ -51,6 +59,27 @@ function extractChildren(node) {
     }
     rest.extractDocs = extractDocs;
     rest.menuGroup = menuGroup;
+    // Hacky workaround to get param descriptions for function type aliases
+    if (
+        Object.keys(paramTags).length > 0 &&
+        rest.kindString === 'Type alias' &&
+        rest.type.type === 'reflection' &&
+        rest.type.declaration &&
+        rest.type.declaration.signatures
+    ) {
+        rest.type.declaration.signatures[0].parameters.forEach(param => {
+            if (paramTags[param.name]) {
+                param.comment = {
+                    text: paramTags[param.name],
+                };
+            }
+        });
+        rest.type.declaration.signatures[0].comment =
+            rest.type.declaration.signatures[0].comment || {};
+        if (returnTagText) {
+            rest.type.declaration.signatures[0].comment.returns = returnTagText;
+        }
+    }
     const { fileName } = rest.sources[0];
     const importPath = fileName.replace('js-packages/', '').replace('src/', '').split('.')[0];
     const slug = [...importPath.split('/').slice(0, -1), rest.name].join('/');

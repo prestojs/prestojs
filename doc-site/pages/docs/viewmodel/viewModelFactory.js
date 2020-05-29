@@ -65,6 +65,7 @@ export default function Doc({ docs, extraNodes }) {
                     }
                     anchorLink="method-viewmodel"
                 />
+                <h3 className="text-5xl my-5">The ViewModel Class</h3>
                 <h3 className="text-4xl">Static Class Methods</h3>
                 {staticMethods.map(method => (
                     <MethodDoc key={method.name} method={method} />
@@ -87,11 +88,12 @@ export default function Doc({ docs, extraNodes }) {
                     title="On this page"
                     links={[
                         {
-                            title: 'ViewModel',
+                            title: 'viewModelFactory',
                             href: `#method-viewmodel`,
                         },
                     ]}
                 />
+                <h4 className="font-bold text-lg text-gray-600">ViewModel</h4>
                 <Sidebar.LinksSection
                     title="Static Methods"
                     links={staticMethods.map(prop => ({

@@ -7,8 +7,9 @@ export type JSON<T> = string & { ' __JSON': T };
  *
  * Parses valid json string into json objects. Invalid input will be treated as if they're already an object and returned as is.
  *
+ * @extract-docs
+ * @menu-group Fields
  */
-
 export default class JsonField<T> extends CharField {
     parse<T>(json: JSON<T>): T {
         try {

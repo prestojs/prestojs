@@ -1,44 +1,21 @@
 import React from 'react';
+import { expandProperties } from '../../util';
 import AnchorLink from '../AnchorLink';
 import SourceLink from '../SourceLink';
 import MdxWrapper from './MdxWrapper';
+import ReturnType from './ReturnType';
 import SignatureDefinition from './SignatureDefinition';
 import TypeDesc from './TypeDesc';
 
-const expandProperties = (param, force) => {
-    const paramType = param.type && typeof param.type == 'object' ? param.type : param;
-    if (force && paramType.declaration?.children) {
-        return [param.name, paramType.declaration.children];
-    }
-
-    if (
-        paramType?.referencedType?.()?.comment?.tagsByName?.['expand-properties'] ||
-        (force && param.referencedType?.())
-    ) {
-        const t = paramType?.referencedType?.() || param.referencedType?.();
-        const desc = t.comment?.tagsByName['expand-properties']?.mdx;
-        if (t.type?.type === 'intersection') {
-            const children = [];
-            for (const type of t.type.types) {
-                const [, c] = expandProperties(type, true) || [];
-                if (c) {
-                    children.push(...c);
-                }
-            }
-            return [param.name, children, desc];
-        }
-        if (!t.children) {
-            const [, c] = expandProperties(t, true);
-            return [param.name, c];
-        }
-        return [param.name, t.children || []];
-    }
-    if (param.name === '__namedParameters' && paramType.declaration) {
-        return ['props', paramType.declaration.children];
-    }
-};
-
-export default function SignatureDoc({ signature, method, anchorLink, isConstructor }) {
+export default function SignatureDoc({
+    signature,
+    method,
+    anchorLink,
+    isConstructor,
+    bordered = true,
+    hideName = false,
+    hideParamDescription = false,
+}) {
     const restPropName = signature.comment?.tagsByName?.['rest-prop-name'];
     const parameters = (signature.parameters || []).reduce((acc, param) => {
         const t = expandProperties(param);
@@ -77,7 +54,6 @@ export default function SignatureDoc({ signature, method, anchorLink, isConstruc
     const sigName = (
         <span className="flex items-center justify-between">
             <SignatureDefinition
-                returnType={isConstructor ? null : signature.type}
                 name={signature.name}
                 parameters={(signature.parameters || []).map(p => ({
                     ...p,
@@ -95,8 +71,8 @@ export default function SignatureDoc({ signature, method, anchorLink, isConstruc
         <span className={sigClassName}>{sigName}</span>
     );
     return (
-        <div className="border-t-2 border-gray-200 mt-3 pt-3">
-            {header}
+        <div className={bordered ? 'pt-3 mt-3 border-t-2 border-gray-200' : ''}>
+            {!hideName && header}
             <MdxWrapper mdx={signature.mdx} />
             {parameters.length > 0 && (
                 <table className="w-full text-left table-collapse mt-5 mb-5">
@@ -108,9 +84,11 @@ export default function SignatureDoc({ signature, method, anchorLink, isConstruc
                             <th className="text-sm font-semibold text-gray-700 p-2 bg-gray-100">
                                 Type
                             </th>
-                            <th className="text-sm font-semibold text-gray-700 p-2 bg-gray-100">
-                                Description
-                            </th>
+                            {!hideParamDescription && (
+                                <th className="text-sm font-semibold text-gray-700 p-2 bg-gray-100">
+                                    Description
+                                </th>
+                            )}
                         </tr>
                     </thead>
                     <tbody>
@@ -126,14 +104,17 @@ export default function SignatureDoc({ signature, method, anchorLink, isConstruc
                                 >
                                     <TypeDesc doc={param} />
                                 </td>
-                                <td className="p-2 border-t border-gray-300 font-mono text-xs text-blue-700 align-top table-mdx">
-                                    <MdxWrapper mdx={param.mdx} />
-                                </td>
+                                {!hideParamDescription && (
+                                    <td className="p-2 border-t border-gray-300 font-mono text-xs text-blue-700 align-top table-mdx">
+                                        <MdxWrapper mdx={param.mdx} />
+                                    </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>
                 </table>
             )}
+            {!isConstructor && <ReturnType signature={signature} />}
         </div>
     );
 }

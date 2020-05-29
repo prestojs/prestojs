@@ -1,4 +1,4 @@
-import { useReducer, useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useReducer, useRef } from 'react';
 
 import ViewModelCache from './ViewModelCache';
 import { ViewModelInterface } from './ViewModelFactory';
@@ -28,6 +28,9 @@ type Selector<T extends ViewModelInterface<any, any>, ResultType> = (
  * same object across multiple calls if the underlying data has not changed.
  *
  * @returns The data as returned by `selector`
+ *
+ * @extract-docs
+ * @menu-group Caching
  */
 export default function useViewModelCache<T extends ViewModelInterface<any, any>, ResultType>(
     viewModel: T['_model'],

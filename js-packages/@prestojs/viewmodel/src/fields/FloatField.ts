@@ -5,7 +5,10 @@ import NumberField from './NumberField';
  *
  * Use only if stored number is tolerant on precision error.
  *
- * See also: DecimalField
+ * See also: [DecimalField](doc:DecimalField)
+ *
+ * @extract-docs
+ * @menu-group Fields
  */
 export default class FloatField extends NumberField<number> {
     parse(value: any): number | null {

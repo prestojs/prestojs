@@ -11,6 +11,7 @@ type CharFieldProps = FieldProps<string> & { maxLength?: number };
  * Other char fields (EmailField, URLField...) will extend this.
  *
  * @extract-docs
+ * @menu-group Fields
  */
 export default class CharField extends Field<string> {
     public maxLength?: number;

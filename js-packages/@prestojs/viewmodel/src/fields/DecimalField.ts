@@ -7,7 +7,10 @@ import NumberField from './NumberField';
  *
  * Also used by CurrencyField.
  *
- * See also: FloatField
+ * See also: [FloatField](doc:FloatField)
+ *
+ * @extract-docs
+ * @menu-group Fields
  */
 export default class DecimalField extends NumberField<string> {
     public decimalPlaces?: number;

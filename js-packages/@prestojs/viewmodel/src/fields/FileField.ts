@@ -5,5 +5,7 @@ import Field from './Field';
  *
  * Used by ImageField.
  *
+ * @extract-docs
+ * @menu-group Fields
  */
 export default class FileField extends Field<File> {}

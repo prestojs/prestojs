@@ -63,6 +63,16 @@ type Change<T> = {
 };
 
 /**
+ * @param change An object listing changes. Any additions will be included as an array under `ADD`, any updates
+ * as an array of [before, after] tuples under `UPDATE`, and any deletions as an array under `DELETE`.
+ * @param lastValue The value before this change
+ * @param nextValue The value after this change
+ *
+ * @returns No return value
+ */
+type OnChange<T> = (change: Change<T>, lastValue: T, nextValue: T) => void;
+
+/**
  * Call a function whenever values in a list change. This differs from `useChangeObserver` by
  * allowing you to choose what changes you get (additions, updates, deletions) and to be passed the
  * changed items in the callback. In order to achieve this each item in the array needs to have a
@@ -104,11 +114,13 @@ type Change<T> = {
  *
  * The last and next list of records are also passed.
  *
+ * @return No return value
+ *
  * @extract-docs
  */
 export default function useListChangeObserver<T extends any[]>(
     value: T | false | null | undefined,
-    onChange: (change: Change<T>, lastValue: T, nextValue: T) => void,
+    onChange: OnChange<T>,
     options?: ListChangeObserverOptions<T>
 ): void {
     const {

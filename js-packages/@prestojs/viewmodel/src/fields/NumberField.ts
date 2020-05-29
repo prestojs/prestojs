@@ -10,6 +10,8 @@ type NumberFieldProps<T> = FieldProps<T> & {
  *
  * Other numeric fields (IntegerField, DecimalField, FloatField...) will extend this.
  *
+ * @extract-docs
+ * @menu-group Fields
  */
 export default class NumberField<T = string | number> extends Field<T> {
     public minValue?: number;

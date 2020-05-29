@@ -1,5 +1,9 @@
 import NumberField from './NumberField';
 
+/**
+ * @extract-docs
+ * @menu-group Fields
+ */
 export default class IntegerField extends NumberField<number> {
     parse(value: any): number | null {
         if (value === '' || value == null) {

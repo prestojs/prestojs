@@ -6,5 +6,8 @@ import CharField from './CharField';
  * Duration longer than 23h59m is not currently supported.
  *
  * Backend of choice need to be capable of storing a duration in a similar manner.
+ *
+ * @extract-docs
+ * @menu-group Fields
  */
 export default class DurationField extends CharField {}

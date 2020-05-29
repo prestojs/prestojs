@@ -14,6 +14,8 @@ interface Boundary<T> extends FieldProps<T> {
  *
  * Other range based fields (DateTimeRangeField, IntegerRangeField, ...) will extend this.
  *
+ * @extract-docs
+ * @menu-group Fields
  */
 export default class RangeField<T> extends Field<T> {
     public lowerBound: T | null | undefined;

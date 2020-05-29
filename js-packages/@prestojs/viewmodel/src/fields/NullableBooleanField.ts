@@ -5,7 +5,10 @@ import Field from './Field';
  *
  * Follows standard javascript Truthy and Falsy definition except undefined and null.
  *
- * See also: BooleanField.
+ * See also: [BooleanField](doc:BooleanField).
+ *
+ * @extract-docs
+ * @menu-group Fields
  */
 export default class NullableBooleanField extends Field<boolean> {
     parse(value: any): boolean | null {

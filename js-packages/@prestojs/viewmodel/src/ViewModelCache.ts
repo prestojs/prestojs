@@ -437,6 +437,7 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
  * ```
  *
  * @extract-docs
+ * @menu-group Caching
  */
 export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
     cache: Map<PrimaryKeyCacheKey, RecordCache<T>>;

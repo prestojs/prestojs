@@ -50,6 +50,7 @@ class UnboundFieldError<T, K> extends Error {
  * Base Field
  *
  * @extract-docs
+ * @menu-group Fields
  */
 export default class Field<T, ParsableType extends any = T> {
     // These are just for internal usage with typescript

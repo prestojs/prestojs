@@ -78,6 +78,15 @@ export default function getStaticProps(context, filter, transform = id => id) {
                 </MDXProvider>
             );
         }
+        if (obj.comment && obj.comment.returns) {
+            obj.mdxReturns = ReactDOMServer.renderToStaticMarkup(
+                <MDXProvider components={{ ...mdxComponents, a: LinkWrapper }}>
+                    <div className="mdx">
+                        <MDX>{obj.comment.returns.trim()}</MDX>
+                    </div>
+                </MDXProvider>
+            );
+        }
     }
     function transformObj(obj) {
         transformComment(obj);
