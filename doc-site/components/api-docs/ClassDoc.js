@@ -25,7 +25,9 @@ function getTypeArguments(doc) {
         }
         if (t.typeArguments) {
             const x = t.typeArguments.reduce((acc, item, i) => {
-                acc[type.typeParameter[i].name] = item.name;
+                if (type.typeParameter?.[i]) {
+                    acc[type.typeParameter[i].name] = item;
+                }
                 return acc;
             }, {});
             Object.assign(types, x);

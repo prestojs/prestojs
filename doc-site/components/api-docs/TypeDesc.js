@@ -123,7 +123,7 @@ export default function TypeDesc({ doc, type, isArray, isReturnType }) {
         name = doc.type.name;
     }
     if (type.type === 'typeParameter' && typeArgs[type.name]) {
-        name = typeArgs[type.name];
+        return <TypeDesc type={typeArgs[type.name]} doc={doc} isReturnType={isReturnType} />;
     }
     if (type.name === 'Promise') {
         const [, c] = expandProperties(type.typeArguments[0], true) || [];
