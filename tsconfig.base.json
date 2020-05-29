@@ -23,8 +23,8 @@
       "@prestojs/routing/*": ["./js-packages/@prestojs/routing/src/*"],
       "@prestojs/rest": ["./js-packages/@prestojs/rest/src/"],
       "@prestojs/rest/*": ["./js-packages/@prestojs/rest/src/*"],
-      "@prestojs/util": ["./js-packages/@prestojs/codegen/src/"],
-      "@prestojs/util/*": ["./js-packages/@prestojs/codegen/src/*"]
+      "@prestojs/util": ["./js-packages/@prestojs/util/src/"],
+      "@prestojs/util/*": ["./js-packages/@prestojs/util/src/*"]
     }
   },
   "references": [

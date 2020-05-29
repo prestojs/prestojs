@@ -7,10 +7,5 @@
     "tsBuildInfoFile": "/tmp/tsc-output/@prestojs/util.tsbuildinfo",
     "outDir": "/tmp/tsc-output/@prestojs/util"
   },
-  "references": [
-    {
-      "path": "../viewmodel/tsconfig.lint.json"
-    }
-  ],
   "include": ["src/**/*"]
 }

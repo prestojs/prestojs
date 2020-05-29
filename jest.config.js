@@ -1,12 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-// const { pathsToModuleNameMapper } = require('ts-jest/utils');
-// // In the following statement, replace `./tsconfig` with the path to your `tsconfig` file
-// // which contains the path mapping (ie the `compilerOptions.paths` option):
-// // eslint-disable-next-line @typescript-eslint/no-var-requires
-// const { compilerOptions } = require('./tsconfig.base');
-//
-// Don't seem to need this anymore with yarn 2...
-// const moduleNameMapper = pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' });
+const { pathsToModuleNameMapper } = require('ts-jest/utils');
+// In the following statement, replace `./tsconfig` with the path to your `tsconfig` file
+// which contains the path mapping (ie the `compilerOptions.paths` option):
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { compilerOptions } = require('./tsconfig.base');
+
+const moduleNameMapper = pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' });
 
 module.exports = {
     setupFilesAfterEnv: ['<rootDir>js-testing/setupTests.ts'],
@@ -32,7 +31,7 @@ module.exports = {
     },
     moduleFileExtensions: ['ts', 'tsx', 'js'],
     modulePathIgnorePatterns: [],
-    // moduleNameMapper,
+    moduleNameMapper,
     notify: true,
     notifyMode: 'always',
     roots: ['<rootDir>js-packages'],

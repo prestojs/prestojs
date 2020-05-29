@@ -26,7 +26,6 @@
     "shallowequal": "^1.1.0"
   },
   "devDependencies": {
-    "@prestojs/viewmodel": "*",
     "typescript": "^3.9.2"
   }
 }

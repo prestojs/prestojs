@@ -7,6 +7,12 @@
     "rootDir": "./src"
   },
 
+  "references": [
+    {
+      "path": "../util/tsconfig.json"
+    }
+  ],
+
   "include": ["src/**/*"],
   "exclude": ["*/__tests__/**/*"]
 }

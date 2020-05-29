@@ -6,11 +6,6 @@
     "outDir": "./build/module",
     "rootDir": "./src"
   },
-  "references": [
-    {
-      "path": "../viewmodel/tsconfig.json"
-    }
-  ],
 
   "include": ["src/**/*"]
 }
