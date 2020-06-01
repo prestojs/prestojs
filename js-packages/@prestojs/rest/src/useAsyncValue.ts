@@ -149,7 +149,7 @@ export default function useAsyncValue<T, U extends Id>(
         resolve: (idOrIds: U | U[]) => Promise<T[] | T>;
     }
 ): UseAsyncValueReturn<T | T[]> {
-    const { id, ids, getId, resolve, trigger } = props;
+    const { id, ids, getId, resolve, trigger = useAsync.DEEP } = props;
     if (id && ids) {
         throw new Error("Only one of 'id' and 'ids' should be provided");
     }
@@ -210,7 +210,7 @@ export default function useAsyncValue<T, U extends Id>(
         execute,
         {
             args: [id || ids],
-            trigger: isValueMissing ? trigger || useAsync.DEEP : useAsync.MANUAL,
+            trigger: isValueMissing ? trigger : useAsync.MANUAL,
             onSuccess(response) {
                 const r = Array.isArray(response) ? response : [response];
                 r.forEach(item => {
