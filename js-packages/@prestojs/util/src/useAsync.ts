@@ -207,7 +207,10 @@ const comparisonByTrigger = {
  * @param fn A function that returns a promise. When `trigger` is `MANUAL` this is only
  * called when you manually call the returned `run` function, otherwise it's called
  * initially and then whenever an equality comparison fails between previous arguments and new
- * arguments.
+ * arguments. Note that when `trigger` is `SHALLOW` or `DEEP` changes to this function will
+ * cause it to be called again so you must memoize it (eg. with `useCallback`) if it's defined
+ * in your component or hook. To help detect runaway effects caused by this automatically
+ * consider using [stop-runaway-react-effects](https://github.com/kentcdodds/stop-runaway-react-effects).
  *
  *
  * @extract-docs
