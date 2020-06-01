@@ -8,16 +8,16 @@ import { PaginatorInterface } from './Paginator';
  */
 type UseAsyncLookupProps<T> = {
     /**
-     * When to trigger the fetch. Defaults to `SHALLOW` which means whenever `query`
-     * or `paginator` state changes it will refetch.
+     * When to trigger the fetch. Defaults to `DEEP` which means whenever a deep
+     * equality check on `query` or `paginator` state fails it will refetch.
      *
-     * If set to `MANUAL` nothing will happen until it changes to `SHALLOW` or you
+     * If set to `MANUAL` nothing will happen until it changes to `DEEP` or you
      * call the returned `run` function. You can use this to defer execution until
      * the value is required.
      *
-     * Defaults to 'SHALLOW'.
+     * Defaults to 'DEEP'.
      */
-    trigger?: 'MANUAL' | 'SHALLOW';
+    trigger?: 'MANUAL' | 'DEEP';
     /**
      * Any query string parameters for the request
      */

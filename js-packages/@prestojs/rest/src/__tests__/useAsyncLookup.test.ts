@@ -198,7 +198,7 @@ test('useAsyncLookup should support trigger option', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
     const { result, rerender } = renderHook(
-        ({ trigger, query = {} }: { trigger: 'SHALLOW' | 'MANUAL'; query?: {} }) =>
+        ({ trigger, query = {} }: { trigger: 'DEEP' | 'MANUAL'; query?: {} }) =>
             usePaginatorTestHook({
                 execute,
                 trigger,
@@ -209,7 +209,7 @@ test('useAsyncLookup should support trigger option', async () => {
     expect(result.current.isLoading).toBe(false);
     expect(execute).toHaveBeenCalledTimes(0);
     expect(result.current.result).toEqual(null);
-    rerender({ trigger: 'SHALLOW' });
+    rerender({ trigger: 'DEEP' });
     expect(result.current.isLoading).toBe(true);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
@@ -239,8 +239,8 @@ test('useAsyncLookup should support trigger option', async () => {
     expect(result.current.error).toBe(null);
     expect(result.current.result).toEqual(null);
 
-    // Changing back to SHALLOW while maintaining same query must trigger fetch
-    rerender({ trigger: 'SHALLOW', query: { search: 'Item 2' } });
+    // Changing back to DEEP while maintaining same query must trigger fetch
+    rerender({ trigger: 'DEEP', query: { search: 'Item 2' } });
     expect(result.current.isLoading).toBe(true);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);

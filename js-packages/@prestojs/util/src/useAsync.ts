@@ -331,7 +331,7 @@ function useAsync<ResponseT, ErrorT>(
     // =========================================================================
     // Effect to trigger the execute method when:
     // 1) Parameters change
-    // 2) The actual function changes (?)
+    // 2) The actual function changes
     // 3) The trigger changes from MANUAL
     const isManual = trigger === MANUAL;
     useEffect(() => {
@@ -373,7 +373,6 @@ function useAsync<ResponseT, ErrorT>(
                 typeof executeArgs[0] === 'object' &&
                 executeArgs[0].actionArgs
             ) {
-                // TODO: This check can be removed once True Value & Southern Cross have upgraded
                 throw new Error(
                     `The 'actionArgs' option has been removed. You now pass through arguments directly to 'run' like a normal function call.`
                 );
