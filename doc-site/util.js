@@ -1,4 +1,18 @@
 export function expandProperties(param, force) {
+    if (param.type === 'intersection') {
+        const x = param.types
+            .map(t => expandProperties(t, force))
+            .reduce((acc, pair) => {
+                const [, c] = pair || [];
+                if (c) {
+                    const names = c.map(({ name }) => name);
+                    acc = acc.filter(({ name }) => !names.includes(name));
+                    acc.push(...c);
+                }
+                return acc;
+            }, []);
+        return [param.name, x];
+    }
     const paramType = param.type && typeof param.type == 'object' ? param.type : param;
     if (force && paramType.declaration?.children) {
         return [param.name, paramType.declaration.children];
