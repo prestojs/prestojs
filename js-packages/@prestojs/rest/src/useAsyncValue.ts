@@ -97,7 +97,7 @@ export type UseAsyncValueReturn<T> = {
      */
     run: (...args) => Promise<any>;
     /**
-     * When called will unset result and error to null. Will not immediately trigger
+     * When called will set both result and error to null. Will not immediately trigger
      * a call to the action but subsequent changes to query or paginator will according
      * to the value of `trigger`.
      *
@@ -153,9 +153,16 @@ export default function useAsyncValue<T, U extends Id>(
     if (id && ids) {
         throw new Error("Only one of 'id' and 'ids' should be provided");
     }
+    // Track value of id/ids for purposes of detecting changes
     const idRef = useRef(id || ids);
+    // Cache the resolve function on a ref so we can call it from a memoized
+    // function. This allows us to use the memoized function `execute` as a
+    // dependency to `useAsync` without it causing an invalidation if an inline
+    // function is passed
     const resolveRef = useRef(resolve);
+    // A cache to store resolved values
     const cache = useRef(new Map<string, T>());
+
     resolveRef.current = resolve;
     let valueInChoices;
     const existingValues = props.existingValues || [];

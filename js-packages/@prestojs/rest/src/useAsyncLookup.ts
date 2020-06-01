@@ -76,7 +76,7 @@ type UseAsyncLookupReturn<T> = {
      */
     run: (...args) => Promise<any>;
     /**
-     * When called will unset result and error to null. Will not immediately trigger
+     * When called will set both result and error to null. Will not immediately trigger
      * a call to the action but subsequent changes to query or paginator will according
      * to the value of `trigger`.
      */
@@ -95,7 +95,7 @@ type UseAsyncLookupReturn<T> = {
  * @extract-docs
  */
 export default function useAsyncLookup<T>({
-    trigger,
+    trigger = 'DEEP',
     query = {},
     accumulatePages = false,
     execute,

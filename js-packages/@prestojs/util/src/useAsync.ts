@@ -140,7 +140,7 @@ export type UseAsyncReturnObject = {
      */
     run: (...args) => Promise<any>;
     /**
-     * When called will unset response or error to null. Will not immediately trigger
+     * When called will set both response or error to null. Will not immediately trigger
      * a call to the action but subsequent changes to `fn` or `options.args` will
      * according to the value of `trigger`.
      */
@@ -174,6 +174,8 @@ const comparisonByTrigger = {
  * Fetch and render a specified github profile
  *
  * ```js
+ * // we don't define this inside FollowerCount() because that will create a new function on
+ * // every render, causing useAsync() to re-run and triggering an infinite render loop
  * function getGithubUser(user) {
  *   return fetch(`https://api.github.com/users/${user}`).then(r => {
  *      if (r.ok) {
@@ -251,7 +253,7 @@ function useAsync<ResponseT, ErrorT>(
 
     const comparisonFn = comparisonByTrigger[trigger];
     const memoizedArgs = useMemoOne(() => args, args, comparisonFn);
-    // We cache the lastValues so we can read then when run() is called. This allows
+    // We cache the lastValues so we can read them when run() is called. This allows
     // us to accept values that change every render in calls to useAsync when trigger
     // of MANUAL is used (eg. inline arrow functions). Because we read the values at
     // call time they don't need to be deps of the `useCallback` call and as such is
@@ -364,19 +366,10 @@ function useAsync<ResponseT, ErrorT>(
     // =========================================================================
     // Create callback that is returned and can be called by the consumer. This
     // just calls `execute` but optionally supports changing the arguments it
-    // is called with.
+    // is called with (if arguments are passed they override `args`, otherwise
+    // `args` is used).
     const run = useCallback(
         (...executeArgs) => {
-            if (
-                executeArgs.length === 1 &&
-                executeArgs[0] &&
-                typeof executeArgs[0] === 'object' &&
-                executeArgs[0].actionArgs
-            ) {
-                throw new Error(
-                    `The 'actionArgs' option has been removed. You now pass through arguments directly to 'run' like a normal function call.`
-                );
-            }
             if (!isMounted.current) {
                 const message =
                     "useAsync 'run' method was called after component was unmounted. This has no effect. If you are calling it in the response of a promise then ensure the component is still mounted otherwise call the function directly and don't use useAsync.";

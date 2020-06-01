@@ -34,8 +34,10 @@ type Cache<T> = {
 export type ComparisonFn = (newInputs: any[], lastInputs: any[]) => boolean;
 
 /**
+ * useMemo but with a stable cache and support for custom comparison operator
+ *
  * Based on https://github.com/alexreardon/use-memo-one but supports custom
- * comparison operator.
+ * comparison operator. See https://github.com/alexreardon/use-memo-one/issues/11
  *
  * @param getResult Function that returns value to memoize
  * @param inputs Dependency array. When values in this change getResult is called again
