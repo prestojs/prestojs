@@ -47,8 +47,8 @@ export type PaginatorState =
  */
 export default class InferredPaginator implements PaginatorInterface {
     __paginator?: CursorPaginator | PageNumberPaginator | LimitOffsetPaginator;
-    get responseSet(): boolean {
-        return !!this.internalState.responseSet;
+    get responseIsSet(): boolean {
+        return !!this.internalState.responseIsSet;
     }
 
     /**

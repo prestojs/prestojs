@@ -5,7 +5,7 @@ export interface PaginatorInterface<State = {}, InternalState = {}> {
     internalState: InternalState;
     setCurrentState: (set: State) => void;
     setInternalState: (set: InternalState) => void;
-    responseSet: boolean;
+    responseIsSet: boolean;
     hasNextPage(): boolean;
     first(): void;
     firstState(): State | null;
@@ -34,15 +34,15 @@ export interface PaginatorInterfaceClass<T extends PaginatorInterface = Paginato
 export default abstract class Paginator<State extends {}, InternalState extends {}>
     implements PaginatorInterface<State, InternalState> {
     currentState: State;
-    internalState: InternalState & { responseSet?: boolean };
+    internalState: InternalState & { responseIsSet?: boolean };
     setCurrentState: (set: State) => void;
     setInternalState: (set: InternalState) => void;
 
     /**
      * True once setResponse has been called and pagination state is known.
      */
-    get responseSet(): boolean {
-        return !!this.internalState.responseSet;
+    get responseIsSet(): boolean {
+        return !!this.internalState.responseIsSet;
     }
 
     /**
@@ -93,7 +93,7 @@ export default abstract class Paginator<State extends {}, InternalState extends 
         this.setInternalState = (nextState): void => {
             setInternalState({
                 ...nextState,
-                responseSet: true,
+                responseIsSet: true,
             });
         };
     }

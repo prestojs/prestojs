@@ -102,14 +102,11 @@ export default function useAsyncLookup<T>({
     paginator = null,
 }: UseAsyncLookupProps<T>): UseAsyncLookupReturn<T> {
     const initialRun = useRef(true);
-    const paginationState = paginator?.responseSet && paginator?.currentState;
+    const paginationState = paginator?.responseIsSet && paginator?.currentState;
     const nextPaginationStateRef = useRef<{} | null>(null);
     const lastPaginationStateRef = useRef<{} | null>(null);
     const lastQuery = useRef(query);
-    const executeRef = useRef(execute);
     const queryChanged = !isEqual(lastQuery.current, query);
-
-    executeRef.current = execute;
 
     // Tracks whether accumulated values should be reset. We do this as a ref instead
     // of calling dispatch immediately to avoid transitioning the state too
@@ -131,8 +128,9 @@ export default function useAsyncLookup<T>({
         initialRun.current = false;
         const result = await execute({ paginator, query });
         lastPaginationStateRef.current =
-            (paginator?.responseSet && paginator?.currentState) || null;
-        nextPaginationStateRef.current = (paginator?.responseSet && paginator?.nextState()) || null;
+            (paginator?.responseIsSet && paginator?.currentState) || null;
+        nextPaginationStateRef.current =
+            (paginator?.responseIsSet && paginator?.nextState()) || null;
         if (accumulatePages && !Array.isArray(result)) {
             console.warn(
                 `accumulatePages is only valid when result is an array - it has been ignored. Received: `,
@@ -171,11 +169,11 @@ export default function useAsyncLookup<T>({
         // If trigger is manual and query changes we should reset
         if ((queryChanged || paginationChanged) && trigger === 'MANUAL') {
             lastPaginationStateRef.current =
-                (paginator?.responseSet && paginator?.currentState) || null;
+                (paginator?.responseIsSet && paginator?.currentState) || null;
             reset();
         }
         if (
-            paginator?.responseSet &&
+            paginator?.responseIsSet &&
             queryChanged &&
             !isEqual(paginator.firstState(), paginator.currentState)
         ) {

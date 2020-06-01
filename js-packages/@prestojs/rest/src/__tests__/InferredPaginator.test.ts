@@ -87,13 +87,13 @@ test('should infer underlying paginator based on response', () => {
     expect(result.current.currentState).toEqual({ cursor: 'def456' });
 });
 
-test('should set responseSet', () => {
+test('should set responseIsSet', () => {
     const { result } = renderHook(() => useTestHook());
 
     expect(result.current.currentState).toEqual({});
-    expect(result.current.responseSet).toBe(false);
+    expect(result.current.responseIsSet).toBe(false);
     act(() => result.current.setResponse({ total: 30, pageSize: 10 }));
-    expect(result.current.responseSet).toBe(true);
+    expect(result.current.responseIsSet).toBe(true);
 });
 
 test('should support hasNextPage', () => {
