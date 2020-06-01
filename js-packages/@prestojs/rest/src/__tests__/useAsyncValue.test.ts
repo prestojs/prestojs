@@ -299,9 +299,19 @@ test('useAsyncValue should support reset', async () => {
         await jest.runAllTimers();
     });
     expect(result.current.value).toEqual({ name: 'Item 1', _pk: 1 });
+    expect(resolve).toHaveBeenCalledTimes(1);
     act(() => result.current.reset());
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toBe(null);
+    act(() => {
+        result.current.run();
+    });
+    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(resolve).toHaveBeenCalledTimes(2);
+    expect(result.current.value).toEqual({ name: 'Item 1', _pk: 1 });
     rerender({ id: 5 });
     expect(result.current.isLoading).toBe(true);
     await act(async () => {
@@ -354,4 +364,53 @@ test('useAsyncValue should cache values', async () => {
         { name: 'Item 5', _pk: 5 },
         { name: 'Item 6', _pk: 6 },
     ]);
+});
+
+test('useAsyncValue should handle changes to resolve', async () => {
+    jest.useFakeTimers();
+    const { result, rerender } = renderHook(
+        ({
+            id,
+            resolve = resolveSingle,
+            getId,
+        }: {
+            id: number | null;
+            resolve?: (id: number) => Promise<any>;
+            getId?: (item: any) => number;
+        }) =>
+            useAsyncValue({
+                id,
+                resolve,
+                getId,
+            }),
+        { initialProps: { id: 1, resolve: resolveSingle } }
+    );
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual({ name: 'Item 1', _pk: 1 });
+    rerender({ id: 5 });
+    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual({ name: 'Item 5', _pk: 5 });
+
+    rerender({ id: 5, resolve: resolveNoId, getId: (item: TestDataItemNoId): number => item.uuid });
+    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual({ name: 'Item 5', uuid: 5 });
+
+    rerender({ id: 1, resolve: resolveNoId, getId: (item: TestDataItemNoId): number => item.uuid });
+    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual({ name: 'Item 1', uuid: 1 });
 });

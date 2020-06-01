@@ -127,18 +127,18 @@ test('useAsyncLookup should support paginator', async () => {
 
 test('useAsyncLookup should support accumulatePages', async () => {
     jest.useFakeTimers();
-    const execute = jest.fn(mockedPaginatedResponse);
+    const execute1 = jest.fn(mockedPaginatedResponse);
+    const execute2 = jest.fn(mockedPaginatedResponse);
     const { result, rerender } = renderHook(
         props =>
             usePaginatorTestHook({
                 accumulatePages: true,
-                execute,
                 ...props,
             }),
-        { initialProps: {} }
+        { initialProps: { query: {}, execute: execute1 } }
     );
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(1);
+    expect(execute1).toHaveBeenCalledTimes(1);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual(testData.slice(0, 5));
@@ -147,13 +147,13 @@ test('useAsyncLookup should support accumulatePages', async () => {
     if (!paginator) throw new Error('Expected paginator');
     act(() => paginator.next());
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(2);
+    expect(execute1).toHaveBeenCalledTimes(2);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual(testData.slice(0, 10));
-    rerender({ query: { search: '1' } });
+    rerender({ query: { search: '1' }, execute: execute1 });
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(3);
+    expect(execute1).toHaveBeenCalledTimes(3);
     await advanceTimers();
     // Changing query should have reset paginator state
     expect(paginator.currentState).toEqual({ page: 1, pageSize: 5 });
@@ -166,7 +166,7 @@ test('useAsyncLookup should support accumulatePages', async () => {
     act(() => paginator.first());
     await advanceTimers();
     expect(result.current.result).toEqual([testData[1], ...testData.slice(10, 14)]);
-    rerender({ query: {} });
+    rerender({ query: {}, execute: execute1 });
     await advanceTimers();
 
     // Jumping to anything other than next page should reset accumulated values
@@ -192,6 +192,17 @@ test('useAsyncLookup should support accumulatePages', async () => {
     act(() => paginator.next());
     await advanceTimers();
     expect(result.current.result).toEqual(testData.slice(3, 9));
+
+    // Changing execute should reset pagination back to page 1 and clear accumulated data
+    rerender({ query: {}, execute: execute2 });
+    expect(result.current.isLoading).toBe(true);
+    expect(execute2).toHaveBeenCalledTimes(1);
+    await advanceTimers();
+    expect(paginator.currentState).toEqual({ page: 1, pageSize: 3 });
+    expect(result.current.result).toEqual(testData.slice(0, 3));
+    act(() => paginator.next());
+    await advanceTimers();
+    expect(result.current.result).toEqual(testData.slice(0, 6));
 });
 
 test('useAsyncLookup should support trigger option', async () => {
@@ -345,4 +356,39 @@ test('useAsyncLookup should make sure `paginator` provided when `accumulatePages
     expect(result.error).toEqual(
         new Error('When `accumulatePages` is set `paginator` must be provided')
     );
+});
+
+test('useAsyncLookup should support changing execute function', async () => {
+    jest.useFakeTimers();
+    const execute1 = jest.fn(mockedPaginatedResponse);
+    const execute2 = jest.fn(mockedPaginatedResponse);
+    const { result, rerender } = renderHook(
+        ({ query, execute }) =>
+            useAsyncLookup({
+                execute,
+                query,
+            }),
+        { initialProps: { query: {}, execute: execute1 } }
+    );
+    expect(result.current.isLoading).toBe(true);
+    expect(execute1).toHaveBeenCalledTimes(1);
+    await advanceTimers();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.result).toEqual(testData.slice(0, 5));
+    rerender({ query: { search: 'Item 2' }, execute: execute1 });
+    expect(result.current.isLoading).toBe(true);
+    expect(execute1).toHaveBeenCalledTimes(2);
+    await advanceTimers();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.result).toEqual([testData[2]]);
+    expect(execute1).toHaveBeenCalledTimes(2);
+    rerender({ query: { search: 'Item 2' }, execute: execute2 });
+    expect(result.current.isLoading).toBe(true);
+    expect(execute1).toHaveBeenCalledTimes(2);
+    expect(execute2).toHaveBeenCalledTimes(1);
+    await advanceTimers();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.result).toEqual([testData[2]]);
+    expect(execute1).toHaveBeenCalledTimes(2);
+    expect(execute2).toHaveBeenCalledTimes(1);
 });

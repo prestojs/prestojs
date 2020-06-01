@@ -1,6 +1,6 @@
 import { getId as _identifiableGetId, hashId, Id, Identifiable, useAsync } from '@prestojs/util';
 import isEqual from 'lodash/isEqual';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 /**
  * Wrapper around default implementation so we can give more specific error message
@@ -50,6 +50,10 @@ export type UseAsyncValuePropsSingle<T, U extends Id> = CommonProps<T, U> & {
     /**
      * Resolve the value for the provided ID. Function is passed a single parameter
      * being `id`.
+     *
+     * Note that when `trigger` is `DEEP` changes to this function will cause it
+     * to be called again so you must memoize it (eg. with `useCallback`) if it's
+     * defined in your component or hook.
      */
     resolve: (id: U) => Promise<T>;
 };
@@ -155,15 +159,9 @@ export default function useAsyncValue<T, U extends Id>(
     }
     // Track value of id/ids for purposes of detecting changes
     const idRef = useRef(id || ids);
-    // Cache the resolve function on a ref so we can call it from a memoized
-    // function. This allows us to use the memoized function `execute` as a
-    // dependency to `useAsync` without it causing an invalidation if an inline
-    // function is passed
-    const resolveRef = useRef(resolve);
     // A cache to store resolved values
-    const cache = useRef(new Map<string, T>());
+    const cache = useMemo<Map<string, T>>(() => new Map<string, T>(), [resolve]);
 
-    resolveRef.current = resolve;
     let valueInChoices;
     const existingValues = props.existingValues || [];
     if (id || ids) {
@@ -179,7 +177,7 @@ export default function useAsyncValue<T, U extends Id>(
                 if (item) {
                     valueInChoices.push(item);
                 } else {
-                    const cachedItem = cache.current.get(hashedId);
+                    const cachedItem = cache.get(hashedId);
                     if (cachedItem) {
                         valueInChoices.push(cachedItem);
                     }
@@ -197,7 +195,7 @@ export default function useAsyncValue<T, U extends Id>(
             }
             if (!valueInChoices && id) {
                 const hashedId = hashId(id);
-                const cachedItem = cache.current.get(hashedId);
+                const cachedItem = cache.get(hashedId);
                 if (cachedItem) {
                     valueInChoices = cachedItem;
                 }
@@ -205,16 +203,15 @@ export default function useAsyncValue<T, U extends Id>(
         }
     }
     const isValueMissing = (id || ids) && !valueInChoices;
-    const execute = useCallback(id => resolveRef.current(id), []);
     const { run, reset: resetDefault, isLoading, error, response: resolvedValue } = useAsync(
-        execute,
+        resolve,
         {
             args: [id || ids],
             trigger: isValueMissing ? trigger : useAsync.MANUAL,
             onSuccess(response) {
                 const r = Array.isArray(response) ? response : [response];
                 r.forEach(item => {
-                    cache.current.set(hashId(identifiableGetId(item, getId)), item);
+                    cache.set(hashId(identifiableGetId(item, getId)), item);
                 });
             },
         }
@@ -222,8 +219,8 @@ export default function useAsyncValue<T, U extends Id>(
 
     const reset = useCallback(() => {
         resetDefault();
-        cache.current = new Map();
-    }, [resetDefault]);
+        cache.clear();
+    }, [cache, resetDefault]);
 
     useEffect(() => {
         if (!isEqual(id || ids, idRef.current) && trigger === useAsync.MANUAL) {

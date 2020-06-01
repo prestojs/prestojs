@@ -43,6 +43,10 @@ type UseAsyncLookupProps<T> = {
     /**
      * Asynchronous function that returns the result for the query. Passed an
      * object with `query` and `paginator` keys.
+     *
+     * Note that when `trigger` is `DEEP` changes to this function will cause it
+     * to be called again so you must memoize it (eg. with `useCallback`) if it's
+     * defined in your component or hook.
      */
     execute: (props: {
         query?: Record<string, boolean | string | null | number>;
@@ -133,6 +137,8 @@ export default function useAsyncLookup<T>({
     const lastPaginationStateRef = useRef<{} | null>(null);
     const lastQuery = useRef(query);
     const queryChanged = !isEqual(lastQuery.current, query);
+    const lastExecute = useRef(execute);
+    const executeChanged = lastExecute.current !== execute;
 
     // Tracks whether accumulated values should be reset. We do this as a ref instead
     // of calling dispatch immediately to avoid transitioning the state too
@@ -151,6 +157,7 @@ export default function useAsyncLookup<T>({
         // Track query at point of time last fetch occurs so we can detect any
         // changes that occur since last fetch.
         lastQuery.current = query;
+        lastExecute.current = execute;
         initialRun.current = false;
         const result = await execute({ paginator, query });
         lastPaginationStateRef.current =
@@ -178,32 +185,33 @@ export default function useAsyncLookup<T>({
         trigger !== 'MANUAL' &&
         // INITIAL_FETCH doesn't pass this check so shouldFetch still becomes true
         !isLoading &&
-        (paginationChanged || queryChanged || initialRun.current);
+        (paginationChanged || queryChanged || executeChanged || initialRun.current);
 
     // Main effect that handles calling endpoint and monitoring changes in pagination
     // state and query state.
     useEffect(() => {
         // Only update cached lastQuery if we are doing a fetch
-        if (shouldFetch && queryChanged) {
+        if (shouldFetch && (queryChanged || executeChanged)) {
             lastQuery.current = query;
+            lastExecute.current = execute;
             // Changing query results in accumulated values being reset
             if (accumulatePages) {
                 shouldResetAccumulatedValues.current = true;
             }
         }
 
-        // If trigger is manual and query changes we should reset
-        if ((queryChanged || paginationChanged) && trigger === 'MANUAL') {
+        // If trigger is manual and query/pagination/execute changes we should reset
+        if ((queryChanged || paginationChanged || executeChanged) && trigger === 'MANUAL') {
             lastPaginationStateRef.current =
                 (paginator?.responseIsSet && paginator?.currentState) || null;
             reset();
         }
         if (
             paginator?.responseIsSet &&
-            queryChanged &&
+            (queryChanged || executeChanged) &&
             !isEqual(paginator.firstState(), paginator.currentState)
         ) {
-            // If query has changed we need to reset pagination before we fetch
+            // If query or execute has changed we need to reset pagination before we fetch
             paginator.first();
             nextPaginationStateRef.current = null;
         } else if (shouldFetch) {
@@ -219,6 +227,8 @@ export default function useAsyncLookup<T>({
         trigger,
         reset,
         paginationChanged,
+        executeChanged,
+        execute,
     ]);
 
     return {
