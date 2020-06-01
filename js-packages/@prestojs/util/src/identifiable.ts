@@ -54,40 +54,26 @@ export function getId(item: Identifiable | any, fallbackGetId?: (item: any) => I
         'Provided item does not implement Identifiable and no fallback getter was specified.'
     );
 }
-const HASH_SEP = '⁞♥';
-const FIELD_SEP = '⁞♦';
 
 /**
  * Create string representation of ID suitable for strict equality
  * checking or as a key into an object / map.
  */
 export function hashId(id: Id): string {
-    // TODO: is 'hash' appropriate for what we are doing here?
     if (id == null) {
         return id;
     }
     if (typeof id == 'object') {
-        // primary key field names are implicit; never include them in the key itself
         const f = Object.keys(id);
         f.sort();
-        const parts: string[] = [];
-        for (const name of f) {
-            const value = id[name];
-            if (
-                name.includes(HASH_SEP) ||
-                name.includes(FIELD_SEP) ||
-                (typeof value == 'string' &&
-                    (value.includes(HASH_SEP) || value.includes(FIELD_SEP)))
-            ) {
-                throw new Error(
-                    `Compound id field name or value cannot include ${HASH_SEP} or ${FIELD_SEP}`
-                );
-            }
-            parts.push(`${name}${FIELD_SEP}${value}`);
-        }
-        return f.join(HASH_SEP);
+        return JSON.stringify(
+            f.reduce((acc, fieldName) => {
+                acc[fieldName] = id[fieldName];
+                return acc;
+            }, {})
+        );
     }
-    return id.toString();
+    return JSON.stringify(id);
 }
 
 /**
