@@ -101,6 +101,9 @@ export default function useAsyncLookup<T>({
     execute,
     paginator = null,
 }: UseAsyncLookupProps<T>): UseAsyncLookupReturn<T> {
+    if (accumulatePages && !paginator) {
+        throw new Error('When `accumulatePages` is set `paginator` must be provided');
+    }
     const initialRun = useRef(true);
     const paginationState = paginator?.responseIsSet && paginator?.currentState;
     const nextPaginationStateRef = useRef<{} | null>(null);

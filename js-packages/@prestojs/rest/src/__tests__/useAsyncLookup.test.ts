@@ -329,4 +329,20 @@ test('useAsyncLookup should support run', async () => {
     expect(result.current.result).toEqual([testData[2]]);
     expect(execute).toHaveBeenCalledTimes(2);
 });
-// TODO: Should we support single values? eg. don't require array unless accumulating
+
+test('useAsyncLookup should make sure `paginator` provided when `accumulatePages` is true', async () => {
+    jest.useFakeTimers();
+    const execute = jest.fn(mockedPaginatedResponse);
+    const { result } = renderHook(
+        props =>
+            useAsyncLookup({
+                accumulatePages: true,
+                execute,
+                ...props,
+            }),
+        { initialProps: {} }
+    );
+    expect(result.error).toEqual(
+        new Error('When `accumulatePages` is set `paginator` must be provided')
+    );
+});
