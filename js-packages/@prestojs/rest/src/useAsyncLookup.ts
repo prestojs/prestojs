@@ -50,8 +50,7 @@ type UseAsyncLookupProps<T> = {
     }) => Promise<T>;
 };
 
-type UseAsyncLookupReturn<T> = {
-    result: T | null;
+type UseAsyncLookupReturnCommon<T> = {
     /**
      * True while `execute` call is in progress.
      */
@@ -60,12 +59,6 @@ type UseAsyncLookupReturn<T> = {
      * The same `paginator` passed in to `useAsyncLookup`
      */
     paginator: null | PaginatorInterface;
-    /**
-     * Set to the rejected value of the promise. Only one of `error` and `response` can be set. If
-     * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
-     * when you want the UI to show the previous value until the next value is ready.
-     */
-    error: null | Error;
     /**
      * A function to manually trigger the action. If `options.trigger` is `MANUAL`
      * calling this function is the only way to trigger the action.
@@ -82,6 +75,36 @@ type UseAsyncLookupReturn<T> = {
      */
     reset: () => void;
 };
+type UseAsyncLookupReturn<T> =
+    | (UseAsyncLookupReturnCommon<T> & {
+          /**
+           * Until first call has resolved neither error nor result will be set
+           */
+          error: null;
+          result: null;
+      })
+    | (UseAsyncLookupReturnCommon<T> & {
+          /**
+           * Set to the rejected value of the promise. Only one of `error` and `response` can be set. If
+           * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
+           * when you want the UI to show the previous value until the next value is ready.
+           */
+          error: Error;
+          /**
+           * Result will not be set when error is set
+           */
+          result: null;
+      })
+    | (UseAsyncLookupReturnCommon<T> & {
+          /**
+           * Error will not be set when result is set
+           */
+          error: null;
+          /**
+           * The value returned from execute
+           */
+          result: T;
+      });
 
 /**
  * Execute an asynchronous call and return the value which can optionally be paginated.
