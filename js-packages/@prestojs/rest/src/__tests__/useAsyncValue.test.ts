@@ -151,7 +151,7 @@ test('useAsyncValue should use existing values if available', async () => {
 test('useAsyncValue should error if getId required and not specified', async () => {
     jest.useFakeTimers();
     const resolve = jest.fn(resolveNoId);
-    const { result, rerender } = renderHook(
+    const { result } = renderHook(
         ({ id }) =>
             useAsyncValue({
                 id,

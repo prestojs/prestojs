@@ -235,6 +235,7 @@ function useAsync<ResponseT, ErrorT>(
     options: UseAsyncOptions = {}
 ): UseAsyncReturnObject {
     const { trigger = MANUAL, args = [], onSuccess, onError } = options;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [{ id, ...state }, dispatch] = useReducer<
         (
             state: ReducerState<ResponseT, ErrorT>,
