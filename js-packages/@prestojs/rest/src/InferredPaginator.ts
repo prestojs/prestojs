@@ -47,6 +47,9 @@ export type PaginatorState =
  */
 export default class InferredPaginator implements PaginatorInterface {
     __paginator?: CursorPaginator | PageNumberPaginator | LimitOffsetPaginator;
+    get responseIsSet(): boolean {
+        return !!this.internalState.responseIsSet;
+    }
 
     /**
      * The underlying inferred paginator instance (if known). Only available after `setResponse` has been called.
@@ -477,6 +480,16 @@ export default class InferredPaginator implements PaginatorInterface {
             throw new Error('last() is not valid for CursorPaginator');
         }
         return this.paginator.last();
+    }
+
+    /**
+     * Returns true if there's more results after the current page
+     */
+    hasNextPage(): boolean {
+        if (!this.paginator) {
+            return false;
+        }
+        return this.paginator.hasNextPage();
     }
 
     getRequestInit(currentInit): EndpointExecuteOptions {

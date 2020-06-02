@@ -120,3 +120,30 @@ test('should handle changing limit', () => {
     act(() => result.current.setLimit(null));
     expect(result.current.currentState).toEqual({});
 });
+
+test('should set responseIsSet', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+    expect(result.current.responseIsSet).toBe(false);
+    act(() => result.current.setResponse({ total: 30, limit: 10 }));
+    expect(result.current.responseIsSet).toBe(true);
+});
+
+test('should support hasNextPage', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+
+    expect(result.current.hasNextPage()).toBe(false);
+
+    act(() => result.current.setResponse({ total: 30, limit: 10 }));
+
+    expect(result.current.hasNextPage()).toBe(true);
+    act(() => result.current.next());
+    expect(result.current.hasNextPage()).toBe(true);
+    act(() => result.current.next());
+    expect(result.current.hasNextPage()).toBe(false);
+    act(() => result.current.first());
+    expect(result.current.hasNextPage()).toBe(true);
+});

@@ -9,6 +9,12 @@
   "references": [
     {
       "path": "../routing/tsconfig.json"
+    },
+    {
+      "path": "../util/tsconfig.json"
+    },
+    {
+      "path": "../viewmodel/tsconfig.json"
     }
   ],
 

@@ -6,7 +6,7 @@
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es6",
-    "lib": ["dom", "es2017"],
+    "lib": ["dom", "dom.iterable", "es2017"],
     "baseUrl": ".",
     "paths": {
       "@prestojs/viewmodel": ["./js-packages/@prestojs/viewmodel/src/"],

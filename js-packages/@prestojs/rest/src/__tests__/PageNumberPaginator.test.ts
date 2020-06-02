@@ -1,5 +1,5 @@
+import { act, renderHook } from '@testing-library/react-hooks';
 import { useState } from 'react';
-import { renderHook, act } from '@testing-library/react-hooks';
 import PageNumberPaginator from '../PageNumberPaginator';
 
 function useTestHook(initialState = {}): PageNumberPaginator {
@@ -139,4 +139,30 @@ test('should handle changing page size', () => {
     // Setting to null should just reset to default
     act(() => result.current.setPageSize(null));
     expect(result.current.currentState).toEqual({});
+});
+
+test('should set responseIsSet', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+    expect(result.current.responseIsSet).toBe(false);
+    act(() => result.current.setResponse({ total: 30, pageSize: 10 }));
+    expect(result.current.responseIsSet).toBe(true);
+});
+
+test('should support hasNextPage', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+
+    expect(result.current.hasNextPage()).toBe(false);
+
+    act(() => result.current.setResponse({ total: 30, pageSize: 10 }));
+    expect(result.current.hasNextPage()).toBe(true);
+    act(() => result.current.next());
+    expect(result.current.hasNextPage()).toBe(true);
+    act(() => result.current.next());
+    expect(result.current.hasNextPage()).toBe(false);
+    act(() => result.current.first());
+    expect(result.current.hasNextPage()).toBe(true);
 });

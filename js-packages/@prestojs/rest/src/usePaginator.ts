@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Endpoint from './Endpoint';
 import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
 
@@ -68,6 +68,17 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
             [internalState, setInternalState]
         );
     }
+
+    // On unmount or if the paginator instance changes (eg. if paginatorClass changed) then the
+    // state controllers on the old instance are replaced with a noop setter. This avoids:
+    // 1) Having a previous paginator setting the state that's is being used on a newer paginator instance
+    // 2) Setting state after component unmounted and React logging an error
+    useEffect(() => {
+        return (): void => {
+            const noop = (): {} => ({});
+            paginatorInstance?.replaceStateControllers([{}, noop], [{}, noop]);
+        };
+    }, [paginatorInstance]);
 
     return paginatorInstance;
 }

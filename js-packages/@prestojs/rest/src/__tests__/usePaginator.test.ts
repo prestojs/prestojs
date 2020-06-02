@@ -109,3 +109,19 @@ test('should accept no value', async () => {
         page: 2,
     });
 });
+
+test('should not set state after unmount', async () => {
+    const { result, unmount } = renderHook(() => usePaginator(PageNumberPaginator));
+    const paginator = result.current;
+    act(() => paginator.setResponse({ total: 10, pageSize: 5 }));
+
+    unmount();
+
+    // eslint-disable-next-line
+    const mockError = jest.spyOn(global.console, 'error').mockImplementation(() => {});
+    // This should be a noop after unmount. If it's not React will log an error about
+    // "Can't perform a React state update on an unmounted component"
+    act(() => paginator.setResponse({ total: 5, pageSize: 2 }));
+    expect(mockError).not.toHaveBeenCalled();
+    mockError.mockRestore();
+});

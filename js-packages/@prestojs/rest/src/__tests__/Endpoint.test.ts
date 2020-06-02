@@ -48,6 +48,21 @@ test('prepare should maintain equality based on inputs', () => {
     const f = action.prepare(fArgs);
     expect(f).toBe(action.prepare(fArgs));
     expect(e).not.toBe(a);
+
+    // Paginator should be factored into equality checks
+    const noop = (): void => undefined;
+    const gArgs = {
+        urlArgs: { id: 1 },
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        paginator: new PageNumberPaginator([{}, noop], [{}, noop]),
+    };
+    const g = action.prepare(gArgs);
+    expect(g).toBe(action.prepare(gArgs));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    gArgs.paginator = new PageNumberPaginator([{}, noop], [{}, noop]);
+    expect(g).not.toBe(action.prepare(gArgs));
 });
 
 test('should resolve URLs', () => {
@@ -303,4 +318,40 @@ test('should support changing paginatorClass & getPaginationState', async () => 
         expect((hookResult.current as PageNumberPaginator).pageSize).toBe(5);
         expect(result).toEqual(records);
     });
+});
+
+test('should support custom URL resolve function', () => {
+    fetchMock.mockResponse('');
+    const endpoint = new Endpoint(new UrlPattern('/whatever/:id?/'), {
+        resolveUrl(urlPattern, urlArgs, query): string {
+            return urlPattern.resolve(urlArgs, { query: { ...query, always: 1 } });
+        },
+    });
+    endpoint.prepare().execute();
+    expect(fetchMock.mock.calls.length).toEqual(1);
+    expect(fetchMock.mock.calls[0][0]).toEqual('/whatever/?always=1');
+    endpoint.prepare({ urlArgs: { id: 2 } }).execute();
+    expect(fetchMock.mock.calls.length).toEqual(2);
+    expect(fetchMock.mock.calls[1][0]).toEqual('/whatever/2/?always=1');
+    endpoint.prepare({ urlArgs: { id: 2 }, query: { a: 'b' } }).execute();
+    expect(fetchMock.mock.calls.length).toEqual(3);
+    expect(fetchMock.mock.calls[2][0]).toEqual('/whatever/2/?a=b&always=1');
+    endpoint.prepare({ query: { a: 'b' } }).execute();
+    expect(fetchMock.mock.calls.length).toEqual(4);
+    expect(fetchMock.mock.calls[3][0]).toEqual('/whatever/?a=b&always=1');
+
+    // Same thing but call execute directly without prepare
+    fetchMock.resetMocks();
+    endpoint.execute();
+    expect(fetchMock.mock.calls.length).toEqual(1);
+    expect(fetchMock.mock.calls[0][0]).toEqual('/whatever/?always=1');
+    endpoint.execute({ urlArgs: { id: 2 } });
+    expect(fetchMock.mock.calls.length).toEqual(2);
+    expect(fetchMock.mock.calls[1][0]).toEqual('/whatever/2/?always=1');
+    endpoint.execute({ urlArgs: { id: 2 }, query: { a: 'b' } });
+    expect(fetchMock.mock.calls.length).toEqual(3);
+    expect(fetchMock.mock.calls[2][0]).toEqual('/whatever/2/?a=b&always=1');
+    endpoint.execute({ query: { a: 'b' } });
+    expect(fetchMock.mock.calls.length).toEqual(4);
+    expect(fetchMock.mock.calls[3][0]).toEqual('/whatever/?a=b&always=1');
 });

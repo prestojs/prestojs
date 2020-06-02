@@ -35,6 +35,21 @@ type EndpointOptions = ExecuteInitOptions & {
      * @param data
      */
     transformResponseBody?: (data: any) => any;
+    /**
+     * A function to resolve the URL. It is passed the URL pattern object, any
+     * arguments for the URL and any query string parameters.
+     *
+     * If not provided defaults to:
+     *
+     * ```js
+     * urlPattern.resolve(urlArgs, { query });
+     * ```
+     */
+    resolveUrl?: (
+        urlPattern: UrlPattern,
+        urlArgs?: Record<string, any>,
+        query?: Record<string, boolean | string | null | number>
+    ) => string;
 };
 
 type UrlResolveOptions = {
@@ -223,6 +238,28 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
     return response;
 }
 
+function defaultResolveUrl(
+    urlPattern: UrlPattern,
+    urlArgs?: Record<string, any>,
+    query?: Record<string, boolean | string | null | number>
+): string {
+    return this.urlPattern.resolve(urlArgs, { query });
+}
+
+/**
+ * Equality function used to compare keys used in `prepare`.
+ *
+ * We do deep equality on everything except the `paginator` key - for that we
+ * do strict equality check as we want it to fail if they are different instances
+ * even if they have the same internal state.
+ */
+function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolean {
+    if (a.paginator !== b.paginator) {
+        return false;
+    }
+    return isEqual(a, b);
+}
+
 /**
  * Describe an REST API endpoint that can then be executed.
  *
@@ -360,17 +397,28 @@ export default class Endpoint<ReturnT = any> {
     urlCache: Map<string, Map<{}, PreparedAction>>;
     decodeBody: (res: Response) => any;
     requestInit: ExecuteInitOptions;
+    resolveUrl: (
+        urlPattern: UrlPattern,
+        urlArgs?: Record<string, any>,
+        query?: Record<string, boolean | string | null | number>
+    ) => string;
 
     /**
      * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint
      */
     constructor(urlPattern: UrlPattern, options: EndpointOptions = {}) {
-        const { decodeBody = defaultDecodeBody, transformResponseBody, ...requestInit } = options;
+        const {
+            decodeBody = defaultDecodeBody,
+            transformResponseBody,
+            resolveUrl = defaultResolveUrl,
+            ...requestInit
+        } = options;
         this.urlPattern = urlPattern;
         this.transformResponseBody = transformResponseBody;
         this.urlCache = new Map();
         this.decodeBody = decodeBody;
         this.requestInit = requestInit;
+        this.resolveUrl = resolveUrl;
     }
 
     /**
@@ -401,19 +449,19 @@ export default class Endpoint<ReturnT = any> {
         if (options.paginator) {
             options = options.paginator.getRequestInit(options);
         }
-        const { urlArgs = {}, query, paginator, ...init } = options;
-        const url = this.urlPattern.resolve(urlArgs, { query });
+        const { urlArgs = {}, query, ...init } = options;
+        const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         let cache = this.urlCache.get(url);
         if (!cache) {
             cache = new Map();
             this.urlCache.set(url, cache);
         }
         for (const [key, value] of cache.entries()) {
-            if (isEqual(key, init)) {
+            if (isEqualPrepareKey(key, init)) {
                 return value;
             }
         }
-        const execute = new PreparedAction(this, { urlArgs, query }, { ...init, paginator });
+        const execute = new PreparedAction(this, { urlArgs, query }, init);
         cache.set(init, execute);
         return execute;
     }
@@ -455,7 +503,7 @@ export default class Endpoint<ReturnT = any> {
             options = options.paginator.getRequestInit(options);
         }
         const { urlArgs = {}, query, paginator, ...init } = options;
-        const url = this.urlPattern.resolve(urlArgs, { query });
+        const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         try {
             const cls = Object.getPrototypeOf(this).constructor;
             const requestInit = mergeRequestInit(
