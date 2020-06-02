@@ -4,6 +4,8 @@ import MdxWrapper from './MdxWrapper';
 import ParameterTable from './ParameterTable';
 import TypeDesc from './TypeDesc';
 
+const classTypeNames = ['ViewModelInterface'];
+
 export default function ReturnType({ signature }) {
     const returnTypes = [];
     const type = signature.type.referencedType?.().type || signature.type;
@@ -20,11 +22,12 @@ export default function ReturnType({ signature }) {
             <h3>Returns</h3>
             {returnTypes.length > 1 && <p className="my-5">One of the following:</p>}
             {returnTypes.map(([type, c], i) => {
-                let isConstructor = false;
+                let isConstructor = classTypeNames.includes(type.name);
                 if (c) {
                     // Don't expand properties for these... kind of weird when this happens when
                     // the returned value is a class
-                    isConstructor = c.filter(({ name }) => name === 'constructor').length > 0;
+                    isConstructor =
+                        isConstructor || c.filter(({ name }) => name === 'constructor').length > 0;
                 }
                 return (
                     <React.Fragment key={i}>

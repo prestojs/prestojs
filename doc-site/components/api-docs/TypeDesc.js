@@ -7,18 +7,31 @@ import MdxWrapper from './MdxWrapper';
 import ParameterTable from './ParameterTable';
 import SignatureDoc from './SignatureDoc';
 
-function Union({ type, isArray = false, ...rest }) {
-    const l = type.types.length;
-    if (l === 2 && type.types.filter(t => t.name === 'undefined').length === 1) {
+function BooleanType() {
+    return <span className="text-red-400">boolean</span>;
+}
+
+function Union({ doc, type, isArray = false, ...rest }) {
+    let types = type.types;
+    const isOptional = doc?.flags?.isOptional;
+    if (types.length === 2 && type.types.filter(t => t.name === 'undefined').length === 1) {
         return <TypeDesc type={type.types.filter(t => t.name !== 'undefined')[0]} />;
+    }
+    if (isOptional) {
+        types = types.filter(t => t.name !== 'undefined');
+    }
+    const names = types.map(t => t.name);
+    names.sort();
+    if (types.length === 2 && names[0] === 'false' && names[1] === 'true') {
+        return <BooleanType />;
     }
     return (
         <>
             {isArray && '('}
-            {type.types.map((type, i) => (
+            {types.map((type, i) => (
                 <React.Fragment key={i}>
                     <TypeDesc type={type} {...rest} />
-                    {i < l - 1 && <span className="text-gray-400">|</span>}
+                    {i < types.length - 1 && <span className="text-gray-400">|</span>}
                 </React.Fragment>
             ))}
             {isArray && ')'}
@@ -116,7 +129,7 @@ export default function TypeDesc({ doc, type, isArray, isReturnType }) {
         );
     }
     if (type.type === 'intrinsic' && type.name === 'boolean') {
-        return <span className="text-red-400">{type.name}</span>;
+        return <BooleanType />;
     }
     let { name } = type;
     if (name === '__type' && doc?.type?.name) {
@@ -124,6 +137,9 @@ export default function TypeDesc({ doc, type, isArray, isReturnType }) {
     }
     if (type.type === 'typeParameter' && typeArgs[type.name]) {
         return <TypeDesc type={typeArgs[type.name]} doc={doc} isReturnType={isReturnType} />;
+    }
+    if (type.name === 'Record' && type?.typeArguments.length === 2) {
+        return <span className="text-blue-400">Object</span>;
     }
     if (type.name === 'Promise') {
         const [, c] = expandProperties(type.typeArguments[0], true) || [];

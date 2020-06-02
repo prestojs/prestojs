@@ -1,4 +1,11 @@
 export function expandProperties(param, force) {
+    if (param.type === 'reference' && param.name === 'Pick' && param.typeArguments?.length === 2) {
+        const fieldNames = param.typeArguments[1].types.map(t => t.value);
+        const [name, c] = expandProperties(param.typeArguments[0], force) || [];
+        if (c) {
+            return [name || param.name, c.filter(t => fieldNames.includes(t.name))];
+        }
+    }
     if (param.type === 'intersection') {
         const x = param.types
             .map(t => expandProperties(t, force))

@@ -319,7 +319,7 @@ interface ViewModelOptions<T extends FieldsMapping> {
     /**
      * Optional base class to extend. When calling `augment` this is set the augmented class.
      *
-     * @type-name ?Class
+     * @type-name Class
      */
     baseClass?: ViewModelConstructor<T>;
     /**
@@ -329,7 +329,7 @@ interface ViewModelOptions<T extends FieldsMapping> {
      * Only `pkFieldName` or `getImplicitPkField` should be provided. If neither are provided then
      * a field called `id` will be used and created if not provided in `fields`.
      *
-     * @type-name ?string|string[]
+     * @type-name string|string[]
      */
     pkFieldName?: null | undefined | string | string[];
     /**
@@ -337,7 +337,7 @@ interface ViewModelOptions<T extends FieldsMapping> {
      * the fields on the model. It should return an array of size 2 - first element should be the
      * field name and the second an instance of `Field`.
      *
-     * @type-name ?Function
+     * @type-name Function
      */
     getImplicitPkField?: null | undefined | GetImplicitPkField<T>;
 }

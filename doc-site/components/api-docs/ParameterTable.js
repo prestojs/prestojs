@@ -8,6 +8,9 @@ export default function ParameterTable({ parameters, nameHeader = 'Parameter', i
             <table className="w-full text-left table-collapse mt-5 mb-5">
                 <thead>
                     <tr>
+                        {!isReturnType && (
+                            <th className="text-sm font-semibold text-gray-700 p-2 bg-gray-100" />
+                        )}
                         <th className="text-sm font-semibold text-gray-700 p-2 bg-gray-100">
                             {nameHeader}
                         </th>
@@ -22,6 +25,13 @@ export default function ParameterTable({ parameters, nameHeader = 'Parameter', i
                 <tbody>
                     {parameters.map(param => (
                         <tr key={param.name}>
+                            {!isReturnType && (
+                                <td
+                                    className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs text-red-600 whitespace-no-wrap align-top`}
+                                >
+                                    {!param.flags?.isOptional && <abbr title="Required">*</abbr>}
+                                </td>
+                            )}
                             <td
                                 className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs text-purple-700 whitespace-no-wrap align-top`}
                             >

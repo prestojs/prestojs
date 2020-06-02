@@ -57,6 +57,11 @@ export default function Doc({ docs, extraNodes }) {
                         sources: docs.viewModelFactory.sources,
                     }}
                 />
+                <p>
+                    A `ViewModel` class is created using the `viewModelFactory` function. The
+                    factory function is documented immediately below followed by the documentation
+                    for the generated class.
+                </p>
                 <SignatureDoc
                     signature={
                         docs.viewModelFactory.signatures[
@@ -93,7 +98,7 @@ export default function Doc({ docs, extraNodes }) {
                         },
                     ]}
                 />
-                <h4 className="font-bold text-lg text-gray-600">ViewModel</h4>
+                <h4 className="font-bold text-lg text-gray-600 mb-5">ViewModel</h4>
                 <Sidebar.LinksSection
                     title="Static Methods"
                     links={staticMethods.map(prop => ({

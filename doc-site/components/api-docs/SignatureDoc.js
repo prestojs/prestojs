@@ -3,9 +3,9 @@ import { expandProperties } from '../../util';
 import AnchorLink from '../AnchorLink';
 import SourceLink from '../SourceLink';
 import MdxWrapper from './MdxWrapper';
+import ParameterTable from './ParameterTable';
 import ReturnType from './ReturnType';
 import SignatureDefinition from './SignatureDefinition';
-import TypeDesc from './TypeDesc';
 
 export default function SignatureDoc({
     signature,
@@ -74,46 +74,7 @@ export default function SignatureDoc({
         <div className={bordered ? 'pt-3 mt-3 border-t-2 border-gray-200' : ''}>
             {!hideName && header}
             <MdxWrapper mdx={signature.mdx} />
-            {parameters.length > 0 && (
-                <table className="w-full text-left table-collapse mt-5 mb-5">
-                    <thead>
-                        <tr>
-                            <th className="text-sm font-semibold text-gray-700 p-2 bg-gray-100">
-                                Parameter
-                            </th>
-                            <th className="text-sm font-semibold text-gray-700 p-2 bg-gray-100">
-                                Type
-                            </th>
-                            {!hideParamDescription && (
-                                <th className="text-sm font-semibold text-gray-700 p-2 bg-gray-100">
-                                    Description
-                                </th>
-                            )}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {parameters.map(param => (
-                            <tr key={param.name}>
-                                <td
-                                    className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs text-purple-700 whitespace-no-wrap align-top`}
-                                >
-                                    {param.name}
-                                </td>
-                                <td
-                                    className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs align-top`}
-                                >
-                                    <TypeDesc doc={param} />
-                                </td>
-                                {!hideParamDescription && (
-                                    <td className="p-2 border-t border-gray-300 font-mono text-xs text-blue-700 align-top table-mdx">
-                                        <MdxWrapper mdx={param.mdx} />
-                                    </td>
-                                )}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+            {parameters.length > 0 && <ParameterTable parameters={parameters} />}
             {!isConstructor && <ReturnType signature={signature} />}
         </div>
     );
