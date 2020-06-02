@@ -1,6 +1,6 @@
 import { getId as _identifiableGetId, hashId, Id, Identifiable, useAsync } from '@prestojs/util';
 import isEqual from 'lodash/isEqual';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 /**
  * Wrapper around default implementation so we can give more specific error message
@@ -19,6 +19,15 @@ type CommonProps<T, U extends Id> = {
      *
      * If each item does not implement [Identifiable](doc:Identifiable) then you
      * must provide the `getId` function.
+     *
+     * You can use this to avoid resolving data that already exists. If dealing with
+     * ViewModel instances you can use it with [useViewModelCache](doc:useViewModelCache),
+     * eg.
+     *
+     * ```js
+     * const existingValues = useViewModelCache(User, cache => cache.get(id, fieldNames));
+     * const { value } = useAsyncValue({ id, existingValues, resolve: fetchUser });
+     * ```
      */
     existingValues?: T[];
     /**
@@ -159,8 +168,6 @@ export default function useAsyncValue<T, U extends Id>(
     }
     // Track value of id/ids for purposes of detecting changes
     const idRef = useRef(id || ids);
-    // A cache to store resolved values
-    const cache = useMemo<Map<string, T>>(() => new Map<string, T>(), [resolve]);
 
     let valueInChoices;
     const existingValues = props.existingValues || [];
@@ -176,11 +183,6 @@ export default function useAsyncValue<T, U extends Id>(
                 const item = existingIds[hashedId];
                 if (item) {
                     valueInChoices.push(item);
-                } else {
-                    const cachedItem = cache.get(hashedId);
-                    if (cachedItem) {
-                        valueInChoices.push(cachedItem);
-                    }
                 }
             }
             if (valueInChoices.length !== ids.length) {
@@ -193,34 +195,13 @@ export default function useAsyncValue<T, U extends Id>(
                     break;
                 }
             }
-            if (!valueInChoices && id) {
-                const hashedId = hashId(id);
-                const cachedItem = cache.get(hashedId);
-                if (cachedItem) {
-                    valueInChoices = cachedItem;
-                }
-            }
         }
     }
     const isValueMissing = (id || ids) && !valueInChoices;
-    const { run, reset: resetDefault, isLoading, error, response: resolvedValue } = useAsync(
-        resolve,
-        {
-            args: [id || ids],
-            trigger: isValueMissing ? trigger : useAsync.MANUAL,
-            onSuccess(response) {
-                const r = Array.isArray(response) ? response : [response];
-                r.forEach(item => {
-                    cache.set(hashId(identifiableGetId(item, getId)), item);
-                });
-            },
-        }
-    );
-
-    const reset = useCallback(() => {
-        resetDefault();
-        cache.clear();
-    }, [cache, resetDefault]);
+    const { run, reset, isLoading, error, response: resolvedValue } = useAsync(resolve, {
+        args: [id || ids],
+        trigger: isValueMissing ? trigger : useAsync.MANUAL,
+    });
 
     useEffect(() => {
         if (!isEqual(id || ids, idRef.current) && trigger === useAsync.MANUAL) {
@@ -229,17 +210,15 @@ export default function useAsyncValue<T, U extends Id>(
         idRef.current = id || ids;
     }, [id, ids, reset, trigger]);
 
-    const resolvedValueInSync = isEqual(id || ids, idRef.current) && resolvedValue;
-
-    // If we don't have id/ids or if trigger is async we should never return a value
+    // If we don't have id/ids we should never return a value
     // Otherwise return the value if it exists in existingChoices otherwise value
     // returned from `resolve` (if any)
     let finalValue = null;
     if (id || ids) {
-        if (resolvedValueInSync) {
-            finalValue = resolvedValue;
-        } else {
+        if (valueInChoices) {
             finalValue = valueInChoices;
+        } else {
+            finalValue = resolvedValue;
         }
     }
 

@@ -124,18 +124,18 @@ test('useAsyncValue should use existing values if available', async () => {
     jest.useFakeTimers();
     const resolve = jest.fn(resolveSingle);
     const { result, rerender } = renderHook(
-        ({ id }) =>
+        ({ id, existingValues }) =>
             useAsyncValue({
                 id,
                 resolve,
-                existingValues: testData.slice(0, 5),
+                existingValues,
             }),
-        { initialProps: { id: 1 } }
+        { initialProps: { id: 1, existingValues: testData.slice(0, 5) } }
     );
     expect(resolve).toHaveBeenCalledTimes(0);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual({ name: 'Item 1', _pk: 1 });
-    rerender({ id: 10 });
+    rerender({ id: 10, existingValues: testData.slice(0, 5) });
     expect(resolve).toHaveBeenCalledTimes(1);
     expect(result.current.isLoading).toBe(true);
     await act(async () => {
@@ -143,6 +143,9 @@ test('useAsyncValue should use existing values if available', async () => {
     });
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual({ name: 'Item 10', _pk: 10 });
+    rerender({ id: 10, existingValues: [{ name: 'ITEM 10', _pk: 10 }] });
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(result.current.value).toEqual({ name: 'ITEM 10', _pk: 10 });
 });
 
 test('useAsyncValue should error if getId required and not specified', async () => {
@@ -244,6 +247,10 @@ test('useAsyncValue should respect trigger', async () => {
     expect(resolve).toHaveBeenCalledTimes(2);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual({ name: 'Item 10', _pk: 10 });
+
+    // Rerendering with different id while on MANUAL should clear value
+    rerender({ id: 11, trigger: 'MANUAL', existingValues: [] });
+    expect(result.current.value).toBe(null);
 });
 
 test('useAsyncValue should support run', async () => {
@@ -319,51 +326,6 @@ test('useAsyncValue should support reset', async () => {
     });
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual({ name: 'Item 5', _pk: 5 });
-});
-
-test('useAsyncValue should cache values', async () => {
-    jest.useFakeTimers();
-    const resolve = jest.fn(resolveMulti);
-    const { result, rerender } = renderHook(
-        ({ ids, existingValues }: { ids: number[] | null; existingValues?: TestDataItem[] }) =>
-            useAsyncValue({
-                ids,
-                resolve,
-                existingValues,
-            }),
-        { initialProps: { ids: [1, 2] } }
-    );
-    expect(resolve).toHaveBeenCalledTimes(1);
-    expect(result.current.isLoading).toBe(true);
-    await act(async () => {
-        await jest.runAllTimers();
-    });
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.value).toEqual([
-        { name: 'Item 1', _pk: 1 },
-        { name: 'Item 2', _pk: 2 },
-    ]);
-    rerender({ ids: [1, 2, 5], existingValues: [testData[5]] });
-    expect(resolve).toHaveBeenCalledTimes(1);
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.value).toEqual([
-        { name: 'Item 1', _pk: 1 },
-        { name: 'Item 2', _pk: 2 },
-        { name: 'Item 5', _pk: 5 },
-    ]);
-    rerender({ ids: [1, 2, 5, 6], existingValues: [testData[5]] });
-    expect(resolve).toHaveBeenCalledTimes(2);
-    expect(result.current.isLoading).toBe(true);
-    await act(async () => {
-        await jest.runAllTimers();
-    });
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.value).toEqual([
-        { name: 'Item 1', _pk: 1 },
-        { name: 'Item 2', _pk: 2 },
-        { name: 'Item 5', _pk: 5 },
-        { name: 'Item 6', _pk: 6 },
-    ]);
 });
 
 test('useAsyncValue should handle changes to resolve', async () => {
