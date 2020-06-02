@@ -764,3 +764,32 @@ test('useAsync should throw an error if invalid option specified', async () => {
         )
     );
 });
+
+test('useAsync should call reset loading state if call is aborted', async () => {
+    const callAction1 = jest.fn(() => Promise.resolve('test1'));
+    const callAction2 = jest.fn(() => Promise.resolve('test2'));
+    const { result, rerender } = renderHook(
+        ({ action, trigger }: { action: typeof callAction1; trigger: 'MANUAL' | 'DEEP' }) =>
+            useAsync(action, { trigger }),
+        { initialProps: { action: callAction1, trigger: useAsync.DEEP } }
+    );
+    expect(result.current).toEqual({
+        isLoading: true,
+        error: null,
+        response: null,
+        run: matchesFunction,
+        reset: matchesFunction,
+    });
+    // Switch to manual rendering before initial call finishes - isLoading state
+    // should reset to false and not get stuck on isLoading
+    act(() => {
+        rerender({ action: callAction2, trigger: useAsync.MANUAL });
+    });
+    expect(result.current).toEqual({
+        isLoading: false,
+        error: null,
+        response: null,
+        run: matchesFunction,
+        reset: matchesFunction,
+    });
+});

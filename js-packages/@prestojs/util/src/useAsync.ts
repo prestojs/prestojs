@@ -9,11 +9,21 @@ type ReducerState<ResponseT, ErrorT> = {
     response: ResponseT | null;
     isLoading: boolean;
     error: ErrorT | null;
+    // Id used to track calls. It is set by `start` and if `abort` is called with
+    // the same `id` then it will reset isLoading state otherwise it will do nothing
+    // This is to handle abort calls that do not happen in response to a new call
+    // happening
+    id?: number;
 };
 
 type ReducerAction<ResponseT, ErrorT> =
     | {
           type: 'start';
+          id: number;
+      }
+    | {
+          type: 'abort';
+          id: number;
       }
     | { type: 'reset' }
     | {
@@ -30,13 +40,18 @@ function reducer<ResponseT, ErrorT>(
     action: ReducerAction<ResponseT, ErrorT>
 ): ReducerState<ResponseT, ErrorT> {
     switch (action.type) {
+        case 'abort':
+            if (state.id === action.id) {
+                return { ...state, isLoading: false };
+            }
+            return state;
         case 'reset':
             return { isLoading: false, error: null, response: null };
         case 'start':
             if (state.isLoading) {
-                return state;
+                return { ...state, id: action.id };
             }
-            return { ...state, isLoading: true };
+            return { ...state, isLoading: true, id: action.id };
         case 'error':
             return { isLoading: false, error: action.payload, response: null };
         case 'success':
@@ -220,7 +235,7 @@ function useAsync<ResponseT, ErrorT>(
     options: UseAsyncOptions = {}
 ): UseAsyncReturnObject {
     const { trigger = MANUAL, args = [], onSuccess, onError } = options;
-    const [state, dispatch] = useReducer<
+    const [{ id, ...state }, dispatch] = useReducer<
         (
             state: ReducerState<ResponseT, ErrorT>,
             action: ReducerAction<ResponseT, ErrorT>
@@ -270,6 +285,7 @@ function useAsync<ResponseT, ErrorT>(
     const lastValues = useRef(l);
     lastValues.current = l;
 
+    const callId = useRef(0);
     // =========================================================================
     // This is the function that gets called to fire the async function. It's
     // either called manually by the consumer calling the returned 'run' function
@@ -291,7 +307,13 @@ function useAsync<ResponseT, ErrorT>(
         executeOnError = lastValues.current.onError
     ): [Promise<any>, () => void] => {
         let isCurrent = true;
-        dispatch({ type: 'start' });
+        const currentCallId = callId.current;
+        callId.current += 1;
+        // Avoid possibility of overflow
+        if (callId.current > 100000) {
+            callId.current = 0;
+        }
+        dispatch({ type: 'start', id: currentCallId });
         const promise = executeFn(...executeArgs);
         if (!isPromise(promise)) {
             const message = 'useAsync can only be used with functions that return a Promise. Got: ';
@@ -322,6 +344,7 @@ function useAsync<ResponseT, ErrorT>(
         return [
             promise,
             (): void => {
+                dispatch({ type: 'abort', id: currentCallId });
                 isCurrent = false;
             },
         ];
