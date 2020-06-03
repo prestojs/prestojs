@@ -1,6 +1,7 @@
-import { getId as _identifiableGetId, hashId, Id, Identifiable, useAsync } from '@prestojs/util';
 import isEqual from 'lodash/isEqual';
 import { useEffect, useRef } from 'react';
+import { getId as _identifiableGetId, hashId, Id, Identifiable } from './identifiable';
+import useAsync from './useAsync';
 
 /**
  * Wrapper around default implementation so we can give more specific error message

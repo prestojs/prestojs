@@ -1,5 +1,5 @@
+import { ExecuteReturnVal } from '@prestojs/rest/build/module/Endpoint';
 import qs from 'qs';
-import { ExecuteReturnVal } from './Endpoint';
 import InferredPaginator from './InferredPaginator';
 import Paginator from './Paginator';
 

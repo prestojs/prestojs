@@ -1,9 +1,9 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useState } from 'react';
-import CursorPaginator from '../CursorPaginator';
-import InferredPaginator from '../InferredPaginator';
-import LimitOffsetPaginator from '../LimitOffsetPaginator';
-import PageNumberPaginator from '../PageNumberPaginator';
+import CursorPaginator from '../pagination/CursorPaginator';
+import InferredPaginator from '../pagination/InferredPaginator';
+import LimitOffsetPaginator from '../pagination/LimitOffsetPaginator';
+import PageNumberPaginator from '../pagination/PageNumberPaginator';
 
 function useTestHook(initialState = {}): InferredPaginator {
     return new InferredPaginator(useState(initialState), useState());

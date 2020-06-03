@@ -1,5 +1,5 @@
-import getPaginationState from '../getPaginationState';
-import InferredPaginator from '../InferredPaginator';
+import getPaginationState from '../pagination/getPaginationState';
+import InferredPaginator from '../pagination/InferredPaginator';
 
 const paginator = new InferredPaginator([{}, (): {} => ({})], [{}, (): {} => ({})]);
 

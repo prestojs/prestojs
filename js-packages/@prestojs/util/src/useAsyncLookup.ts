@@ -1,7 +1,7 @@
-import { useAsync } from '@prestojs/util';
 import isEqual from 'lodash/isEqual';
 import { useEffect, useRef } from 'react';
-import { PaginatorInterface } from './Paginator';
+import { PaginatorInterface } from './pagination/Paginator';
+import useAsync from './useAsync';
 
 /**
  * @expand-properties
@@ -121,13 +121,14 @@ type UseAsyncLookupReturn<T> =
  *
  * @extract-docs
  */
-export default function useAsyncLookup<T>({
-    trigger = 'DEEP',
-    query = {},
-    accumulatePages = false,
-    execute,
-    paginator = null,
-}: UseAsyncLookupProps<T>): UseAsyncLookupReturn<T> {
+export default function useAsyncLookup<T>(props: UseAsyncLookupProps<T>): UseAsyncLookupReturn<T> {
+    const {
+        trigger = 'DEEP',
+        query = {},
+        accumulatePages = false,
+        execute,
+        paginator = null,
+    } = props;
     if (accumulatePages && !paginator) {
         throw new Error('When `accumulatePages` is set `paginator` must be provided');
     }

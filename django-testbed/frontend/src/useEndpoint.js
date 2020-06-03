@@ -1,4 +1,4 @@
-import { usePaginator } from '@prestojs/rest';
+import { usePaginator } from '@prestojs/util';
 import { useCallback } from 'react';
 import useSWR from 'swr';
 

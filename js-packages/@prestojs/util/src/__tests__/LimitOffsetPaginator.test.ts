@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useState } from 'react';
-import LimitOffsetPaginator from '../LimitOffsetPaginator';
+import LimitOffsetPaginator from '../pagination/LimitOffsetPaginator';
 
 function useTestHook(initialState = {}): LimitOffsetPaginator {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

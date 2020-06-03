@@ -1,11 +1,11 @@
 /* eslint-disable no-use-before-define,@typescript-eslint/no-use-before-define */
-import { Endpoint } from '@prestojs/rest';
+import { Endpoint, PaginatedEndpoint } from '@prestojs/rest';
 import {
-    IntegerField,
-    ImageField,
-    NullableBooleanField,
-    FilterSet,
     CharField,
+    FilterSet,
+    ImageField,
+    IntegerField,
+    NullableBooleanField,
     NumberField,
 } from '@prestojs/viewmodel';
 
@@ -57,7 +57,7 @@ export default class User extends BaseUser.augment({
             transformResponseBody: transformAndCacheUser,
             method: 'patch',
         }),
-        list: new Endpoint(namedUrls.get('users-list'), {
+        list: new PaginatedEndpoint(namedUrls.get('users-list'), {
             transformResponseBody: transformAndCacheUser,
         }),
         create: new Endpoint(namedUrls.get('users-list'), {

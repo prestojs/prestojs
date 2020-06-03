@@ -1,5 +1,5 @@
+import { EndpointExecuteOptions } from '@prestojs/rest/build/module/Endpoint';
 import CursorPaginator, { CursorPaginationState } from './CursorPaginator';
-import { EndpointExecuteOptions } from './Endpoint';
 import LimitOffsetPaginator, { LimitOffsetPaginationState } from './LimitOffsetPaginator';
 import PageNumberPaginator, { PageNumberPaginationState } from './PageNumberPaginator';
 import { PaginatorInterface } from './Paginator';

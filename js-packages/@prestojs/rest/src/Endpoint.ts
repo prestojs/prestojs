@@ -1,8 +1,11 @@
 import { UrlPattern } from '@prestojs/routing';
+import {
+    getPaginationState as defaultGetPaginationState,
+    InferredPaginator,
+    PaginatorInterface,
+    PaginatorInterfaceClass,
+} from '@prestojs/util';
 import isEqual from 'lodash/isEqual';
-import defaultGetPaginationState from './getPaginationState';
-import InferredPaginator from './InferredPaginator';
-import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
 
 type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
     /**

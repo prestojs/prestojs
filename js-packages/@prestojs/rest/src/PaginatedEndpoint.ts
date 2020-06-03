@@ -1,5 +1,5 @@
+import { PaginatorInterfaceClass } from '@prestojs/util/pagination/Paginator';
 import Endpoint from './Endpoint';
-import { PaginatorInterfaceClass } from './Paginator';
 
 /**
  * Extension of [Endpoint](doc:Endpoint) that provides a default paginator. This

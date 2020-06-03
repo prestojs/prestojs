@@ -11,7 +11,6 @@ export default function ReturnType({ signature }) {
     const type = signature.type.referencedType?.().type || signature.type;
     if (type.type === 'union') {
         const types = type.types;
-        console.log('heh', types);
         returnTypes.push(...types.map(t => [t, expandProperties(t, true)?.[1] || []]));
     } else {
         const [, c] = (signature.type && expandProperties(signature.type, true)) || [];

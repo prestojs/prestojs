@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-hooks';
-import PageNumberPaginator from '../PageNumberPaginator';
+import PageNumberPaginator from '../pagination/PageNumberPaginator';
+import usePaginator from '../pagination/usePaginator';
 import useAsyncLookup from '../useAsyncLookup';
-import usePaginator from '../usePaginator';
 
 type TestDataItem = { name: string; pk: number };
 const testData: TestDataItem[] = Array.from({ length: 20 }, (_, i) => ({

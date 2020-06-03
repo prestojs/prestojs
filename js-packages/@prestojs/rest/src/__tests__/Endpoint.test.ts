@@ -1,15 +1,18 @@
 import { UrlPattern } from '@prestojs/routing';
+import {
+    getPaginationState,
+    InferredPaginator,
+    LimitOffsetPaginator,
+    PageNumberPaginator,
+    PaginatorInterface,
+    PaginatorInterfaceClass,
+} from '@prestojs/util';
 import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
 import { useState } from 'react';
 import { act } from 'react-test-renderer';
 import Endpoint, { ApiError, RequestError } from '../Endpoint';
-import getPaginationState from '../getPaginationState';
-import InferredPaginator from '../InferredPaginator';
-import LimitOffsetPaginator from '../LimitOffsetPaginator';
-import PageNumberPaginator from '../PageNumberPaginator';
 import PaginatedEndpoint from '../PaginatedEndpoint';
-import { PaginatorInterface, PaginatorInterfaceClass } from '../Paginator';
 
 const fetchMock = fetch as FetchMock;
 

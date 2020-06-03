@@ -1,4 +1,4 @@
-import { EndpointExecuteOptions } from './Endpoint';
+import { EndpointExecuteOptions } from '@prestojs/rest/build/module/Endpoint';
 
 export interface PaginatorInterface<State = {}, InternalState = {}> {
     currentState: State;

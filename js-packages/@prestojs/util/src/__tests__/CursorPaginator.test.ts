@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useState } from 'react';
-import CursorPaginator from '../CursorPaginator';
+import CursorPaginator from '../pagination/CursorPaginator';
 
 function useTestHook(initialState = {}): CursorPaginator {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

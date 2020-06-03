@@ -1,14 +1,24 @@
 import { useEffect, useMemo, useState } from 'react';
-import Endpoint from './Endpoint';
 import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
+
+export interface PaginatorClassProvider<T extends PaginatorInterface> {
+    getPaginatorClass(): PaginatorInterfaceClass<T> | null;
+}
+
+function isPaginatorClassProvider<T extends PaginatorInterface>(
+    item: any
+): item is PaginatorClassProvider<T> {
+    return item && typeof item.getPaginatorClass === 'function';
+}
 
 /**
  * Hook to help manage paginator state. An instance of the specified paginator is created with provided
  * state setter or a default setter if none provided. You only need to provide a state setter if you
  * want to store the state somewhere external eg. from URL query parameters.
  *
- * @param paginatorClassOrEndpoint Must either be an `Endpoint` - in which case `Endpoint.getPaginatorClass()`
- * is called - or a  Paginator class. This class defines how paginator is handled.
+ * @param paginatorClassOrProvider Must either be an object with a `getPaginatorClass` method (eg.
+ * [Endpoint](doc:Endpoint)) or a [Paginator](doc:Paginator) class. This class defines how pagination is
+ * handled.
  * @param currentStatePair A tuple of current state and a state setter function. If not provided state
  * is handled internally in usePaginator. You can pass `useState()` to this parameter.
  *
@@ -16,11 +26,11 @@ import { PaginatorInterface, PaginatorInterfaceClass } from './Paginator';
  * @extract-docs
  */
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any>,
+    paginatorClassOrProvider: PaginatorInterfaceClass<T> | PaginatorClassProvider<T>,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): T;
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrEndpoint: null,
+    paginatorClassOrProvider: null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): null;
 // This is only necessary because the type is inferred as PaginatorInterfaceClass<T> | null here
@@ -29,11 +39,11 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
 //     usePaginator(endpoint && endpoint.getPaginatorClass());
 // }
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any> | null,
+    paginatorClassOrProvider: PaginatorInterfaceClass<T> | PaginatorClassProvider<T> | null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): T | null;
 export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrEndpoint: PaginatorInterfaceClass<T> | Endpoint<any> | null,
+    paginatorClassOrProvider: PaginatorInterfaceClass<T> | PaginatorClassProvider<T> | null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): T | null {
     // Only used if currentStatePair is not provided. We have to create this regardless
@@ -50,11 +60,10 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
 
     let paginatorClass;
 
-    if (paginatorClassOrEndpoint) {
-        paginatorClass =
-            paginatorClassOrEndpoint instanceof Endpoint
-                ? paginatorClassOrEndpoint.getPaginatorClass()
-                : paginatorClassOrEndpoint;
+    if (paginatorClassOrProvider) {
+        paginatorClass = isPaginatorClassProvider(paginatorClassOrProvider)
+            ? paginatorClassOrProvider.getPaginatorClass()
+            : paginatorClassOrProvider;
     }
 
     // Only recreate the paginator class instance when necessary (eg. if the type changes)
