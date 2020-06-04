@@ -1,8 +1,8 @@
+import { NumberField } from '@prestojs/viewmodel';
+import '@testing-library/jest-dom/extend-expect';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import getWidgetForField from '../getWidgetForField';
-import { NumberField } from '@prestojs/viewmodel';
-import { render, fireEvent, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
 
 test('getWidgetForField should return widget for field', async () => {
     const fieldArgs = { label: 'input number with a spin button' };
@@ -14,6 +14,7 @@ test('getWidgetForField should return widget for field', async () => {
         </React.Suspense>
     );
 
+    expect(await screen.findByText('loading...')).toBeInTheDocument();
     const lazyElement = await screen.findByRole('spinbutton');
     expect(lazyElement).toBeInTheDocument();
 });

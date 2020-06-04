@@ -1,5 +1,4 @@
-import { EndpointExecuteOptions } from '@prestojs/rest/build/module/Endpoint';
-import Paginator from './Paginator';
+import Paginator, { PaginatorRequestOptions } from './Paginator';
 
 export type LimitOffsetPaginationState = {
     limit?: number | string;
@@ -195,7 +194,7 @@ export default class LimitOffsetPaginator extends Paginator<
         }
     }
 
-    getRequestInit({ query, ...options }): EndpointExecuteOptions {
+    getRequestInit({ query, ...options }): PaginatorRequestOptions {
         const nextQuery = { ...query };
         if (this.limit) {
             nextQuery.limit = this.limit;

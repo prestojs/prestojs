@@ -1,8 +1,7 @@
-import { EndpointExecuteOptions } from '@prestojs/rest/build/module/Endpoint';
 import CursorPaginator, { CursorPaginationState } from './CursorPaginator';
 import LimitOffsetPaginator, { LimitOffsetPaginationState } from './LimitOffsetPaginator';
 import PageNumberPaginator, { PageNumberPaginationState } from './PageNumberPaginator';
-import { PaginatorInterface } from './Paginator';
+import { PaginatorInterface, PaginatorRequestOptions } from './Paginator';
 
 export type PaginatorState =
     | PageNumberPaginationState
@@ -492,7 +491,7 @@ export default class InferredPaginator implements PaginatorInterface {
         return this.paginator.hasNextPage();
     }
 
-    getRequestInit(currentInit): EndpointExecuteOptions {
+    getRequestInit(currentInit): PaginatorRequestOptions {
         if (this.paginator) {
             return this.paginator.getRequestInit(currentInit);
         }

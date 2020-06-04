@@ -58,7 +58,7 @@ export default function getStaticProps(context, filter, transform = id => id) {
             const [name, hash] = props.href.split(':')[1].split('#');
             const target = data.filter(datum => datum.name === name)[0];
             if (target) {
-                let href = `/docs/${target.slug}/`;
+                let href = `/docs/${target.slug}`;
                 if (hash) {
                     href += `#${hash}`;
                 }

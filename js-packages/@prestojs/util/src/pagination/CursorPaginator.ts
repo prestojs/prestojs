@@ -1,5 +1,4 @@
-import { EndpointExecuteOptions } from '@prestojs/rest/build/module/Endpoint';
-import Paginator from './Paginator';
+import Paginator, { PaginatorRequestOptions } from './Paginator';
 
 export type CursorPaginationState = {
     pageSize?: number;
@@ -152,7 +151,7 @@ export default class CursorPaginator extends Paginator<
         }
     }
 
-    getRequestInit({ query, ...options }): EndpointExecuteOptions {
+    getRequestInit({ query, ...options }): PaginatorRequestOptions {
         const newQuery = { ...query };
         if (this.currentState.pageSize) {
             newQuery.pageSize = this.currentState.pageSize;

@@ -1,4 +1,4 @@
-import { PaginatorInterfaceClass } from '@prestojs/util/pagination/Paginator';
+import { PaginatorInterfaceClass } from '@prestojs/util';
 import Endpoint from './Endpoint';
 
 /**

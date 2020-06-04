@@ -1,4 +1,18 @@
-import { EndpointExecuteOptions } from '@prestojs/rest/build/module/Endpoint';
+export type PaginatorRequestOptions = Omit<RequestInit, 'headers'> & {
+    /**
+     * Any headers to add to the request. You can unset default headers that might be specified in the default
+     * `Endpoint.defaultConfig.requestInit` by setting the value to `undefined`.
+     */
+    headers?: HeadersInit | Record<string, undefined | string>;
+    /**
+     * Any arguments for the [URL](doc:UrlPattern)
+     */
+    urlArgs?: Record<string, any>;
+    /**
+     * Any query request parameters
+     */
+    query?: Record<string, boolean | string | null | number>;
+};
 
 export interface PaginatorInterface<State = {}, InternalState = {}> {
     currentState: State;
@@ -13,7 +27,7 @@ export interface PaginatorInterface<State = {}, InternalState = {}> {
     nextState(): State | null;
     previous(): void;
     previousState(): State | null;
-    getRequestInit(options: EndpointExecuteOptions): EndpointExecuteOptions;
+    getRequestInit(options: PaginatorRequestOptions): PaginatorRequestOptions;
 
     setResponse(response: Record<string, any>): void;
 
@@ -106,7 +120,7 @@ export default abstract class Paginator<State extends {}, InternalState extends 
      * @param options The existing options for the endpoint
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    getRequestInit(options: EndpointExecuteOptions): EndpointExecuteOptions {
+    getRequestInit(options: PaginatorRequestOptions): PaginatorRequestOptions {
         throw new Error('Not implemented');
     }
 

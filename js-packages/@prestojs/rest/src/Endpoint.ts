@@ -449,10 +449,12 @@ export default class Endpoint<ReturnT = any> {
      * directly.
      */
     prepare(options: EndpointExecuteOptions = {}): PreparedAction {
-        if (options.paginator) {
-            options = options.paginator.getRequestInit(options);
+        const { paginator, ...restOptions } = options;
+        if (paginator) {
+            options = paginator.getRequestInit(restOptions);
         }
         const { urlArgs = {}, query, ...init } = options;
+        init.paginator = paginator;
         const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         let cache = this.urlCache.get(url);
         if (!cache) {
@@ -502,10 +504,11 @@ export default class Endpoint<ReturnT = any> {
      * a header entirely set the value to `undefined`.
      */
     async execute(options: EndpointExecuteOptions = {}): Promise<ExecuteReturnVal<ReturnT>> {
-        if (options.paginator) {
-            options = options.paginator.getRequestInit(options);
+        const { paginator, ...restOptions } = options;
+        if (paginator) {
+            options = paginator.getRequestInit(restOptions);
         }
-        const { urlArgs = {}, query, paginator, ...init } = options;
+        const { urlArgs = {}, query, ...init } = options;
         const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         try {
             const cls = Object.getPrototypeOf(this).constructor;

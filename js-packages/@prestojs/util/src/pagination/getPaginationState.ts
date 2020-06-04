@@ -1,7 +1,20 @@
-import { ExecuteReturnVal } from '@prestojs/rest/build/module/Endpoint';
 import qs from 'qs';
 import InferredPaginator from './InferredPaginator';
 import Paginator from './Paginator';
+
+/**
+ * @expand-properties eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)
+ */
+type PaginationRequestDetails<T> = {
+    /**
+     * Any query string parameters
+     */
+    query?: Record<string, boolean | string | null | number>;
+    /**
+     * The value returned by `decodedBody`. See [Endpoint.execute](doc:Endpoint#method-execute).
+     */
+    decodedBody?: any;
+};
 
 /**
  * Return the state for a paginator based on the response itself.
@@ -28,9 +41,9 @@ import Paginator from './Paginator';
  */
 export default function getPaginationState<State, InternalState, Data>(
     paginator: Paginator<State, InternalState> | InferredPaginator,
-    execReturnVal: ExecuteReturnVal<Data>
+    requestDetails: PaginationRequestDetails<Data>
 ): Record<string, any> | false {
-    const { query, decodedBody } = execReturnVal;
+    const { query, decodedBody } = requestDetails;
     // If it's an array then it's assumed to be unpaginated data
     if (Array.isArray(decodedBody) || !decodedBody) {
         return false;

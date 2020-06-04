@@ -1,5 +1,4 @@
-import { EndpointExecuteOptions } from '@prestojs/rest/build/module/Endpoint';
-import Paginator from './Paginator';
+import Paginator, { PaginatorRequestOptions } from './Paginator';
 
 export type PageNumberPaginationState = {
     page?: string | number;
@@ -190,7 +189,7 @@ export default class PageNumberPaginator extends Paginator<
     /**
      * Adds `page` and `pageSize` into query options passed through to the endpoint
      */
-    getRequestInit({ query, ...options }): EndpointExecuteOptions {
+    getRequestInit({ query, ...options }): PaginatorRequestOptions {
         const newQuery = { ...query };
         if (this.currentState.pageSize) {
             newQuery.pageSize = this.currentState.pageSize;
