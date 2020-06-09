@@ -1,5 +1,5 @@
+import { compile, Key, PathFunction, pathToRegexp } from 'path-to-regexp';
 import qs from 'qs';
-import { pathToRegexp, compile, PathFunction, Key } from 'path-to-regexp';
 
 export interface ResolveOptions {
     query?: {};
@@ -66,7 +66,9 @@ export default class UrlPattern {
         }
         let url = this.toPath(kwargs);
         if (query) {
-            url = `${url}?${qs.stringify(query)}`;
+            // TODO: indices: false really depends on backend... how we handle?
+            // https://github.com/prestojs/prestojs/issues/61
+            url = `${url}?${qs.stringify(query, { indices: false })}`;
         }
         return url;
     }
