@@ -8,6 +8,8 @@ export type Id = SingleId | CompoundId;
  *
  * If a `_pk` property exists (eg. from [ViewModelFactory](doc:ViewModelFactory))
  * that will be used otherwise an `id` property will be used.
+ *
+ * @extract-docs
  */
 export type Identifiable =
     | {
