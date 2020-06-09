@@ -1,6 +1,6 @@
 import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
-import React from 'react';
 import { InputNumber } from 'antd';
+import React from 'react';
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
@@ -8,7 +8,7 @@ import { InputNumber } from 'antd';
 const IntegerWidget = React.forwardRef(
     (
         { input, ...rest }: WidgetProps<number, HTMLInputElement>,
-        ref: React.RefObject<InputNumber>
+        ref: React.RefObject<typeof InputNumber>
     ): React.ReactElement => {
         return <InputNumber ref={ref} {...rest} {...input} />;
     }

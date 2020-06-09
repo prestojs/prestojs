@@ -1,8 +1,8 @@
 import { RangedWidgetProps } from '@prestojs/ui/FieldWidgetInterface';
 import { InputNumber } from 'antd';
+import { InputNumberProps } from 'antd/lib/input-number';
 import React from 'react';
 import RangeWidget from './RangeWidget';
-import { InputNumberProps } from 'antd/lib/input-number';
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
@@ -17,7 +17,7 @@ const FloatRangeWidget = React.forwardRef(
             separator,
             ...rest
         }: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
-        ref: React.RefObject<InputNumber>
+        ref: React.RefObject<typeof InputNumber>
     ): React.ReactElement => {
         return (
             <RangeWidget

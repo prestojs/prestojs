@@ -1,6 +1,7 @@
-import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
+import { WidgetProps } from '@prestojs/ui';
 import React from 'react';
 import RadioChoiceWidget from './RadioChoiceWidget';
+import SelectAsyncChoiceWidget from './SelectAsyncChoiceWidget';
 import SelectChoiceWidget from './SelectChoiceWidget';
 
 /**
@@ -14,19 +15,23 @@ const IntegerChoicesWidget = React.forwardRef(
     (
         {
             widgetType,
+            asyncChoices,
             ...rest
         }: WidgetProps<number, HTMLElement> & { widgetType?: 'select' | 'radio' | undefined },
         ref: any
     ): React.ReactElement => {
+        if (asyncChoices) {
+            return <SelectAsyncChoiceWidget ref={ref} asyncChoices={asyncChoices} {...rest} />;
+        }
         if (widgetType === 'select') {
             return <SelectChoiceWidget ref={ref} {...rest} />;
         } else if (widgetType === 'radio') {
-            return <RadioChoiceWidget ref={ref} {...rest} />;
+            return <RadioChoiceWidget {...rest} />;
         } else if (rest.choices && rest.choices.size > 3) {
             return <SelectChoiceWidget ref={ref} {...rest} />;
         }
 
-        return <RadioChoiceWidget ref={ref} {...rest} />;
+        return <RadioChoiceWidget {...rest} />;
     }
 );
 
