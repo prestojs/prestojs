@@ -17,7 +17,7 @@ const IntegerRangeWidget = React.forwardRef(
             separator,
             ...rest
         }: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
-        ref: React.RefObject<InputNumber>
+        ref: React.RefObject<typeof InputNumber>
     ): React.ReactElement => {
         return (
             <RangeWidget

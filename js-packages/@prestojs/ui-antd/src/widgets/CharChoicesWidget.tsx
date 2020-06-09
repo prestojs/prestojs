@@ -23,12 +23,12 @@ const CharChoicesWidget = React.forwardRef(
         if (widgetType === 'select') {
             return <SelectChoiceWidget ref={ref} {...rest} />;
         } else if (widgetType === 'radio') {
-            return <RadioChoiceWidget ref={ref} {...rest} />;
+            return <RadioChoiceWidget {...rest} />;
         } else if (rest.choices && rest.choices.size > 3) {
             return <SelectChoiceWidget ref={ref} {...rest} />;
         }
 
-        return <RadioChoiceWidget ref={ref} {...rest} />;
+        return <RadioChoiceWidget {...rest} />;
     }
 );
 

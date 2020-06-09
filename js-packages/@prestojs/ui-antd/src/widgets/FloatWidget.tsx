@@ -8,7 +8,7 @@ import React from 'react';
 const FloatWidget = React.forwardRef(
     (
         { input, ...rest }: WidgetProps<number, HTMLInputElement>,
-        ref: React.RefObject<InputNumber>
+        ref: React.RefObject<typeof InputNumber>
     ): React.ReactElement => {
         return <InputNumber ref={ref} {...input} {...rest} />;
     }
