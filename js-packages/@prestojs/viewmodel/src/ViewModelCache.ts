@@ -568,7 +568,7 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
         if (!fieldNames) {
             throw new Error('fieldNames must be provided');
         }
-        if (!pk) {
+        if (pk == null) {
             throw new Error('Primary key must be provided');
         }
         const { pkFieldName } = this.viewModel;
