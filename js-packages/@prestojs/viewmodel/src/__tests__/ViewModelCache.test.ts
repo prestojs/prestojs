@@ -1,7 +1,7 @@
-import Field from '../fields/Field';
 import { recordEqualTo } from '../../../../../js-testing/matchers';
-import viewModelFactory, { isViewModelInstance, ViewModelInterface } from '../ViewModelFactory';
+import Field from '../fields/Field';
 import ViewModelCache from '../ViewModelCache';
+import viewModelFactory, { isViewModelInstance, ViewModelInterface } from '../ViewModelFactory';
 
 function F<T>(name): Field<T> {
     return new Field<T>({ label: name });
@@ -26,6 +26,17 @@ test('should cache records from record instance', () => {
 
     expect(Test2.cache.cache).toEqual(new Map());
     expect(Test2.cache.get(5, ['id'])).toBe(null);
+});
+
+test('should handle id of 0', () => {
+    class Test1 extends viewModelFactory({
+        id: F('id'),
+    }) {}
+
+    const record1 = new Test1({ id: 0 });
+    expect(Test1.cache.add(record1)).toBe(record1);
+    expect(Test1.cache.get(0, ['id'])).toBe(record1);
+    expect(Test1.cache.get(record1)).toBe(record1);
 });
 
 test('should cache records from plain object', () => {
