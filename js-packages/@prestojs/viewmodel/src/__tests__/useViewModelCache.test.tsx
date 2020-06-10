@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react';
 import { act, renderHook } from '@testing-library/react-hooks';
+import deepEqual from 'lodash/isEqual';
 import React from 'react';
 
 import { recordEqualTo } from '../../../../../js-testing/matchers';
