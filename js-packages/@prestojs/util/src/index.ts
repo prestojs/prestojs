@@ -1,6 +1,6 @@
 export { default as useChangeObserver } from './useChangeObserver';
 export { default as useListChangeObserver } from './useListChangeObserver';
-export { getId, hashId, isSameById } from './identifiable';
+export { getId, hashId, isSameById, isIdentifiable } from './identifiable';
 export { default as useAsync } from './useAsync';
 export { default as useAsyncValue } from './useAsyncValue';
 export { default as useAsyncLookup } from './useAsyncLookup';
@@ -15,8 +15,10 @@ export { default as LimitOffsetPaginator } from './pagination/LimitOffsetPaginat
 export { default as CursorPaginator } from './pagination/CursorPaginator';
 export { default as Paginator } from './pagination/Paginator';
 export { default as getPaginationState } from './pagination/getPaginationState';
+export { getRichLabel, isPlainLabeled, isLabeled } from './Labeled';
 
 import type { Id, Identifiable } from './identifiable';
+import type { PlainLabeled, RichLabeled } from './Labeled';
 import type { CursorPaginationState } from './pagination/CursorPaginator';
 import type { PaginatorState } from './pagination/InferredPaginator';
 import type { LimitOffsetPaginationState } from './pagination/LimitOffsetPaginator';
@@ -30,6 +32,8 @@ import type {
 } from './useAsyncValue';
 
 export type {
+    PlainLabeled,
+    RichLabeled,
     UseAsyncLookupProps,
     UseAsyncLookupReturn,
     UseAsyncValuePropsMulti,
@@ -41,6 +45,6 @@ export type {
     CursorPaginationState,
     LimitOffsetPaginationState,
     PaginatorState,
+    Identifiable,
+    Id,
 };
-
-export type { Identifiable, Id };
