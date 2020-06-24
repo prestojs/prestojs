@@ -1,6 +1,6 @@
-import React from 'react';
 import { FieldWidgetType } from '@prestojs/ui/FieldWidgetInterface';
 import { Field } from '@prestojs/viewmodel';
+import React from 'react';
 
 // RangeField is not included: its not meant to be used directly - TODO: mark it abstract?
 const mapping = new Map<string, FieldWidgetType<any, any>>([
@@ -46,19 +46,20 @@ export default function getWidgetForField<FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
 ): FieldWidgetType<FieldValue, T> | [FieldWidgetType<FieldValue, T>, object] | null {
     // Couldn't work out what to type this as so field.constructor was accepted
-    const widget: FieldWidgetType<any, any> | null | undefined = field.choices
-        ? choicesMapping.get(field.constructor.name) || mapping.get(field.constructor.name)
-        : mapping.get(field.constructor.name);
+    const widget: FieldWidgetType<any, any> | null | undefined =
+        field.choices || field.asyncChoices
+            ? choicesMapping.get(field.constructor.name) || mapping.get(field.constructor.name)
+            : mapping.get(field.constructor.name);
 
     const getReturnWithChoices = (
         w,
         f
     ): FieldWidgetType<FieldValue, T> | [FieldWidgetType<FieldValue, T>, object] => {
-        if (f.choices) {
+        if (f.choices || f.asyncChoices) {
             if (Array.isArray(w)) {
-                return [w[0], { ...w[1], choices: f.choices }];
+                return [w[0], { ...w[1], choices: f.choices, asyncChoices: f.asyncChoices }];
             } else {
-                return [w, { choices: f.choices }];
+                return [w, { choices: f.choices, asyncChoices: f.asyncChoices }];
             }
         } else {
             return w;
@@ -72,9 +73,10 @@ export default function getWidgetForField<FieldValue, T extends HTMLElement>(
     // if no match can be found check prototypes
     let f = Object.getPrototypeOf(field.constructor);
     do {
-        const widgetF: FieldWidgetType<any, any> | null | undefined = field.choices
-            ? choicesMapping.get(f.name) || mapping.get(f.name)
-            : mapping.get(f.name);
+        const widgetF: FieldWidgetType<any, any> | null | undefined =
+            field.choices || field.asyncChoices
+                ? choicesMapping.get(f.name) || mapping.get(f.name)
+                : mapping.get(f.name);
         if (widgetF) {
             return getReturnWithChoices(widgetF, field);
         }
