@@ -1,3 +1,4 @@
+import { AsyncChoicesInterface } from '@prestojs/viewmodel';
 import React from 'react';
 
 // TODO: Based on final-form currently without much thought
@@ -16,6 +17,7 @@ export interface WidgetProps<FieldValue, T extends HTMLElement> {
     input: InputProps<FieldValue, T>;
     meta?: {};
     choices?: Map<FieldValue, string>;
+    asyncChoices?: AsyncChoicesInterface<any, any, any>;
 }
 
 export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {
