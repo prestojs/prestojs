@@ -232,7 +232,6 @@ type SelectReducerAction =
     | { type: 'setKeywords'; keywords: string };
 
 function reducer(state: SelectReducerState, action: SelectReducerAction): SelectReducerState {
-    console.log(action);
     switch (action.type) {
         case 'open':
             return { ...state, isOpen: true };
