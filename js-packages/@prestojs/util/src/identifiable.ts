@@ -73,11 +73,11 @@ export function isIdentifiable(item: any): item is Identifiable {
  * @menu-group Identifiable
  */
 export function getId(item: Identifiable | any, fallbackGetId?: (item: any) => Id): Id {
-    if (isIdentifiableId(item)) {
-        return item.id;
-    }
     if (isIdentifiablePk(item)) {
         return item._pk;
+    }
+    if (isIdentifiableId(item)) {
+        return item.id;
     }
     if (fallbackGetId) {
         return fallbackGetId(item);
