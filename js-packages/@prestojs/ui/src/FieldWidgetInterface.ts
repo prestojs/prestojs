@@ -17,7 +17,7 @@ export interface WidgetProps<FieldValue, T extends HTMLElement> {
     input: InputProps<FieldValue, T>;
     meta?: {};
     choices?: Map<FieldValue, string>;
-    asyncChoices?: AsyncChoicesInterface<any, any, any>;
+    asyncChoices?: AsyncChoicesInterface<any, any>;
 }
 
 export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {

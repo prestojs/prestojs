@@ -66,33 +66,30 @@ function resolveMulti(
 function buildAsyncChoices<Multiple extends boolean>({
     multiple = false as Multiple,
     list = resolveMulti,
-    retrieve = resolveSingle as (
-        value: Multiple extends true ? number[] : number,
-        deps?: any
-    ) => Promise<Multiple extends true ? TestDataItem[] : TestDataItem>,
+    retrieve = resolveSingle,
     ...rest
 }: {
     multiple?: Multiple;
     list?: (params: Record<string, any>, deps?: any) => Promise<TestDataItem[]>;
     retrieve?: (
-        value: Multiple extends true ? number[] : number,
+        value: number[] | number,
         deps?: any
-    ) => Promise<Multiple extends true ? TestDataItem[] : TestDataItem>;
+    ) => Promise<typeof value extends number[] ? TestDataItem[] : TestDataItem>;
 } & Pick<
-    AsyncChoicesOptions<TestDataItem, number, Multiple>,
-    'useRetrieveDeps' | 'getLabel' | 'getChoices'
->): AsyncChoices<TestDataItem, number, Multiple> {
+    AsyncChoicesOptions<TestDataItem, number>,
+    'useRetrieveProps' | 'getLabel' | 'getChoices'
+>): AsyncChoices<TestDataItem, number> {
     return new AsyncChoices({
         multiple: multiple as Multiple,
-        useListDeps(): { paginator: Paginator<any, any> } {
+        useListProps(): { paginator: Paginator<any, any> } {
             return { paginator: usePaginator(PageNumberPaginator) };
         },
         list(params): Promise<TestDataItem[]> {
             return list(params.query || {}, params.paginator);
         },
         retrieve(
-            value: Multiple extends true ? number[] : number
-        ): Promise<Multiple extends true ? TestDataItem[] : TestDataItem> {
+            value: number[] | number
+        ): Promise<typeof value extends number[] ? TestDataItem[] : TestDataItem> {
             return retrieve(value);
         },
         getLabel(item: TestDataItem): React.ReactNode {
@@ -359,7 +356,7 @@ test('should be able to integrate with viewmodel cache', async () => {
         getLabel(item: TestDataItem): React.ReactNode {
             return (User.cache.get(item.id, ['name']) || item).name;
         },
-        useRetrieveDeps({ id }) {
+        useRetrieveProps({ id }) {
             const existing = useViewModelCache(User, cache =>
                 id ? cache.get(id, ['name']) : null
             );
@@ -625,10 +622,7 @@ test('should work if asyncChoices instance changes', async () => {
 test('should support multi select', async () => {
     const input = buildInput([2, 3]);
     const list = jest.fn(resolveMulti);
-    const retrieve = (jest.fn(resolveSingle) as unknown) as (
-        value: number[],
-        deps?: any
-    ) => Promise<TestDataItem[]>;
+    const retrieve = jest.fn(resolveSingle);
     const asyncChoices = buildAsyncChoices<true>({ list, retrieve, multiple: true });
     const { container, baseElement, rerender } = render(
         <SelectAsyncChoiceWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
