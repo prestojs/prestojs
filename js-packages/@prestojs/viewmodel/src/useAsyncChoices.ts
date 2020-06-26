@@ -7,7 +7,6 @@ import {
     UseAsyncValueReturn,
     useMemoOne,
 } from '@prestojs/util';
-import { useRef } from 'react';
 import { AsyncChoicesInterface } from './fields/AsyncChoices';
 
 /**
@@ -131,12 +130,10 @@ export default function useAsyncChoices<ItemT, ValueT>(
             existingValues: list.result,
             retrieveOptions,
         }) || {};
-    const retrievePropsRef = useRef(retrieveProps);
-    retrievePropsRef.current = retrieveProps;
     const resolve = useMemoOne(
         // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-        () => props => asyncChoices.retrieve(props, retrievePropsRef.current),
-        [asyncChoices],
+        () => props => asyncChoices.retrieve(props, retrieveProps),
+        [asyncChoices, retrieveProps],
         isDeepEqual
     );
     // If useRetrieveProps returns existingValues we use that otherwise use the value returned by list call
