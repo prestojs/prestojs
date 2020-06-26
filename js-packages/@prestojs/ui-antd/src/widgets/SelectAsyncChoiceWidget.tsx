@@ -4,14 +4,11 @@ import { AsyncChoicesInterface, Choice, useAsyncChoices } from '@prestojs/viewmo
 import { Button, Select } from 'antd';
 import { SelectProps } from 'antd/lib/select';
 import debounce from 'lodash/debounce';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 
-type ValueType<T, Multiple extends boolean> = (Multiple extends true ? T[] : T) | null;
+type ValueType<T> = T[] | T | null;
 
-type SelectInputProps<T, Multiple extends boolean> = InputProps<
-    ValueType<T, Multiple>,
-    HTMLSelectElement
-> & {
+type SelectInputProps<T> = InputProps<ValueType<T>, HTMLSelectElement> & {
     // Types in antd require event. Our types don't because final-form doesn't.
     onBlur: (event: React.FocusEvent<HTMLSelectElement>) => void;
     onFocus: (event: React.FocusEvent<HTMLSelectElement>) => void;
@@ -23,14 +20,12 @@ type SelectInputProps<T, Multiple extends boolean> = InputProps<
  * changed, `notFoundContent` is set to `loadingContent` when choices are resolving otherwise `notFoundContent`
  * @hide-properties meta
  */
-export type SelectAsyncChoiceProps<T, Multiple extends boolean> = SelectProps<
-    ValueType<T, Multiple>
-> &
-    Omit<WidgetProps<ValueType<T, Multiple>, HTMLSelectElement>, 'choices' | 'asyncChoices'> & {
+export type SelectAsyncChoiceProps<T> = SelectProps<ValueType<T>> &
+    Omit<WidgetProps<ValueType<T>, HTMLSelectElement>, 'choices' | 'asyncChoices'> & {
         /**
          * The [AsyncChoices](doc:AsyncChoicesInterface) instance to use.
          */
-        asyncChoices: AsyncChoicesInterface<any, T, Multiple>;
+        asyncChoices: AsyncChoicesInterface<any, T>;
         /**
          * Number of milliseconds to debounce changes to search keywords before an API call
          * will be triggered. Set to 0 to disable.
@@ -45,7 +40,7 @@ export type SelectAsyncChoiceProps<T, Multiple extends boolean> = SelectProps<
          * Defaults to `false`
          */
         triggerWhenClosed?: boolean;
-        input: SelectInputProps<T, Multiple>;
+        input: SelectInputProps<T>;
         /**
          * Content to show when the dropdown is open and in the loading state. This it passed through
          * to `notFoundContent` on [Select](https://ant.design/components/select/#API). If you pass through
@@ -126,30 +121,30 @@ export type SelectAsyncChoiceProps<T, Multiple extends boolean> = SelectProps<
         buildQuery?: (props: {
             keywords: string;
             isOpen: boolean;
-            input: SelectInputProps<T, Multiple>;
+            input: SelectInputProps<T>;
         }) => Record<string, any>;
         /**
          * If provided this function will be called whenever a value is successfully
          * resolved using `asyncChoices.retrieve`.
          */
-        onRetrieveSuccess?: (response: T, props: { input: SelectInputProps<T, Multiple> }) => void;
+        onRetrieveSuccess?: (response: T, props: { input: SelectInputProps<T> }) => void;
         /**
          * If provided this function will be called whenever `asyncChoices.retrieve` errors
          *
          * You can use this to do things like unset a value if it no longer exists.
          */
-        onRetrieveError?: (error: Error, props: { input: SelectInputProps<T, Multiple> }) => void;
+        onRetrieveError?: (error: Error, props: { input: SelectInputProps<T> }) => void;
         /**
          * Any extra options to pass through to [list](doc:AsyncChoicesInterface#method-list)
          *
-         * These will be available in both [useListDeps](doc:AsyncChoicesInterface#method-list) and [list](doc:AsyncChoicesInterface#method-useListDeps) under the `listOptions`
+         * These will be available in both [useListProps](doc:AsyncChoicesInterface#method-list) and [list](doc:AsyncChoicesInterface#method-useListProps) under the `listOptions`
          * key
          */
         listOptions?: Record<string, any>;
         /**
          * Any extra options to pass through to [retrieve](doc:AsyncChoicesInterface#method-retrieve)
          *
-         * These will be available in both [useRetrieveDeps](doc:AsyncChoicesInterface#method-retrieve) and [retrieve](doc:AsyncChoicesInterface#method-useRetrieveDeps) under the `retrieveOptions`
+         * These will be available in both [useRetrieveProps](doc:AsyncChoicesInterface#method-retrieve) and [retrieve](doc:AsyncChoicesInterface#method-useRetrieveProps) under the `retrieveOptions`
          * key
          */
         retrieveOptions?: Record<string, any>;
@@ -169,19 +164,19 @@ function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props
     rawValue: T;
     allItems: Choice<T>[];
     selected?: ItemType | null;
-    asyncChoices: AsyncChoicesInterface<ItemType, T, any>;
+    asyncChoices: AsyncChoicesInterface<ItemType, T>;
 }): LabeledValue<T>;
 function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props: {
     rawValue: T[];
     allItems: Choice<T>[];
     selected?: ItemType[] | null;
-    asyncChoices: AsyncChoicesInterface<ItemType, T, any>;
+    asyncChoices: AsyncChoicesInterface<ItemType, T>;
 }): LabeledValue<T>[];
 function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props: {
     rawValue: T | T[];
     allItems: Choice<T>[];
     selected?: ItemType | ItemType[] | null;
-    asyncChoices: AsyncChoicesInterface<ItemType, T, any>;
+    asyncChoices: AsyncChoicesInterface<ItemType, T>;
 }): LabeledValue<T> | LabeledValue<T>[] {
     const { rawValue, allItems, selected, asyncChoices } = props;
     if (Array.isArray(rawValue)) {
@@ -205,7 +200,12 @@ function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props
     }
     const matchedItem = rawValue ? allItems.filter(item => item.value === rawValue).pop() : null;
     let label;
-    if (rawValue && !matchedItem && selected) {
+    if (
+        rawValue &&
+        !matchedItem &&
+        selected &&
+        asyncChoices.getValue(selected as ItemType) === rawValue
+    ) {
         label = asyncChoices.getLabel(selected as ItemType);
     } else if (rawValue) {
         label = matchedItem ? matchedItem.label : asyncChoices.getMissingLabel(rawValue as T);
@@ -225,6 +225,27 @@ function defaultRenderNextPageButton({ isLoading, onClick }): React.ReactNode {
     );
 }
 
+type SelectReducerState = { isOpen: boolean; keywords: string };
+type SelectReducerAction =
+    | { type: 'open' }
+    | { type: 'close' }
+    | { type: 'setKeywords'; keywords: string };
+
+function reducer(state: SelectReducerState, action: SelectReducerAction): SelectReducerState {
+    console.log(action);
+    switch (action.type) {
+        case 'open':
+            return { ...state, isOpen: true };
+        case 'close':
+            // Originally attempted to clear keywords on close... but that caused an infinite loop that
+            // I was unable to track down. Retaining the keywords across open/close transitions
+            // works.
+            return { ...state, isOpen: false };
+        case 'setKeywords':
+            return { ...state, keywords: action.keywords };
+    }
+}
+
 type SelectAsyncChoiceWidgetValue = number | string;
 
 // Pagination is handled by rendering a button within a Select.Option that triggers a fetch. This
@@ -242,7 +263,7 @@ const NEXT_PAGE_VALUE = '__nextpage';
 function SelectAsyncChoiceWidget<
     T extends SelectAsyncChoiceWidgetValue,
     Multiple extends boolean = T extends Array<any> ? true : false
->(props: SelectAsyncChoiceProps<T, Multiple>, ref: React.RefObject<Select>): React.ReactElement {
+>(props: SelectAsyncChoiceProps<T>, ref: React.RefObject<Select>): React.ReactElement {
     const {
         input,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -262,9 +283,12 @@ function SelectAsyncChoiceWidget<
         retrieveOptions,
         ...rest
     } = props;
-    const [keywords, setKeywords] = useState('');
-    const [isOpen, setIsOpen] = useState(false);
-    const { list, choices, selected } = useAsyncChoices<any, T, Multiple>({
+    // Internal input state for keywords. This differs from keywords set with reducer as
+    // reducer keywords are debounced but internal state is not.
+    const [internalKeywords, setInternalKeywords] = useState('');
+    const [{ isOpen, keywords }, dispatch] = useReducer(reducer, { isOpen: false, keywords: '' });
+    const setKeywords = (s): void => dispatch({ type: 'setKeywords', keywords: s });
+    const { list, choices, selected } = useAsyncChoices<any, T>({
         asyncChoices,
         trigger: !isOpen && !triggerWhenClosed ? 'MANUAL' : 'DEEP',
         query: buildQuery({ keywords, input, isOpen }),
@@ -288,10 +312,10 @@ function SelectAsyncChoiceWidget<
     const debouncedSetKeywords = useMemo(
         () =>
             debounce(keywords => {
-                if (paginator) {
-                    paginator;
-                }
                 setKeywords(keywords);
+                if (paginator?.responseIsSet) {
+                    paginator.first();
+                }
             }, debounceWait),
         [paginator, debounceWait]
     );
@@ -346,38 +370,42 @@ function SelectAsyncChoiceWidget<
             }
             if (value.value === NEXT_PAGE_VALUE) {
                 // This catches the option wrapping the next page more button
+                // It would be nice to do the next page selection here and not from the button as this
+                // would allow usage of the keyboard... unfortunately not possible with Ant Select as
+                // it closes the dropdown on selection and there's no way that I found to prevent this
+                // from happening.
                 return;
             }
             return onChange(value.value);
         },
         [onChange]
     );
-
     return (
         <Select
             mode={asyncChoices.multiple ? 'multiple' : undefined}
             ref={ref}
+            open={isOpen}
             onDropdownVisibleChange={(isOpen): void => {
-                // Internally antd seems to do this itself but for some reason
-                // triggers an infinite loop in our case due to the debounced
-                // function passed to onSearch. Manually clearing it here
-                // on close resolves this issue.
-                if (!isOpen) {
-                    setKeywords('');
-                }
-                setIsOpen(isOpen);
+                dispatch({ type: isOpen ? 'open' : 'close' });
             }}
             loading={isLoading}
             showSearch
-            onSearch={debounceWait === 0 ? setKeywords : debouncedSetKeywords}
+            onSearch={(k: string): void => {
+                if (!isOpen) {
+                    return;
+                }
+                setInternalKeywords(k);
+                (debounceWait === 0 ? setKeywords : debouncedSetKeywords)(k);
+            }}
             filterOption={false}
-            disabled={selected.isLoading}
+            disabled={!isOpen && selected.isLoading}
             {...input}
             {...rest}
             onChange={wrappedOnChange}
             labelInValue
             value={selected.isLoading ? undefined : value}
             notFoundContent={isLoading ? loadingContent : rest.notFoundContent}
+            searchValue={internalKeywords}
         >
             {extraOptions.map(option => (
                 <Select.Option key={option.key.toString()} value={option.key} {...optionProps}>

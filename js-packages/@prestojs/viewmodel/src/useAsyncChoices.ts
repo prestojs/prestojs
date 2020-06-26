@@ -7,31 +7,32 @@ import {
     UseAsyncValueReturn,
     useMemoOne,
 } from '@prestojs/util';
+import { useRef } from 'react';
 import { AsyncChoicesInterface } from './fields/AsyncChoices';
 
 /**
  * @expand-properties
  */
-type UseAsyncChoicesProps<ItemT, ValueT, Mult extends boolean> = Pick<
+type UseAsyncChoicesProps<ItemT, ValueT> = Pick<
     UseAsyncLookupProps<ItemT[]>,
     'accumulatePages' | 'query' | 'trigger'
 > & {
     /**
      * See [AsyncChoices](doc:AsyncChoices]
      */
-    asyncChoices: AsyncChoicesInterface<ItemT, ValueT, Mult>;
+    asyncChoices: AsyncChoicesInterface<ItemT, ValueT>;
     /**
      * The currently selected choice(s) - if any
      *
      * When specified the corresponding label(s) will be resolved
      * automatically.
      */
-    value?: (Mult extends true ? ValueT[] : ValueT) | null;
+    value?: ValueT[] | ValueT | null;
     /**
      * If provided this function will be called whenever a value is successfully
      * resolved using `asyncChoices.retrieve`.
      */
-    onRetrieveSuccess?: (response: Mult extends true ? ItemT[] : ItemT) => void;
+    onRetrieveSuccess?: (response: ItemT[] | ItemT) => void;
     /**
      * If provided this function will be called whenever `asyncChoices.retrieve` errors
      *
@@ -41,14 +42,14 @@ type UseAsyncChoicesProps<ItemT, ValueT, Mult extends boolean> = Pick<
     /**
      * Any extra options to pass through to [list](doc:AsyncChoicesInterface#method-list)
      *
-     * These will be available in both [useListDeps](doc:AsyncChoicesInterface#method-list) and [list](doc:AsyncChoicesInterface#method-useListDeps) under the `listOptions`
+     * These will be available in both [useListProps](doc:AsyncChoicesInterface#method-list) and [list](doc:AsyncChoicesInterface#method-useListProps) under the `listOptions`
      * key
      */
     listOptions?: Record<string, any>;
     /**
      * Any extra options to pass through to [retrieve](doc:AsyncChoicesInterface#method-retrieve)
      *
-     * These will be available in both [useRetrieveDeps](doc:AsyncChoicesInterface#method-retrieve) and [retrieve](doc:AsyncChoicesInterface#method-useRetrieveDeps) under the `retrieveOptions`
+     * These will be available in both [useRetrieveProps](doc:AsyncChoicesInterface#method-retrieve) and [retrieve](doc:AsyncChoicesInterface#method-useRetrieveProps) under the `retrieveOptions`
      * key
      */
     retrieveOptions?: Record<string, any>;
@@ -57,7 +58,7 @@ type UseAsyncChoicesProps<ItemT, ValueT, Mult extends boolean> = Pick<
 /**
  * @expand-properties
  */
-type UseAsyncChoicesReturn<ItemT, ValueT, Mult extends boolean> = {
+type UseAsyncChoicesReturn<ItemT, ValueT> = {
     /**
      * See [useAsyncLookup](doc:useAsyncLookup#return-type)
      */
@@ -65,11 +66,11 @@ type UseAsyncChoicesReturn<ItemT, ValueT, Mult extends boolean> = {
     /**
      * See [useAsyncValue](doc:useAsyncValue#return-type)
      */
-    selected: UseAsyncValueReturn<Mult extends true ? ItemT[] : ItemT>;
+    selected: UseAsyncValueReturn<ItemT[] | ItemT>;
     /**
      * See [getChoices](doc:AsyncChoicesInterface#method-getChoices)
      */
-    choices: ReturnType<AsyncChoicesInterface<ItemT, ValueT, Mult>['getChoices']>;
+    choices: ReturnType<AsyncChoicesInterface<ItemT, ValueT>['getChoices']>;
 };
 
 /**
@@ -77,11 +78,11 @@ type UseAsyncChoicesReturn<ItemT, ValueT, Mult extends boolean> = {
  *
  * This hook does the following:
  *
- * 1) Calls [useListDeps](doc:AsyncChoicesInterface#method-useListDeps) to get any dependencies for [list](doc:AsyncChoicesInterface#method-list)
+ * 1) Calls [useListProps](doc:AsyncChoicesInterface#method-useListProps) to get any dependencies for [list](doc:AsyncChoicesInterface#method-list)
  *
  * 2) Calls [list](doc:AsyncChoicesInterface#method-list) and passes through the dependencies and a `query` object representing any query parameters for the async call
  *
- * 3) Calls [useRetrieveDeps](doc:AsyncChoicesInterface#method-useRetrieveDeps) to get any dependencies for [retrieve](doc:AsyncChoicesInterface#method-retrieve)
+ * 3) Calls [useRetrieveProps](doc:AsyncChoicesInterface#method-useRetrieveProps) to get any dependencies for [retrieve](doc:AsyncChoicesInterface#method-retrieve)
  *
  * 4) If there is a current `value` [retrieve](doc:AsyncChoicesInterface#method-retrieve) is called and is passed the dependencies returned above
  *
@@ -90,9 +91,9 @@ type UseAsyncChoicesReturn<ItemT, ValueT, Mult extends boolean> = {
  * @extract-docs
  * @menu-group Async Choices
  */
-export default function useAsyncChoices<ItemT, ValueT, Mult extends boolean>(
-    props: UseAsyncChoicesProps<ItemT, ValueT, Mult>
-): UseAsyncChoicesReturn<ItemT, ValueT, Mult> {
+export default function useAsyncChoices<ItemT, ValueT>(
+    props: UseAsyncChoicesProps<ItemT, ValueT>
+): UseAsyncChoicesReturn<ItemT, ValueT> {
     const {
         asyncChoices,
         value,
@@ -104,39 +105,45 @@ export default function useAsyncChoices<ItemT, ValueT, Mult extends boolean>(
         listOptions,
         retrieveOptions,
     } = props;
-    const listDeps = asyncChoices.useListDeps({
+    const listProps = asyncChoices.useListProps({
         value,
         query,
         listOptions,
     });
     const execute = useMemoOne(
         // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-        () => props => asyncChoices.list({ value, ...props, ...listDeps, listOptions }),
-        [asyncChoices],
+        () => props => asyncChoices.list({ value, ...props, ...listProps, listOptions }),
+        [listOptions, listProps, asyncChoices],
         isDeepEqual
     );
     const list = useAsyncLookup<ItemT[]>({
         trigger,
-        query,
-        accumulatePages: listDeps?.paginator ? accumulatePages : false,
+        // If useListDeps has overridden query we should use it, otherwise default to original query
+        query: listProps?.query ?? query,
+        accumulatePages: listProps?.paginator ? accumulatePages : false,
         execute,
-        paginator: listDeps?.paginator,
+        paginator: listProps?.paginator,
     });
-    const retrieveDeps =
-        asyncChoices.useRetrieveDeps({
+    const retrieveProps =
+        asyncChoices.useRetrieveProps({
             ids: Array.isArray(value) ? value : undefined,
             id: !Array.isArray(value) ? value : undefined,
+            existingValues: list.result,
             retrieveOptions,
         }) || {};
+    const retrievePropsRef = useRef(retrieveProps);
+    retrievePropsRef.current = retrieveProps;
     const resolve = useMemoOne(
         // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-        () => props => asyncChoices.retrieve(props, retrieveDeps),
-        [asyncChoices, retrieveDeps],
+        () => props => asyncChoices.retrieve(props, retrievePropsRef.current),
+        [asyncChoices],
         isDeepEqual
     );
-    const { existingValues } = retrieveDeps;
+    // If useRetrieveProps returns existingValues we use that otherwise use the value returned by list call
+    // This allows overriding this behaviour from useRetrieveProps if necessary
+    const { existingValues = list.result } = retrieveProps;
     const selected = useAsyncValue({
-        existingValues: existingValues || list.result,
+        existingValues: existingValues,
         // Haven't been able to workout typing on this yet
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
@@ -146,9 +153,19 @@ export default function useAsyncChoices<ItemT, ValueT, Mult extends boolean>(
         onError: onRetrieveError,
         onSuccess: onRetrieveSuccess,
     });
+    const listResult = asyncChoices.useResolveItems(list.result);
+    const selectedValue = asyncChoices.useResolveItems(selected.value);
     return {
-        list,
-        selected,
-        choices: asyncChoices.getChoices(list.result || []),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        list: {
+            ...list,
+            result: listResult,
+        },
+        selected: {
+            ...selected,
+            value: selectedValue,
+        },
+        choices: asyncChoices.getChoices(listResult || []),
     };
 }

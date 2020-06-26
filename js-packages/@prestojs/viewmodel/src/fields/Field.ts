@@ -35,7 +35,7 @@ export interface FieldProps<T> {
      *
      * Only one of `asyncChoices` and `choices` should be passed.
      */
-    asyncChoices?: AsyncChoicesInterface<any, T, any>;
+    asyncChoices?: AsyncChoicesInterface<any, T>;
     /**
      * True if field should be considered read only (eg. excluded from forms)
      */
@@ -112,7 +112,7 @@ export default class Field<T, ParsableType extends any = T> {
     /**
      * Async choices for this field.
      */
-    public asyncChoices?: AsyncChoicesInterface<any, T, any>;
+    public asyncChoices?: AsyncChoicesInterface<any, T>;
     /**
      * Indicates this field should only be read, not written. Not enforced but can be used by components to adjust their
      * output accordingly (eg. exclude it from a form or show it on a form with a read only input)
