@@ -440,7 +440,13 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
  * @menu-group Caching
  */
 export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
+    /**
+     * @private
+     */
     cache: Map<PrimaryKeyCacheKey, RecordCache<T>>;
+    /**
+     * @private
+     */
     viewModel: T['_model'];
 
     /**
@@ -512,7 +518,13 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
         return record;
     }
 
+    /**
+     * @private
+     */
     isAddingList = false;
+    /**
+     * @private
+     */
     onAddingListDone: (() => void)[] = [];
 
     /**
@@ -646,6 +658,9 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
         return records;
     }
 
+    /**
+     * @private
+     */
     _lastAllRecords: Map<string, T[]> = new Map();
 
     /**
@@ -714,6 +729,9 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
         }
     }
 
+    /**
+     * @private
+     */
     allChangeListeners: (() => void)[] = [];
 
     /**

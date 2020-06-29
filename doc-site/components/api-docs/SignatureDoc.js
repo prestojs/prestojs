@@ -14,10 +14,13 @@ export default function SignatureDoc({
     isConstructor,
     bordered = true,
     hideName = false,
-    hideParamDescription = false,
+    excludeParameters = [],
 }) {
     const restPropName = signature.comment?.tagsByName?.['rest-prop-name'];
-    const parameters = (signature.parameters || []).reduce((acc, param) => {
+    const rawParameters = (signature.parameters || []).filter(
+        param => !excludeParameters.includes(param.name)
+    );
+    const parameters = rawParameters.reduce((acc, param) => {
         const t = expandProperties(param);
         if (t) {
             const [name, children, desc] = t;
@@ -55,7 +58,7 @@ export default function SignatureDoc({
         <span className="flex items-center justify-between">
             <SignatureDefinition
                 name={signature.name}
-                parameters={(signature.parameters || []).map(p => ({
+                parameters={rawParameters.map(p => ({
                     ...p,
                     name: p.name === '__namedParameters' ? 'props' : p.name,
                 }))}

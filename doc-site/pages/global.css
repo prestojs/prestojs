@@ -16,6 +16,19 @@ html {
 
 @tailwind components;
 
+.btn {
+    @apply font-bold py-2 px-4 rounded;
+}
+.btn-blue {
+    @apply btn bg-blue-500 text-white;
+}
+.btn-blue:hover {
+    @apply bg-blue-700;
+}
+.btn-blue:disabled {
+    @apply bg-blue-300;
+}
+
 .anchor-link {
     position: relative;
     margin-left: -1em;
@@ -50,6 +63,24 @@ html {
 .mdx code {
     @apply p-1;
     @apply bg-yellow-200;
+}
+.code-editor-compiler input[type="text"] {
+    @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight;
+}
+.code-editor-compiler input[type="text"]:focus {
+    @apply  outline-none shadow-outline;
+}
+.code-editor-compiler .ant-form-item {
+    @apply py-2;
+}
+.code-editor-compiler .ant-form-item label {
+    @apply block text-gray-700 text-sm font-bold mb-2;
+}
+.code-editor-compiler .ant-radio-wrapper {
+    @apply px-1;
+}
+.code-editor-compiler .ant-radio {
+   @apply mr-1;
 }
 
 @tailwind utilities;

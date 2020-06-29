@@ -88,6 +88,20 @@ export default function TypeDesc({ doc, type, isArray, isReturnType }) {
             </span>
         );
     }
+    if (type.type === 'tuple') {
+        return (
+            <span className="text-blue-400">
+                [
+                {type.elements.map((t, i) => (
+                    <React.Fragment key={i}>
+                        <TypeDesc type={t} isArray />
+                        {i < type.elements.length - 1 && ', '}
+                    </React.Fragment>
+                ))}
+                ]
+            </span>
+        );
+    }
     if (type.type === 'union') {
         return <Union doc={doc} type={type} isArray={isArray} isReturnType={isReturnType} />;
     }
@@ -138,7 +152,7 @@ export default function TypeDesc({ doc, type, isArray, isReturnType }) {
     if (type.type === 'typeParameter' && typeArgs[type.name]) {
         return <TypeDesc type={typeArgs[type.name]} doc={doc} isReturnType={isReturnType} />;
     }
-    if (type.name === 'Record' && type?.typeArguments.length === 2) {
+    if (type.name === 'Record' && type?.typeArguments?.length === 2) {
         return <span className="text-blue-400">Object</span>;
     }
     if (type.name === 'Promise') {

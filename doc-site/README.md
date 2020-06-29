@@ -19,7 +19,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 -   Other comment tags you can use
     -   `@type-name MyOverride` - this replaces the type name with `MyOverride`. Useful when the typescript name is not suitable to display.
     -   `@expand-properties` - This expands each property of a type into it's own parameter on a function parameter table. If text is provided then the original name is also kept with a description matching this text. See `Form` for an example of this in use.
+    -   `@hide-properties` - Use this with `@expand-properties` to hide specific properties names. Separate each name with a space.
     -   `@menu-group` - This nests this item under this menu name. If not specified appears ungrouped under the package name.
+    -   `@forward-ref` - Indicate this function is used as a React.forwardRef. This allows doc site renderer to not document second `ref` parameter to the function as you don't pass it in yourself.
     
     
 ## Deployment
