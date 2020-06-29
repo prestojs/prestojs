@@ -1,5 +1,5 @@
-import React from 'react';
 import Highlight, { defaultProps } from 'prism-react-renderer';
+import React from 'react';
 import prismTheme from '../prismTheme';
 import CodeEditor from './CodeEditor';
 import useMdxScope from './useMdxScope';

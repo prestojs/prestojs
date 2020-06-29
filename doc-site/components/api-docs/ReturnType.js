@@ -1,5 +1,6 @@
 import React from 'react';
 import { expandProperties } from '../../util';
+import AnchorLink from '../AnchorLink';
 import MdxWrapper from './MdxWrapper';
 import ParameterTable from './ParameterTable';
 import TypeDesc from './TypeDesc';
@@ -9,6 +10,23 @@ const classTypeNames = ['ViewModelInterface'];
 export default function ReturnType({ signature }) {
     const returnTypes = [];
     const type = signature.type.referencedType?.().type || signature.type;
+    if (type.type === 'array' && type.elementType.type === 'union') {
+        const newTypes = type.elementType.types.map(t => ({
+            type: 'array',
+            elementType: t,
+        }));
+        return (
+            <ReturnType
+                signature={{
+                    ...signature,
+                    type: {
+                        type: 'union',
+                        types: newTypes,
+                    },
+                }}
+            />
+        );
+    }
     if (type.type === 'union') {
         const types = type.types;
         returnTypes.push(...types.map(t => [t, expandProperties(t, true)?.[1] || []]));
@@ -18,7 +36,9 @@ export default function ReturnType({ signature }) {
     }
     return (
         <div className="mt-5">
-            <h3>Returns</h3>
+            <AnchorLink id="return-type" Component="h3" className="text-4xl">
+                Returns
+            </AnchorLink>
             {returnTypes.length > 1 && <p className="my-5">One of the following:</p>}
             {returnTypes.map(([type, c], i) => {
                 let isConstructor = classTypeNames.includes(type.name);

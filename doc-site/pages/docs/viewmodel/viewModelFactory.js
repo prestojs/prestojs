@@ -57,10 +57,10 @@ export default function Doc({ docs, extraNodes }) {
                         sources: docs.viewModelFactory.sources,
                     }}
                 />
-                <p>
-                    A `ViewModel` class is created using the `viewModelFactory` function. The
-                    factory function is documented immediately below followed by the documentation
-                    for the generated class.
+                <p className="mdx">
+                    A <code>ViewModel</code> class is created using the{' '}
+                    <code>viewModelFactory</code> function. The factory function is documented
+                    immediately below followed by the documentation for the generated class.
                 </p>
                 <SignatureDoc
                     signature={

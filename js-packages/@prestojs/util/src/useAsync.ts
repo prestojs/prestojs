@@ -188,25 +188,17 @@ const comparisonByTrigger = {
  *
  * Fetch and render a specified github profile
  *
- * ```js
- * // we don't define this inside FollowerCount() because that will create a new function on
- * // every render, causing useAsync() to re-run and triggering an infinite render loop
- * function getGithubUser(user) {
- *   return fetch(`https://api.github.com/users/${user}`).then(r => {
- *      if (r.ok) {
- *          return r.json();
- *      }
- *      throw r;
- *   });
- * }
+ * ```js live horizontal
  * function FollowerCount() {
  *     const [user, setUser] = React.useState('octocat')
  *     const { response, isLoading, error, run, reset } = useAsync(() => getGithubUser(user));
  *     return (
  *         <div>
- *             <InputWidget value={user} onChange={e => setUser(e.target.value)} />
- *             <Button onClick={run} loading={isLoading}>Query follower count</Button>
- *             <Button onClick={reset}>Clear</Button>
+ *             <input value={user} onChange={e => setUser(e.target.value)} />
+ *             <div className="my-2 justify-between flex">
+ *             <button onClick={run} disabled={isLoading} className="btn-blue">Query follower count</button>
+ *             <button className="btn" onClick={reset}>Clear</button>
+ *             </div>
  *             {response && (
  *                 <p>
  *                     <img src={response.avatar_url} /><br />
@@ -217,7 +209,16 @@ const comparisonByTrigger = {
  *         </div>
  *     );
  * }
- * <FollowerCount />
+ * // we don't define this inside FollowerCount() because that will create a new function on
+ * // every render, causing useAsync() to re-run and triggering an infinite render loop
+ * function getGithubUser(user) {
+ *   return fetch(`https://api.github.com/users/${user}`).then(r => {
+ *      if (r.ok) {
+ *          return r.json();
+ *      }
+ *      throw r;
+ *   });
+ * }
  * ```
  * @param fn A function that returns a promise. When `trigger` is `MANUAL` this is only
  * called when you manually call the returned `run` function, otherwise it's called
