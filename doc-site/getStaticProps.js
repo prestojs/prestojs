@@ -6,17 +6,15 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import mdxComponents from './components/mdxComponents';
 
-const VISITED = Symbol.for('VISITED');
-
-function traverse(obj, fn) {
+function traverse(obj, fn, visitedTracker = new Map()) {
     if (!obj || typeof obj !== 'object') {
         return obj;
     }
-    if (obj[VISITED]) {
+    if (visitedTracker.has(obj)) {
         return obj;
     }
+    visitedTracker.set(obj, true);
 
-    obj[VISITED] = true;
     if (fn(obj)) {
         return obj;
     }
@@ -24,11 +22,11 @@ function traverse(obj, fn) {
         if (Array.isArray(value)) {
             for (const v of value) {
                 if (value && typeof value == 'object') {
-                    traverse(v, fn);
+                    traverse(v, fn, visitedTracker);
                 }
             }
         } else if (value && typeof value == 'object') {
-            traverse(value, fn);
+            traverse(value, fn, visitedTracker);
         }
     }
     return obj;
@@ -40,8 +38,9 @@ export function prepareDocs(docs, extraNodes) {
             obj.referencedType = () => extraNodes[obj.id];
         }
     };
-    traverse(docs, fn);
-    traverse(extraNodes, fn);
+    const visitedTracker = new Map();
+    traverse(docs, fn, visitedTracker);
+    traverse(extraNodes, fn, visitedTracker);
 }
 
 export default function getStaticProps(context, filter, transform = id => id) {
@@ -69,14 +68,21 @@ export default function getStaticProps(context, filter, transform = id => id) {
     }
     function transformComment(obj) {
         if (obj.comment && (obj.comment.shortText || obj.comment.text)) {
-            obj.mdx = ReactDOMServer.renderToStaticMarkup(
-                <MDXProvider components={{ ...mdxComponents, a: LinkWrapper }}>
-                    <div className="mdx">
-                        {obj.comment.shortText && <MDX>{obj.comment.shortText.trim()}</MDX>}
-                        {obj.comment.text && <MDX>{obj.comment.text.trim()}</MDX>}
-                    </div>
-                </MDXProvider>
-            );
+            if (/```.*live/.test(obj.comment.text || '')) {
+                obj.mdx = {
+                    live: true,
+                    ...obj.comment,
+                };
+            } else {
+                obj.mdx = ReactDOMServer.renderToStaticMarkup(
+                    <MDXProvider components={{ ...mdxComponents, a: LinkWrapper }}>
+                        <div className="mdx">
+                            {obj.comment.shortText && <MDX>{obj.comment.shortText.trim()}</MDX>}
+                            {obj.comment.text && <MDX>{obj.comment.text.trim()}</MDX>}
+                        </div>
+                    </MDXProvider>
+                );
+            }
         }
         if (obj.comment && obj.comment.returns) {
             obj.mdxReturns = ReactDOMServer.renderToStaticMarkup(
@@ -88,18 +94,20 @@ export default function getStaticProps(context, filter, transform = id => id) {
             );
         }
     }
+    const visitedTracker = new Map();
     function transformObj(obj) {
         transformComment(obj);
         if (obj.type === 'reference' && !extraNodes[obj.id] && obj.id && byId[obj.id]) {
             extraNodes[obj.id] = byId[obj.id];
-            traverse(byId[obj.id], transformObj);
+            traverse(byId[obj.id], transformObj, visitedTracker);
         }
     }
-    const docs = transform(items.map(item => traverse(item, transformObj)));
+    const docs = transform(items.map(item => traverse(item, transformObj, visitedTracker)));
     return {
         props: {
             docs,
             extraNodes,
+            slug: context.params?.slug.join('/') || null,
         }, // will be passed to the page component as props
     };
 }

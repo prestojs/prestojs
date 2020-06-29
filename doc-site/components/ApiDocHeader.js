@@ -16,8 +16,10 @@ function CopyToClipboard({ text }) {
     );
 }
 
-export default function ApiDocHeader({ doc }) {
-    const importString = `import { ${doc.name} } from \"@prestojs/${doc.packageName}\";`;
+export default function ApiDocHeader({ doc, isType = false }) {
+    const importString = `import ${isType ? 'type ' : ' '}{ ${doc.name} } from \"@prestojs/${
+        doc.packageName
+    }\";`;
     return (
         <>
             <h1 className="text-3xl flex justify-between items-center">

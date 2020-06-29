@@ -42,6 +42,8 @@ function extractChildren(node) {
     }
     const paramTags = {};
     let returnTagText;
+    let docClass;
+    let isForwardRef = false;
     if (comment && comment.tags) {
         const tagsByName = comment.tags.reduce((acc, tag) => {
             acc[tag.tag] = tag.text.trim();
@@ -54,9 +56,13 @@ function extractChildren(node) {
             return acc;
         }, {});
         extractDocs = 'extract-docs' in tagsByName;
+        docClass = tagsByName['doc-class'];
         menuGroup = tagsByName['menu-group'] || 'default';
+        isForwardRef = 'forward-ref' in tagsByName;
         comment.tagsByName = tagsByName;
     }
+    rest.isForwardRef = isForwardRef;
+    rest.docClass = docClass;
     rest.extractDocs = extractDocs;
     rest.menuGroup = menuGroup;
     // Hacky workaround to get param descriptions for function type aliases
@@ -140,6 +146,9 @@ updateObjects(byId, obj => {
             acc[tag.tag] = tag.text.trim();
             if (acc[tag.tag] === '') {
                 acc[tag.tag] = true;
+            }
+            if (tag.tag === 'hide-properties') {
+                acc[tag.tag] = tag.text.trim().split(' ');
             }
             if (tag.tag === 'expand-properties' && acc[tag.tag] !== true) {
                 // Hack to have mdx transform work on it
