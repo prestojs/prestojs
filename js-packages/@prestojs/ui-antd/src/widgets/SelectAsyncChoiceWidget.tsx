@@ -353,7 +353,7 @@ function SelectAsyncChoiceWidget<
                 extraOptions.push(labeledValue);
             }
         }
-    } else if (rawValue != null) {
+    } else if (rawValue != null && rawValue !== '') {
         value = getLabeledValue<T, any>({
             rawValue: rawValue as T,
             allItems: flattenedItems,
