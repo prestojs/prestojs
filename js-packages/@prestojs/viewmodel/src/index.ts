@@ -37,13 +37,17 @@ import type {
     FieldDataMapping,
     FieldDataMappingRaw,
     FieldsMapping,
+    PartialViewModel,
     ViewModelConstructor,
     ViewModelInterface,
+    ViewModelValues,
 } from './ViewModelFactory';
 
 export type {
     ViewModelInterface,
     ViewModelConstructor,
+    ViewModelValues,
+    PartialViewModel,
     FieldProps,
     FieldsMapping,
     FieldDataMapping,

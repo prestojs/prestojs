@@ -1,8 +1,10 @@
+import { isDev } from './util';
 import {
     FieldDataMappingRaw,
     isViewModelInstance,
+    PartialViewModel,
     PrimaryKey,
-    ViewModelInterface,
+    ViewModelConstructor,
 } from './ViewModelFactory';
 
 /**
@@ -12,7 +14,7 @@ import {
  * have to check if the _assignedFields is what we expect and then clone - it's easier and faster
  * to just check if it's an instanceof RecordPointer
  */
-class RecordPointer<T extends ViewModelInterface<any, any>> {
+class RecordPointer<ViewModelClassType extends ViewModelConstructor<any, any, any>> {
     /**
      * This is the value that was replaced by this pointer in the cache. When we actually clone
      * the record we compare against this value - if it's the same we return the original object
@@ -23,9 +25,16 @@ class RecordPointer<T extends ViewModelInterface<any, any>> {
      * RecordPointer as that would be lower than doing it lazily - especially if you are updating
      * lots of records)
      */
-    currentCachedRecord?: null | T;
-    record: T;
-    constructor(currentCachedValue: null | undefined | T | RecordPointer<T>, record: T) {
+    currentCachedRecord?: null | InstanceType<ViewModelClassType>;
+    record: InstanceType<ViewModelClassType>;
+    constructor(
+        currentCachedValue:
+            | null
+            | undefined
+            | InstanceType<ViewModelClassType>
+            | RecordPointer<ViewModelClassType>,
+        record: InstanceType<ViewModelClassType>
+    ) {
         this.currentCachedRecord =
             currentCachedValue instanceof RecordPointer
                 ? currentCachedValue.currentCachedRecord
@@ -33,22 +42,27 @@ class RecordPointer<T extends ViewModelInterface<any, any>> {
         this.record = record;
     }
 
-    clone(fieldNames: string[]): T {
+    clone(
+        fieldNames: readonly (keyof ViewModelClassType['fields'])[]
+    ): PartialViewModel<ViewModelClassType, typeof fieldNames[number]> {
         // First clone existing record as list of field names may be a subset. When we compare
         // values below we need to only compare the specified fields.
         const cloned = this.record.clone(fieldNames);
         // Check if the value has actually changed from what it used to be. If not we can return
         // the old value so that equality checks still hold.
         if (this.currentCachedRecord && cloned.isEqual(this.currentCachedRecord)) {
-            return this.currentCachedRecord;
+            return this.currentCachedRecord as PartialViewModel<
+                ViewModelClassType,
+                typeof fieldNames[number]
+            >;
         }
-        return cloned;
+        return cloned as PartialViewModel<ViewModelClassType, typeof fieldNames[number]>;
     }
 }
 
-function isEqual<T extends ViewModelInterface<any, any>>(
-    a: null | T | RecordPointer<T>,
-    b: null | T | RecordPointer<T>
+function isEqual<T extends ViewModelConstructor<any, any, any>>(
+    a: null | InstanceType<T> | RecordPointer<T>,
+    b: null | InstanceType<T> | RecordPointer<T>
 ): boolean {
     if (a == null || b == null) {
         return a === b;
@@ -105,7 +119,7 @@ type AllChangesListener = () => void;
 // ['a', 'b', 'c'] becomes 'a⁞b⁞c'
 const CACHE_KEY_FIELD_SEPARATOR = '⁞';
 
-function getFieldNameCacheKey(fieldNames: string[], excludeFields: string[]): string {
+function getFieldNameCacheKey(fieldNames: readonly string[], excludeFields: string[]): string {
     // primary key field names are implicit; never include them in the key itself
     const f = fieldNames.filter(name => !excludeFields.includes(name));
     f.sort();
@@ -136,16 +150,19 @@ function getFieldNameCacheKey(fieldNames: string[], excludeFields: string[]): st
  *    and return it.
  * 4) Otherwise we return null
  **/
-class RecordCache<T extends ViewModelInterface<any, any>> {
-    viewModel: T['_model'];
+class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>> {
+    viewModel: ViewModelClassType;
     pkFieldNames: string[];
-    cache: Map<FieldNameCacheKey, T | RecordPointer<T>>;
-    cacheListeners: Map<FieldNameCacheKey, ChangeListener<T>[]>;
+    cache: Map<
+        FieldNameCacheKey,
+        InstanceType<ViewModelClassType> | RecordPointer<ViewModelClassType>
+    >;
+    cacheListeners: Map<FieldNameCacheKey, ChangeListener<InstanceType<ViewModelClassType>>[]>;
     latestRecords: { [fieldsKey: string]: number };
     counter = 0;
     onAnyChange: () => void;
 
-    constructor(viewModel: T['_model'], onAnyChange: () => void) {
+    constructor(viewModel: ViewModelClassType, onAnyChange: () => void) {
         this.cache = new Map();
         this.cacheListeners = new Map();
         this.latestRecords = {};
@@ -157,8 +174,8 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
     /**
      * Return the key to use into `cache` for the specified field names
      */
-    private getCacheKey(fieldNames: string[]): string {
-        return getFieldNameCacheKey(fieldNames, this.pkFieldNames);
+    private getCacheKey(fieldNames: readonly (keyof ViewModelClassType['fields'])[]): string {
+        return getFieldNameCacheKey(fieldNames as string[], this.pkFieldNames);
     }
 
     /**
@@ -173,8 +190,8 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
      */
     private setValueForKey(
         key,
-        value: T | RecordPointer<T> | null
-    ): Map<string, T | RecordPointer<T>> | null {
+        value: InstanceType<ViewModelClassType> | RecordPointer<ViewModelClassType> | null
+    ): Map<string, InstanceType<ViewModelClassType> | RecordPointer<ViewModelClassType>> | null {
         let before = this.cache.get(key) || null;
         let ret;
         if (this.cacheListeners.has(key)) {
@@ -238,7 +255,9 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
      * a superset of fields, ie. updating fields (a,b) won't update a record
      * that contains (a,b,c)
      */
-    add(record: T): Map<string, T | RecordPointer<T>> | null {
+    add(
+        record: InstanceType<ViewModelClassType>
+    ): Map<string, InstanceType<ViewModelClassType> | RecordPointer<ViewModelClassType>> | null {
         const fieldNames = record._assignedFields as string[];
         const fieldsKey = this.getCacheKey(fieldNames);
         this.latestRecords[fieldsKey] = this.counter++;
@@ -266,7 +285,9 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
     /**
      * Get the cached record for the specified field names
      */
-    get(fieldNames: string[]): T | null {
+    get(
+        fieldNames: readonly (keyof ViewModelClassType['fields'])[]
+    ): PartialViewModel<ViewModelClassType, typeof fieldNames[number]> | null {
         const fieldsKey = this.getCacheKey(fieldNames);
         if (!this.cache.has(fieldsKey)) {
             // No cache entries exist but there may be cached records that
@@ -283,11 +304,16 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
                     continue;
                 }
                 const underlyingRecord = record instanceof RecordPointer ? record.record : record;
-                if (isSubset(fieldNames, underlyingRecord._assignedFields as string[])) {
+                if (
+                    isSubset(fieldNames as string[], underlyingRecord._assignedFields as string[])
+                ) {
                     // Create a new record with subset of fields and cache
                     // it so that we maintain object equality if you fetch
                     // this entry from the cache multiple times
-                    const newRecord = record.clone(fieldNames);
+                    const newRecord = record.clone(fieldNames) as PartialViewModel<
+                        ViewModelClassType,
+                        typeof fieldNames[number]
+                    >;
                     this.setValueForKey(fieldsKey, newRecord);
                     return newRecord;
                 }
@@ -303,7 +329,13 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
             this.setValueForKey(fieldsKey, record);
             return record;
         }
-        return recordOrPointer || null;
+        if (recordOrPointer) {
+            return recordOrPointer as PartialViewModel<
+                ViewModelClassType,
+                typeof fieldNames[number]
+            >;
+        }
+        return null;
     }
 
     /**
@@ -311,7 +343,7 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
      *
      * Returns true if anything was deleted otherwise false
      */
-    delete(fieldNames?: string[]): boolean {
+    delete(fieldNames?: readonly (keyof ViewModelClassType['fields'])[]): boolean {
         if (!fieldNames) {
             let anyDeleted = false;
             for (const key of this.cache.keys()) {
@@ -340,7 +372,10 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
      * @param fieldNames field names to listen to any changes for
      * @param listener Function to call with any changes
      */
-    addListener(fieldNames: string[], listener: ChangeListener<T>): ChangeListenerUnsubscribe {
+    addListener(
+        fieldNames: readonly (keyof ViewModelClassType['fields'])[],
+        listener: ChangeListener<InstanceType<ViewModelClassType>>
+    ): ChangeListenerUnsubscribe {
         const fieldsKey = this.getCacheKey(fieldNames);
         let listeners = this.cacheListeners.get(fieldsKey);
         if (!listeners) {
@@ -439,14 +474,16 @@ class RecordCache<T extends ViewModelInterface<any, any>> {
  * @extract-docs
  * @menu-group Caching
  */
-export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
-    cache: Map<PrimaryKeyCacheKey, RecordCache<T>>;
-    viewModel: T['_model'];
+export default class ViewModelCache<
+    ViewModelClassType extends ViewModelConstructor<any, any, any>
+> {
+    cache: Map<PrimaryKeyCacheKey, RecordCache<ViewModelClassType>>;
+    viewModel: ViewModelClassType;
 
     /**
      * @param viewModel The `ViewModel` this class is for
      */
-    constructor(viewModel: T['_model']) {
+    constructor(viewModel: ViewModelClassType) {
         this.viewModel = viewModel;
         this.cache = new Map();
     }
@@ -463,7 +500,7 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
         return pk;
     }
 
-    private isInstanceOfModel(a: any): a is T {
+    private isInstanceOfModel(a: any): a is InstanceType<ViewModelClassType> {
         return a instanceof this.viewModel;
     }
 
@@ -479,23 +516,44 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
      * in which case each entry in the array will be converted to the view model if required
      * and returned.
      */
-    add(
+    add<T extends InstanceType<ViewModelClassType>>(recordOrData: T): T;
+    add<T extends InstanceType<ViewModelClassType>>(recordOrData: T[]): T[];
+    add<FieldNames extends keyof ViewModelClassType['fields']>(
+        recordOrData: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>
+    ): PartialViewModel<ViewModelClassType, FieldNames>;
+    add<FieldNames extends keyof ViewModelClassType['fields']>(
+        recordOrData: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>[]
+    ): PartialViewModel<ViewModelClassType, FieldNames>[];
+    add<
+        T extends InstanceType<ViewModelClassType>,
+        FieldNames extends keyof ViewModelClassType['fields']
+    >(
         recordOrData:
             | T
-            | FieldDataMappingRaw<T['__instanceFieldMappingType']>
-            | (T | FieldDataMappingRaw<T['__instanceFieldMappingType']>)[]
-    ): T | T[] {
+            | FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>
+            | (T | FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>)[]
+    ):
+        | T
+        | T[]
+        | PartialViewModel<ViewModelClassType, FieldNames>
+        | PartialViewModel<ViewModelClassType, FieldNames>[] {
         if (Array.isArray(recordOrData)) {
             return this.addList(recordOrData);
         }
-        let record: T;
+        let record: InstanceType<ViewModelClassType>;
         if (!this.isInstanceOfModel(recordOrData)) {
             if (isViewModelInstance(recordOrData)) {
                 throw new Error(
-                    `Attempted to cache ViewModel of type ${recordOrData._model} in cache for ${this.viewModel}`
+                    `Attempted to cache ViewModel of type ${recordOrData._model} in cache for ${
+                        this.viewModel
+                    }. ${
+                        isDev()
+                            ? ' If you are using hot loading this can cause instanceof checks to fail when the class is recreated - if this is the case a hard refresh should resolve the issue.'
+                            : ''
+                    }`
                 );
             }
-            record = new this.viewModel(recordOrData) as T;
+            record = new this.viewModel(recordOrData) as InstanceType<ViewModelClassType>;
         } else {
             record = recordOrData;
         }
@@ -521,10 +579,21 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
      * notified once of the change to the list rather than for
      * each record in the list.
      */
-    addList(records: (T | FieldDataMappingRaw<T['__instanceFieldMappingType']>)[]): T[] {
+    addList<T extends InstanceType<ViewModelClassType>>(records: T[]): T[];
+    addList<FieldNames extends keyof ViewModelClassType['fields']>(
+        records: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>[]
+    ): PartialViewModel<ViewModelClassType, FieldNames>[];
+    addList<
+        T extends InstanceType<ViewModelClassType>,
+        FieldNames extends keyof ViewModelClassType['fields']
+    >(
+        records: (T | FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>)[]
+    ): (T | PartialViewModel<ViewModelClassType, FieldNames>)[] {
         this.isAddingList = true;
         try {
-            const ret = records.map(record => this.add(record)) as T[];
+            const ret = records.map(record => this.add(record)) as InstanceType<
+                ViewModelClassType
+            >[];
             this.isAddingList = false;
             this.onAddingListDone.forEach(cb => cb());
             this.onAddingListDone = [];
@@ -543,7 +612,7 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
      *
      * @returns The cached record or null if none found
      */
-    get(record: T): T | null;
+    get<T extends InstanceType<ViewModelClassType>>(record: T): T | null;
     /**
      * Get a record with the specified `fieldNames` set from the cache
      *
@@ -552,17 +621,27 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
      *
      * @returns The cached record or null if none found
      */
-    get(pk: PrimaryKey, fieldNames: string[]): T | null;
-    get(pkOrRecord: PrimaryKey | T, fieldNames?: string[]): T | null {
+    get<FieldNames extends keyof ViewModelClassType['fields']>(
+        pk: PrimaryKey,
+        fieldNames: readonly FieldNames[]
+    ): PartialViewModel<ViewModelClassType, FieldNames> | null;
+    get<
+        FieldNames extends keyof ViewModelClassType['fields'],
+        T extends InstanceType<ViewModelClassType>
+    >(pkOrRecord: PrimaryKey | T, fieldNames?: readonly FieldNames[]): T | null {
         let pk = pkOrRecord;
         if (isViewModelInstance(pk)) {
             const { _model } = pk;
             if (!this.isInstanceOfModel(pk)) {
                 throw new Error(
-                    `Attempted to get ViewModel of type ${_model} in cache for ${this.viewModel}`
+                    `Attempted to get ViewModel of type ${_model} in cache for ${this.viewModel}.${
+                        isDev()
+                            ? ' If you are using hot loading this can cause instanceof checks to fail when the class is recreated - if this is the case a hard refresh should resolve the issue.'
+                            : ''
+                    }`
                 );
             }
-            fieldNames = pk._assignedFields as string[];
+            fieldNames = pk._assignedFields as FieldNames[];
             pk = pk._pk;
         }
         if (!fieldNames) {
@@ -610,7 +689,11 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
      * @param removeNulls whether to remove entries that have no record in the cache. Defaults to true.
      * @returns an array of the cached records. Any records not found will be in the array as a null value if `removeNulls` is false otherwise they will be removed.
      **/
-    getList(records: T[], removeNulls?: boolean): (T | null)[];
+    getList<T extends InstanceType<ViewModelClassType>>(records: T[], removeNulls: true): T[];
+    getList<T extends InstanceType<ViewModelClassType>>(
+        records: T[],
+        removeNulls?: false
+    ): (T | null)[];
     /**
      * Get a list of records with the specified `fieldNames` set from the cache
      *
@@ -622,19 +705,26 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
      * @param removeNulls whether to remove entries that have no record in the cache. Defaults to true.
      * @returns an array of the cached records. Any records not found will be in the array as a null value if `removeNulls` is false otherwise they will be removed.
      */
-    getList(pks: PrimaryKey[], fieldNames: string[], removeNulls?: boolean): (T | null)[];
-    getList(
-        pksOrRecords: PrimaryKey[],
-        fieldNames?: string[] | boolean,
+    getList<FieldNames extends keyof ViewModelClassType['fields']>(
+        pks: PrimaryKey[],
+        fieldNames: readonly FieldNames[],
+        removeNulls?: boolean
+    ): (PartialViewModel<ViewModelClassType, FieldNames> | null)[];
+    getList<
+        FieldNames extends keyof ViewModelClassType['fields'],
+        T extends InstanceType<ViewModelClassType>
+    >(
+        pksOrRecords: (T | PrimaryKey)[],
+        fieldNames?: readonly FieldNames[] | boolean,
         removeNulls = true
     ): (T | null)[] {
         if (pksOrRecords.length === 0) {
             return [];
         }
-        let records: (T | null)[] = [];
-        if (!Array.isArray(fieldNames)) {
+        let records: (InstanceType<ViewModelClassType> | null)[] = [];
+        if (!fieldNames || fieldNames === true) {
             removeNulls = fieldNames == null ? true : fieldNames;
-            records = pksOrRecords.map(record => this.get(record as T));
+            records = (pksOrRecords as T[]).map(record => this.get(record));
         } else {
             for (const pk of pksOrRecords) {
                 records.push(this.get(pk, fieldNames));
@@ -646,7 +736,7 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
         return records;
     }
 
-    _lastAllRecords: Map<string, T[]> = new Map();
+    _lastAllRecords: Map<string, PartialViewModel<ViewModelClassType, any>[]> = new Map();
 
     /**
      * Get all records in the cache for the specified field names. This acts like `getList` but returns
@@ -657,14 +747,25 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
      *
      * @param fieldNames List of field names to return records for
      */
-    getAll(fieldNames: string[]): T[] {
-        const records: T[] = [];
+    getAll<FieldNames extends keyof ViewModelClassType['fields']>(
+        fieldNames: readonly FieldNames[]
+    ): PartialViewModel<ViewModelClassType, FieldNames>[] {
+        const records: PartialViewModel<ViewModelClassType, FieldNames>[] = [];
         let isSame = true;
         let index = 0;
-        const key = getFieldNameCacheKey(fieldNames, this.viewModel.pkFieldNames);
-        const lastRecords = this._lastAllRecords.get(key) || [];
+        const key = getFieldNameCacheKey(
+            fieldNames as readonly string[],
+            this.viewModel.pkFieldNames
+        );
+        const lastRecords = (this._lastAllRecords.get(key) || []) as PartialViewModel<
+            ViewModelClassType,
+            FieldNames
+        >[];
         for (const cacheValue of this.cache.values()) {
-            const record = cacheValue.get(fieldNames);
+            const record = cacheValue.get(fieldNames) as PartialViewModel<
+                ViewModelClassType,
+                FieldNames
+            >;
             if (record) {
                 records.push(record);
                 if (index > lastRecords.length - 1 || lastRecords[index] !== record) {
@@ -691,7 +792,7 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
      *
      * @returns true if anything was removed, false otherwise
      */
-    delete(pk: PrimaryKey, fieldNames?: string[]): boolean {
+    delete(pk: PrimaryKey, fieldNames?: readonly (keyof ViewModelClassType['fields'])[]): boolean {
         const pkKey = this.getPkCacheKey(pk);
         const recordCache = this.cache.get(pkKey);
         if (!recordCache) {
@@ -733,15 +834,22 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
      * @param listener Function to call with any changes
      * @returns A function that removes the listener
      */
-    addListener(
-        pkOrPks: PrimaryKey | PrimaryKey[],
-        fieldNames: string[],
-        listener: MultiChangeListener<T> | ChangeListener<T>
+    addListener<FieldNames extends keyof ViewModelClassType['fields']>(
+        pkOrPks: PrimaryKey,
+        fieldNames: FieldNames[],
+        listener: ChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>
     ): ChangeListenerUnsubscribe;
-    addListener(
+    addListener<FieldNames extends keyof ViewModelClassType['fields']>(
+        pkOrPks: PrimaryKey[],
+        fieldNames: FieldNames[],
+        listener: MultiChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>
+    ): ChangeListenerUnsubscribe;
+    addListener<FieldNames extends keyof ViewModelClassType['fields']>(
         pkOrPksOrListener: PrimaryKey | PrimaryKey[] | (() => void),
-        fieldNames?: string[],
-        listener?: MultiChangeListener<T> | ChangeListener<T>
+        fieldNames?: FieldNames[],
+        listener?:
+            | MultiChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>
+            | ChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>
     ): ChangeListenerUnsubscribe {
         if (typeof pkOrPksOrListener == 'function') {
             this.allChangeListeners.push(pkOrPksOrListener);
@@ -754,7 +862,10 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
             };
         }
         if (!fieldNames) {
-            throw new Error('If primary key(s) are specified fieldNames msut also be specified');
+            throw new Error('If primary key(s) are specified fieldNames must also be specified');
+        }
+        if (!listener) {
+            throw new Error('Listener function must be provided');
         }
         const pkOrPks: PrimaryKey | PrimaryKey[] = pkOrPksOrListener;
         if (Array.isArray(pkOrPks)) {
@@ -765,7 +876,7 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
                 // function overload but doesn't seem to be possible to narrow
                 // to type of the function to differentiate between ChangeListener
                 // and MultiChangeListener
-                (listener as unknown) as MultiChangeListener<T>
+                listener as MultiChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>
             );
         }
         const pkKey = this.getPkCacheKey(pkOrPks);
@@ -774,13 +885,16 @@ export default class ViewModelCache<T extends ViewModelInterface<any, any>> {
             recordCache = new RecordCache(this.viewModel, this.onAnyChange.bind(this));
             this.cache.set(pkKey, recordCache);
         }
-        return recordCache.addListener(fieldNames, (listener as unknown) as ChangeListener<T>);
+        return recordCache.addListener(
+            fieldNames,
+            listener as ChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>
+        );
     }
 
-    addListenerList(
+    addListenerList<FieldNames extends keyof ViewModelClassType['fields']>(
         pks: PrimaryKey[],
-        fieldNames: string[],
-        listener: MultiChangeListener<T>
+        fieldNames: FieldNames[],
+        listener: MultiChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>
     ): ChangeListenerUnsubscribe {
         let previous = pks.map(pk => this.get(pk, fieldNames));
         let onDoneCallback;

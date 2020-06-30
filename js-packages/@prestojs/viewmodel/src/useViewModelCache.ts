@@ -1,9 +1,9 @@
 import { useLayoutEffect, useReducer, useRef } from 'react';
 
 import ViewModelCache from './ViewModelCache';
-import { ViewModelInterface } from './ViewModelFactory';
+import { ViewModelConstructor } from './ViewModelFactory';
 
-type Selector<T extends ViewModelInterface<any, any>, ResultType> = (
+type Selector<T extends ViewModelConstructor<any, any>, ResultType> = (
     cache: ViewModelCache<T>
 ) => ResultType;
 
@@ -32,8 +32,8 @@ type Selector<T extends ViewModelInterface<any, any>, ResultType> = (
  * @extract-docs
  * @menu-group Caching
  */
-export default function useViewModelCache<T extends ViewModelInterface<any, any>, ResultType>(
-    viewModel: T['_model'],
+export default function useViewModelCache<T extends ViewModelConstructor<any>, ResultType>(
+    viewModel: T,
     selector: Selector<T, ResultType>
 ): ResultType {
     // Implementation is based on https://github.com/reduxjs/react-redux/blob/master/src/hooks/useSelector.js
