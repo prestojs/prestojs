@@ -828,7 +828,9 @@ export default function viewModelFactory<T extends FieldsMapping>(
                         );
                     }
                     pkFieldName.forEach((fieldName, i) => {
-                        extraFields[fieldName] = pkField[i];
+                        if (!modelClass.prototype.hasOwnProperty(fieldName)) {
+                            extraFields[fieldName] = pkField[i];
+                        }
                     });
                 } else {
                     if (Array.isArray(pkFieldName) || Array.isArray(pkField)) {
@@ -836,7 +838,9 @@ export default function viewModelFactory<T extends FieldsMapping>(
                             `When defining a compound key both the name and field definition must be an array. Received ${pkFieldName} and ${pkField}.`
                         );
                     }
-                    extraFields[pkFieldName] = pkField;
+                    if (!modelClass.prototype.hasOwnProperty(pkFieldName)) {
+                        extraFields[pkFieldName] = pkField;
+                    }
                 }
                 if (Object.keys(extraFields).length > 0) {
                     Object.keys(extraFields).map(fieldName => {
