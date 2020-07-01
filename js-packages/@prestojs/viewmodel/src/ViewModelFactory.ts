@@ -56,18 +56,16 @@ export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
  */
 export type ViewModelInterface<
     FieldMappingType extends FieldsMapping,
-    IncomingData extends FieldDataMappingRaw<FieldMappingType>,
+    // The field names that actually have data
+    FieldNames extends keyof FieldMappingType,
     PkFieldType extends string | string[] = string | string[],
     PkType extends PrimaryKey = PrimaryKey
 > = {
-    readonly [K in Extract<
-        keyof IncomingData,
-        keyof FieldMappingType
-    >]: FieldMappingType[K]['__fieldValueType'];
+    readonly [K in FieldNames]: FieldMappingType[K]['__fieldValueType'];
 } & {
     /** @private */
     __instanceFieldMappingType: {
-        [k in Extract<keyof IncomingData, keyof FieldMappingType>]: FieldMappingType[k];
+        [k in FieldNames]: FieldMappingType[k];
     };
     /**
      * Get the actual ViewModel class for this instance
@@ -85,14 +83,14 @@ export type ViewModelInterface<
      *   considered different even if the common fields are the same and other fields are
      *   all null
      */
-    isEqual(record: ViewModelInterface<FieldMappingType, IncomingData> | null): boolean;
+    isEqual(record: ViewModelInterface<any, any> | null): boolean;
 
     /**
      * Clone this record, optionally with only a subset of the fields
      */
-    clone(
-        fieldNames?: string[]
-    ): ViewModelInterface<FieldMappingType, IncomingData, PkFieldType, PkType>;
+    clone<CloneFieldNames extends keyof FieldMappingType>(
+        fieldNames?: readonly CloneFieldNames[]
+    ): ViewModelInterface<FieldMappingType, CloneFieldNames, PkFieldType, PkType>;
 
     /**
      * Access record bound fields. A record bound field is a normal field with it's `value` property
@@ -112,7 +110,7 @@ export type ViewModelInterface<
      * @type-name Object
      */
     readonly _f: {
-        readonly [K in Extract<keyof IncomingData, keyof FieldMappingType>]: RecordBoundField<
+        readonly [K in FieldNames]: RecordBoundField<
             FieldMappingType[K]['__fieldValueType'],
             FieldMappingType[K]['__parsableValueType']
         >;
@@ -131,10 +129,7 @@ export type ViewModelInterface<
      * @type-name Object
      */
     readonly _data: {
-        [k in Extract<
-            keyof IncomingData,
-            keyof FieldMappingType
-        >]: FieldMappingType[k]['__fieldValueType'];
+        [k in FieldNames]: FieldMappingType[k]['__fieldValueType'];
     };
 
     /**
@@ -142,7 +137,7 @@ export type ViewModelInterface<
      *
      * @type-name string[]
      */
-    readonly _assignedFields: (keyof FieldMappingType)[];
+    readonly _assignedFields: FieldNames[];
 };
 
 /**
@@ -157,13 +152,42 @@ export interface ViewModelConstructor<
     __pkFieldType: PkFieldType;
     /** @private */
     __pkType: PkType;
-    new <
-        IncomingData extends FieldDataMappingRaw<FieldMappingType> = FieldDataMappingRaw<
-            FieldMappingType
-        >
-    >(
-        data: IncomingData
-    ): ViewModelInterface<FieldMappingType, IncomingData, PkFieldType, PkType>;
+    new <FieldNames extends keyof FieldMappingType>(
+        data: { [K in FieldNames]: FieldMappingType[K]['__parsableValueType'] }
+    ): ViewModelInterface<FieldMappingType, FieldNames, PkFieldType, PkType>;
+
+    // This is necessary for when the base class is extended so that it still conforms to
+    // ViewModelConstructor - without this there will be no matching type (for some reason?)
+    // due to `IncomingData`. It's important to fix this otherwise anywhere that accepts
+    // ViewModelConstructor will fail to accept anything that extends a class created with
+    // viewModelFactory by default.
+    //
+    // I don't fully understand why. This means that for a class
+    // that extends the base class you won't get proper types for partial records. For example:
+    // const A = viewModelFactory({
+    //     name: new Field<string>(),
+    //     age: new Field<number>(),
+    // });
+    //
+    // const a1 = new A({ name: 'test' });
+    // // Error: Property 'age' does not exist on type ...
+    // a1.age;
+    // class B extends A {}
+    // const a2 = new B({ name: 'test' });
+    // // No error, all known fields are valid:
+    // a2.age
+    //
+    // You can fix it with:
+    // const C: ViewModelConstructor<any> = B;
+    // const a3 = new C({ name: 'test' });
+    // Error: Property 'age' does not exist on type ...
+    // a3.age
+    new (data: FieldDataMappingRaw<FieldMappingType>): ViewModelInterface<
+        FieldMappingType,
+        keyof FieldMappingType,
+        PkFieldType,
+        PkType
+    >;
 
     /**
      * The bound fields for this ViewModel. These will match the `fields` passed in to `ViewModel` with the
@@ -233,7 +257,7 @@ export interface ViewModelConstructor<
      * }
      * ```
      */
-    cache: ViewModelCache<ViewModelInterface<any, any>>;
+    cache: ViewModelCache<this>;
 
     /**
      * Create a new class that extends this class with the additional specified fields. To remove a
@@ -661,9 +685,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
             },
         },
         isEqual: {
-            value(
-                record: ViewModelInterface<FieldsMapping, { [fieldName: string]: any }> | null
-            ): boolean {
+            value(record: ViewModelInterface<FieldsMapping, any> | null): boolean {
                 if (!record) {
                     return false;
                 }
@@ -683,9 +705,9 @@ export default function viewModelFactory<T extends FieldsMapping>(
             },
         },
         clone: {
-            value(
-                fieldNames?: string[]
-            ): ViewModelInterface<FinalFields, FinalFields, PkFieldType, PkValueType> {
+            value<CloneFieldNames extends keyof FinalFields>(
+                fieldNames?: CloneFieldNames[]
+            ): ViewModelInterface<FinalFields, CloneFieldNames, PkFieldType, PkValueType> {
                 const missingFieldNames = fieldNames
                     ? fieldNames.filter(fieldName => !this._assignedFields.includes(fieldName))
                     : [];
@@ -699,13 +721,13 @@ export default function viewModelFactory<T extends FieldsMapping>(
                     );
                 }
                 if (!fieldNames) {
-                    fieldNames = this._assignedFields as string[];
+                    fieldNames = this._assignedFields;
                 }
 
-                const data = {};
-                for (const fieldName of fieldNames) {
+                const data: Record<string, any> = {};
+                for (const fieldName of fieldNames as CloneFieldNames[]) {
                     // TODO: Unclear to me if this needs to call a method on the Field on not. Revisit this.
-                    data[fieldName] = this[fieldName];
+                    data[fieldName as string] = this[fieldName];
                 }
 
                 // Always clone primary keys
@@ -873,7 +895,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
         __cache: {
             value: new Map<
                 ViewModelConstructor<FinalFields>,
-                ViewModelCache<ViewModelInterface<any, any>>
+                ViewModelCache<ViewModelConstructor<FinalFields, PkFieldType, PkValueType>>
             >(),
         },
         pkFieldNames: {
@@ -907,7 +929,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
             },
         },
         cache: {
-            get(): ViewModelCache<ViewModelInterface<any, any>> {
+            get(): ViewModelCache<ViewModelConstructor<FinalFields, PkFieldType, PkValueType>> {
                 // This is a getter so we can instantiate cache on each ViewModel independently without
                 // having to have the descendant create the cache
                 let cache = this.__cache.get(this);
@@ -917,7 +939,9 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 }
                 return cache;
             },
-            set(value: ViewModelCache<ViewModelInterface<any, any>>): void {
+            set(
+                value: ViewModelCache<ViewModelConstructor<FinalFields, PkFieldType, PkValueType>>
+            ): void {
                 if (!(value instanceof ViewModelCache)) {
                     throw new Error(
                         `cache class must extend ViewModelCache. See ${this.name}.cache`
@@ -960,3 +984,46 @@ export default function viewModelFactory<T extends FieldsMapping>(
     _Base.augment = augment;
     return (_Base as Function) as ViewModelConstructor<FinalFields, PkFieldType, PkValueType>;
 }
+
+/**
+ * Type to describe values of an instance of ViewModel
+ *
+ * Usage:
+ *
+ * ```ts
+ * const Person = viewModelFactory({
+ *   name: new Field<string>(),
+ *   age: new Field<number>(),
+ * });
+ * type PersonValues = ViewModelValues<typeof Person>;
+ * ```
+ */
+export type ViewModelValues<
+    T extends ViewModelConstructor<any>,
+    FieldNames extends keyof T['fields'] = keyof T['fields'],
+    OptionalFieldNames extends keyof T['fields'] = keyof T['fields']
+> = {
+    [K in Extract<keyof T['fields'], FieldNames>]: T['fields'][K]['__fieldValueType'];
+} &
+    {
+        [K in Extract<keyof T['fields'], OptionalFieldNames>]?: T['fields'][K]['__fieldValueType'];
+    };
+
+/**
+ * Type to describe a ViewModel instance with only some of the fields set
+ *
+ * Usage:
+ *
+ * ```ts
+ * const Person = viewModelFactory({
+ *   name: new Field<string>(),
+ *   age: new Field<number>(),
+ * });
+ * type AgeOnly = PartialViewModel<typeof Person, 'age'>;
+ * ```
+ */
+export type PartialViewModel<
+    T extends ViewModelConstructor<any>,
+    FieldNames extends keyof T['fields']
+> = InstanceType<T> &
+    ViewModelInterface<T['fields'], FieldNames, T['__pkFieldType'], T['__pkType']>;
