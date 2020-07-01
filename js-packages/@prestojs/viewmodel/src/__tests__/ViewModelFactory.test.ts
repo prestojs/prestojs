@@ -4,6 +4,15 @@ import Field from '../fields/Field';
 import NumberField from '../fields/NumberField';
 import ViewModelFactory, { isViewModelClass, isViewModelInstance } from '../ViewModelFactory';
 
+
+
+
+test('Should be able to invoke ViewModelFactory directly and explicitly creates a pk without error', () => {
+    ViewModelFactory({
+        id: new Field(),
+    }).fields;
+});
+
 test('_model property returns the class', () => {
     class A extends ViewModelFactory({
         id: new Field(),
