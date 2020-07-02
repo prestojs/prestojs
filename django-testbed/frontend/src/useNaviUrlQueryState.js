@@ -10,7 +10,7 @@ export default function useNaviUrlQueryState(initialState = {}, options = {}) {
     ]);
     return useUrlQueryState(initialState, {
         ...options,
-        url,
+        location: url,
         replaceUrl,
     });
 }

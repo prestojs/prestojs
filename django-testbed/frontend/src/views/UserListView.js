@@ -16,8 +16,8 @@ const fieldList = ['email', 'firstName', 'lastName'];
 
 export default function UserListView() {
     const { search, pathname, origin } = window.location;
-    const { paginationType } = qs.parse(search);
-    const [filter, setFilter] = useNaviUrlQueryState();
+    const { paginationType } = qs.parse(search, { ignoreQueryPrefix: true });
+    const [filter, setFilter] = useNaviUrlQueryState({}, { prefix: 'f_' });
     const paginationStatePair = useNaviUrlQueryState({}, { prefix: 'p_' });
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
@@ -101,6 +101,14 @@ export default function UserListView() {
                 }}
             >
                 Reset Page Size
+            </Button>
+            <Button
+                onClick={async () => {
+                    await setFilter({ id: '3' });
+                    paginator.setPageSize(1);
+                }}
+            >
+                Page Size 1 and Filter id=3
             </Button>
             <table>
                 <thead>
