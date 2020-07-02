@@ -41,7 +41,7 @@ export interface FieldProps<T> {
 
 class UnboundFieldError<T, K> extends Error {
     constructor(field: Field<T, K>) {
-        const msg = `Field ${field} has not been bound to it's parent. Check that the fields of the associated class are defined on the static '_fields' property and not 'fields'.`;
+        const msg = `Field ${field} has not been bound to it's model. Check that the fields of the associated class are defined on the static '_fields' property and not 'fields'.`;
         super(msg);
     }
 }
@@ -57,15 +57,15 @@ export default class Field<T, ParsableType extends any = T> {
     __fieldValueType: T;
     __parsableValueType: ParsableType;
 
-    private _parent: typeof FieldBinder;
-    public set parent(viewModel: typeof FieldBinder) {
-        this._parent = viewModel;
+    private _model: typeof FieldBinder;
+    public set model(viewModel: typeof FieldBinder) {
+        this._model = viewModel;
     }
-    public get parent(): typeof FieldBinder {
-        if (!this._parent) {
+    public get model(): typeof FieldBinder {
+        if (!this._model) {
             throw new UnboundFieldError<T, ParsableType>(this);
         }
-        return this._parent;
+        return this._model;
     }
 
     private _name: string;
@@ -175,7 +175,7 @@ export default class Field<T, ParsableType extends any = T> {
      * @param value
      */
     public parse(value: ParsableType): T | null {
-        return value as T;
+        return (value as unknown) as T;
     }
 
     /**
@@ -204,7 +204,7 @@ export default class Field<T, ParsableType extends any = T> {
      * @param value
      */
     public normalize(value: ParsableType): T | null {
-        return value as T;
+        return (value as unknown) as T;
     }
 
     /**

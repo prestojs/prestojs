@@ -19,7 +19,7 @@ function generateFieldLabel(name: string): string {
  * Class that contains field definitions that get bound to that class
  *
  * On bind the following happens:
- * - The field has it's `parent` property set to point to the containing class
+ * - The field has it's `model` property set to point to the containing class
  * - The field has it's `name` property set to the name used on the containing class object definition
  * - If label is not set it is generated from the name
  *
@@ -48,7 +48,7 @@ export default abstract class FieldBinder {
      * This should be a mapping from the field name to an instance of `Field`.
      *
      * To access fields use `<model>.fields` which will return the field instance with a link back
-     * to the `parent` and it's `name` property set.
+     * to the `model` and it's `name` property set.
      */
     public static _fields: FieldsMapping = {};
 
@@ -60,14 +60,14 @@ export default abstract class FieldBinder {
 
     // This tracks the fields as they are bound to specific FieldBinder classes in the inheritance
     // hierarchy For example if you have a base class A and descendants B and C then they all
-    // should get their own copy of the fields with a 'parent' property pointing to A, B and
+    // should get their own copy of the fields with a 'model' property pointing to A, B and
     // C respectively
     protected static __boundFields: Map<typeof FieldBinder, FieldsMapping> = new Map();
 
     protected static bindFields(fields: FieldsMapping, bindTo: typeof FieldBinder): FieldsMapping {
         const newFields = Object.entries(fields).reduce((acc, [fieldName, field]) => {
             acc[fieldName] = field.clone();
-            acc[fieldName].parent = bindTo;
+            acc[fieldName].model = bindTo;
             acc[fieldName].name = fieldName;
             if (acc[fieldName].label === undefined) {
                 acc[fieldName].label = generateFieldLabel(fieldName);
@@ -106,7 +106,7 @@ export default abstract class FieldBinder {
                     set(v: FieldsMapping): void {
                         if (!this.__boundFields.get(this)) {
                             // This will happen if a descendant class sets _fields after the
-                            // parent class has already bound fields.
+                            // model class has already bound fields.
                             this.__fieldsCopy = v;
                             return;
                         }
@@ -117,7 +117,7 @@ export default abstract class FieldBinder {
                     get(): FieldsMapping {
                         if (!this.__boundFields.get(this)) {
                             // This will happen if a descendant class sets _fields after the
-                            // parent class has already bound fields.
+                            // model class has already bound fields.
                             return this.__fieldsCopy;
                         }
                         throw new Error(

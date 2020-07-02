@@ -41,21 +41,21 @@ test('ViewModel should be accessible via the field', () => {
         name: new Field(),
     }) {}
 
-    expect(A.fields.name.parent).toBe(A);
-    expect(A.fields.id.parent).toBe(A);
+    expect(A.fields.name.model).toBe(A);
+    expect(A.fields.id.model).toBe(A);
 
     class B extends A.augment({
         age: new Field(),
     }) {}
 
-    expect(B.fields.name.parent).toBe(B);
-    expect(A.fields.name.parent).toBe(A);
-    expect(B.fields.age.parent).toBe(B);
+    expect(B.fields.name.model).toBe(B);
+    expect(A.fields.name.model).toBe(A);
+    expect(B.fields.age.model).toBe(B);
 
     class C extends B {}
-    expect(C.fields.name.parent).toBe(C);
-    expect(B.fields.name.parent).toBe(B);
-    expect(A.fields.name.parent).toBe(A);
+    expect(C.fields.name.model).toBe(C);
+    expect(B.fields.name.model).toBe(B);
+    expect(A.fields.name.model).toBe(A);
 });
 
 test('field name and label should be set automatically', () => {

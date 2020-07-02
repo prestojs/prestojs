@@ -194,7 +194,7 @@ export interface ViewModelConstructor<
      * following differences:
      * - If a primary key is created for you this will exist here
      * - All fields are bound to the created class. This means you can access the `ViewModel` class from the field on
-     *   the `parent` property, eg. `User.fields.email.parent === User` will be true.
+     *   the `model` property, eg. `User.fields.email.model === User` will be true.
      * - All fields have the `name` property set to match the key in `fields`
      * - All fields have `label` filled out if not explicitly set (eg. if name was `emailAddress` label will be created
      *   as `Email Address`)
@@ -456,7 +456,7 @@ function buildFieldGetterSetter(fieldName: string): { set(value: any): any; get:
 function bindFields<T extends FieldsMapping>(fields: T, bindTo: ViewModelConstructor<T>): T {
     const newFields = Object.entries(fields).reduce((acc, [fieldName, field]) => {
         acc[fieldName] = field.clone();
-        acc[fieldName].parent = bindTo;
+        acc[fieldName].model = bindTo;
         acc[fieldName].name = fieldName;
         if (acc[fieldName].label === undefined) {
             acc[fieldName].label = getImplicitFieldLabel(fieldName);
@@ -800,9 +800,9 @@ export default function viewModelFactory<T extends FieldsMapping>(
     /**
      * Helper to bind fields to the specific ViewModel class. This happens once per class and happens
      * for every class in a hierarchy (eg. if B extends A they may have the same fields but there is
-     * a copy for A & B that are bound to the correct parent class).
+     * a copy for A & B that are bound to the correct model class).
      *
-     * Binding just means the `name` of a field has been set and the `parent` link is set to the owning
+     * Binding just means the `name` of a field has been set and the `model` link is set to the owning
      * class.
      *
      * The return value is a 2-tuple of the field mapping object and the primary key name(s).
