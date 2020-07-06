@@ -1,6 +1,6 @@
-import React from 'react';
-import { FieldWidgetType } from '@prestojs/ui/FieldWidgetInterface';
+import { FieldWidgetType } from '@prestojs/ui';
 import { Field } from '@prestojs/viewmodel';
+import React from 'react';
 
 // RangeField is not included: its not meant to be used directly - TODO: mark it abstract?
 const mapping = new Map<string, FieldWidgetType<any, any>>([

@@ -1,6 +1,5 @@
 import { useUi } from '@prestojs/ui';
-import { isViewModelInstance } from '@prestojs/viewmodel';
-import { ViewModelInterface } from '@prestojs/viewmodel/ViewModelFactory';
+import { isViewModelInstance, ViewModelInterface } from '@prestojs/viewmodel';
 import React from 'react';
 import { AnyObject, Form as FinalForm, FormProps as FinalFormProps } from 'react-final-form';
 import FormField from './FormField';
