@@ -1,8 +1,8 @@
+import { RangedWidgetProps } from '@prestojs/ui';
 import { DatePicker } from 'antd';
-import React from 'react';
-import { RangedWidgetProps } from '@prestojs/ui/FieldWidgetInterface';
-import RangeWidget from './RangeWidget';
 import { DatePickerProps } from 'antd/lib/date-picker';
+import React from 'react';
+import RangeWidget from './RangeWidget';
 
 /**
  * See [DatePicker](https://next.ant.design/components/date-picker/) for props available

@@ -1,4 +1,4 @@
-import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
+import { WidgetProps } from '@prestojs/ui';
 import { Checkbox } from 'antd';
 import React from 'react';
 

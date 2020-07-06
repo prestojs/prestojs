@@ -1,4 +1,4 @@
-import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
+import { WidgetProps } from '@prestojs/ui';
 import { Input } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import React from 'react';

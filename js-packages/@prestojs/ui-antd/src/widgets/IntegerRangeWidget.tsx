@@ -1,8 +1,8 @@
-import { RangedWidgetProps } from '@prestojs/ui/FieldWidgetInterface';
+import { RangedWidgetProps } from '@prestojs/ui';
 import { InputNumber } from 'antd';
+import { InputNumberProps } from 'antd/lib/input-number';
 import React from 'react';
 import RangeWidget from './RangeWidget';
-import { InputNumberProps } from 'antd/lib/input-number';
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available

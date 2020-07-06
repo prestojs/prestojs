@@ -1,8 +1,8 @@
-import { InputProps, WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
-import { Upload, Button } from 'antd';
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { InputProps, WidgetProps } from '@prestojs/ui';
+import { Button, Upload } from 'antd';
 import { UploadFile } from 'antd/lib/upload/interface';
+import React, { useEffect, useState } from 'react';
 //import { UploadProps } from 'antd/lib/upload/interface'; // we're not using uploadprops as it's using rcFile not File - not worth the hassle
 
 type UploadWidgetInputType = Omit<InputProps<File, HTMLElement>, 'type'> & {

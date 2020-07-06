@@ -1,7 +1,7 @@
-import { InputProps, WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
+import { InputProps, WidgetProps } from '@prestojs/ui';
 import { Select } from 'antd';
-import React from 'react';
 import { SelectProps } from 'antd/lib/select';
+import React from 'react';
 
 export type SelectChoiceProps = SelectProps<any> &
     WidgetProps<number | string | boolean, HTMLSelectElement> & {

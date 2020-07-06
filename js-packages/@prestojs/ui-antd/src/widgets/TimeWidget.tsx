@@ -1,7 +1,7 @@
-import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
+import { WidgetProps } from '@prestojs/ui';
 import { TimePicker } from 'antd';
-import React from 'react';
 import { TimePickerProps } from 'antd/lib/time-picker';
+import React from 'react';
 
 /**
  * See [TimePicker](https://next.ant.design/components/time-picker/) for props available

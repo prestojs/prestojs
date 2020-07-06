@@ -1,4 +1,4 @@
-import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
+import { WidgetProps } from '@prestojs/ui';
 import { Radio } from 'antd';
 import RadioGroup from 'antd/lib/radio/group';
 import React from 'react';

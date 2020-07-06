@@ -1,7 +1,7 @@
-import React from 'react';
-import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
+import { WidgetProps } from '@prestojs/ui';
 import { DatePicker } from 'antd';
 import { DatePickerProps } from 'antd/lib/date-picker';
+import React from 'react';
 
 /**
  * See [DatePicker](https://next.ant.design/components/date-picker/) for props available

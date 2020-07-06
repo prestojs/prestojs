@@ -1,6 +1,6 @@
-import { WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
-import React from 'react';
+import { WidgetProps } from '@prestojs/ui';
 import { InputNumber } from 'antd';
+import React from 'react';
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
