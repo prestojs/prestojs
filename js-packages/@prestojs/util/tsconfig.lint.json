@@ -7,5 +7,6 @@
     "tsBuildInfoFile": "/tmp/tsc-output/@prestojs/util.tsbuildinfo",
     "outDir": "/tmp/tsc-output/@prestojs/util"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["*/__tests__/**/*"]
 }
