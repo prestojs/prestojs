@@ -1,31 +1,23 @@
 import { render } from '@testing-library/react';
 import { act, renderHook } from '@testing-library/react-hooks';
+import deepEqual from 'lodash/isEqual';
 import React from 'react';
 
 import { recordEqualTo } from '../../../../../js-testing/matchers';
 
 import Field from '../fields/Field';
 import useViewModelCache from '../useViewModelCache';
-import ViewModelCache from '../ViewModelCache';
-import ViewModelFactory, { ViewModelConstructor } from '../ViewModelFactory';
+import ViewModelFactory from '../ViewModelFactory';
 
-// eslint-disable-next-line @typescript-eslint/class-name-casing
-class _Test1 extends ViewModelFactory({
-    id: new Field(),
-    firstName: new Field(),
-    lastName: new Field(),
-    email: new Field(),
-}) {}
-const Test1 = (_Test1 as unknown) as ViewModelConstructor<
-    typeof _Test1.fields,
-    typeof _Test1['__pkFieldType'],
-    typeof _Test1['__pkType']
->;
-beforeEach(() => {
-    Test1.cache = new ViewModelCache(Test1);
-});
+const createModel = () =>
+    ViewModelFactory({
+        firstName: new Field(),
+        lastName: new Field(),
+        email: new Field(),
+    });
 
 test('should select initial state', () => {
+    const Test1 = createModel();
     const data1 = { id: 1, firstName: 'Bob', lastName: 'Jack', email: 'a@b.com' };
     Test1.cache.add(data1);
     const selector = jest.fn(cache => cache.getAll(['firstName', 'lastName', 'email']));
@@ -35,6 +27,7 @@ test('should select initial state', () => {
 });
 
 test('should unsubscribe on unmount', () => {
+    const Test1 = createModel();
     const data1 = { id: 1, firstName: 'Bob', lastName: 'Jack', email: 'a@b.com' };
     Test1.cache.add(data1);
     const selector = jest.fn(cache => cache.getAll(['firstName', 'lastName', 'email']));
@@ -48,6 +41,7 @@ test('should unsubscribe on unmount', () => {
 });
 
 test('should handle updates between first render and subscription', () => {
+    const Test1 = createModel();
     const data1 = { id: 1, firstName: 'Bob' };
     Test1.cache.add(data1);
     const selector = jest.fn(cache => cache.getAll(['firstName']));
@@ -69,6 +63,7 @@ test('should handle updates between first render and subscription', () => {
 });
 
 test('should rerender with new results on change', () => {
+    const Test1 = createModel();
     const data1 = { id: 1, firstName: 'Bob', lastName: 'Jack', email: 'a@b.com' };
     const data2 = { id: 2, firstName: 'Sam', lastName: 'Jack', email: 'b@c.com' };
     Test1.cache.add(data1);
@@ -116,6 +111,7 @@ test('should rerender with new results on change', () => {
 });
 
 test('should handle selector changes', () => {
+    const Test1 = createModel();
     const data1 = { id: 1, firstName: 'Bob', email: 'a@b.com' };
     Test1.cache.add(data1);
     const selector1 = jest.fn(cache => cache.getAll(['firstName']));
@@ -128,4 +124,64 @@ test('should handle selector changes', () => {
     rerender({ selector: selector2 });
 
     expect(result.current).toEqual([recordEqualTo({ id: 1, email: 'a@b.com' })]);
+});
+
+test('should accept extra args', () => {
+    const Test1 = createModel();
+    const data1 = { id: 1, firstName: 'Bob', email: 'a@b.com' };
+    Test1.cache.add(data1);
+    const getAll = (cache, fieldNames) => cache.getAll(fieldNames);
+    const selector = jest.fn(getAll);
+
+    const { result, rerender } = renderHook(
+        ({ fieldNames }) => useViewModelCache(Test1, selector, [fieldNames]),
+        {
+            initialProps: { fieldNames: ['firstName'] },
+        }
+    );
+    expect(result.current).toEqual([recordEqualTo({ id: 1, firstName: 'Bob' })]);
+    rerender({ fieldNames: ['email'] });
+
+    expect(result.current).toEqual([recordEqualTo({ id: 1, email: 'a@b.com' })]);
+
+    rerender({ fieldNames: ['firstName', 'email'] });
+    expect(result.current).toEqual([recordEqualTo({ id: 1, firstName: 'Bob', email: 'a@b.com' })]);
+
+    rerender({ fieldNames: ['email'] });
+    expect(result.current).toEqual([recordEqualTo({ id: 1, email: 'a@b.com' })]);
+});
+
+test('should allow custom equality checks', () => {
+    const Test1 = createModel();
+    Test1.cache.add({ id: 1, firstName: 'Bob', email: 'a@b.com' });
+    Test1.cache.add({ id: 2, firstName: 'Bob', email: 'anotherbob@b.com' });
+    Test1.cache.add({ id: 3, firstName: 'Sam', email: 'sam@b.com' });
+    const selector = jest.fn(cache =>
+        cache.getAll(['firstName']).reduce((acc, record) => {
+            acc[record.firstName] = acc[record.firstName] || [];
+            acc[record.firstName].push(record.id);
+            return acc;
+        }, {})
+    );
+
+    const { result, rerender } = renderHook(() =>
+        useViewModelCache(Test1, selector, [], deepEqual)
+    );
+    const last = result.current;
+    expect(last).toEqual({ Bob: [1, 2], Sam: [3] });
+    act(() => {
+        // Add same value again to trigger listener to rerender
+        Test1.cache.add({ id: 1, firstName: 'Bob', email: 'a@b.com' });
+    });
+    expect(result.current).toBe(last);
+    rerender();
+    expect(result.current).toBe(last);
+    act(() => {
+        Test1.cache.add({ id: 4, firstName: 'Bob', email: 'bob@b.com' });
+    });
+    expect(result.current).not.toBe(last);
+    expect(result.current).toEqual({
+        Bob: [1, 2, 4],
+        Sam: [3],
+    });
 });
