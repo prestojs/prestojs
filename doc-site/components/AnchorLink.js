@@ -7,6 +7,7 @@ export default function AnchorLink({ Component, children, id, className = '' }) 
                 className="text-gray-500 no-underline absolute anchor-link-a hover hidden"
                 aria-label="Anchor"
                 href={`#${id}`}
+                data-anchorlink={id}
             >
                 #
             </a>
