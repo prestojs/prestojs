@@ -141,12 +141,6 @@ export type ViewModelInterface<
     };
 
     /**
-     * The resolved related data for this record. You usually don't need to access this directly;
-     * values for a field can be retrieved from the record directly using the field name
-     */
-    readonly _relatedData: Record<string, ViewModelConstructor<any>>;
-
-    /**
      * List of field names with data available on this instance.
      *
      * @type-name string[]
@@ -475,9 +469,6 @@ function buildFieldGetterSetter(fieldName: string): { set(value: any): any; get:
                     console.warn(msg);
                 }
             } else {
-                if (fieldName in this._relatedData) {
-                    return this._relatedData[fieldName];
-                }
                 return this._data[fieldName];
             }
         },
@@ -911,7 +902,6 @@ export default function viewModelFactory<T extends FieldsMapping>(
         assignedFields.sort();
         this._assignedFields = assignedFields;
         this._data = freezeObject(assignedData);
-        this._relatedData = {};
 
         return this;
     }
