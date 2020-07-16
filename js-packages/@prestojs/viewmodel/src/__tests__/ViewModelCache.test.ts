@@ -2514,9 +2514,7 @@ test.skip('should be performant', async () => {
             }
         })
     ).toBeLessThan(1500);
-    let i = 0;
     for (const cb of cbs) {
-        i++;
         expect(cb).toHaveBeenCalledTimes(2);
     }
 });

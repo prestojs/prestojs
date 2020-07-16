@@ -1,5 +1,5 @@
-import { ViewModelConstructor } from '@prestojs/viewmodel/ViewModelFactory';
 import FieldBinder from '../FieldBinder';
+import { ViewModelConstructor } from '../ViewModelFactory';
 import { AsyncChoicesInterface } from './AsyncChoices';
 
 /**
@@ -311,6 +311,7 @@ export default class Field<T, ParsableType extends any = T> {
      * By default this does nothing but can be used by fields to attach extra properties or validate
      * against the final view model (for example checking that another field does / does not exist).
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public contributeToClass(viewModel: ViewModelConstructor<any>): void {
         // Do nothing by default
     }
