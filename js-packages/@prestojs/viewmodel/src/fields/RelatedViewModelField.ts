@@ -1,10 +1,21 @@
 import { isViewModelClass, ViewModelConstructor, ViewModelInterface } from '../ViewModelFactory';
 import Field, { FieldProps } from './Field';
 
+/**
+ * @expand-properties
+ */
 type RelatedViewModelFieldProps<T extends ViewModelConstructor<any>> = FieldProps<
     ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']>
 > & {
+    /**
+     * The name of the field on the [ViewModel](doc:viewModelFactory) that stores the
+     * ID for this relation
+     */
     sourceFieldName: string;
+    /**
+     * Either a [ViewModel](doc:viewModelFactory), a function that returns a [ViewModel](doc:viewModelFactory)
+     * or a function that returns a `Promise` that resolves to a [ViewModel](doc:viewModelFactory).
+     */
     to: (() => Promise<T> | T) | T;
 };
 
@@ -132,16 +143,21 @@ export default class RelatedViewModelField<
     private _resolvingTo?: Promise<T>;
     sourceFieldName: string;
 
-    constructor({ to, sourceFieldName, ...values }: RelatedViewModelFieldProps<T>) {
-        super(values);
+    constructor(props: RelatedViewModelFieldProps<T>) {
+        const { to, sourceFieldName, ...fieldProps } = props;
+        super(fieldProps);
         if (isViewModelClass(to)) {
             this._resolvedTo = to;
         } else {
             this._loadTo = to;
         }
         this.sourceFieldName = sourceFieldName;
+        this._isResolvingDeps = false;
     }
 
+    /**
+     * @private
+     */
     contributeToClass(viewModel: T): void {
         if (!viewModel.fields[this.sourceFieldName]) {
             throw new Error(
@@ -150,7 +166,8 @@ export default class RelatedViewModelField<
         }
     }
 
-    _isResolvingDeps = false;
+    _isResolvingDeps: boolean;
+
     /**
      * Resolves the ViewModel this field links to. This is necessary as the ViewModel might be a dynamic
      * import that hasn't yet loaded.
@@ -188,6 +205,9 @@ export default class RelatedViewModelField<
         return this._resolvingTo;
     }
 
+    /**
+     * Converts a value into the relations [ViewModel](doc:viewModelFactory) instance.
+     */
     normalize(value): ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']> {
         if (value && !(value instanceof this.to)) {
             return new this.to(value);
@@ -195,6 +215,9 @@ export default class RelatedViewModelField<
         return value;
     }
 
+    /**
+     * Compares to relations for equality - if the ViewModel has the same data this returns true
+     */
     isEqual(
         value1: ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']>,
         value2: ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']>
@@ -205,6 +228,9 @@ export default class RelatedViewModelField<
         return value1.isEqual(value2);
     }
 
+    /**
+     * Converts the linked record to a plain javascript object
+     */
     toJS(
         value: ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']>
     ): Record<string, any> {
@@ -214,6 +240,12 @@ export default class RelatedViewModelField<
         return value.toJS();
     }
 
+    /**
+     * Get the [ViewModel](doc:viewModelFactory) this related field is to.
+     *
+     * If `to` was defined as a function returning a `Promise` then you must call `resolveViewModel`
+     * and wait for the returned `Promise` to resolve before accessing this otherwise an error will be thrown
+     */
     get to(): T {
         if (!this._resolvedTo) {
             if (this._resolvingTo) {
