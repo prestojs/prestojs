@@ -18,7 +18,8 @@ function equalityCustomizer(a: any, b: any): boolean | undefined {
     if (supportsEqualityInterface(b)) {
         return b.isEqual(a);
     }
-    // undefined return means shallowequal or isEqualWith does normal shallow/deep comparison
+    // if called from `shallowequal` then no return here means it will do a normal shallow comparison
+    // if called from `isEqualWith` then no return here means it will do a normal deep comparison
 }
 
 /**
