@@ -21,19 +21,30 @@ type ViewModelMapping = ViewModelConstructor<any> | Record<string, ViewModelCons
 type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<ViewModelMapping>);
 
 /**
- * Define an endpoint for a ViewModel. The response is transformed according
- * to `viewModelMapping`. If the endpoint returns a single record or a list
- * of the same record type you can pass a ViewModel class as the parameter:
+ * Define an endpoint for a ViewModel. The response is transformed & cached according
+ * to `viewModelMapping`.
+ *
+ * The simplest form of a mapping is to a Model:
  *
  * ```js
- * // Response will be an array of User instances
- * const userList = new ViewModelEndpoint(new UrlPattern('/users/'), User);
- * // Response will be a single User instance
- * const userRetrieve = new ViewModelEndpoint(new UrlPattern('/users/:id/'), User);
+ * const getUser = new ViewModelEndpoint(new UrlPattern('/users/:id/'), User);
  * ```
  *
- * If the response is an object mapping different models you can specify how
- * each key is transformed:
+ * If an element is a response is an array then it will transparently be treated as a list
+ * of objects of the mapping type and the transformation function will be invoked for each
+ * element one by one:
+ *
+ * ```js
+ * // Response is a single User instance:
+ * const userRetrieve = new ViewModelEndpoint(new UrlPattern('/users/:id/'), User);
+ * // Response is an array of User instances
+ * // (declaration is the same but the response handler will treat it differently)
+ * const userList = new ViewModelEndpoint(new UrlPattern('/users/'), User);
+ * ```
+ *
+ * If the response is an object mapping different models you can specify how each
+ * key is transformed. Each response value will be treated as an array/individual object
+ * automatically:
  *
  * ```js
  * new ViewModelEndpoint(new UrlPattern('/users/'), {
@@ -42,7 +53,8 @@ type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<
  * });
  * ```
  *
- * Dot notation is also supported for nested objects:
+ * Dot notation is also supported for nested objects (again each element may be a
+ * single object or an array of objects)
  *
  * ```js
  * new ViewModelEndpoint(new UrlPattern('/users/'), {
@@ -65,9 +77,10 @@ type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<
  * });
  * ```
  *
+ * Each record instance created is also automatically added to the cache.
+ *
  * If the endpoint is paginated use [PaginatedViewModelEndpoint](doc:PaginatedViewModelEndpoint).
  *
- * TODO: Add note about how foreign key data is cached once we have worked that out
  * TODO: Convention for deleting an item?
  *
  * @extract-docs
