@@ -38,10 +38,10 @@ class ModelIdFilter(ModelMultipleChoiceFilter):
 
 
 class UserFilterSet(filters.FilterSet):
+    ids = ModelIdFilter(queryset=User.objects.all())
     first_name = filters.CharFilter(lookup_expr="icontains")
     last_name = filters.CharFilter(lookup_expr="icontains")
     keywords = filters.CharFilter(method="filter_keywords")
-    ids = ModelIdFilter(queryset=User.objects.all())
 
     class Meta:
         model = User

@@ -48,8 +48,9 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
      */
     multiple: boolean;
     /**
-     * Hook that returns dependencies for listing choices. This is useful to store state
-     * for things like pagination. The value returned here is passed to `list`.
+     * Hook that returns any extra props to pass through to `list` in components/hooks that
+     * consume this (eg. [useAsyncChoices](doc:useAsyncChoices)). This is useful to
+     * store state for things like pagination.
      *
      * What this function is passed depends on the implementation but when used with
      * [useAsyncChoices](doc:useAsyncChoices) it will be passed `value` (the currently
@@ -70,9 +71,9 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
     list(params: Record<string, any>): Promise<ItemType[]>;
 
     /**
-     * Hook that returns dependencies for retrieving an existing value of a choice. This is
-     * useful for things like hooking into an existing cache (eg. [useViewModelCache](doc:useViewModelCache])). The value
-     * returned here is passed as the second parameter to `retrieve`. In addition the `existingValues` key is
+     * Hook that returns props to pass through to `retrieve` in components/hooks that consume this (eg. [useAsyncChoices](doc:useAsyncChoices).
+     * This is useful for things like hooking into an existing cache (eg. [useViewModelCache](doc:useViewModelCache])).
+     * The value returned here is passed as the second parameter to `retrieve`. In addition the `existingValues` key is
      * passed through to `useAsyncValue` as the list of items it can resolve existing values from.
      *
      * What this function is passed depends on the implementation but when used with
