@@ -8,4 +8,6 @@ import Field from './Field';
  * @extract-docs
  * @menu-group Fields
  */
-export default class TimeField extends Field<string> {}
+export default class TimeField extends Field<string> {
+    static fieldClassName = 'TimeField';
+}

@@ -11,6 +11,7 @@ import NullableBooleanField from './NullableBooleanField';
  * @menu-group Fields
  */
 export default class BooleanField extends NullableBooleanField {
+    static fieldClassName = 'BooleanField';
     parse(value: any): boolean {
         return !!value;
     }

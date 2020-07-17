@@ -14,6 +14,7 @@ import Field from './Field';
  * @menu-group Fields
  */
 export default class DateField extends Field<Date, string | Date> {
+    static fieldClassName = 'DateField';
     parse(value: any): Date | null {
         if (Number.isNaN(Date.parse(value))) {
             return null;

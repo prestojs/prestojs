@@ -18,6 +18,7 @@ interface Boundary<T> extends FieldProps<T> {
  * @menu-group Fields
  */
 export default class RangeField<T> extends Field<T> {
+    static fieldClassName = 'RangeField';
     public lowerBound: T | null | undefined;
     public upperBound: T | null | undefined;
     public separator: string;
