@@ -1,4 +1,4 @@
-import { getId, getRichLabel, isIdentifiable, isLabeled } from '@prestojs/util';
+import { getId, getNodeLabel, isIdentifiable, isLabeled } from '@prestojs/util';
 
 /**
  * A single choice
@@ -209,10 +209,10 @@ class AsyncChoices<ItemType, ValueType> implements AsyncChoicesInterface<ItemTyp
             return this.options.getLabel.call(this, item);
         }
         if (isLabeled(item)) {
-            return getRichLabel(item);
+            return getNodeLabel(item);
         }
         throw new Error(
-            'getLabel must be provided to AsyncChoices if item does not provide a getLabel or getRichLabel method'
+            'getLabel must be provided to AsyncChoices if item does not provide a getLabel or getNodeLabel method'
         );
     }
     getMissingLabel(value: ValueType): React.ReactNode {
