@@ -15,10 +15,13 @@ function delay<T>(fn, timeout = 0): Promise<T> {
     return new Promise((resolve, reject) => setTimeout(() => resolve(fn(reject)), timeout));
 }
 
-type TestDataItem = { name: string; id: number };
+type TestDataItem = { name: string; id: number; _key: number };
 const testData: TestDataItem[] = Array.from({ length: 12 }, (_, i) => ({
     name: `Item ${i}`,
     id: i,
+    get _key(): number {
+        return this.id;
+    },
 }));
 Object.freeze(testData);
 
@@ -345,7 +348,8 @@ test('should be able to integrate with viewmodel cache', async () => {
         paginator: PageNumberPaginator
     ): Promise<TestDataItem[]> {
         const results = await resolveMulti(query, paginator);
-        User.cache.addList(results);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        User.cache.addList(results.map(({ _key, ...rest }) => rest));
         return results;
     }
     const list = jest.fn(wrappedResolveMulti);

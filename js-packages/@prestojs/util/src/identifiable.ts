@@ -3,54 +3,21 @@ type CompoundId = { [fieldName: string]: SingleId };
 export type Id = SingleId | CompoundId;
 
 /**
- * Defines a property `_pk` which is taken as the `id`. [ViewModel](doc:ViewModelFactory)
- * always implements this interface.
- */
-interface IdentifiablePk {
-    /**
-     * The id for this item
-     */
-    _pk: Id;
-}
-
-/**
- * Defines a property `id` to uniquely identify the item
- */
-interface IdentifiableId {
-    /**
-     * The id for this item
-     */
-    id: Id;
-}
-
-/**
- * Interface for types that we can automatically extract a unique
- * identifier from.
+ * Interface for types that we can automatically extract a unique identifier from.
  *
- * If a `_pk` property exists (eg. from [ViewModelFactory](doc:ViewModelFactory))
- * that will be used otherwise an `id` property will be used.
+ * To confirm to the interface provide a `_key` property or getter.
+ *
+ * [ViewModelFactory](doc:ViewModelFactory) conforms to this so anything that expects an Identifiable
+ * will accept a ViewModel.
  *
  * Implementing this can save you having to pass explicit functions to identify an item in other parts of the system
  * (eg. for [AsyncChoices](doc:AsyncChoices) or [useAsyncValue](doc:useAsyncValue))
  *
  * @extract-docs
  * @menu-group Identifiable
- * @doc-class UnionInterface
  */
-export type Identifiable = IdentifiableId | IdentifiablePk;
-
-function isIdentifiablePk(item: any): item is IdentifiablePk {
-    if (!item || typeof item !== 'object') {
-        return false;
-    }
-    return item._pk != null;
-}
-
-function isIdentifiableId(item: any): item is IdentifiableId {
-    if (!item || typeof item !== 'object') {
-        return false;
-    }
-    return item.id != null;
+export interface Identifiable {
+    _key: Id;
 }
 
 /**
@@ -60,7 +27,10 @@ function isIdentifiableId(item: any): item is IdentifiableId {
  * @menu-group Identifiable
  */
 export function isIdentifiable(item: any): item is Identifiable {
-    return isIdentifiableId(item) || isIdentifiablePk(item);
+    if (!item || typeof item !== 'object') {
+        return false;
+    }
+    return item._key != null;
 }
 
 /**
@@ -73,11 +43,8 @@ export function isIdentifiable(item: any): item is Identifiable {
  * @menu-group Identifiable
  */
 export function getId(item: Identifiable | any, fallbackGetId?: (item: any) => Id): Id {
-    if (isIdentifiablePk(item)) {
-        return item._pk;
-    }
-    if (isIdentifiableId(item)) {
-        return item.id;
+    if (isIdentifiable(item)) {
+        return item._key;
     }
     if (fallbackGetId) {
         return fallbackGetId(item);
