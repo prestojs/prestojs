@@ -229,7 +229,7 @@ class AsyncChoices<ItemType, ValueType> implements AsyncChoicesInterface<ItemTyp
             return (getId(item) as unknown) as ValueType;
         }
         throw new Error(
-            'getValue must be provided to AsyncChoices if item does not have a `id` or `_pk` property'
+            'getValue must be provided to AsyncChoices if item does not have a `_key` property'
         );
     }
     useResolveItems<T extends ItemType | ItemType[] | null>(items: T): T {

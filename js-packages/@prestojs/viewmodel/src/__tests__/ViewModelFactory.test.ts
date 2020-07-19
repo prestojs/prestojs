@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
+import { getId, isIdentifiable } from '@prestojs/util';
 import CharField from '../fields/CharField';
 import Field from '../fields/Field';
 import NumberField from '../fields/NumberField';
@@ -644,4 +645,17 @@ test('should bind fields to _f', () => {
     expect(record1._f.name.value).toBe('bob');
     expect(record1._f.email.value).toBe('a@b');
     expect(record1._f.id.value).toBe(1);
+});
+
+test('should conform to Identifiable', () => {
+    class Test1 extends ViewModelFactory({
+        id: new Field(),
+    }) {}
+    const record1 = new Test1({ id: 1 });
+    const record2 = new Test1({ id: 2 });
+
+    expect(isIdentifiable(record1)).toBe(true);
+    expect(isIdentifiable(record2)).toBe(true);
+    expect(getId(record1)).toBe(1);
+    expect(getId(record2)).toBe(2);
 });

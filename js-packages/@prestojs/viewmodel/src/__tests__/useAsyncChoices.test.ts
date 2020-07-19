@@ -10,6 +10,9 @@ type TestDataItem = { label: string; id: number };
 const testData: TestDataItem[] = Array.from({ length: 20 }, (_, i) => ({
     label: `Item ${i}`,
     id: i,
+    get _key(): number {
+        return this.id;
+    },
 }));
 const getLabel = (item): string => item.label;
 const getValue = (item): number => item.id;

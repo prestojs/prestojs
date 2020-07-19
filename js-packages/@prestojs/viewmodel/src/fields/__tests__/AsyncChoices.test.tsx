@@ -23,7 +23,7 @@ class Record {
     constructor(item: TestDataItem) {
         this.item = item;
     }
-    get id(): string {
+    get _key(): string {
         return `I${this.item.id}`;
     }
     getLabel(): string {
