@@ -15,10 +15,10 @@ export { default as LimitOffsetPaginator } from './pagination/LimitOffsetPaginat
 export { default as CursorPaginator } from './pagination/CursorPaginator';
 export { default as Paginator } from './pagination/Paginator';
 export { default as getPaginationState } from './pagination/getPaginationState';
-export { getRichLabel, isPlainLabeled, isLabeled } from './Labeled';
+export { getNodeLabel, isTextLabeled, isLabeled } from './Labeled';
 
 import type { Id, Identifiable } from './identifiable';
-import type { PlainLabeled, RichLabeled } from './Labeled';
+import type { NodeLabeled, TextLabeled } from './Labeled';
 import type { CursorPaginationState } from './pagination/CursorPaginator';
 import type { PaginatorState } from './pagination/InferredPaginator';
 import type { LimitOffsetPaginationState } from './pagination/LimitOffsetPaginator';
@@ -32,8 +32,8 @@ import type {
 } from './useAsyncValue';
 
 export type {
-    PlainLabeled,
-    RichLabeled,
+    TextLabeled,
+    NodeLabeled,
     UseAsyncLookupProps,
     UseAsyncLookupReturn,
     UseAsyncValuePropsMulti,

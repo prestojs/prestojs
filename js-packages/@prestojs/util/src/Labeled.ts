@@ -2,45 +2,45 @@
  * Interface for items that provide a plain text label. Implementing this can save you having to pass
  * explicit functions to label an item in other parts of the system (eg. for [AsyncChoices](doc:AsyncChoices))
  *
- * See [isPlainLabeled](doc:isPlainLabeled) and [getPlainLabel](doc:getPlainLabel).
+ * See [isTextLabeled](doc:isTextLabeled) and [getPlainLabel](doc:getPlainLabel).
  *
  * @extract-docs
  * @menu-group Labeled
  */
-export interface PlainLabeled {
+export interface TextLabeled {
     /**
      * Return the plain text label for this item. This must return a string
      *
-     * See [isPlainLabeled](doc:isPlainLabeled) to test for support and [getPlainLabel](doc:getPlainLabel) for easiest way
+     * See [isTextLabeled](doc:isTextLabeled) to test for support and [getPlainLabel](doc:getPlainLabel) for easiest way
      * to get the label.
      */
     getLabel(): string;
 }
 
 /**
- * Interface for items that provide a rich label (anything that React can render). Implementing this can save you having to pass
+ * Interface for items that provide a React node label (anything that React can render). Implementing this can save you having to pass
  * explicit functions to label an item in other parts of the system (eg. for [AsyncChoices](doc:AsyncChoices))
  *
- * See [isRichLabeled](doc:isRichLabeled) and [getRichLabel](doc:getRichLabel).
+ * See [isNodeLabeled](doc:isNodeLabeled) and [getNodeLabel](doc:getNodeLabel).
  *
  * @extract-docs
  * @menu-group Labeled
  */
-export interface RichLabeled {
+export interface NodeLabeled {
     /**
-     * Return the rich label for this item. This can be anything renderable by React.
+     * Return the node label for this item. This can be anything renderable by React.
      *
-     * See [isRichLabeled](doc:isRichLabeled) to test for support and [getRichLabel](doc:getRichLabel) for easiest way
+     * See [isNodeLabeled](doc:isNodeLabeled) to test for support and [getNodeLabel](doc:getNodeLabel) for easiest way
      * to get the label.
      */
-    getRichLabel(): React.ReactNode;
+    getNodeLabel(): React.ReactNode;
 }
 
 /**
- * Check if a value conforms to PlainLabeled
+ * Check if a value conforms to TextLabeled
  * @menu-group Labeled
  */
-export function isPlainLabeled(item: any): item is PlainLabeled {
+export function isTextLabeled(item: any): item is TextLabeled {
     if (!item || typeof item !== 'object') {
         return false;
     }
@@ -48,30 +48,30 @@ export function isPlainLabeled(item: any): item is PlainLabeled {
 }
 
 /**
- * Check if a value conforms to RichLabeled
+ * Check if a value conforms to NodeLabeled
  * @extract-docs
  * @menu-group Labeled
  */
-export function isRichLabeled(item: any): item is RichLabeled {
+export function isNodeLabeled(item: any): item is NodeLabeled {
     if (!item || typeof item !== 'object') {
         return false;
     }
-    return typeof item.getRichLabel === 'function';
+    return typeof item.getNodeLabel === 'function';
 }
 
 /**
- * Check if item supports either plain or rich labels
+ * Check if item supports either text or React node labels
  * @extract-docs
  * @menu-group Labeled
  */
-export function isLabeled(item: any): item is PlainLabeled | RichLabeled {
-    return isPlainLabeled(item) || isRichLabeled(item);
+export function isLabeled(item: any): item is TextLabeled | NodeLabeled {
+    return isTextLabeled(item) || isNodeLabeled(item);
 }
 
 /**
- * Get a rich label from an item
+ * Get a React node label from an item
  *
- * If item implements `getRichLabel` that will be used otherwise `getLabel` will be used.
+ * If item implements `getNodeLabel` that will be used otherwise `getLabel` will be used.
  *
  * If neither are defined an error is thrown. To conditional call this check if labeled first
  * with `isLabeled`.
@@ -79,32 +79,32 @@ export function isLabeled(item: any): item is PlainLabeled | RichLabeled {
  * @extract-docs
  * @menu-group Labeled
  */
-export function getRichLabel(item: any): React.ReactNode {
-    if (isRichLabeled(item)) {
-        return item.getRichLabel();
+export function getNodeLabel(item: any): React.ReactNode {
+    if (isNodeLabeled(item)) {
+        return item.getNodeLabel();
     }
-    if (isPlainLabeled(item)) {
+    if (isTextLabeled(item)) {
         return item.getLabel();
     }
     throw new Error(
-        'getRichLabel is only supported on objects that implement getRichLabel or getLabel'
+        'getNodeLabel is only supported on objects that implement getNodeLabel or getLabel'
     );
 }
 
 /**
  * Get a plain text label from an item
  *
- * If does not implement PlainLabeled an error is thrown. To conditional call this check if labeled first
- * with `isPlainLabeled`.
+ * If does not implement TextLabeled an error is thrown. To conditional call this check if labeled first
+ * with `isTextLabeled`.
  *
  * @extract-docs
  * @menu-group Labeled
  */
 export function getPlainLabel(item: any): string {
-    if (isPlainLabeled(item)) {
+    if (isTextLabeled(item)) {
         return item.getLabel();
     }
     throw new Error(
-        'getRichLabel is only supported on objects that implement getRichLabel or getLabel'
+        'getNodeLabel is only supported on objects that implement getNodeLabel or getLabel'
     );
 }
