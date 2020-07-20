@@ -87,6 +87,7 @@ test('useAsyncChoices should support hooking up to ViewModelCache easily', async
         label: new CharField(),
     });
     type ItemModelInstance = InstanceType<typeof ItemModel>;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const data = testData.map(({ _key, ...item }) => ItemModel.cache.add(item));
     const list = (): Promise<ItemModelInstance[]> => Promise.resolve(data.slice(0, 10));
     const retrieve = (i: number): Promise<ItemModelInstance> => Promise.resolve(data[i]);
