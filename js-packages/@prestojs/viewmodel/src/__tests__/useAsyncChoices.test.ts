@@ -6,7 +6,7 @@ import useAsyncChoices from '../useAsyncChoices';
 import useViewModelCache from '../useViewModelCache';
 import viewModelFactory from '../ViewModelFactory';
 
-type TestDataItem = { label: string; id: number };
+type TestDataItem = { label: string; id: number; _key: number };
 const testData: TestDataItem[] = Array.from({ length: 20 }, (_, i) => ({
     label: `Item ${i}`,
     id: i,
@@ -66,6 +66,7 @@ test('useAsyncChoices should support basic usage', async () => {
     expect(result.current.choices).toEqual(
         testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
     );
+    expect(result.current.list.isLoading).toBe(false);
     rerender({ value: 3 });
     // Changing value shouldn't result in any loading changes as we already have the value
     expect(result.current.list.isLoading).toBe(false);
@@ -86,7 +87,7 @@ test('useAsyncChoices should support hooking up to ViewModelCache easily', async
         label: new CharField(),
     });
     type ItemModelInstance = InstanceType<typeof ItemModel>;
-    const data = testData.map(item => ItemModel.cache.add(item));
+    const data = testData.map(({ _key, ...item }) => ItemModel.cache.add(item));
     const list = (): Promise<ItemModelInstance[]> => Promise.resolve(data.slice(0, 10));
     const retrieve = (i: number): Promise<ItemModelInstance> => Promise.resolve(data[i]);
     const asyncChoices = new AsyncChoices({
@@ -202,7 +203,7 @@ test('useAsyncChoices should support accumulatePages', async () => {
     expect(result.current.choices).toEqual(testData.map(({ label, id }) => ({ value: id, label })));
 });
 
-test.only('useAsyncChoices should support query', async () => {
+test('useAsyncChoices should support query', async () => {
     const asyncChoices = new AsyncChoices(baseOptions);
     const { rerender, result, waitForNextUpdate } = renderHook(
         ({ value, query }: { value?: null | number; query: Record<string, any> }) =>
