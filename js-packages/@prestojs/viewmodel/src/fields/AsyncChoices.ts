@@ -53,9 +53,9 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
      * store state for things like pagination.
      *
      * What this function is passed depends on the implementation but when used with
-     * [useAsyncChoices](doc:useAsyncChoices) it will be passed `value` (the currently
-     * selected value), `query` (the query object eg. to filter results with) and `listOptions`
-     * (any additional options passed on the `listOptions` prop to `useAsyncChoices`).
+     * [useAsyncChoices](doc:useAsyncChoices) it will be `query` (the query object eg. to
+     * filter results with) and `listOptions` (any additional options passed on the `listOptions`
+     * prop to `useAsyncChoices`).
      * Official presto widgets all use `useAsyncChoices` and so will use these parameters.
      */
     useListProps(args: any): any;
@@ -63,9 +63,9 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
      * Function to resolve a list of choices based on the provided params.
      *
      * What this function is passed depends on the implementation but when used with
-     * [useAsyncChoices](doc:useAsyncChoices) it will be passed `value` (the currently
-     * selected value), `query` (the query object eg. to filter results with), `paginator` (the current
-     * paginator if any) and `listOptions` (any additional options passed on the `listOptions` prop to `useAsyncChoices`).
+     * [useAsyncChoices](doc:useAsyncChoices) it will be passed `query` (the query object eg. to
+     * filter results with), `paginator` (the current paginator if any) and `listOptions` (any
+     * additional options passed on the `listOptions` prop to `useAsyncChoices`).
      * Official presto widgets all use `useAsyncChoices` and so will use these parameters.
      */
     list(params: Record<string, any>): Promise<ItemType[]>;

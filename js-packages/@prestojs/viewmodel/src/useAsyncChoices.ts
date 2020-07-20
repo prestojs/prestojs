@@ -105,13 +105,12 @@ export default function useAsyncChoices<ItemT, ValueT>(
         retrieveOptions,
     } = props;
     const listProps = asyncChoices.useListProps({
-        value,
         query,
         listOptions,
     });
     const execute = useMemoOne(
         // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-        () => props => asyncChoices.list({ value, ...props, ...listProps, listOptions }),
+        () => props => asyncChoices.list({ ...props, ...listProps, listOptions }),
         [listOptions, listProps, asyncChoices],
         isDeepEqual
     );
