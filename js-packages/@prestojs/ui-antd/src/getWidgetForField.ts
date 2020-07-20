@@ -41,14 +41,17 @@ const choicesMapping = new Map<string, FieldWidgetType<any, any>>([
  * Returns the default widget for any given Field.
  *
  * Depending on Field, this will return either a FieldWidget component directly, or [FieldWidget, props] where props is the default props that would be applied to said widget.
+ *
+ * @extract-docs
  */
 export default function getWidgetForField<FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
 ): FieldWidgetType<FieldValue, T> | [FieldWidgetType<FieldValue, T>, object] | null {
+    const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     // Couldn't work out what to type this as so field.constructor was accepted
     const widget: FieldWidgetType<any, any> | null | undefined = field.choices
-        ? choicesMapping.get(field.constructor.name) || mapping.get(field.constructor.name)
-        : mapping.get(field.constructor.name);
+        ? choicesMapping.get(fieldClassName) || mapping.get(fieldClassName)
+        : mapping.get(fieldClassName);
 
     const getReturnWithChoices = (
         w,
@@ -73,8 +76,8 @@ export default function getWidgetForField<FieldValue, T extends HTMLElement>(
     let f = Object.getPrototypeOf(field.constructor);
     do {
         const widgetF: FieldWidgetType<any, any> | null | undefined = field.choices
-            ? choicesMapping.get(f.name) || mapping.get(f.name)
-            : mapping.get(f.name);
+            ? choicesMapping.get(f.fieldClassName) || mapping.get(f.fieldClassName)
+            : mapping.get(f.fieldClassName);
         if (widgetF) {
             return getReturnWithChoices(widgetF, field);
         }

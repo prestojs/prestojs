@@ -8,4 +8,6 @@ import Field from './Field';
  * @extract-docs
  * @menu-group Fields
  */
-export default class FileField extends Field<File> {}
+export default class FileField extends Field<File> {
+    static fieldClassName = 'FileField';
+}

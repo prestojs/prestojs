@@ -10,4 +10,6 @@ import CharField from './CharField';
  * @extract-docs
  * @menu-group Fields
  */
-export default class DurationField extends CharField {}
+export default class DurationField extends CharField {
+    static fieldClassName = 'DurationField';
+}

@@ -8,4 +8,6 @@ import DecimalField from './DecimalField';
  * @extract-docs
  * @menu-group Fields
  */
-export default class CurrencyField extends DecimalField {}
+export default class CurrencyField extends DecimalField {
+    static fieldClassName = 'CurrencyField';
+}

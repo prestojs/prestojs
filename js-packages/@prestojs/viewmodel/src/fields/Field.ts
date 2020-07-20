@@ -78,6 +78,18 @@ export default class Field<T, ParsableType extends any = T> {
         }
         return this._name;
     }
+
+    /**
+     * Field class name
+     *
+     * This exists so things like [getWidgetForField](doc:getWidgetForField) can select a widget for
+     * a field without needing to import all fields up front.
+     *
+     * For custom fields this isn't required unless your implementation of `getWidgetForField` wants
+     * to do avoid importing the field up front.
+     */
+    static fieldClassName: string | null = null;
+
     /** Is this field required when saving a record? */
     public required: boolean;
     /**

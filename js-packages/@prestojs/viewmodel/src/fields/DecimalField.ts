@@ -13,6 +13,7 @@ import NumberField from './NumberField';
  * @menu-group Fields
  */
 export default class DecimalField extends NumberField<string> {
+    static fieldClassName = 'DecimalField';
     public decimalPlaces?: number;
 
     constructor(values) {

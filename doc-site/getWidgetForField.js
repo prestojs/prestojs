@@ -57,8 +57,9 @@ const choicesMapping = new Map([
 export default function getWidgetForField(field) {
     // Couldn't work out what to type this as so field.constructor was accepted
     const widget = field.choices
-        ? choicesMapping.get(field.constructor.name) || mapping.get(field.constructor.name)
-        : mapping.get(field.constructor.name);
+        ? choicesMapping.get(field.constructor.fieldClassName) ||
+          mapping.get(field.constructor.fieldClassName)
+        : mapping.get(field.constructor.fieldClassName);
 
     const getReturnWithChoices = (w, f) => {
         if (f.choices) {
@@ -80,8 +81,8 @@ export default function getWidgetForField(field) {
     let f = Object.getPrototypeOf(field.constructor);
     do {
         const widgetF = field.choices
-            ? choicesMapping.get(f.name) || mapping.get(f.name)
-            : mapping.get(f.name);
+            ? choicesMapping.get(f.fieldClassName) || mapping.get(f.fieldClassName)
+            : mapping.get(f.fieldClassName);
         if (widgetF) {
             return getReturnWithChoices(widgetF, field);
         }

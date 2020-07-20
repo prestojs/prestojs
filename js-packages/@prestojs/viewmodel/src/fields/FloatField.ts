@@ -11,6 +11,7 @@ import NumberField from './NumberField';
  * @menu-group Fields
  */
 export default class FloatField extends NumberField<number> {
+    static fieldClassName = 'FloatField';
     parse(value: any): number | null {
         // Don't force empty string, null or undefined to a number (which would be 0) -
         // force them both to be null to represent no value set.

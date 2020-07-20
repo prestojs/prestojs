@@ -5,6 +5,7 @@ import NumberField from './NumberField';
  * @menu-group Fields
  */
 export default class IntegerField extends NumberField<number> {
+    static fieldClassName = 'IntegerField';
     parse(value: any): number | null {
         if (value === '' || value == null) {
             return null;

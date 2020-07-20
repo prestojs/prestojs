@@ -11,6 +11,7 @@ export type JSON<T> = string & { ' __JSON': T };
  * @menu-group Fields
  */
 export default class JsonField<T> extends CharField {
+    static fieldClassName = 'JsonField';
     parse<T>(json: JSON<T>): T {
         try {
             return JSON.parse(json as string) as any;

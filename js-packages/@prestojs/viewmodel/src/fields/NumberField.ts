@@ -17,6 +17,7 @@ type NumberFieldProps<T> = FieldProps<T> & {
  * @menu-group Fields
  */
 export default class NumberField<T = string | number> extends Field<T> {
+    static fieldClassName = 'NumberField';
     public minValue?: number;
     public maxValue?: number;
 

@@ -14,6 +14,7 @@ type CharFieldProps = FieldProps<string> & { maxLength?: number };
  * @menu-group Fields
  */
 export default class CharField extends Field<string> {
+    static fieldClassName = 'CharField';
     public maxLength?: number;
 
     constructor(values: CharFieldProps = {}) {
