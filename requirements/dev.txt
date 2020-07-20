@@ -23,7 +23,7 @@ flake8-print
 pip-autoremove
 
 # python import sorter
-isort
+isort[pyproject]<5,>=4.3.5
 
 # show pip dependency tree
 pipdeptree
