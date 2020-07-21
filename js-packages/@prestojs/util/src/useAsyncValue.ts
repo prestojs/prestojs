@@ -44,6 +44,15 @@ type CommonProps<T, U extends Id> = {
      * can use this to defer execution until the value is required.
      */
     trigger?: 'MANUAL' | 'DEEP';
+    /**
+     * Called when `resolve` resolves successfully. Is passed a single parameter which
+     * is the value returned from `resolve`
+     */
+    onSuccess?: (response: T) => void;
+    /**
+     * Called when `resolve` errors. Passed the error returned from `resolve`.
+     */
+    onError?: (error: Error) => void;
 };
 
 /**
@@ -163,7 +172,7 @@ export default function useAsyncValue<T, U extends Id>(
         resolve: (idOrIds: U | U[]) => Promise<T[] | T>;
     }
 ): UseAsyncValueReturn<T | T[]> {
-    const { id, ids, getId, resolve, trigger = useAsync.DEEP } = props;
+    const { id, ids, getId, resolve, trigger = useAsync.DEEP, onSuccess, onError } = props;
     if (id && ids) {
         throw new Error("Only one of 'id' and 'ids' should be provided");
     }
@@ -202,6 +211,8 @@ export default function useAsyncValue<T, U extends Id>(
     const { run, reset, isLoading, error, response: resolvedValue } = useAsync(resolve, {
         args: [id || ids],
         trigger: isValueMissing ? trigger : useAsync.MANUAL,
+        onSuccess,
+        onError,
     });
 
     useEffect(() => {

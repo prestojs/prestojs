@@ -8,7 +8,7 @@ import React from 'react';
 const DecimalWidget = React.forwardRef(
     (
         { input, ...rest }: WidgetProps<string, HTMLInputElement>,
-        ref: React.RefObject<InputNumber>
+        ref: React.RefObject<typeof InputNumber>
     ): React.ReactElement => {
         const { value, ...restInput } = input;
         const valueNum: number | null | undefined =

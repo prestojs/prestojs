@@ -39,7 +39,7 @@ function Union({ doc, type, isArray = false, ...rest }) {
     );
 }
 
-export default function TypeDesc({ doc, type, isArray, isReturnType }) {
+export default function TypeDesc({ doc, type, isArray, isReturnType, isTypeParameter = false }) {
     const typeArgs = useTypeArguments();
     if (!type) {
         type = doc.type;
@@ -85,6 +85,20 @@ export default function TypeDesc({ doc, type, isArray, isReturnType }) {
             <span className="text-blue-400">
                 <TypeDesc type={type.elementType} isArray />
                 []
+            </span>
+        );
+    }
+    if (type.type === 'tuple') {
+        return (
+            <span className="text-blue-400">
+                [
+                {type.elements.map((t, i) => (
+                    <React.Fragment key={i}>
+                        <TypeDesc type={t} isArray />
+                        {i < type.elements.length - 1 && ', '}
+                    </React.Fragment>
+                ))}
+                ]
             </span>
         );
     }
@@ -135,10 +149,18 @@ export default function TypeDesc({ doc, type, isArray, isReturnType }) {
     if (name === '__type' && doc?.type?.name) {
         name = doc.type.name;
     }
-    if (type.type === 'typeParameter' && typeArgs[type.name]) {
-        return <TypeDesc type={typeArgs[type.name]} doc={doc} isReturnType={isReturnType} />;
+    if (type.type === 'typeParameter' && typeArgs[type.name] && !isTypeParameter) {
+        // Avoid circular references by not rendering nested typeParameter (isTypeParameter)
+        return (
+            <TypeDesc
+                type={typeArgs[type.name]}
+                doc={doc}
+                isReturnType={isReturnType}
+                isTypeParameter
+            />
+        );
     }
-    if (type.name === 'Record' && type?.typeArguments.length === 2) {
+    if (type.name === 'Record' && type?.typeArguments?.length === 2) {
         return <span className="text-blue-400">Object</span>;
     }
     if (type.name === 'Promise') {

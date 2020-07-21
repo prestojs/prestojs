@@ -1,7 +1,7 @@
+import { Form } from '@prestojs/final-form';
 import { useViewModelCache } from '@prestojs/viewmodel';
 import { Button } from 'antd';
 import React from 'react';
-import { Form } from '@prestojs/final-form';
 
 import User from '../models/User';
 import useEndpoint from '../useEndpoint';
@@ -68,6 +68,12 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
                 <FieldErrors name="email" />
                 <Form.Item field={User.fields.region} />
                 <FieldErrors name="region" />
+                <Form.Item field={User.fields.referredBy} />
+                <FieldErrors name="referredBy" />
+                <Form.Item field={User.fields.referredByGrouped} />
+                <FieldErrors name="referredByGrouped" />
+                <Form.Item field={User.fields.friends} />
+                <FieldErrors name="friends" />
                 <hr />
                 <Button htmlType="submit" type="primary">
                     Save

@@ -3,30 +3,34 @@ type CompoundId = { [fieldName: string]: SingleId };
 export type Id = SingleId | CompoundId;
 
 /**
- * Interface for types that we can automatically extract a unique
- * identifier from.
+ * Interface for types that we can automatically extract a unique identifier from.
  *
- * If a `_pk` property exists (eg. from [ViewModelFactory](doc:ViewModelFactory))
- * that will be used otherwise an `id` property will be used.
+ * To confirm to the interface provide a `_key` property or getter.
+ *
+ * [ViewModelFactory](doc:ViewModelFactory) conforms to this so anything that expects an Identifiable
+ * will accept a ViewModel.
+ *
+ * Implementing this can save you having to pass explicit functions to identify an item in other parts of the system
+ * (eg. for [AsyncChoices](doc:AsyncChoices) or [useAsyncValue](doc:useAsyncValue))
+ *
+ * @extract-docs
+ * @menu-group Identifiable
  */
-export type Identifiable =
-    | {
-          id: Id;
-          _pk?: Id;
-      }
-    | {
-          id?: Id;
-          _pk: Id;
-      };
+export interface Identifiable {
+    _key: Id;
+}
 
 /**
  * Check if a value conforms to Identifiable
+ *
+ * @extract-docs
+ * @menu-group Identifiable
  */
 export function isIdentifiable(item: any): item is Identifiable {
     if (!item || typeof item !== 'object') {
         return false;
     }
-    return item.id != null || item._pk != null;
+    return item._key != null;
 }
 
 /**
@@ -34,18 +38,13 @@ export function isIdentifiable(item: any): item is Identifiable {
  * must be provided or an error will be thrown.
  * @param item Any value to get ID for
  * @param fallbackGetId Function to return id for `item` if it doesn't implement Identifiable
+ *
+ * @extract-docs
+ * @menu-group Identifiable
  */
 export function getId(item: Identifiable | any, fallbackGetId?: (item: any) => Id): Id {
     if (isIdentifiable(item)) {
-        if (item._pk != null) {
-            return item._pk;
-        }
-        if (item.id != null) {
-            return item.id;
-        }
-        // This will never happen as isIdentifiable checks this... but typescript doesn't
-        // get it
-        throw new Error('Item has a valid id field but no value set');
+        return item._key;
     }
     if (fallbackGetId) {
         return fallbackGetId(item);
@@ -58,6 +57,9 @@ export function getId(item: Identifiable | any, fallbackGetId?: (item: any) => I
 /**
  * Create string representation of ID suitable for strict equality
  * checking or as a key into an object / map.
+ *
+ * @extract-docs
+ * @menu-group Identifiable
  */
 export function hashId(id: Id): string {
     if (id == null) {
@@ -80,6 +82,9 @@ export function hashId(id: Id): string {
  * Check if two objects share the same ID.
  *
  * NOTE: Doesn't compare objects for equality; only their id
+ *
+ * @extract-docs
+ * @menu-group Identifiable
  */
 export function isSameById(
     item1: Identifiable | any,

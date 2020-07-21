@@ -123,6 +123,12 @@ export type ViewModelInterface<
     readonly _pk: PkType;
 
     /**
+     * Returns the primary key value(s) for this instance. This is to conform to the
+     * [Identifiable](doc:Identifiable) interface.
+     */
+    readonly _key: PkType;
+
+    /**
      * The assigned data for this record. You usually don't need to access this directly; values
      * for a field can be retrieved from the record directly using the field name
      *
@@ -673,6 +679,11 @@ export default function viewModelFactory<T extends FieldsMapping>(
                     }, {});
                 }
                 return this[pkFieldName];
+            },
+        },
+        _key: {
+            get(): PrimaryKey {
+                return this._pk;
             },
         },
         toJS: {

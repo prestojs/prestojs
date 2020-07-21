@@ -1,4 +1,5 @@
 import FieldBinder from '../FieldBinder';
+import { AsyncChoicesInterface } from './AsyncChoices';
 
 /**
  * @expand-properties
@@ -30,6 +31,12 @@ export interface FieldProps<T> {
      */
     choices?: Map<T, string> | [T, string][];
     /**
+     * Asynchronous choices for this field.
+     *
+     * Only one of `asyncChoices` and `choices` should be passed.
+     */
+    asyncChoices?: AsyncChoicesInterface<any, T>;
+    /**
      * True if field should be considered read only (eg. excluded from forms)
      */
     readOnly?: boolean;
@@ -54,7 +61,13 @@ class UnboundFieldError<T, K> extends Error {
  */
 export default class Field<T, ParsableType extends any = T> {
     // These are just for internal usage with typescript
+    /**
+     * @private
+     */
     __fieldValueType: T;
+    /**
+     * @private
+     */
     __parsableValueType: ParsableType;
 
     private _model: typeof FieldBinder;
@@ -109,6 +122,10 @@ export default class Field<T, ParsableType extends any = T> {
     // In djrad we had: choiceRefinementUrl
     public choices?: Map<T, string>;
     /**
+     * Async choices for this field.
+     */
+    public asyncChoices?: AsyncChoicesInterface<any, T>;
+    /**
      * Indicates this field should only be read, not written. Not enforced but can be used by components to adjust their
      * output accordingly (eg. exclude it from a form or show it on a form with a read only input)
      */
@@ -119,6 +136,9 @@ export default class Field<T, ParsableType extends any = T> {
      */
     public writeOnly: boolean;
 
+    /**
+     * @private
+     */
     protected _defaultValue?: T | (() => Promise<T> | T);
 
     constructor(values: FieldProps<T> = {}) {
@@ -128,9 +148,14 @@ export default class Field<T, ParsableType extends any = T> {
             helpText,
             defaultValue,
             choices,
+            asyncChoices,
             readOnly = false,
             writeOnly = false,
         } = values;
+
+        if (choices && asyncChoices) {
+            throw new Error("Only one of 'choices' and 'asyncChoices' should be provided");
+        }
 
         if (required !== undefined && typeof required !== 'boolean')
             throw new Error(`"required" should be a boolean, received: ${required}`);
@@ -151,6 +176,7 @@ export default class Field<T, ParsableType extends any = T> {
                     'helpText',
                     'defaultValue',
                     'choices',
+                    'asyncChoices',
                     'readOnly',
                     'writeOnly',
                 ].includes(key)
@@ -164,6 +190,7 @@ export default class Field<T, ParsableType extends any = T> {
         this.label = label;
         this.helpText = helpText;
         this._defaultValue = defaultValue;
+        this.asyncChoices = asyncChoices;
         if (choices) {
             this.choices = !(choices instanceof Map) ? new Map(choices) : choices;
         }

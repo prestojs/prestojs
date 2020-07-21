@@ -6,7 +6,7 @@ import useAsync from './useAsync';
 /**
  * @expand-properties
  */
-type UseAsyncLookupProps<T> = {
+export type UseAsyncLookupProps<T> = {
     /**
      * When to trigger the fetch. Defaults to `DEEP` which means whenever a deep
      * equality check on `query` or `paginator` state fails it will refetch.
@@ -79,7 +79,7 @@ type UseAsyncLookupReturnCommon<T> = {
      */
     reset: () => void;
 };
-type UseAsyncLookupReturn<T> =
+export type UseAsyncLookupReturn<T> =
     | (UseAsyncLookupReturnCommon<T> & {
           /**
            * Until first call has resolved neither error nor result will be set

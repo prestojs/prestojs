@@ -17,6 +17,9 @@ type FormProps<FormValues = AnyObject> = FinalFormProps<FormValues> & {
      * Any extra props to pass through to the underlying form component. The form component
      * used is determined by the `formComponent` passed to [UiProvider](doc:UiProvider) or
      * `form` if none is passed.
+     *
+     * Note that this only applies if you pass `children` to `Form`. If you use `render` or `component`
+     * then it is ignored.
      */
     formProps?: Record<string, any>;
 };

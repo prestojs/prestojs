@@ -477,7 +477,13 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
 export default class ViewModelCache<
     ViewModelClassType extends ViewModelConstructor<any, any, any>
 > {
+    /**
+     * @private
+     */
     cache: Map<PrimaryKeyCacheKey, RecordCache<ViewModelClassType>>;
+    /**
+     * @private
+     */
     viewModel: ViewModelClassType;
 
     /**
@@ -570,7 +576,13 @@ export default class ViewModelCache<
         return record;
     }
 
+    /**
+     * @private
+     */
     isAddingList = false;
+    /**
+     * @private
+     */
     onAddingListDone: (() => void)[] = [];
 
     /**
@@ -647,7 +659,7 @@ export default class ViewModelCache<
         if (!fieldNames) {
             throw new Error('fieldNames must be provided');
         }
-        if (!pk) {
+        if (pk == null) {
             throw new Error('Primary key must be provided');
         }
         const { pkFieldName } = this.viewModel;
@@ -736,6 +748,9 @@ export default class ViewModelCache<
         return records;
     }
 
+    /**
+     * @private
+     */
     _lastAllRecords: Map<string, PartialViewModel<ViewModelClassType, any>[]> = new Map();
 
     /**
@@ -815,6 +830,9 @@ export default class ViewModelCache<
         }
     }
 
+    /**
+     * @private
+     */
     allChangeListeners: (() => void)[] = [];
 
     /**
