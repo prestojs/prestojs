@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define,@typescript-eslint/no-use-before-define */
-import { Endpoint, PaginatedEndpoint } from '@prestojs/rest';
+import { PaginatedViewModelEndpoint, ViewModelEndpoint } from '@prestojs/rest';
 import { usePaginator } from '@prestojs/util';
 import {
     AsyncChoices,
@@ -16,32 +16,12 @@ import namedUrls from '../namedUrls';
 
 import BaseUser from './generated/BaseUser';
 
-function transformAndCacheUser(data) {
-    if (data.results && data.count != null) {
-        throw new Error(
-            'Response is paginated but paginator was not defined. Do you need to use PaginatedEndpoint instead?'
-        );
-    }
-    if (Array.isArray(data)) {
-        const users = data.map(datum => new User(datum));
-        User.cache.addList(users);
-        return users;
-    }
-    const user = new User(data);
-    User.cache.add(user);
-    return user;
-}
-
 const endpoints = {
-    retrieve: new Endpoint(namedUrls.get('users-detail'), {
-        transformResponseBody: transformAndCacheUser,
-    }),
-    update: new Endpoint(namedUrls.get('users-detail'), {
-        transformResponseBody: transformAndCacheUser,
+    retrieve: new ViewModelEndpoint(namedUrls.get('users-detail'), () => User),
+    update: new ViewModelEndpoint(namedUrls.get('users-detail'), () => User, {
         method: 'patch',
     }),
-    list: new PaginatedEndpoint(namedUrls.get('users-list'), {
-        transformResponseBody: transformAndCacheUser,
+    list: new PaginatedViewModelEndpoint(namedUrls.get('users-list'), () => User, {
         resolveUrl(urlPattern, urlArgs, query) {
             return urlPattern.resolve(urlArgs, {
                 // default to pageNumber pagination if not specified
@@ -49,8 +29,7 @@ const endpoints = {
             });
         },
     }),
-    create: new Endpoint(namedUrls.get('users-list'), {
-        transformResponseBody: transformAndCacheUser,
+    create: new ViewModelEndpoint(namedUrls.get('users-list'), () => User, {
         method: 'post',
     }),
 };
@@ -76,9 +55,6 @@ const asyncChoicesOptions = {
         return useViewModelCache(User, cache => {
             if (!item) {
                 return item;
-            }
-            if (Array.isArray(item)) {
-                console.log(cache.getList(item));
             }
 
             return Array.isArray(item) ? cache.getList(item) : cache.get(item) || item;

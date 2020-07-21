@@ -23,7 +23,7 @@ type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
 /**
  * @expand-properties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
  */
-type EndpointOptions = ExecuteInitOptions & {
+export type EndpointOptions = ExecuteInitOptions & {
     /**
      * Method to decode body based on response. The default implementation looks at the content type of the
      * response and processes it accordingly (eg. handles JSON and text responses) and is suitable for most cases.
