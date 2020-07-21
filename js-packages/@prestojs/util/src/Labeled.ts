@@ -2,7 +2,7 @@
  * Interface for items that provide a plain text label. Implementing this can save you having to pass
  * explicit functions to label an item in other parts of the system (eg. for [AsyncChoices](doc:AsyncChoices))
  *
- * See [isTextLabeled](doc:isTextLabeled) and [getPlainLabel](doc:getPlainLabel).
+ * See [isTextLabeled](doc:isTextLabeled) and [getTextLabel](doc:getTextLabel).
  *
  * @extract-docs
  * @menu-group Labeled
@@ -11,7 +11,7 @@ export interface TextLabeled {
     /**
      * Return the plain text label for this item. This must return a string
      *
-     * See [isTextLabeled](doc:isTextLabeled) to test for support and [getPlainLabel](doc:getPlainLabel) for easiest way
+     * See [isTextLabeled](doc:isTextLabeled) to test for support and [getTextLabel](doc:getTextLabel) for easiest way
      * to get the label.
      */
     getLabel(): string;
@@ -100,7 +100,7 @@ export function getNodeLabel(item: any): React.ReactNode {
  * @extract-docs
  * @menu-group Labeled
  */
-export function getPlainLabel(item: any): string {
+export function getTextLabel(item: any): string {
     if (isTextLabeled(item)) {
         return item.getLabel();
     }
