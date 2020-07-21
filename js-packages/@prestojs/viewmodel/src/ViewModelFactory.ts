@@ -206,6 +206,8 @@ export interface ViewModelConstructor<
      * - All fields have the `name` property set to match the key in `fields`
      * - All fields have `label` filled out if not explicitly set (eg. if name was `emailAddress` label will be created
      *   as `Email Address`)
+     *
+     * See also [getField](doc:viewModelFactory#method-getField) for getting a nested field using array notation.
      */
     readonly fields: FieldMappingType;
 
@@ -568,7 +570,28 @@ export function flattenFieldPath(fieldPath: FieldPath[] | FieldPath, separator =
     return flattenedPath;
 }
 
-export function expandField(model: ViewModelConstructor<any>, fieldName: string): FieldPath[] {
+/**
+ * For the given field `fieldName` on View Model `model` expand any RelatedViewModelField's to
+ * it's set of fields.
+ *
+ * eg. If `User` had a `RelatedViewModelField` on `group` to a model with a 'name' and 'ownerId' field then:
+ *
+ * ```js
+ * expandField(User, 'group')
+ * // [ ['group', 'name'], ['group', 'ownerId' ]
+ * ```
+ *
+ * For non relation fields the passed fieldName is returned as an array:
+ *
+ * ```
+ * expandField(User, 'name')
+ * // ['name']
+ * ```
+ *
+ * @param model
+ * @param fieldName
+ */
+function expandField(model: ViewModelConstructor<any>, fieldName: string): FieldPath[] {
     const field = model.fields[fieldName];
     if (field instanceof RelatedViewModelField) {
         return field.to.fieldNames
@@ -603,7 +626,7 @@ export class InvalidFieldError extends Error {}
  *
  * Where 'user' is a foreign key to a model that has a foreign key on field 'group' with two fields.
  *
- * We exclude non-relation fields to avoid circular dependencies.
+ * We exclude [RelatedViewModelField](doc:RelatedViewModelField)'s to avoid circular dependencies.
  *
  * @param model
  * @param paths
@@ -646,7 +669,7 @@ export function expandRelationFieldPaths(
                 }
                 const isRelation = field instanceof RelatedViewModelField;
                 const isLast = i === path.length - 1;
-                if (i % 2 == 0 && !isLast && !isRelation) {
+                if (!isLast && !isRelation) {
                     throw new Error(
                         `Nested paths are only valid for RelatedViewModelField. '${fieldName}' is a ${field}.`
                     );
@@ -870,17 +893,14 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 if (field instanceof RelatedViewModelField) {
                     // TODO: Make doing this part of interface rather than special case?
                     if (
+                        assignedData[key] &&
                         data[field.sourceFieldName] != null &&
                         data[field.sourceFieldName] !== assignedData[key]._pk
                     ) {
+                        const { name, sourceFieldName } = field;
+                        const pk = assignedData[key]._pk;
                         console.warn(
-                            `Related field ${
-                                field.name
-                            } was created from nested object that had a different id to the source field name ${
-                                field.sourceFieldName
-                            }: ${data[field.sourceFieldName]} !== ${assignedData[key]._pk}. ${
-                                assignedData[key]._pk
-                            } has been used for both.`
+                            `Related field ${name} was created from nested object that had a different id to the source field name ${sourceFieldName}: ${data[sourceFieldName]} !== ${pk}. ${pk} has been used for both.`
                         );
                     }
                     if (assignedData[key]) {

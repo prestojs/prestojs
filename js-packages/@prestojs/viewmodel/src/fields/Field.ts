@@ -306,10 +306,14 @@ export default class Field<T, ParsableType extends any = T> {
     }
 
     /**
-     * Called after fields are attached to a ViewModel.
+     * Called once after fields are attached to a ViewModel. This occurs the first time `.fields` is
+     * accessed on the ViewModel.
      *
      * By default this does nothing but can be used by fields to attach extra properties or validate
      * against the final view model (for example checking that another field does / does not exist).
+     *
+     * NOTE: This is called for every distinct ViewModel class; so if class A is extended by class B
+     * then it will be called on both A and B.
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public contributeToClass(viewModel: ViewModelConstructor<any>): void {

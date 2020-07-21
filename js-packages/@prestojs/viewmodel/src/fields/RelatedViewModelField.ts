@@ -19,6 +19,14 @@ type RelatedViewModelFieldProps<T extends ViewModelConstructor<any>> = FieldProp
     to: (() => Promise<T> | T) | T;
 };
 
+export class UnresolvedRelatedViewModelFieldError extends Error {
+    field: RelatedViewModelField;
+    constructor(field: RelatedViewModelField, message) {
+        super(message);
+        this.field = field;
+    }
+}
+
 /**
  * Define a field that references another ViewModel
  *
@@ -249,7 +257,8 @@ export default class RelatedViewModelField<
     get to(): T {
         if (!this._resolvedTo) {
             if (this._resolvingTo) {
-                throw new Error(
+                throw new UnresolvedRelatedViewModelFieldError(
+                    this,
                     `${this.model.name}.fields.${this.name}.resolveViewModel() has been called but hasn't yet resolved. Did you forgot to wait for the promise to resolve?`
                 );
             }
@@ -257,7 +266,8 @@ export default class RelatedViewModelField<
             if (isViewModelClass(maybeViewModel)) {
                 this._resolvedTo = maybeViewModel;
             } else {
-                throw new Error(
+                throw new UnresolvedRelatedViewModelFieldError(
+                    this,
                     `Call ${this.model.name}.fields.${this.name}.resolveViewModel() first`
                 );
             }

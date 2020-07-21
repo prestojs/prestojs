@@ -15,6 +15,29 @@ import {
     ViewModelInterface,
 } from './ViewModelFactory';
 
+// Controller for conditionally enabling listeners. We don't want to fire listeners anytime
+// something changes in the cache as there's lots of changes that happen internally for keeping
+// the cache in sync that aren't specifically a change consumers care about
+let listenersEnabled = false;
+
+/**
+ * Any changes that occur within the passed function will trigger listeners
+ */
+function withEnableListeners<T>(run: () => T): T {
+    if (listenersEnabled) {
+        return run();
+    }
+    listenersEnabled = true;
+    try {
+        const r = run();
+        listenersEnabled = false;
+        return r;
+    } catch (err) {
+        listenersEnabled = false;
+        throw err;
+    }
+}
+
 /**
  * Points to a record that is cached already. The purpose of this is to have a single object
  * in memory and only clone it as needed (eg. a single instance of the RecordPointer is stored
@@ -128,6 +151,9 @@ type AllChangesListener = () => void;
 // ['a', 'b', 'c'] becomes 'a⁞b⁞c'
 const CACHE_KEY_FIELD_SEPARATOR = '⁞';
 
+/**
+ * Must be kept in sync with `reverseCacheKey`
+ */
 function getFieldNameCacheKey(
     fieldNames: readonly FieldPath[],
     viewModel: ViewModelConstructor<any>
@@ -204,6 +230,8 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
 
     /**
      * Return the key to use into `cache` for the specified field names
+     *
+     * Must be kept in sync with `reverseCacheKey`
      */
     private getCacheKey(
         fieldNames: readonly (keyof ViewModelClassType['fields'])[] | FieldPath[]
@@ -213,6 +241,8 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
 
     /**
      * Take a cache key generated with `getCacheKey` and return the list of fields
+     *
+     * Must be kept in sync with `getCacheKey`/`getFieldNameCacheKey`
      */
     private reverseCacheKey(fieldsKey: string): FieldPath[] {
         return fieldsKey.split(CACHE_KEY_FIELD_SEPARATOR).map(fieldName => {
@@ -236,7 +266,8 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
      * @private
      */
     private getRelationFields(
-        fieldNames: FieldPath[]
+        fieldNames: FieldPath[],
+        viewModel = this.viewModel
     ): { relations: Record<string, FieldPath[]>; nonRelationFieldNames: string[] } {
         const relations: Record<string, FieldPath[]> = {};
         const nonRelationFieldNames: string[] = [];
@@ -248,16 +279,18 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                 } else {
                     relations[fieldName[0]].push(fieldName.slice(1));
                 }
-            } else if (this.viewModel.fields[fieldName] instanceof RelatedViewModelField) {
+            } else if (viewModel.fields[fieldName] instanceof RelatedViewModelField) {
                 relations[fieldName] = relations[fieldName] || [];
-                nonRelationFieldNames.push(this.viewModel.fields[fieldName].sourceFieldName);
+                nonRelationFieldNames.push(viewModel.fields[fieldName].sourceFieldName);
             } else {
-                nonRelationFieldNames.push(fieldName);
+                if (!viewModel.pkFieldNames.includes(fieldName)) {
+                    nonRelationFieldNames.push(fieldName);
+                }
             }
         }
         for (const [relationName, relationFieldNames] of Object.entries(relations)) {
             if (relationFieldNames.length === 0) {
-                const relation = this.viewModel.fields[relationName];
+                const relation = viewModel.fields[relationName];
                 // If field names for relation haven't been specified default to all non-relation fields
                 relationFieldNames.push(
                     ...relation.to.fieldNames.filter(fieldName => {
@@ -307,7 +340,9 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                 } else {
                     ret = this.cache.set(key, value);
                 }
-                listeners.forEach(cb => cb(before as InstanceType<ViewModelClassType>, value));
+                if (listenersEnabled) {
+                    listeners.forEach(cb => cb(before as InstanceType<ViewModelClassType>, value));
+                }
             }
         } else {
             if (value === null) {
@@ -333,14 +368,16 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
      * (eg. when a superset of fields are changed). Changes to a subset of fields are detected
      * by their existence in either listener cache or record cache. This handles almost all cases
      * but as we support traversing related caches there is the case where some part of the chain
-     * legitimately has a null value and so the related record can't be returned but it's still
-     * a valid record. For example if you try to retrieve a record with `get(1, ['user', 'group', 'owner'])`
+     * legitimately has a null value on the sourceFieldName and so the related record can't be
+     * returned but it's still a valid record.
+     *
+     * For example if you try to retrieve a record with `get(1, ['user', 'group', 'owner'])`
      * but the `groupId` is null (ie. group is actually optional) then this should still return
-     * a record as it exists it's just that the relations aren't set. This won't be detected based
-     * on entries in cache keys or listeners keys as we can't extract the nested field paths as
-     * they aren't set. In this case we know what fields were requested (they were specified in the
-     * `get` call) and so we use this function to add a null entry in the cache purely so the key
-     * exists and can be returned.
+     * a record as it exists it's just that the `RelatedViewModelField` field isn't set. This won't
+     * be detected based on entries in cache keys or listeners keys as we can't extract the nested
+     * field paths as they aren't set. In this case we know what fields were requested (they were
+     * specified in the `get` call) and so we use this function to add a null entry in the cache
+     * purely so the key exists and can be returned.
      * @param fieldNames
      */
     addKeyPlaceholder(fieldNames: FieldPath[]): void {
@@ -385,7 +422,9 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                                 record = record.clone(assignedFieldNames);
                             }
                             if (record) {
-                                if (!after.isEqual(record[fieldName])) {
+                                if (!after) {
+                                    this.cleanupKey(fieldsKey);
+                                } else if (!after.isEqual(record[fieldName])) {
                                     const newRecord = new this.viewModel({
                                         ...record._data,
                                         [fieldName]: after,
@@ -403,6 +442,71 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
     }
 
     /**
+     * Given an existing cached record `record`, a cache key `key` and the
+     * fields `assignedFieldNames` on `record` create a new record for `key` if it is
+     * a subset of `record`.
+     * @private
+     */
+    private createRecordForSubKey(
+        record: InstanceType<ViewModelClassType> | RecordPointer<ViewModelClassType>,
+        key: FieldNameCacheKey,
+        assignedFieldNames: FieldPath[]
+    ): InstanceType<ViewModelClassType> | RecordPointer<ViewModelClassType> | null {
+        const fieldNames = flattenFieldPath(assignedFieldNames);
+        const cacheFieldNames = this.reverseCacheKey(key);
+        const { nonRelationFieldNames: otherNonRelationFieldKeys } = this.getRelationFields(
+            fieldNames
+        );
+        const { relations, nonRelationFieldNames } = this.getRelationFields(cacheFieldNames);
+        if (isSubset(flattenFieldPath(cacheFieldNames), fieldNames)) {
+            if (record instanceof RecordPointer) {
+                record = record.record;
+            }
+            return new RecordPointer(this.cache.get(key), record);
+        }
+        if (
+            Object.keys(relations).length > 0 &&
+            isSubset(nonRelationFieldNames, otherNonRelationFieldKeys)
+        ) {
+            if (record instanceof RecordPointer) {
+                record = record.record;
+            }
+            const data = {};
+            for (const [fieldName, relationFields] of Object.entries(relations)) {
+                const relation = this.viewModel.fields[fieldName];
+                if (record._assignedFields.includes(relation.sourceFieldName)) {
+                    const id = record[relation.sourceFieldName];
+                    if (id == null) {
+                        data[fieldName] = null;
+                        data[relation.sourceFieldName] = null;
+                    } else {
+                        let relationRecord = relation.to.cache.get(id, relationFields);
+                        if (
+                            !relationRecord &&
+                            record._assignedFields.includes(fieldName) &&
+                            record[fieldName]
+                        ) {
+                            relation.to.cache.add(record[fieldName]);
+                            relationRecord = relation.to.cache.get(id, relationFields);
+                        }
+                        if (!relationRecord) {
+                            return null;
+                        }
+                        data[fieldName] = relationRecord;
+                    }
+                } else {
+                    return null;
+                }
+            }
+            return new this.viewModel({
+                ...pick(record._data, [...nonRelationFieldNames, ...record._model.pkFieldNames]),
+                ...data,
+            }) as InstanceType<ViewModelClassType>;
+        }
+        return null;
+    }
+
+    /**
      * Add a record to the cache based on the fields that are set on it.
      *
      * This will also update any cached entries for records that contain only
@@ -414,66 +518,12 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
         record: InstanceType<ViewModelClassType>
     ): Map<string, InstanceType<ViewModelClassType> | RecordPointer<ViewModelClassType>> | null {
         const assignedFieldNames = getAssignedFieldsDeep(record);
-        const fieldNames = flattenFieldPath(assignedFieldNames);
         const fieldsKey = this.getCacheKey(assignedFieldNames);
         for (const key of [...this.cache.keys(), ...this.cacheListeners.keys()]) {
-            const cacheFieldNames = this.reverseCacheKey(key);
-            const { relations, nonRelationFieldNames } = this.getRelationFields(cacheFieldNames);
-            if (isSubset(flattenFieldPath(cacheFieldNames), fieldNames)) {
-                const pointer = new RecordPointer(this.cache.get(key), record);
-                this.setValueForKey(key, pointer);
+            const newRecord = this.createRecordForSubKey(record, key, assignedFieldNames);
+            if (newRecord) {
+                this.setValueForKey(key, newRecord);
                 this.setupRelationListeners(record, key);
-            } else if (
-                Object.keys(relations).length > 0 &&
-                isSubset(nonRelationFieldNames, fieldNames)
-            ) {
-                let matches = true;
-                const data = {};
-                for (const [fieldName, relationFields] of Object.entries(relations)) {
-                    const relation = this.viewModel.fields[fieldName];
-                    if (record._assignedFields.includes(relation.sourceFieldName)) {
-                        const id = record[relation.sourceFieldName];
-                        if (id == null) {
-                            data[fieldName] = null;
-                            data[relation.sourceFieldName] = null;
-                        } else {
-                            // const relationRecord = record._assignedFields.includes(fieldName)
-                            //     ? record[fieldName]
-                            //     : relation.to.cache.get(id, relationFields);
-                            let relationRecord = relation.to.cache.get(id, relationFields);
-                            if (
-                                !relationRecord &&
-                                record._assignedFields.includes(fieldName) &&
-                                record[fieldName]
-                            ) {
-                                // Not yet cached but is available on this record. Add it then refetch
-                                // from the cache. Note that because relationFields could be deeply
-                                // nested this still may be a cache miss.
-                                relation.to.cache.add(record[fieldName]);
-                                relationRecord = relation.to.cache.get(id, relationFields);
-                            }
-                            if (!relationRecord) {
-                                matches = false;
-                            } else {
-                                data[fieldName] = relationRecord;
-                            }
-                        }
-                    } else {
-                        matches = false;
-                    }
-                    if (!matches) break;
-                }
-                if (matches) {
-                    const newRecord = new this.viewModel({
-                        ...pick(record._data, [
-                            ...nonRelationFieldNames,
-                            ...record._model.pkFieldNames,
-                        ]),
-                        ...data,
-                    });
-                    this.setValueForKey(key, newRecord as InstanceType<ViewModelClassType>);
-                    this.setupRelationListeners(record, key);
-                }
             }
         }
         const ret = this.setValueForKey(fieldsKey, record);
@@ -574,8 +624,15 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
         return null;
     }
 
+    /**
+     * Remove specified key from cache, cleanup any relation listeners and trigger
+     * listener callbacks if required.
+     * @private
+     */
     private cleanupKey(fieldsKey): void {
         this.setValueForKey(fieldsKey, null);
+
+        // Cleanup any relation listeners this entry had attached
         for (const p of this.reverseCacheKey(fieldsKey)) {
             if (Array.isArray(p)) {
                 const r = this.relationListeners.get(p[0]);
@@ -629,6 +686,30 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
         const fieldsKey = this.getCacheKey(
             expandRelationFieldPaths(this.viewModel, fieldNames as FieldPath[])
         );
+        if (!this.cache.has(fieldsKey)) {
+            // This handles the case where a listener is added _after_ an item that
+            // would match it's key is added. This is only necessary for the delete
+            // case; without this a delete that occurs in this instance wouldn't be
+            // picked up and the listener would not be called. See the test case
+            // "deletes should still work if listener added after record created"
+            for (const key of [...this.cache.keys(), ...this.cacheListeners.keys()]) {
+                const record = this.cache.get(key);
+                if (!record) {
+                    continue;
+                }
+                const newRecord = this.createRecordForSubKey(
+                    record,
+                    fieldsKey,
+                    this.reverseCacheKey(key)
+                );
+                if (newRecord) {
+                    this.setValueForKey(fieldsKey, newRecord);
+                    this.setupRelationListeners(record, fieldsKey);
+                    break;
+                }
+            }
+        }
+
         let listeners = this.cacheListeners.get(fieldsKey);
         if (!listeners) {
             listeners = [];
@@ -709,6 +790,8 @@ const defaultListenerBatcher = {
      * will be dispatched. The value returned from `run` will be returned.
      *
      * If any error occurs in `run` then no listeners will be called.
+     *
+     * If you nest batches then all listeners run at the end of the outer batch.
      */
     batch<T>(run: () => T): T {
         if (this.isActive) {
@@ -718,18 +801,15 @@ const defaultListenerBatcher = {
         try {
             const r = run();
             let pending = this.pendingNoBatch;
-            // TODO: :shrug:?
             while (pending.size > 0) {
                 this.pendingNoBatch = new Map();
                 pending.forEach(([before, after], cb) => cb(before, after));
                 pending = this.pendingNoBatch;
-                // break;
             }
             this.pending.forEach(([before, after], cb) => cb(before, after));
             this.pending = new Map();
             this.pendingAll.forEach(cb => cb());
             this.pendingAll = new Set();
-            // TODO:Should this move up above this.pending.forEach?
             this.isActive = false;
             return r;
         } catch (e) {
@@ -824,11 +904,11 @@ const defaultListenerBatcher = {
  * can be retrieved using array notation:
  *
  * ```js
- * // Fetch the 'name' field and the related 'group' record and it's 'label' field
+ * // Fetch the 'name' field and the related 'group' record and its 'label' field
  * ['name', ['group', 'label']]
  * ```
  *
- * To fetch all fields from a relation you can just specify it's name:
+ * To fetch all fields from a relation you can just specify its name:
  *
  * ```js
  * ['name', 'group']
@@ -851,7 +931,7 @@ const defaultListenerBatcher = {
  * ['name', ['group', 'label'], ['group', 'owner', 'name']]
  * ```
  *
- * **NOTE:** When accessing a relation it's `sourceFieldName` is always included regardless
+ * **NOTE:** When accessing a relation its `sourceFieldName` is always included regardless
  * of whether you explicitly request it:
  *
  * ```js
@@ -970,39 +1050,36 @@ export default class ViewModelCache<
         if (Array.isArray(recordOrData)) {
             return this.addList(recordOrData);
         }
-        return this.cacheClass.listenerBatcher.batch(() => {
-            let record: InstanceType<ViewModelClassType>;
-            if (!this.isInstanceOfModel(recordOrData)) {
-                if (isViewModelInstance(recordOrData)) {
-                    throw new Error(
-                        `Attempted to cache ViewModel of type ${recordOrData._model} in cache for ${
-                            this.viewModel
-                        }. ${
-                            isDev()
-                                ? ' If you are using hot loading this can cause instanceof checks to fail when the class is recreated - if this is the case a hard refresh should resolve the issue.'
-                                : ''
-                        }`
-                    );
+        let record: InstanceType<ViewModelClassType>;
+        if (!this.isInstanceOfModel(recordOrData)) {
+            if (isViewModelInstance(recordOrData)) {
+                let message = `Attempted to cache ViewModel of type ${recordOrData._model} in cache for ${this.viewModel}.`;
+                if (isDev()) {
+                    message +=
+                        ' If you are using hot loading this can cause instanceof checks to fail when the class is recreated - if this is the case a hard refresh should resolve the issue.';
                 }
-                record = new this.viewModel(recordOrData) as InstanceType<ViewModelClassType>;
-            } else {
-                record = recordOrData;
+                throw new Error(message);
             }
-            if (!record._assignedFields) {
-                throw new Error('_assignedFields not set on record; cannot be cached');
-            }
-            const pkKey = this.getPkCacheKey(record._pk);
-            let recordCache = this.cache.get(pkKey);
-            if (!recordCache) {
-                recordCache = new RecordCache(
-                    this.viewModel,
-                    this.onAnyChange.bind(this),
-                    record._pk
-                );
-                this.cache.set(pkKey, recordCache);
-            }
-            recordCache.add(record);
-            return record;
+            record = new this.viewModel(recordOrData) as InstanceType<ViewModelClassType>;
+        } else {
+            record = recordOrData;
+        }
+        if (!record._assignedFields) {
+            throw new Error('_assignedFields not set on record; cannot be cached');
+        }
+        const pkKey = this.getPkCacheKey(record._pk);
+        let recordCache = this.cache.get(pkKey);
+        if (!recordCache) {
+            recordCache = new RecordCache(this.viewModel, this.onAnyChange.bind(this), record._pk);
+            this.cache.set(pkKey, recordCache);
+        }
+        // Reassign to const so typescript know won't change in closure below
+        const _recordCache = recordCache;
+        return withEnableListeners(() => {
+            return this.cacheClass.listenerBatcher.batch(() => {
+                _recordCache.add(record);
+                return record;
+            });
         });
     }
 
@@ -1022,8 +1099,12 @@ export default class ViewModelCache<
     >(
         records: (T | FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>)[]
     ): (T | PartialViewModel<ViewModelClassType, FieldNames>)[] {
-        return this.cacheClass.listenerBatcher.batch(() => {
-            return records.map(record => this.add(record)) as InstanceType<ViewModelClassType>[];
+        return withEnableListeners(() => {
+            return this.cacheClass.listenerBatcher.batch(() => {
+                return records.map(record => this.add(record)) as InstanceType<
+                    ViewModelClassType
+                >[];
+            });
         });
     }
 
@@ -1128,6 +1209,11 @@ export default class ViewModelCache<
         if (!recordCache) {
             return null;
         }
+        // If record exists under fieldNames key already then return it
+        let record = recordCache.get(fieldNames as FieldPath[]);
+        if (record) {
+            return record;
+        }
         const relations: RelatedViewModelField[] = [];
         const sourceFieldNames: FieldNames[] = [];
         const nestedFields: Record<string, FieldPath[]> = {};
@@ -1173,11 +1259,6 @@ export default class ViewModelCache<
             if (!sourceFieldNames.includes(sourceFieldName)) {
                 sourceFieldNames.push(sourceFieldName);
             }
-        }
-        // If record exists under fieldNames key already then return it
-        let record = recordCache.get(fieldNames as FieldPath[]);
-        if (record) {
-            return record;
         }
         // Otherwise retrieve it without the related field names (ie. just look it
         // up with the non-related field names + corresponding id's for related fields)
@@ -1232,9 +1313,10 @@ export default class ViewModelCache<
                 // Add a null entry for these fields. This handles the case when nested data is fetched
                 // but some part of the hierarchy is null (eg. the value is legitimately optional) -
                 // in those cases the record should be returned.
-                recordCache.addKeyPlaceholder(cacheFieldNames);
                 const newRecord = new this.viewModel({ ...record._data, ...relationData });
-                this.add(newRecord);
+
+                recordCache.addKeyPlaceholder(cacheFieldNames);
+                recordCache.add(newRecord as InstanceType<ViewModelClassType>);
 
                 // We can now return the underlying record for the cache key requested (ie. the original
                 // related field name rather than the source field name). It would work without this but
@@ -1377,7 +1459,7 @@ export default class ViewModelCache<
         if (!recordCache) {
             return false;
         }
-        return this.batch(() => recordCache.delete(fieldNames));
+        return withEnableListeners(() => this.batch(() => recordCache.delete(fieldNames)));
     }
 
     private notifyAnyChange = (): void => {

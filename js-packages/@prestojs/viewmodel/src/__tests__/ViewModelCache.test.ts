@@ -1481,6 +1481,182 @@ test('listeners should work across deeply nested related models', async () => {
     expect(userListenerAll).not.toHaveBeenCalled();
 });
 
+test('getting a subset of keys should not trigger listeners', async () => {
+    const { User, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const subscriptionListenerNested = jest.fn();
+
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+
+    Subscription.cache.addListener(
+        1,
+        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        subscriptionListenerNested
+    );
+
+    expect(
+        Subscription.cache.get(1, [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ])
+    ).toEqual(
+        new Subscription({
+            id: 1,
+            userId: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: { id: 1, name: 'Staff', ownerId: 1, owner: { id: 1, name: 'Bob' } },
+            },
+        })
+    );
+    expect(subscriptionListenerNested).not.toHaveBeenCalled();
+});
+
+test('deletes should still work if listener added after record created', async () => {
+    const { User, Group, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const subscriptionListenerNested = jest.fn();
+    const userListenerNested = jest.fn();
+
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+
+    Subscription.cache.addListener(
+        1,
+        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        subscriptionListenerNested
+    );
+    User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested);
+
+    Group.cache.delete(1);
+    expect(User.cache.get(1, ['id', 'name', 'group'])).toBeNull();
+    expect(userListenerNested).toHaveBeenCalledTimes(1);
+    expect(userListenerNested).toHaveBeenCalledWith(
+        new User({
+            id: 1,
+            name: 'Bob',
+            groupId: 1,
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        }),
+        null
+    );
+    expect(
+        Subscription.cache.get(1, [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ])
+    ).toBeNull();
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                userId: 1,
+                user: {
+                    id: 1,
+                    name: 'Bob',
+                    groupId: 1,
+                    group: { id: 1, name: 'Staff', ownerId: 1, owner: { id: 1, name: 'Bob' } },
+                },
+            })
+        ),
+        null
+    );
+});
+
+test('deletes should work across deeply nested related models', async () => {
+    const { User, Group, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const subscriptionListenerNested = jest.fn();
+    const userListenerNested = jest.fn();
+
+    Subscription.cache.addListener(
+        1,
+        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        subscriptionListenerNested
+    );
+    User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested);
+
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+
+    expect(userListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+
+    Group.cache.delete(1);
+
+    expect(userListenerNested).toHaveBeenCalledTimes(2);
+    expect(userListenerNested).toHaveBeenCalledWith(
+        new User({
+            id: 1,
+            name: 'Bob',
+            groupId: 1,
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        }),
+        null
+    );
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(2);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        new Subscription({
+            id: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+                group: { id: 1, name: 'Staff', owner: { id: 1, name: 'Bob' } },
+            },
+        }),
+        null
+    );
+});
+
 test('listeners should handle missing nested', async () => {
     const { Subscription, User } = createTestModels(true);
     const cb = jest.fn();
@@ -2292,6 +2468,35 @@ test('should support manual batching', async () => {
     );
 });
 
+test('should support manual nested batching', async () => {
+    const { User } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    const listener = jest.fn();
+    const listenerList = jest.fn();
+    const listenerAll = jest.fn();
+    User.cache.addListener(listenerAll);
+    User.cache.addListener(1, ['id', 'name'], listener);
+    User.cache.addListenerList([1, 2], ['id', 'name'], listenerList);
+    User.cache.batch(() => {
+        User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
+        User.cache.batch(() => {
+            User.cache.add({ id: 2, name: 'Sam', groupId: null });
+            User.cache.add({ id: 1, name: 'Bobby', groupId: 1 });
+        });
+    });
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listenerList).toHaveBeenCalledTimes(1);
+    expect(listenerAll).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(null, recordEqualTo(new User({ id: 1, name: 'Bobby' })));
+    expect(listenerList).toHaveBeenCalledWith(
+        [null, null],
+        [
+            recordEqualTo(new User({ id: 1, name: 'Bobby' })),
+            recordEqualTo(new User({ id: 2, name: 'Sam' })),
+        ]
+    );
+});
+
 test('getList from work across caches', async () => {
     const { User, Group } = createTestModels(true);
     await User.fields.group.resolveViewModel();
@@ -2428,14 +2633,13 @@ function timeBlock(run): bigint {
     return (end - start) / BigInt(1e6);
 }
 
-test.skip('should be performant', async () => {
-    // TODO: Revisit this, disabled for now  - it's slow
+test('should be performant', async () => {
     // TODO: I don't know what's good here but as a starting point:
-    // 500 nested records (so 500 subs, 500 users, 500, groups) with
-    // a listener each (3 on different permutations of nested fields = 2500)
+    // 50 nested records (so 50 subs, 50 users, 50, groups) with
+    // a listener each (3 on different permutations of nested fields = 250)
     // and list listener on all subscriptions for 3 different permutations of
-    // nested fields (1500)
-    // So total 1500 records and 4000 listeners
+    // nested fields (150)
+    // So total 150 records and 400 listeners
     const { User, Group, Subscription } = createTestModels(true);
     await Subscription.fields.user.resolveViewModel();
     await User.fields.group.resolveViewModel();
@@ -2445,7 +2649,8 @@ test.skip('should be performant', async () => {
         cbs.push(fn);
         return fn;
     }
-    for (let i = 0; i < 500; i++) {
+    const count = 50;
+    for (let i = 0; i < count; i++) {
         Subscription.cache.addListener(i, ['id', 'userId'], nextFn());
         Subscription.cache.addListener(
             i,
@@ -2472,28 +2677,28 @@ test.skip('should be performant', async () => {
         Group.cache.addListener(i, ['id', 'name', 'ownerId'], nextFn());
         Group.cache.addListener(i, ['id', 'name', 'owner'], nextFn());
     }
-    const ids = Array.from({ length: 500 }, (_, i) => i);
+    const ids = Array.from({ length: count }, (_, i) => i);
     Subscription.cache.addListenerList(
         ids,
         ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
-        nextFn()
+        jest.fn()
     );
     Subscription.cache.addListenerList(
         ids,
         ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']],
-        nextFn()
+        jest.fn()
     );
     Subscription.cache.addListenerList(
         ids,
         ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'group']],
-        nextFn()
+        jest.fn()
     );
     User.cache.addListener(jest.fn());
     Subscription.cache.addListener(jest.fn());
     Group.cache.addListener(jest.fn());
     expect(
         timeBlock(() => {
-            for (let i = 0; i < 500; i++) {
+            for (let i = 0; i < count; i++) {
                 Group.cache.add({
                     id: i,
                     name: 'Staff',
@@ -2509,8 +2714,10 @@ test.skip('should be performant', async () => {
                     userId: i,
                 });
             }
-            for (let i = 0; i < 500; i++) {
+            for (let i = 0; i < count; i++) {
                 Subscription.cache.delete(i);
+                User.cache.delete(i);
+                Group.cache.delete(i);
             }
         })
     ).toBeLessThan(1500);
