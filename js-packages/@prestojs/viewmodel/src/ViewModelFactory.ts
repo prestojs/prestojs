@@ -890,6 +890,23 @@ export default function viewModelFactory<T extends FieldsMapping>(
             ];
             boundFields.set(modelClass as ViewModelConstructor<FinalFields>, f);
         }
+        if (isDev() && typeof Proxy != 'undefined') {
+            // In dev throw an error if invalid field is accessed
+            return [
+                new Proxy(f[0], {
+                    get(target, prop: string): Field<any> {
+                        if (!(prop in target)) {
+                            const validFieldNames = Object.keys(target).join(', ');
+                            throw new Error(
+                                `Attempted to access field '${prop}' but does not exist. Valid field names are: ${validFieldNames}`
+                            );
+                        }
+                        return target[prop];
+                    },
+                }),
+                f[1],
+            ];
+        }
         return f;
     }
 
