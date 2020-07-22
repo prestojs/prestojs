@@ -365,20 +365,33 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
 
     /**
      * Adds a placeholder entry for `fieldNames` so that changes to that cache key are detected
-     * (eg. when a superset of fields are changed). Changes to a subset of fields are detected
-     * by their existence in either listener cache or record cache. This handles almost all cases
-     * but as we support traversing related caches there is the case where some part of the chain
-     * legitimately has a null value on the sourceFieldName and so the related record can't be
-     * returned but it's still a valid record.
+     * (eg. when a superset of fields are changed).
      *
-     * For example if you try to retrieve a record with `get(1, ['user', 'group', 'owner'])`
-     * but the `groupId` is null (ie. group is actually optional) then this should still return
-     * a record as it exists it's just that the `RelatedViewModelField` field isn't set. This won't
-     * be detected based on entries in cache keys or listeners keys as we can't extract the nested
-     * field paths as they aren't set. In this case we know what fields were requested (they were
-     * specified in the `get` call) and so we use this function to add a null entry in the cache
-     * purely so the key exists and can be returned.
-     * @param fieldNames
+     * Changes to a subset of fields are detected by their existence in either the listener cache
+     * or record cache. If a record is retrieved from the cache on field names that has no current
+     * entry but there exists a record with the superset of fields then a new cache Record entry
+     * is created at that point in time and returned immediately.
+     *
+     * This works fine in most cases however if there's a null RelatedField then keys corresponding
+     * to fields nested via the FK won't yet exist in the cache and will not be updated. This is because
+     * when the record is cached the keys are extracted from the assigned fields - but if the RelatedField
+     * is null then the nested fields cannot be inferred and so the cache key will differ from the
+     * requested key.
+     *
+     * As an example consider `cache.get(1, ['username', ['group', 'name']])`
+     *  - Here there's a related field `group` which in turn has a related field `owner`.
+     *  - The source field for `group` is `groupId` and is null.
+     *  - The requested key does not exists we do have a superset of
+     *    `['email', 'username', ['group', 'name']]`
+     *  - `addKeyPlaceholder(['username', ['group', 'name']])` is called to ensure that there is
+     *    guaranteed to be a cache entry for the requested key.
+     *    - If there is no cache entry present it will set it to null.
+     *  - We set the cache entry for `['username', ['group', 'name']])` to
+     *    `{username: 'dev', groupId: null}`
+     *  - The act of setting this cache entry also triggers an update on the `['username', 'groupId']`
+     *    key which is identified as having a subset of fields
+     *  - This ensure that updates to partial records involving both `group` and `groupId` are kept
+     *    in sync
      */
     addKeyPlaceholder(fieldNames: FieldPath[]): void {
         fieldNames = expandRelationFieldPaths(this.viewModel, fieldNames as FieldPath[]);

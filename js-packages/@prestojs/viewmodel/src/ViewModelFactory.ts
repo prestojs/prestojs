@@ -626,7 +626,8 @@ export class InvalidFieldError extends Error {}
  *
  * Where 'user' is a foreign key to a model that has a foreign key on field 'group' with two fields.
  *
- * We exclude [RelatedViewModelField](doc:RelatedViewModelField)'s to avoid circular dependencies.
+ * We exclude [RelatedViewModelField](doc:RelatedViewModelField)'s to avoid circular dependencies. In the
+ * example above this means the `owner` field is excluded but the source field `ownerId` is still included.
  *
  * @param model
  * @param paths
