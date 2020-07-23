@@ -21,6 +21,15 @@ type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
 };
 
 /**
+ * Same as [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) but
+ * guarantees `headers` is set and is a `Headers` instance, and `method` is set.
+ */
+export type EndpointRequestInit = { headers: Headers; method: string } & Omit<
+    RequestInit,
+    'headers' | 'method'
+>;
+
+/**
  * @expand-properties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
  */
 export type EndpointOptions = ExecuteInitOptions & {
@@ -127,9 +136,9 @@ type MiddlewareContext<T> = {
  * @param context The context for the current execute. This gives you access to the original options and a function to re-execute the command.
  * @returns Returns the value from `fetch` after it has been transformed by each middleware further down the chain
  */
-type MiddlewareFunction<T> = (
+export type MiddlewareFunction<T> = (
     url: string,
-    requestInit: RequestInit,
+    requestInit: EndpointRequestInit,
     next: (url: string, requestInit: RequestInit) => Promise<T>,
     context: MiddlewareContext<T>
 ) => Promise<T>;
@@ -634,9 +643,12 @@ export default class Endpoint<ReturnT = any> {
             options = paginator.getRequestInit(restOptions);
         }
         const { urlArgs = {}, query, ...init } = options;
-        // Always make sure headers is so middleware implementations can assume it exists
+        // Always make sure headers & method is set middleware implementations can assume it exists
         if (!init.headers) {
             init.headers = new Headers();
+        }
+        if (!init.method) {
+            init.method = 'GET';
         }
         const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         try {
@@ -645,7 +657,7 @@ export default class Endpoint<ReturnT = any> {
                 cls.defaultConfig.requestInit,
                 this.requestInit,
                 init
-            );
+            ) as EndpointRequestInit;
             const returnVal: ExecuteReturnVal<ReturnT> = {
                 url,
                 urlArgs,
@@ -694,7 +706,10 @@ export default class Endpoint<ReturnT = any> {
             const executeWithMiddleware = (): Promise<ReturnT> => {
                 const middleware = [...this.middleware];
                 let lastMiddleware;
-                const next = async (url: string, requestInit: RequestInit): Promise<ReturnT> => {
+                const next = async (
+                    url: string,
+                    requestInit: EndpointRequestInit
+                ): Promise<ReturnT> => {
                     let errors: string[] = [];
                     if (typeof url !== 'string') {
                         errors.push(`'url' arg from middleware was not a string, received: ${url}`);

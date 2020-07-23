@@ -5,7 +5,7 @@ import TypeDesc from './TypeDesc';
 export default function ParameterTable({ parameters, nameHeader = 'Parameter', isReturnType }) {
     return (
         parameters.length > 0 && (
-            <table className="w-full text-left table-collapse mt-5 mb-5">
+            <table className="w-full text-left table-collapse mt-5 mb-5 z-10 relative">
                 <thead>
                     <tr>
                         {!isReturnType && (
