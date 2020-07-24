@@ -16,6 +16,9 @@
     @apply -ml-10;
     @apply -mr-10;
 }
+.collapse-box .prism-highlight {
+    @apply mx-0 my-0;
+}
 
 .prism-highlight > code[class*='prism-code-'],
 .prism-highlight > pre[class*='prism-code-'],

@@ -1,0 +1,160 @@
+import { useState } from 'react';
+import {
+    useAsync,
+    useAsyncValue,
+    useAsyncLookup,
+    usePaginator,
+    PageNumberPaginator,
+} from '@prestojs/util';
+import * as githubApi from '../../../tutorial-code/github-api';
+import Collapse from '../../../components/Collapse';
+import UserSearch from '../../../tutorial-code/UserSearch';
+import UserList from '../../../tutorial-code/UserList';
+import { metadata as indexMetadata } from './index.mdx';
+
+export const metadata = {
+    title: 'Async Functions & Data Fetching',
+    sideBarSections: indexMetadata.sideBarSections,
+    scope: {
+        useState,
+        githubApi,
+        useAsync,
+        useAsyncValue,
+        usePaginator,
+        PageNumberPaginator,
+        useAsyncLookup,
+        UserSearch,
+        UserList,
+    },
+};
+
+
+# Data fetching basics
+
+```js file=../../../tutorial-code/github-api.js collapsable=For_reference_-_API_code_used_below
+```
+
+The [useAsync](doc:useAsync) is a low level hook to deal with triggering async function calls and handling response / errors and loading states.
+
+For example here's a simple example of using it to fetch the follower count for a GitHub user. While the response is loading
+the button is disabled.
+
+First define a component to render the input and search & reset buttons:
+
+```js live horizontal file=../../../tutorial-code/UserSearch.js stripImports prepend=() => <UserSearch onSearch={user => alert(user)} onReset={() => alert('Reset')} buttonText="Search" />
+```
+
+And a component to list out GitHub user records:
+
+```js live horizontal file=../../../tutorial-code/UserList.js stripImports prepend=() => <UserList users={[{login: 'octocat', avatar_url: 'https://avatars3.githubusercontent.com/u/583231?v=4'}, {login: 'prestojs', avatar_url: 'https://avatars0.githubusercontent.com/u/58584507?v=4'}]} />
+```
+
+Using [useAsync](doc:useAsync) we can call any async function and have it handle loading/error/response states:
+
+```js live horizontal
+function FollowerCount() {
+    const [user, setUser] = React.useState('');
+    const { response, isLoading, error, reset } = useAsync(githubApi.getUser, { trigger:  user ? 'DEEP': 'MANUAL', args: [user]});
+    return (
+        <div>
+            <UserSearch onSearch={setUser} disabled={isLoading} onReset={reset} buttonText="Get follower count"/>
+            {response && (
+                <p>
+                    <img src={response.avatar_url} />
+                    <br />
+                    {response.name} has {response.followers} followers
+                </p>
+            )}
+            {error && (
+                <p>
+                    Failed with status: {error.status} {error.statusText}
+                </p>
+            )}
+        </div>
+    );
+}
+```
+
+[useAsyncLookup](doc:useAsyncLookup) is more specialised and works with lists of data and assists with handling
+pagination. Here we fetch a list of records with ability to go to the next or previous page.
+
+```js live horizontal
+function FollowerListing() {
+    const [user, setUser] = React.useState();
+    const paginator = usePaginator(PageNumberPaginator);
+    const { result, isLoading, error, run, reset, ...rest } = useAsyncLookup({
+        trigger: user ? 'DEEP' : 'MANUAL',
+        execute: githubApi.getFollowers,
+        paginator,
+        query: { user },
+    });
+    return (
+        <div>
+            <UserSearch onSearch={setUser} disabled={isLoading} onReset={reset} buttonText="Get Followers"/>
+            <UserList users={result} />
+            {result && (
+            <div className="flex justify-between p-1 m-1">
+                <button
+                    onClick={() => paginator.previous()}
+                    disabled={paginator.page === 1}
+                    className="btn-blue"
+                >
+                    Previous Page
+                </button>
+                <button
+                    onClick={() => paginator.next()}
+                    disabled={!paginator.hasNextPage}
+                    className="btn-blue"
+                >
+                    Next Page
+                </button>
+            </div>
+            )}
+            {error && (
+                <p>
+                    Failed with status: {error.status} {error.statusText}
+                </p>
+            )}
+        </div>
+    );
+}
+```
+
+[useAsyncLookup](doc:useAsyncLookup) also provides the `accumulatePages` option to make it easy to implement
+a UI where each page of results is appended to the last (eg. infinite scroll)
+
+```js live horizontal
+function FollowerListing() {
+    const [user, setUser] = React.useState();
+    const paginator = usePaginator(PageNumberPaginator);
+    const { result, isLoading, error, run, reset, ...rest } = useAsyncLookup({
+        trigger: user ? 'DEEP' : 'MANUAL',
+        execute: githubApi.getFollowers,
+        paginator,
+        query: { user },
+        accumulatePages: true
+    });
+    return (
+        <div>
+            <UserSearch onSearch={setUser} disabled={isLoading} onReset={reset} buttonText="Get Followers"/>
+            <UserList users={result} />
+            {result && (
+            <div className="flex justify-between p-1 m-1">
+                <button
+                    onClick={() => paginator.next()}
+                    disabled={!paginator.hasNextPage}
+                    className="btn-blue"
+                >
+                    Fetch more
+                </button>
+            </div>
+            )}
+            {error && (
+                <p>
+                    Failed with status: {error.status} {error.statusText}
+                </p>
+            )}
+        </div>
+    );
+}
+```
