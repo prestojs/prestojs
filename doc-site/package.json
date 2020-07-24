@@ -30,6 +30,7 @@
   "devDependencies": {
     "babel-plugin-macros": "^2.8.0",
     "babel-plugin-styled-components": "^1.10.7",
+    "remark-code-import": "^0.2.0",
     "tailwind.macro": "^0.5.10"
   }
 }

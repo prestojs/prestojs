@@ -177,11 +177,15 @@ export default function useAsyncLookup<T>(props: UseAsyncLookupProps<T>): UseAsy
         shouldResetAccumulatedValues.current = false;
         return result;
     });
+    console.log({ response });
 
     const paginationChanged =
         paginationState &&
-        (lastPaginationStateRef.current === null ||
-            !isEqual(lastPaginationStateRef.current, paginationState));
+        // First pagination being set should not register as a change - otherwise results will
+        // be returned, pagination state set and then change will be detected and require fetching
+        // again. If last pagination doesn't exist it's not considered a change.
+        lastPaginationStateRef.current !== null &&
+        !isEqual(lastPaginationStateRef.current, paginationState);
     const shouldFetch =
         trigger !== 'MANUAL' &&
         // INITIAL_FETCH doesn't pass this check so shouldFetch still becomes true
@@ -205,6 +209,14 @@ export default function useAsyncLookup<T>(props: UseAsyncLookupProps<T>): UseAsy
         if ((queryChanged || paginationChanged || executeChanged) && trigger === 'MANUAL') {
             lastPaginationStateRef.current =
                 (paginator?.responseIsSet && paginator?.currentState) || null;
+            console.log('lol reset', {
+                queryChanged,
+                paginationChanged,
+                executeChanged,
+                lastQuery: JSON.stringify(lastQuery.current, null, 2),
+                query: JSON.stringify(query, null, 2),
+            });
+            lastQuery.current = query;
             reset();
         }
         if (
