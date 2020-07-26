@@ -19,9 +19,11 @@ type RelatedViewModelFieldProps<T extends ViewModelConstructor<any>> = FieldProp
     to: (() => Promise<T> | T) | T;
 };
 
-export class UnresolvedRelatedViewModelFieldError extends Error {
-    field: RelatedViewModelField;
-    constructor(field: RelatedViewModelField, message) {
+export class UnresolvedRelatedViewModelFieldError<
+    T extends ViewModelConstructor<any> = ViewModelConstructor<any>
+> extends Error {
+    field: RelatedViewModelField<T>;
+    constructor(field: RelatedViewModelField<T>, message) {
         super(message);
         this.field = field;
     }
