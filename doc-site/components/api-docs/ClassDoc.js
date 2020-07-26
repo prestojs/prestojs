@@ -12,6 +12,13 @@ export default function ClassDoc({ doc }) {
     const classDetails = getClassDetails(doc);
     const { constructor, methods, properties, staticMethods, staticProperties } = classDetails;
     const typeArguments = getTypeArguments(doc);
+    let sideLinkIds = [];
+    if (doc.mdx) {
+        const matches = doc.mdx.match(/data-anchorlink="([^"]*)"/g);
+        if (matches) {
+            sideLinkIds = matches.map(m => m.split('"')[1]);
+        }
+    }
     return (
         <TypeArgProvider typeArguments={typeArguments}>
             <Article>
@@ -20,6 +27,14 @@ export default function ClassDoc({ doc }) {
                 <ClassDetails {...classDetails} />
             </Article>
             <Sidebar currentTitle="On This Page">
+                {sideLinkIds.length > 0 && (
+                    <Sidebar.LinksSection
+                        links={sideLinkIds.map(linkId => ({
+                            href: `#${linkId}`,
+                            title: linkId.split('_').join(' '),
+                        }))}
+                    />
+                )}
                 {constructor && (
                     <Sidebar.LinksSection
                         title="Constructor"

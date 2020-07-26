@@ -3,10 +3,25 @@ import { getId, isIdentifiable } from '@prestojs/util';
 import CharField from '../fields/CharField';
 import Field from '../fields/Field';
 import NumberField from '../fields/NumberField';
-import ViewModelFactory, { isViewModelClass, isViewModelInstance } from '../ViewModelFactory';
+import RelatedViewModelField from '../fields/RelatedViewModelField';
+import viewModelFactory from '../ViewModelFactory';
+import ViewModelFactory, {
+    expandRelationFieldPaths,
+    flattenFieldPath,
+    getAssignedFieldsDeep,
+    isViewModelClass,
+    isViewModelInstance,
+    ViewModelConstructor,
+} from '../ViewModelFactory';
 
-
-
+declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace jest {
+        interface Matchers<R, T> {
+            toBeEqualToRecord(received: any, msg?: string): R;
+        }
+    }
+}
 
 test('Should be able to invoke ViewModelFactory directly and explicitly creates a pk without error', () => {
     ViewModelFactory({
@@ -391,6 +406,64 @@ test('Should be able to compare if two records are equal', () => {
     expect(new A(data).isEqual('string')).toBe(false);
 });
 
+test('Should be able to compare if two nested records are equal', async () => {
+    const Group = viewModelFactory({
+        name: new Field<string>(),
+    });
+    const User = viewModelFactory({
+        name: new Field<string>(),
+        groupId: new Field<number>(),
+        group: new RelatedViewModelField({
+            to: (): Promise<typeof Group> => Promise.resolve(Group),
+            sourceFieldName: 'groupId',
+        }),
+    });
+    const fields = {
+        userId: new Field<number>(),
+        user: new RelatedViewModelField<typeof User>({
+            to: (): Promise<typeof User> => Promise.resolve(User),
+            sourceFieldName: 'userId',
+        }),
+    };
+    const Subscription = viewModelFactory(fields);
+    await Subscription.fields.user.resolveViewModel();
+    const record1 = new Subscription({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+            },
+        },
+    });
+    const record2 = new Subscription({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+            },
+        },
+    });
+    const record3 = new Subscription({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 2,
+                name: 'Customer',
+            },
+        },
+    });
+    expect(record1.isEqual(record2)).toBe(true);
+    expect(record1.isEqual(record3)).toBe(false);
+});
+
 test('should clone a ViewModel record', () => {
     class A extends ViewModelFactory({
         id: new Field({ label: 'Id' }),
@@ -660,6 +733,7 @@ test('should conform to Identifiable', () => {
     class Test1 extends ViewModelFactory({
         id: new Field(),
     }) {}
+
     const record1 = new Test1({ id: 1 });
     const record2 = new Test1({ id: 2 });
 
@@ -667,4 +741,366 @@ test('should conform to Identifiable', () => {
     expect(isIdentifiable(record2)).toBe(true);
     expect(getId(record1)).toBe(1);
     expect(getId(record2)).toBe(2);
+});
+
+test('should support cloning across related fields', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
+    const Group = viewModelFactory({
+        name: new Field<string>(),
+    });
+    const User = viewModelFactory({
+        name: new Field<string>(),
+        groupId: new Field<number>(),
+        group: new RelatedViewModelField({
+            to: (): Promise<typeof Group> => Promise.resolve(Group),
+            sourceFieldName: 'groupId',
+        }),
+    });
+    const fields = {
+        userId: new Field<number>(),
+        user: new RelatedViewModelField<typeof User>({
+            to: (): Promise<typeof User> => Promise.resolve(User),
+            sourceFieldName: 'userId',
+        }),
+    };
+    const Subscription = viewModelFactory(fields);
+    await Subscription.fields.user.resolveViewModel();
+    const record1 = new Subscription({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+            },
+        },
+    });
+    expect(
+        new Subscription({
+            id: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+            },
+        })
+    ).toBeEqualToRecord(record1.clone([['user', 'name']]));
+    expect(
+        new Subscription({
+            id: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+                group: {
+                    id: 1,
+                },
+            },
+        })
+    ).toBeEqualToRecord(
+        record1.clone([
+            ['user', 'name'],
+            ['user', 'group', 'id'],
+        ])
+    );
+    // Shouldn't have been called with eg. 'Received value for key <key>. No such field exist on Subscription'
+    expect(mockWarn).not.toHaveBeenCalled();
+
+    const record2 = new Subscription({
+        id: 1,
+        user: {
+            id: 1,
+        },
+    });
+
+    expect(() =>
+        record2.clone([
+            ['user', 'name'],
+            ['user', 'group', 'id'],
+        ])
+    ).toThrowError(/Missing fields: user.group, user.name/);
+    const record3 = new Subscription({
+        id: 1,
+        userId: 1,
+    });
+    expect(() =>
+        record3.clone([
+            ['user', 'name'],
+            ['user', 'group', 'id'],
+        ])
+    ).toThrowError(/Missing fields: user/);
+    const record4 = new Subscription({
+        id: 1,
+        user: {
+            id: 1,
+            group: {
+                id: 1,
+            },
+        },
+    });
+    expect(() => record4.clone([['user', 'group', 'name']])).toThrowError(
+        /Missing fields: user.group.name/
+    );
+});
+
+test('getAssignedFieldsDeep should handle related view model data', async () => {
+    const Group = viewModelFactory({
+        name: new Field<string>(),
+    });
+    const User = viewModelFactory({
+        name: new Field<string>(),
+        groupId: new Field<number>(),
+        group: new RelatedViewModelField({
+            to: (): Promise<typeof Group> => Promise.resolve(Group),
+            sourceFieldName: 'groupId',
+        }),
+    });
+    const fields = {
+        userId: new Field<number>(),
+        user: new RelatedViewModelField<typeof User>({
+            to: (): Promise<typeof User> => Promise.resolve(User),
+            sourceFieldName: 'userId',
+        }),
+    };
+    const Subscription = viewModelFactory(fields);
+    await Subscription.fields.user.resolveViewModel();
+    const record1 = new Subscription({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+            },
+        },
+    });
+    expect(getAssignedFieldsDeep(record1)).toEqual([
+        'id',
+        ['user', 'group', 'id'],
+        ['user', 'group', 'name'],
+        ['user', 'groupId'],
+        ['user', 'id'],
+        ['user', 'name'],
+        'userId',
+    ]);
+    const record2 = new Subscription({
+        id: 1,
+        user: {
+            id: 1,
+            group: {
+                id: 1,
+            },
+        },
+    });
+    expect(getAssignedFieldsDeep(record2)).toEqual([
+        'id',
+        ['user', 'group', 'id'],
+        ['user', 'groupId'],
+        ['user', 'id'],
+        'userId',
+    ]);
+    const record3 = new User({
+        id: 1,
+        name: 'test',
+    });
+    expect(getAssignedFieldsDeep(record3)).toEqual(['id', 'name']);
+});
+
+test('flattenFieldPath should flatten nested paths', async () => {
+    expect(flattenFieldPath(['id', 'name'])).toEqual(['id', 'name']);
+    expect(
+        flattenFieldPath([
+            'id',
+            ['user', 'group', 'id'],
+            ['user', 'group', 'name'],
+            ['user', 'groupId'],
+            ['user', 'id'],
+            ['user', 'name'],
+            'userId',
+        ])
+    ).toEqual([
+        'id',
+        'user.group.id',
+        'user.group.name',
+        'user.groupId',
+        'user.id',
+        'user.name',
+        'userId',
+    ]);
+    expect(
+        flattenFieldPath([
+            'id',
+            ['user', 'group', 'id'],
+            ['user', 'groupId'],
+            ['user', 'id'],
+            'userId',
+        ])
+    ).toEqual(['id', 'user.group.id', 'user.groupId', 'user.id', 'userId']);
+    expect(
+        flattenFieldPath([
+            'id',
+            ['user', 'group', 'id'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+            ['user', 'group', 'owner', 'id'],
+            ['user', 'groupId'],
+            ['user', 'id'],
+            ['user', 'name'],
+            'userId',
+        ])
+    ).toEqual([
+        'id',
+        'user.group.id',
+        'user.group.name',
+        'user.group.owner.name',
+        'user.group.owner.id',
+        'user.groupId',
+        'user.id',
+        'user.name',
+        'userId',
+    ]);
+});
+
+test('expandPaths should correctly expand paths', async () => {
+    const Group = viewModelFactory({
+        name: new Field<string>(),
+        ownerId: new Field<number>(),
+        owner: new RelatedViewModelField({
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            to: (): Promise<typeof User> => Promise.resolve(User),
+            sourceFieldName: 'ownerId',
+        }),
+    });
+    const User = viewModelFactory({
+        name: new Field<string>(),
+        groupId: new Field<number>(),
+        group: new RelatedViewModelField({
+            to: (): Promise<typeof Group> => Promise.resolve(Group),
+            sourceFieldName: 'groupId',
+        }),
+    });
+    const Subscription = viewModelFactory({
+        userId: new Field<number>(),
+        user: new RelatedViewModelField<typeof User>({
+            to: (): Promise<typeof User> => Promise.resolve(User),
+            sourceFieldName: 'userId',
+        }),
+    });
+    await Subscription.fields.user.resolveViewModel();
+    expect(expandRelationFieldPaths(Subscription, [['user', 'group']])).toEqual([
+        'userId',
+        ['user', 'groupId'],
+        ['user', 'group', 'name'],
+        ['user', 'group', 'ownerId'],
+    ]);
+    expect(expandRelationFieldPaths(Subscription, ['userId', ['user', 'group']])).toEqual([
+        'userId',
+        ['user', 'groupId'],
+        ['user', 'group', 'name'],
+        ['user', 'group', 'ownerId'],
+    ]);
+    expect(expandRelationFieldPaths(User, ['id', 'name', 'group'])).toEqual([
+        'id',
+        'name',
+        'groupId',
+        ['group', 'name'],
+        ['group', 'ownerId'],
+    ]);
+    expect(
+        expandRelationFieldPaths(User, ['name', ['group', 'name'], ['group', 'owner', 'name']])
+    ).toEqual([
+        'name',
+        'groupId',
+        ['group', 'name'],
+        ['group', 'ownerId'],
+        ['group', 'owner', 'name'],
+    ]);
+    expect(
+        expandRelationFieldPaths(User, [
+            'name',
+            ['group', 'name'],
+            ['group', 'owner', 'name'],
+            ['group', 'owner', 'group'],
+        ])
+    ).toEqual([
+        'name',
+        'groupId',
+        ['group', 'name'],
+        ['group', 'ownerId'],
+        ['group', 'owner', 'name'],
+        ['group', 'owner', 'groupId'],
+        ['group', 'owner', 'group', 'name'],
+        ['group', 'owner', 'group', 'ownerId'],
+    ]);
+
+    // Should handle overlap
+    expect(
+        expandRelationFieldPaths(User, [
+            'name',
+            ['group', 'name'],
+            ['group', 'ownerId'],
+            ['group', 'owner', 'name'],
+            // Specify group which means all non-relation fields
+            ['group', 'owner', 'group'],
+            // Then opt in to a relation as well
+            ['group', 'owner', 'group', 'owner'],
+        ])
+    ).toEqual([
+        'name',
+        'groupId',
+        ['group', 'name'],
+        ['group', 'ownerId'],
+        ['group', 'owner', 'name'],
+        ['group', 'owner', 'groupId'],
+        ['group', 'owner', 'group', 'name'],
+        ['group', 'owner', 'group', 'ownerId'],
+        ['group', 'owner', 'group', 'owner', 'name'],
+        ['group', 'owner', 'group', 'owner', 'groupId'],
+    ]);
+});
+
+test('getField should support traversing relations', async () => {
+    class Group extends viewModelFactory({
+        name: new Field<string>(),
+        ownerId: new Field<number>(),
+        owner: new RelatedViewModelField({
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            to: (): Promise<ViewModelConstructor<any>> => Promise.resolve(User),
+            sourceFieldName: 'ownerId',
+        }),
+    }) {}
+    class User extends viewModelFactory({
+        name: new Field<string>(),
+        groupId: new Field<number>(),
+        group: new RelatedViewModelField({
+            to: (): Promise<typeof Group> => Promise.resolve(Group),
+            sourceFieldName: 'groupId',
+        }),
+    }) {}
+    class Subscription extends viewModelFactory({
+        userId: new Field<number>(),
+        user: new RelatedViewModelField<typeof User>({
+            to: (): Promise<typeof User> => Promise.resolve(User),
+            sourceFieldName: 'userId',
+        }),
+    }) {}
+    await Subscription.fields.user.resolveViewModel();
+    expect(Subscription.getField('user')).toBe(Subscription.fields.user);
+    expect(Subscription.getField(['user', 'group'])).toBe(User.fields.group);
+    expect(Subscription.getField(['user', 'group', 'owner'])).toBe(Group.fields.owner);
+
+    expect(() => Subscription.getField('asdf')).toThrow(
+        new Error("Unknown field 'asdf' on ViewModel 'Subscription'")
+    );
+
+    expect(() => Subscription.getField(['user', 'blah', 'id'])).toThrow(
+        new Error("Unknown field 'blah' (from [user, blah, id]) on ViewModel 'User'")
+    );
+
+    expect(() => Subscription.getField(['user', 'name', 'id'])).toThrow(
+        new Error(
+            "Field 'name' (from [user, name, id]) on ViewModel 'User' is not a RelatedViewModelField"
+        )
+    );
 });

@@ -32,7 +32,8 @@ module.exports = {
     moduleFileExtensions: ['ts', 'tsx', 'js'],
     modulePathIgnorePatterns: [],
     moduleNameMapper,
-    notify: true,
+    // When true I end up with many terminal-notifier processes and 'usernoted' process pegging cpu at 100%
+    notify: false,
     notifyMode: 'always',
     roots: ['<rootDir>js-packages'],
     testMatch: ['**/src/**/__tests__/*.+(ts|tsx|js)', '**/src/**/*.test.+(ts|tsx|js)'],

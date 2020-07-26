@@ -32,7 +32,12 @@ export { default as useViewModelCache } from './useViewModelCache';
 export { default as AsyncChoices } from './fields/AsyncChoices';
 export { default as useAsyncChoices } from './useAsyncChoices';
 
-export { isViewModelInstance, isViewModelClass } from './ViewModelFactory';
+export {
+    InvalidFieldError,
+    MissingFieldsError,
+    isViewModelInstance,
+    isViewModelClass,
+} from './ViewModelFactory';
 
 import type {
     AsyncChoicesInterface,

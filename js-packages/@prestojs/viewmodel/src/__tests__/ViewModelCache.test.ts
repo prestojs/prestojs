@@ -1,7 +1,9 @@
+import process from 'process';
 import { recordEqualTo } from '../../../../../js-testing/matchers';
 import Field from '../fields/Field';
+import RelatedViewModelField from '../fields/RelatedViewModelField';
 import ViewModelCache from '../ViewModelCache';
-import viewModelFactory, { isViewModelInstance, ViewModelInterface } from '../ViewModelFactory';
+import viewModelFactory, { isViewModelInstance, ViewModelConstructor } from '../ViewModelFactory';
 
 function F<T>(name): Field<T> {
     return new Field<T>({ label: name });
@@ -208,21 +210,17 @@ test('should support custom cache', () => {
         }
     }).toThrowError('cache class must extend ViewModelCache');
 
-    class MyCache<T extends ViewModelInterface<any, any>> extends ViewModelCache<T> {}
-    class MyCache2<T extends ViewModelInterface<any, any>> extends ViewModelCache<T> {}
+    class MyCache<T extends ViewModelConstructor<any, any>> extends ViewModelCache<T> {}
+    class MyCache2<T extends ViewModelConstructor<any, any>> extends ViewModelCache<T> {}
     class Test1 extends viewModelFactory({}) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        static cache = new MyCache<Test1>(Test1);
+        static cache = new MyCache<typeof Test1>(Test1);
     }
 
     expect(Test1.cache).toBeInstanceOf(MyCache);
 
     // Make sure inheritance results in correct caches for everything
     class Test2 extends Test1.augment({}) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        static cache = new MyCache2<Test2>(Test2);
+        static cache = new MyCache2<typeof Test2>(Test2);
     }
 
     expect(Test1.cache).toBeInstanceOf(MyCache);
@@ -737,4 +735,2047 @@ test('should support listening all changes on a ViewModel', () => {
     Test1.cache.delete(6);
     expect(cb1).toHaveBeenCalledTimes(3);
     expect(cb2).toHaveBeenCalledTimes(3);
+});
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function createTestModels(circular = false) {
+    class Group extends viewModelFactory({
+        name: new Field<string>(),
+        ...(circular
+            ? {
+                  ownerId: new Field<number>(),
+                  owner: new RelatedViewModelField({
+                      // Type here isn't typeof User as it seemed to confuse typescript.. I guess
+                      // because of the circular reference
+                      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                      to: (): Promise<ViewModelConstructor<any>> => Promise.resolve(User),
+                      sourceFieldName: 'ownerId',
+                  }),
+              }
+            : {}),
+    }) {}
+    class User extends viewModelFactory({
+        name: new Field<string>(),
+        groupId: new Field<number | null>(),
+        group: new RelatedViewModelField({
+            to: (): Promise<typeof Group> => Promise.resolve(Group),
+            sourceFieldName: 'groupId',
+        }),
+    }) {}
+    class Subscription extends viewModelFactory({
+        userId: new Field<number>(),
+        user: new RelatedViewModelField<typeof User>({
+            to: (): Promise<typeof User> => Promise.resolve(User),
+            sourceFieldName: 'userId',
+        }),
+    }) {}
+    return { User, Group, Subscription };
+}
+test('cache should support traversing models', async () => {
+    const { User, Group, Subscription } = createTestModels();
+
+    Group.cache.add({ id: 1, name: 'Staff' });
+    User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
+    Subscription.cache.add({
+        id: 1,
+        userId: 1,
+    });
+    const r = Subscription.cache.get(1, ['userId']);
+    expect(r?.userId).toBe(1);
+    expect(() => r?.user).toThrow(/'user' accessed on .* but was not instantiated with it/);
+    expect(() => Subscription.cache.get(1, ['user'])).toThrow(/Call .*resolveViewModel\(\) first/);
+    await Subscription.fields.user.resolveViewModel();
+    const s = Subscription.cache.get(1, ['user']);
+    expect(s).toBeEqualToRecord(
+        new Subscription({
+            id: 1,
+            userId: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+            },
+        })
+    );
+    // Retrieving from cache again should give us same object
+    expect(Subscription.cache.get(1, ['user'])).toBe(s);
+
+    // If we only specify 'group' field from 'user' we shouldn't get other 'user' fields
+    // apart from primary key
+    expect(Subscription.cache.get(1, [['user', 'group']])).toBeEqualToRecord(
+        new Subscription({
+            id: 1,
+            userId: 1,
+            user: {
+                id: 1,
+                groupId: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                },
+            },
+        })
+    );
+
+    // Cache new record with id for group but without group in cache
+    // We should still be able to retrieve the 'user' field without it - we'll
+    // just get the id only.
+    Subscription.cache.add({
+        id: 2,
+        user: {
+            id: 2,
+            name: 'Sam',
+            groupId: 3,
+        },
+    });
+    expect(Subscription.cache.get(2, [['user', 'group']])).toBe(null);
+    const record = Subscription.cache.get(2, ['user']);
+    expect(record).toBeEqualToRecord(
+        new Subscription({
+            id: 2,
+            userId: 2,
+            user: {
+                id: 2,
+                name: 'Sam',
+                groupId: 3,
+            },
+        })
+    );
+    expect(record).toBe(Subscription.cache.get(2, ['user']));
+});
+
+test('caching record with nested data should populate associated caches', async () => {
+    const { User, Group, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: null,
+            },
+        },
+    });
+    expect(Subscription.cache.get(1, ['id', 'userId'])).toEqual(
+        new Subscription({
+            id: 1,
+            userId: 1,
+        })
+    );
+    expect(Subscription.cache.get(1, ['id', 'user'])).toEqual(
+        new Subscription({
+            id: 1,
+            userId: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+            },
+        })
+    );
+    expect(User.cache.get(1, ['name', 'group'])).toEqual(
+        new User({
+            id: 1,
+            name: 'Bob',
+            groupId: 1,
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: null,
+            },
+        })
+    );
+    expect(Group.cache.get(1, ['name'])).toEqual(
+        new Group({
+            id: 1,
+            name: 'Staff',
+        })
+    );
+    Subscription.cache.add({
+        id: 2,
+        userId: 2,
+    });
+    expect(Subscription.cache.get(2, ['id', 'userId'])).toEqual(
+        new Subscription({
+            id: 2,
+            userId: 2,
+        })
+    );
+    expect(Subscription.cache.get(2, ['id', 'user'])).toBe(null);
+
+    // Deeply nested data
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 10,
+            name: 'Garry',
+            group: {
+                id: 5,
+                name: "Garry's",
+                owner: {
+                    id: 9,
+                    name: 'Gazza',
+                    groupId: 5,
+                },
+            },
+        },
+    });
+    expect(User.cache.get(10, ['name', 'group'])).toEqual(
+        new User({
+            id: 10,
+            name: 'Garry',
+            group: {
+                id: 5,
+                name: "Garry's",
+                ownerId: 9,
+            },
+        })
+    );
+    expect(
+        User.cache.get(10, ['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']])
+    ).toEqual(
+        new User({
+            id: 10,
+            name: 'Garry',
+            group: {
+                id: 5,
+                name: "Garry's",
+                owner: {
+                    id: 9,
+                    name: 'Gazza',
+                    group: {
+                        id: 5,
+                        name: "Garry's",
+                        ownerId: 9,
+                    },
+                },
+            },
+        })
+    );
+});
+
+test('order of fields should not matter', async () => {
+    const { User, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 10,
+            name: 'Garry',
+            group: {
+                id: 5,
+                name: "Garry's",
+                owner: {
+                    id: 9,
+                    name: 'Gazza',
+                    groupId: 5,
+                },
+            },
+        },
+    });
+    expect(User.cache.get(10, ['name', 'group'])).toBe(User.cache.get(10, ['group', 'name']));
+    // Using shortcut for all fields should be same as enumerating them explicitly
+    expect(Subscription.cache.get(1, ['user', ['user', 'group'], ['user', 'group', 'owner']])).toBe(
+        Subscription.cache.get(1, [
+            ['user', 'group', 'owner'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'ownerId'],
+            'user',
+        ])
+    );
+});
+
+test('should support nested paths', async () => {
+    const { Subscription } = createTestModels();
+    await Subscription.fields.user.resolveViewModel();
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+            },
+        },
+    });
+    expect(Subscription.cache.get(1, ['userId', ['user', 'name']])).toBeEqualToRecord(
+        new Subscription({
+            id: 1,
+            userId: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+            },
+        })
+    );
+    expect(
+        Subscription.cache.get(1, [
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+        ])
+    ).toBeEqualToRecord(
+        new Subscription({
+            id: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                },
+            },
+        })
+    );
+
+    Subscription.cache.get(1, [
+        ['user', 'name'],
+        ['user', 'group'],
+    ]);
+});
+
+test('should handle nullable values', async () => {
+    const { User, Group, Subscription } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
+    Group.cache.add({ id: 1, name: 'Staff', ownerId: null });
+    expect(User.cache.get(1, ['group'])).toBeEqualToRecord(
+        new User({
+            id: 1,
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: null,
+            },
+        })
+    );
+    await Subscription.fields.user.resolveViewModel();
+    Subscription.cache.add({
+        id: 1,
+        userId: 1,
+    });
+    expect(Subscription.cache.get(1, [['user', 'group']])).toBeEqualToRecord(
+        new Subscription({
+            id: 1,
+            userId: 1,
+            user: {
+                id: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: null,
+                },
+            },
+        })
+    );
+    expect(
+        Subscription.cache.get(1, [
+            ['user', 'group'],
+            ['user', 'group', 'owner'],
+        ])
+    ).toBeEqualToRecord(
+        new Subscription({
+            id: 1,
+            userId: 1,
+            user: {
+                id: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: null,
+                    owner: null,
+                },
+            },
+        })
+    );
+    User.cache.add({ id: 2, name: 'Sam', groupId: null });
+    expect(User.cache.get(2, ['name', ['group', 'name'], ['group', 'owner']])).toBeEqualToRecord(
+        new User({
+            id: 2,
+            name: 'Sam',
+            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+            // @ts-ignore
+            group: null,
+            groupId: null,
+        })
+    );
+});
+
+test('listeners should work across related models', async () => {
+    const { User, Group } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    const userListenerSimple = jest.fn();
+    const userListenerNested = jest.fn();
+    const userListenerAll = jest.fn();
+    const groupListenerSimple = jest.fn();
+    const groupListenerNested = jest.fn();
+    const groupListenerAll = jest.fn();
+    const listeners = [
+        userListenerAll,
+        userListenerNested,
+        userListenerSimple,
+        groupListenerSimple,
+        groupListenerAll,
+        groupListenerNested,
+    ];
+    const resetCbs = (): void => {
+        listeners.forEach(cb => {
+            cb.mockReset();
+        });
+    };
+    const unsubFns = [
+        User.cache.addListener(1, ['id', 'name'], userListenerSimple),
+        User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested),
+        User.cache.addListener(userListenerAll),
+        Group.cache.addListener(2, ['id', 'name', 'ownerId'], groupListenerSimple),
+        Group.cache.addListener(2, ['id', 'name', 'owner'], groupListenerNested),
+        Group.cache.addListener(groupListenerAll),
+    ];
+    User.cache.add({
+        id: 1,
+        name: 'Bob',
+        group: {
+            id: 2,
+            name: 'Staff',
+            ownerId: 1,
+        },
+    });
+    expect(userListenerAll).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new User({ id: 1, name: 'Bob' }))
+    );
+    expect(userListenerNested).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new User({ id: 1, name: 'Bob', group: { id: 2, name: 'Staff', ownerId: 1 } }))
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new Group({ id: 2, name: 'Staff', ownerId: 1 }))
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(
+            new Group({ id: 2, name: 'Staff', owner: { id: 1, name: 'Bob', groupId: 2 } })
+        )
+    );
+    resetCbs();
+
+    Group.cache.add({
+        id: 2,
+        name: 'Management',
+        ownerId: 1,
+    });
+    expect(userListenerAll).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledTimes(0);
+    expect(userListenerNested).toHaveBeenCalledTimes(1);
+    expect(userListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new User({ id: 1, name: 'Bob', group: { id: 2, name: 'Staff', ownerId: 1 } })
+        ),
+        recordEqualTo(
+            new User({ id: 1, name: 'Bob', group: { id: 2, name: 'Management', ownerId: 1 } })
+        )
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledWith(
+        recordEqualTo(new Group({ id: 2, name: 'Staff', ownerId: 1 })),
+        recordEqualTo(new Group({ id: 2, name: 'Management', ownerId: 1 }))
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Group({ id: 2, name: 'Staff', owner: { id: 1, name: 'Bob', groupId: 2 } })
+        ),
+        recordEqualTo(
+            new Group({ id: 2, name: 'Management', owner: { id: 1, name: 'Bob', groupId: 2 } })
+        )
+    );
+    resetCbs();
+    User.cache.add({
+        id: 1,
+        name: 'Bobby',
+        groupId: 2,
+    });
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Group({ id: 2, name: 'Management', owner: { id: 1, name: 'Bob', groupId: 2 } })
+        ),
+        recordEqualTo(
+            new Group({ id: 2, name: 'Management', owner: { id: 1, name: 'Bobby', groupId: 2 } })
+        )
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledTimes(0);
+
+    resetCbs();
+
+    unsubFns.forEach(unsub => unsub());
+
+    User.cache.add({
+        id: 1,
+        name: 'Bob',
+        group: {
+            id: 2,
+            name: 'Staff',
+            ownerId: 1,
+        },
+    });
+    listeners.forEach(listener => {
+        expect(listener).not.toHaveBeenCalled();
+    });
+});
+
+test('listeners should work across deeply nested related models', async () => {
+    const { User, Group, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const subscriptionListenerSimple = jest.fn();
+    const subscriptionListenerNested = jest.fn();
+    const subscriptionListenerAll = jest.fn();
+    const userListenerSimple = jest.fn();
+    const userListenerNested = jest.fn();
+    const userListenerAll = jest.fn();
+    const groupListenerSimple = jest.fn();
+    const groupListenerNested = jest.fn();
+    const groupListenerAll = jest.fn();
+    const unsubFns = [
+        Subscription.cache.addListener(1, ['id', 'userId'], subscriptionListenerSimple),
+        Subscription.cache.addListener(
+            1,
+            ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+            subscriptionListenerNested
+        ),
+        Subscription.cache.addListener(subscriptionListenerAll),
+        User.cache.addListener(1, ['id', 'name'], userListenerSimple),
+        User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested),
+        User.cache.addListener(userListenerAll),
+        Group.cache.addListener(1, ['id', 'name', 'ownerId'], groupListenerSimple),
+        Group.cache.addListener(1, ['id', 'name', 'owner'], groupListenerNested),
+        Group.cache.addListener(groupListenerAll),
+    ];
+    const listeners = [
+        subscriptionListenerSimple,
+        subscriptionListenerNested,
+        subscriptionListenerAll,
+        userListenerAll,
+        userListenerNested,
+        userListenerSimple,
+        groupListenerSimple,
+        groupListenerAll,
+        groupListenerNested,
+    ];
+    const resetCbs = (): void => {
+        listeners.forEach(cb => {
+            cb.mockReset();
+        });
+    };
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+    expect(subscriptionListenerAll).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerSimple).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerSimple).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new Subscription({ id: 1, userId: 1 }))
+    );
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                user: {
+                    id: 1,
+                    name: 'Bob',
+                    group: { id: 1, name: 'Staff', owner: { id: 1, name: 'Bob' } },
+                },
+            })
+        )
+    );
+    expect(userListenerAll).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new User({ id: 1, name: 'Bob' }))
+    );
+    expect(userListenerNested).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new User({ id: 1, name: 'Bob', group: { id: 1, name: 'Staff', ownerId: 1 } }))
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new Group({ id: 1, name: 'Staff', ownerId: 1 }))
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(
+            new Group({ id: 1, name: 'Staff', owner: { id: 1, name: 'Bob', groupId: 1 } })
+        )
+    );
+
+    resetCbs();
+
+    Group.cache.add({
+        id: 1,
+        name: 'Management',
+        ownerId: 1,
+    });
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                user: {
+                    id: 1,
+                    name: 'Bob',
+                    group: { id: 1, name: 'Staff', owner: { id: 1, name: 'Bob' } },
+                },
+            })
+        ),
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                user: {
+                    id: 1,
+                    name: 'Bob',
+                    group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bob' } },
+                },
+            })
+        )
+    );
+
+    expect(userListenerAll).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledTimes(0);
+    expect(userListenerNested).toHaveBeenCalledTimes(1);
+    expect(userListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new User({ id: 1, name: 'Bob', group: { id: 1, name: 'Staff', ownerId: 1 } })
+        ),
+        recordEqualTo(
+            new User({ id: 1, name: 'Bob', group: { id: 1, name: 'Management', ownerId: 1 } })
+        )
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledWith(
+        recordEqualTo(new Group({ id: 1, name: 'Staff', ownerId: 1 })),
+        recordEqualTo(new Group({ id: 1, name: 'Management', ownerId: 1 }))
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Group({ id: 1, name: 'Staff', owner: { id: 1, name: 'Bob', groupId: 1 } })
+        ),
+        recordEqualTo(
+            new Group({ id: 1, name: 'Management', owner: { id: 1, name: 'Bob', groupId: 1 } })
+        )
+    );
+    resetCbs();
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(0);
+    User.cache.add({
+        id: 1,
+        name: 'Bobby',
+        groupId: 1,
+    });
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                user: {
+                    id: 1,
+                    name: 'Bob',
+                    group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bob' } },
+                },
+            })
+        ),
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                user: {
+                    id: 1,
+                    name: 'Bobby',
+                    group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bobby' } },
+                },
+            })
+        )
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Group({ id: 1, name: 'Management', owner: { id: 1, name: 'Bob', groupId: 1 } })
+        ),
+        recordEqualTo(
+            new Group({ id: 1, name: 'Management', owner: { id: 1, name: 'Bobby', groupId: 1 } })
+        )
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledTimes(0);
+
+    resetCbs();
+
+    Subscription.cache.delete(1);
+    expect(subscriptionListenerAll).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                user: {
+                    id: 1,
+                    name: 'Bobby',
+                    group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bobby' } },
+                },
+            })
+        ),
+        null
+    );
+    expect(subscriptionListenerSimple).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerSimple).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                userId: 1,
+            })
+        ),
+        null
+    );
+    expect(groupListenerSimple).not.toHaveBeenCalled();
+    expect(groupListenerNested).not.toHaveBeenCalled();
+    expect(groupListenerAll).not.toHaveBeenCalled();
+    expect(userListenerSimple).not.toHaveBeenCalled();
+    expect(userListenerNested).not.toHaveBeenCalled();
+    expect(userListenerAll).not.toHaveBeenCalled();
+    resetCbs();
+    unsubFns.forEach(cb => cb());
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob1',
+            group: {
+                id: 1,
+                name: 'Staff1',
+                ownerId: 1,
+            },
+        },
+    });
+    expect(subscriptionListenerSimple).not.toHaveBeenCalled();
+    expect(subscriptionListenerNested).not.toHaveBeenCalled();
+    expect(subscriptionListenerAll).not.toHaveBeenCalled();
+    expect(groupListenerSimple).not.toHaveBeenCalled();
+    expect(groupListenerNested).not.toHaveBeenCalled();
+    expect(groupListenerAll).not.toHaveBeenCalled();
+    expect(userListenerSimple).not.toHaveBeenCalled();
+    expect(userListenerNested).not.toHaveBeenCalled();
+    expect(userListenerAll).not.toHaveBeenCalled();
+});
+
+test('getting a subset of keys should not trigger listeners', async () => {
+    const { User, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const subscriptionListenerNested = jest.fn();
+
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+
+    Subscription.cache.addListener(
+        1,
+        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        subscriptionListenerNested
+    );
+
+    expect(
+        Subscription.cache.get(1, [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ])
+    ).toEqual(
+        new Subscription({
+            id: 1,
+            userId: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: { id: 1, name: 'Staff', ownerId: 1, owner: { id: 1, name: 'Bob' } },
+            },
+        })
+    );
+    expect(subscriptionListenerNested).not.toHaveBeenCalled();
+});
+
+test('deletes should still work if listener added after record created', async () => {
+    const { User, Group, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const subscriptionListenerNested = jest.fn();
+    const userListenerNested = jest.fn();
+
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+
+    Subscription.cache.addListener(
+        1,
+        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        subscriptionListenerNested
+    );
+    User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested);
+
+    Group.cache.delete(1);
+    expect(User.cache.get(1, ['id', 'name', 'group'])).toBeNull();
+    expect(userListenerNested).toHaveBeenCalledTimes(1);
+    expect(userListenerNested).toHaveBeenCalledWith(
+        new User({
+            id: 1,
+            name: 'Bob',
+            groupId: 1,
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        }),
+        null
+    );
+    expect(
+        Subscription.cache.get(1, [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ])
+    ).toBeNull();
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                userId: 1,
+                user: {
+                    id: 1,
+                    name: 'Bob',
+                    groupId: 1,
+                    group: { id: 1, name: 'Staff', ownerId: 1, owner: { id: 1, name: 'Bob' } },
+                },
+            })
+        ),
+        null
+    );
+});
+
+test('deletes should work across deeply nested related models', async () => {
+    const { User, Group, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const subscriptionListenerNested = jest.fn();
+    const userListenerNested = jest.fn();
+
+    Subscription.cache.addListener(
+        1,
+        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        subscriptionListenerNested
+    );
+    User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested);
+
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+
+    expect(userListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+
+    Group.cache.delete(1);
+
+    expect(userListenerNested).toHaveBeenCalledTimes(2);
+    expect(userListenerNested).toHaveBeenCalledWith(
+        new User({
+            id: 1,
+            name: 'Bob',
+            groupId: 1,
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        }),
+        null
+    );
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(2);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        new Subscription({
+            id: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+                group: { id: 1, name: 'Staff', owner: { id: 1, name: 'Bob' } },
+            },
+        }),
+        null
+    );
+});
+
+test('listeners should handle missing nested', async () => {
+    const { Subscription, User } = createTestModels(true);
+    const cb = jest.fn();
+    await Subscription.fields.user.resolveViewModel();
+    Subscription.cache.addListener(
+        1,
+        [
+            ['user', 'group'],
+            ['user', 'group', 'owner'],
+        ],
+        cb
+    );
+    User.cache.add({
+        id: 1,
+        name: 'Bob',
+        groupId: null,
+    });
+    Subscription.cache.add({
+        id: 1,
+        userId: 1,
+    });
+    expect(cb).toHaveBeenCalledWith(
+        null,
+        new Subscription({
+            id: 1,
+            userId: 1,
+            user: {
+                id: 1,
+                groupId: null,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // @ts-ignore
+                group: null,
+            },
+        })
+    );
+});
+
+test('listeners should work across related models with partial fields', async () => {
+    class Group extends viewModelFactory({
+        name: new Field<string>(),
+        ownerId: new Field<number>(),
+        owner: new RelatedViewModelField({
+            // Type here isn't typeof User as it seemed to confuse typescript.. I guess
+            // because of the circular reference
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            to: (): Promise<ViewModelConstructor<any>> => Promise.resolve(User),
+            sourceFieldName: 'ownerId',
+        }),
+    }) {}
+    class User extends viewModelFactory({
+        name: new Field<string>(),
+        email: new Field<string>(),
+        groupId: new Field<number | null>(),
+        group: new RelatedViewModelField({
+            to: (): Promise<typeof Group> => Promise.resolve(Group),
+            sourceFieldName: 'groupId',
+        }),
+    }) {}
+    class Subscription extends viewModelFactory({
+        label: new Field<string>(),
+        userId: new Field<number>(),
+        user: new RelatedViewModelField<typeof User>({
+            to: (): Promise<typeof User> => Promise.resolve(User),
+            sourceFieldName: 'userId',
+        }),
+    }) {}
+    await Subscription.fields.user.resolveViewModel();
+    const subscriptionListenerNested = jest.fn();
+    Subscription.cache.addListener(
+        1,
+        ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'email']],
+        subscriptionListenerNested
+    );
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+    expect(subscriptionListenerNested).not.toHaveBeenCalled();
+    User.cache.add({
+        id: 2,
+        name: 'Sam',
+        email: 'sam@sam.com',
+        groupId: 1,
+    });
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            email: 'bob@bob.com',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 2,
+            },
+        },
+    });
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenLastCalledWith(
+        null,
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                userId: 1,
+                user: {
+                    id: 1,
+                    groupId: 1,
+                    group: {
+                        id: 1,
+                        name: 'Staff',
+                        ownerId: 2,
+                        owner: {
+                            id: 2,
+                            email: 'sam@sam.com',
+                        },
+                    },
+                },
+            })
+        )
+    );
+    User.cache.add({ id: 2, name: 'Samuel' });
+    // No new calls, doesn't contain email
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    User.cache.add({ id: 2, name: 'Samuel', email: 'samuel@sam.com' });
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(2);
+    expect(subscriptionListenerNested).toHaveBeenLastCalledWith(
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                userId: 1,
+                user: {
+                    id: 1,
+                    groupId: 1,
+                    group: {
+                        id: 1,
+                        name: 'Staff',
+                        ownerId: 2,
+                        owner: {
+                            id: 2,
+                            email: 'sam@sam.com',
+                        },
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                userId: 1,
+                user: {
+                    id: 1,
+                    groupId: 1,
+                    group: {
+                        id: 1,
+                        name: 'Staff',
+                        ownerId: 2,
+                        owner: {
+                            id: 2,
+                            email: 'samuel@sam.com',
+                        },
+                    },
+                },
+            })
+        )
+    );
+    User.cache.add({ id: 2, email: 'samwise@sam.com' });
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(3);
+    expect(subscriptionListenerNested).toHaveBeenLastCalledWith(
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                userId: 1,
+                user: {
+                    id: 1,
+                    groupId: 1,
+                    group: {
+                        id: 1,
+                        name: 'Staff',
+                        ownerId: 2,
+                        owner: {
+                            id: 2,
+                            email: 'samuel@sam.com',
+                        },
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new Subscription({
+                id: 1,
+                userId: 1,
+                user: {
+                    id: 1,
+                    groupId: 1,
+                    group: {
+                        id: 1,
+                        name: 'Staff',
+                        ownerId: 2,
+                        owner: {
+                            id: 2,
+                            email: 'samwise@sam.com',
+                        },
+                    },
+                },
+            })
+        )
+    );
+});
+test('list listeners should work across related models', async () => {
+    const { User, Group, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const subscriptionListenerSimple = jest.fn();
+    const subscriptionListenerNested = jest.fn();
+    const subscriptionListenerAll = jest.fn();
+    const userListenerSimple = jest.fn();
+    const userListenerNested = jest.fn();
+    const userListenerAll = jest.fn();
+    const groupListenerSimple = jest.fn();
+    const groupListenerNested = jest.fn();
+    const groupListenerAll = jest.fn();
+    const unsubFns = [
+        Subscription.cache.addListenerList([1, 2, 3], ['id', 'userId'], subscriptionListenerSimple),
+        Subscription.cache.addListener(
+            [1, 2, 3],
+            ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+            subscriptionListenerNested
+        ),
+        Subscription.cache.addListener(subscriptionListenerAll),
+        User.cache.addListener([1, 2], ['id', 'name'], userListenerSimple),
+        User.cache.addListener([1, 2], ['id', 'name', 'group'], userListenerNested),
+        User.cache.addListener(userListenerAll),
+        Group.cache.addListener([1, 2], ['id', 'name', 'ownerId'], groupListenerSimple),
+        Group.cache.addListener([1, 2], ['id', 'name', 'owner'], groupListenerNested),
+        Group.cache.addListener(groupListenerAll),
+    ];
+    const listeners = [
+        subscriptionListenerSimple,
+        subscriptionListenerNested,
+        subscriptionListenerAll,
+        userListenerAll,
+        userListenerNested,
+        userListenerSimple,
+        groupListenerSimple,
+        groupListenerAll,
+        groupListenerNested,
+    ];
+    const resetCbs = (): void => {
+        listeners.forEach(cb => {
+            cb.mockReset();
+        });
+    };
+    Subscription.cache.addList([
+        {
+            id: 1,
+            user: {
+                id: 1,
+                name: 'Bob',
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                },
+            },
+        },
+        {
+            id: 2,
+            user: {
+                id: 1,
+                name: 'Bob',
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                },
+            },
+        },
+        {
+            id: 3,
+            user: {
+                id: 2,
+                name: 'Sam',
+                group: {
+                    id: 2,
+                    name: 'Customers',
+                    ownerId: 1,
+                },
+            },
+        },
+    ]);
+    expect(subscriptionListenerAll).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerSimple).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerSimple).toHaveBeenCalledWith(
+        [null, null, null],
+        [
+            recordEqualTo(new Subscription({ id: 1, userId: 1 })),
+            recordEqualTo(new Subscription({ id: 2, userId: 1 })),
+            recordEqualTo(new Subscription({ id: 3, userId: 2 })),
+        ]
+    );
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        [null, null, null],
+        [
+            recordEqualTo(
+                new Subscription({
+                    id: 1,
+                    user: {
+                        id: 1,
+                        name: 'Bob',
+                        group: { id: 1, name: 'Staff', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 2,
+                    user: {
+                        id: 1,
+                        name: 'Bob',
+                        group: { id: 1, name: 'Staff', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 3,
+                    user: {
+                        id: 2,
+                        name: 'Sam',
+                        group: { id: 2, name: 'Customers', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+        ]
+    );
+    expect(userListenerAll).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledWith(
+        [null, null],
+        [
+            recordEqualTo(new User({ id: 1, name: 'Bob' })),
+            recordEqualTo(new User({ id: 2, name: 'Sam' })),
+        ]
+    );
+    expect(userListenerNested).toHaveBeenCalledWith(
+        [null, null],
+        [
+            recordEqualTo(
+                new User({ id: 1, name: 'Bob', group: { id: 1, name: 'Staff', ownerId: 1 } })
+            ),
+            recordEqualTo(
+                new User({ id: 2, name: 'Sam', group: { id: 2, name: 'Customers', ownerId: 1 } })
+            ),
+        ]
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledWith(
+        [null, null],
+        [
+            recordEqualTo(new Group({ id: 1, name: 'Staff', ownerId: 1 })),
+            recordEqualTo(new Group({ id: 2, name: 'Customers', ownerId: 1 })),
+        ]
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        [null, null],
+        [
+            recordEqualTo(
+                new Group({ id: 1, name: 'Staff', owner: { id: 1, name: 'Bob', groupId: 1 } })
+            ),
+            recordEqualTo(
+                new Group({ id: 2, name: 'Customers', owner: { id: 1, name: 'Bob', groupId: 1 } })
+            ),
+        ]
+    );
+
+    resetCbs();
+
+    Group.cache.add({
+        id: 1,
+        name: 'Management',
+        ownerId: 1,
+    });
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        [
+            recordEqualTo(
+                new Subscription({
+                    id: 1,
+                    user: {
+                        id: 1,
+                        name: 'Bob',
+                        group: { id: 1, name: 'Staff', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 2,
+                    user: {
+                        id: 1,
+                        name: 'Bob',
+                        group: { id: 1, name: 'Staff', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 3,
+                    user: {
+                        id: 2,
+                        name: 'Sam',
+                        group: { id: 2, name: 'Customers', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+        ],
+        [
+            recordEqualTo(
+                new Subscription({
+                    id: 1,
+                    user: {
+                        id: 1,
+                        name: 'Bob',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 2,
+                    user: {
+                        id: 1,
+                        name: 'Bob',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 3,
+                    user: {
+                        id: 2,
+                        name: 'Sam',
+                        group: { id: 2, name: 'Customers', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+        ]
+    );
+
+    expect(userListenerAll).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledTimes(0);
+    expect(userListenerNested).toHaveBeenCalledTimes(1);
+    expect(userListenerNested).toHaveBeenCalledWith(
+        [
+            recordEqualTo(
+                new User({ id: 1, name: 'Bob', group: { id: 1, name: 'Staff', ownerId: 1 } })
+            ),
+            recordEqualTo(
+                new User({ id: 2, name: 'Sam', group: { id: 2, name: 'Customers', ownerId: 1 } })
+            ),
+        ],
+        [
+            recordEqualTo(
+                new User({ id: 1, name: 'Bob', group: { id: 1, name: 'Management', ownerId: 1 } })
+            ),
+            recordEqualTo(
+                new User({ id: 2, name: 'Sam', group: { id: 2, name: 'Customers', ownerId: 1 } })
+            ),
+        ]
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledWith(
+        [
+            recordEqualTo(new Group({ id: 1, name: 'Staff', ownerId: 1 })),
+            recordEqualTo(new Group({ id: 2, name: 'Customers', ownerId: 1 })),
+        ],
+        [
+            recordEqualTo(new Group({ id: 1, name: 'Management', ownerId: 1 })),
+            recordEqualTo(new Group({ id: 2, name: 'Customers', ownerId: 1 })),
+        ]
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        [
+            recordEqualTo(
+                new Group({ id: 1, name: 'Staff', owner: { id: 1, name: 'Bob', groupId: 1 } })
+            ),
+            recordEqualTo(
+                new Group({ id: 2, name: 'Customers', owner: { id: 1, name: 'Bob', groupId: 1 } })
+            ),
+        ],
+        [
+            recordEqualTo(
+                new Group({ id: 1, name: 'Management', owner: { id: 1, name: 'Bob', groupId: 1 } })
+            ),
+            recordEqualTo(
+                new Group({ id: 2, name: 'Customers', owner: { id: 1, name: 'Bob', groupId: 1 } })
+            ),
+        ]
+    );
+    resetCbs();
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(0);
+    User.cache.add({
+        id: 1,
+        name: 'Bobby',
+        groupId: 1,
+    });
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        [
+            recordEqualTo(
+                new Subscription({
+                    id: 1,
+                    user: {
+                        id: 1,
+                        name: 'Bob',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 2,
+                    user: {
+                        id: 1,
+                        name: 'Bob',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 3,
+                    user: {
+                        id: 2,
+                        name: 'Sam',
+                        group: { id: 2, name: 'Customers', owner: { id: 1, name: 'Bob' } },
+                    },
+                })
+            ),
+        ],
+        [
+            recordEqualTo(
+                new Subscription({
+                    id: 1,
+                    user: {
+                        id: 1,
+                        name: 'Bobby',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bobby' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 2,
+                    user: {
+                        id: 1,
+                        name: 'Bobby',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bobby' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 3,
+                    user: {
+                        id: 2,
+                        name: 'Sam',
+                        group: { id: 2, name: 'Customers', owner: { id: 1, name: 'Bobby' } },
+                    },
+                })
+            ),
+        ]
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        [
+            recordEqualTo(
+                new Group({ id: 1, name: 'Management', owner: { id: 1, name: 'Bob', groupId: 1 } })
+            ),
+            recordEqualTo(
+                new Group({ id: 2, name: 'Customers', owner: { id: 1, name: 'Bob', groupId: 1 } })
+            ),
+        ],
+        [
+            recordEqualTo(
+                new Group({
+                    id: 1,
+                    name: 'Management',
+                    owner: { id: 1, name: 'Bobby', groupId: 1 },
+                })
+            ),
+            recordEqualTo(
+                new Group({ id: 2, name: 'Customers', owner: { id: 1, name: 'Bobby', groupId: 1 } })
+            ),
+        ]
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledTimes(0);
+    resetCbs();
+    Group.cache.addList([
+        {
+            id: 1,
+            name: 'Management',
+            owner: {
+                id: 1,
+                name: 'Bazza',
+                groupId: 1,
+            },
+        },
+        {
+            id: 2,
+            name: 'Customer',
+            owner: {
+                id: 1,
+                name: 'Baz',
+                groupId: 1,
+            },
+        },
+    ]);
+    expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    expect(subscriptionListenerNested).toHaveBeenCalledWith(
+        [
+            recordEqualTo(
+                new Subscription({
+                    id: 1,
+                    user: {
+                        id: 1,
+                        name: 'Bobby',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bobby' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 2,
+                    user: {
+                        id: 1,
+                        name: 'Bobby',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Bobby' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 3,
+                    user: {
+                        id: 2,
+                        name: 'Sam',
+                        group: { id: 2, name: 'Customers', owner: { id: 1, name: 'Bobby' } },
+                    },
+                })
+            ),
+        ],
+        [
+            recordEqualTo(
+                new Subscription({
+                    id: 1,
+                    user: {
+                        id: 1,
+                        name: 'Baz',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Baz' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 2,
+                    user: {
+                        id: 1,
+                        name: 'Baz',
+                        group: { id: 1, name: 'Management', owner: { id: 1, name: 'Baz' } },
+                    },
+                })
+            ),
+            recordEqualTo(
+                new Subscription({
+                    id: 3,
+                    user: {
+                        id: 2,
+                        name: 'Sam',
+                        group: { id: 2, name: 'Customer', owner: { id: 1, name: 'Baz' } },
+                    },
+                })
+            ),
+        ]
+    );
+    expect(groupListenerNested).toHaveBeenCalledTimes(1);
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        [
+            recordEqualTo(
+                new Group({
+                    id: 1,
+                    name: 'Management',
+                    owner: { id: 1, name: 'Bobby', groupId: 1 },
+                })
+            ),
+            recordEqualTo(
+                new Group({ id: 2, name: 'Customers', owner: { id: 1, name: 'Bobby', groupId: 1 } })
+            ),
+        ],
+        [
+            recordEqualTo(
+                new Group({
+                    id: 1,
+                    name: 'Management',
+                    owner: { id: 1, name: 'Baz', groupId: 1 },
+                })
+            ),
+            recordEqualTo(
+                new Group({ id: 2, name: 'Customer', owner: { id: 1, name: 'Baz', groupId: 1 } })
+            ),
+        ]
+    );
+    expect(groupListenerSimple).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledWith(
+        [
+            recordEqualTo(new Group({ id: 1, name: 'Management', ownerId: 1 })),
+            recordEqualTo(new Group({ id: 2, name: 'Customers', ownerId: 1 })),
+        ],
+        [
+            recordEqualTo(new Group({ id: 1, name: 'Management', ownerId: 1 })),
+            recordEqualTo(new Group({ id: 2, name: 'Customer', ownerId: 1 })),
+        ]
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+
+    resetCbs();
+    unsubFns.forEach(unsub => unsub());
+    Subscription.cache.addList([
+        {
+            id: 1,
+            user: {
+                id: 1,
+                name: 'Bob1',
+                group: {
+                    id: 1,
+                    name: 'Staff1',
+                    ownerId: 1,
+                },
+            },
+        },
+        {
+            id: 2,
+            user: {
+                id: 1,
+                name: 'Bob1',
+                group: {
+                    id: 1,
+                    name: 'Staff1',
+                    ownerId: 1,
+                },
+            },
+        },
+        {
+            id: 3,
+            user: {
+                id: 2,
+                name: 'Sam1',
+                group: {
+                    id: 2,
+                    name: 'Customers1',
+                    ownerId: 1,
+                },
+            },
+        },
+    ]);
+    expect(subscriptionListenerAll).not.toHaveBeenCalled();
+    expect(subscriptionListenerNested).not.toHaveBeenCalled();
+    expect(subscriptionListenerSimple).not.toHaveBeenCalled();
+    expect(userListenerAll).not.toHaveBeenCalled();
+    expect(userListenerNested).not.toHaveBeenCalled();
+    expect(userListenerSimple).not.toHaveBeenCalled();
+    expect(groupListenerSimple).not.toHaveBeenCalled();
+    expect(groupListenerAll).not.toHaveBeenCalled();
+    expect(groupListenerNested).not.toHaveBeenCalled();
+});
+
+test('should support manual batching', async () => {
+    const { User } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    const listener = jest.fn();
+    const listenerList = jest.fn();
+    const listenerAll = jest.fn();
+    User.cache.addListener(listenerAll);
+    User.cache.addListener(1, ['id', 'name'], listener);
+    User.cache.addListenerList([1, 2], ['id', 'name'], listenerList);
+    User.cache.batch(() => {
+        User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
+        User.cache.add({ id: 2, name: 'Sam', groupId: null });
+        User.cache.add({ id: 1, name: 'Bobby', groupId: 1 });
+    });
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listenerList).toHaveBeenCalledTimes(1);
+    expect(listenerAll).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(null, recordEqualTo(new User({ id: 1, name: 'Bobby' })));
+    expect(listenerList).toHaveBeenCalledWith(
+        [null, null],
+        [
+            recordEqualTo(new User({ id: 1, name: 'Bobby' })),
+            recordEqualTo(new User({ id: 2, name: 'Sam' })),
+        ]
+    );
+});
+
+test('should support manual nested batching', async () => {
+    const { User } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    const listener = jest.fn();
+    const listenerList = jest.fn();
+    const listenerAll = jest.fn();
+    User.cache.addListener(listenerAll);
+    User.cache.addListener(1, ['id', 'name'], listener);
+    User.cache.addListenerList([1, 2], ['id', 'name'], listenerList);
+    User.cache.batch(() => {
+        User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
+        User.cache.batch(() => {
+            User.cache.add({ id: 2, name: 'Sam', groupId: null });
+            User.cache.add({ id: 1, name: 'Bobby', groupId: 1 });
+        });
+    });
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listenerList).toHaveBeenCalledTimes(1);
+    expect(listenerAll).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(null, recordEqualTo(new User({ id: 1, name: 'Bobby' })));
+    expect(listenerList).toHaveBeenCalledWith(
+        [null, null],
+        [
+            recordEqualTo(new User({ id: 1, name: 'Bobby' })),
+            recordEqualTo(new User({ id: 2, name: 'Sam' })),
+        ]
+    );
+});
+
+test('getList from work across caches', async () => {
+    const { User, Group } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    Group.cache.add({ id: 1, name: 'Staff', ownerId: 1 });
+    User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
+    User.cache.add({ id: 2, name: 'Sam', groupId: null });
+    User.cache.add({ id: 3, name: 'Godfrey', groupId: 2 });
+    Group.cache.add({ id: 2, name: 'Customers', ownerId: 2 });
+    expect(User.cache.getList([1, 2, 3], ['name', ['group', 'name'], ['group', 'owner']])).toEqual([
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                    owner: {
+                        id: 1,
+                        name: 'Bob',
+                        groupId: 1,
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 2,
+                name: 'Sam',
+                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // @ts-ignore
+                group: null,
+                groupId: null,
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 3,
+                name: 'Godfrey',
+                groupId: 2,
+                group: {
+                    id: 2,
+                    name: 'Customers',
+                    ownerId: 2,
+                    owner: {
+                        id: 2,
+                        name: 'Sam',
+                        groupId: null,
+                    },
+                },
+            })
+        ),
+    ]);
+
+    expect(
+        User.cache.getList(
+            [1, 2, 3],
+            ['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']]
+        )
+    ).toEqual([
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                    owner: {
+                        id: 1,
+                        name: 'Bob',
+                        groupId: 1,
+                        group: {
+                            id: 1,
+                            name: 'Staff',
+                            ownerId: 1,
+                        },
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 2,
+                name: 'Sam',
+                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // @ts-ignore
+                group: null,
+                groupId: null,
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 3,
+                name: 'Godfrey',
+                groupId: 2,
+                group: {
+                    id: 2,
+                    name: 'Customers',
+                    ownerId: 2,
+                    owner: {
+                        id: 2,
+                        name: 'Sam',
+                        groupId: null,
+                        group: null,
+                    },
+                },
+            })
+        ),
+    ]);
+});
+
+test('should validate field names', async () => {
+    const { Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    expect(() => Subscription.cache.get(1, ['userId', ['user', 'nam']])).toThrowError(
+        /Invalid field\(s\) provided:/
+    );
+    expect(() =>
+        Subscription.cache.get(1, [
+            ['use', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'own'],
+        ])
+    ).toThrowError(/Invalid field\(s\) provided:/);
+});
+
+function timeBlock(run): bigint {
+    const start = process.hrtime.bigint();
+    run();
+    const end = process.hrtime.bigint();
+    return (end - start) / BigInt(1e6);
+}
+
+test('should be performant', async () => {
+    // TODO: I don't know what's good here but as a starting point:
+    // 50 nested records (so 50 subs, 50 users, 50, groups) with
+    // a listener each (3 on different permutations of nested fields = 250)
+    // and list listener on all subscriptions for 3 different permutations of
+    // nested fields (150)
+    // So total 150 records and 400 listeners
+    const { User, Group, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const cbs: jest.Mock[] = [];
+    function nextFn(): jest.Mock {
+        const fn = jest.fn();
+        cbs.push(fn);
+        return fn;
+    }
+    const count = 50;
+    for (let i = 0; i < count; i++) {
+        Subscription.cache.addListener(i, ['id', 'userId'], nextFn());
+        Subscription.cache.addListener(
+            i,
+            ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+            nextFn()
+        );
+        Subscription.cache.addListener(
+            i,
+            ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']],
+            nextFn()
+        );
+        Subscription.cache.addListener(
+            i,
+            [
+                'id',
+                ['user', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'owner', 'group'],
+            ],
+            nextFn()
+        );
+        User.cache.addListener(i, ['id', 'name'], nextFn());
+        User.cache.addListener(i, ['id', 'name', 'group'], nextFn());
+        Group.cache.addListener(i, ['id', 'name', 'ownerId'], nextFn());
+        Group.cache.addListener(i, ['id', 'name', 'owner'], nextFn());
+    }
+    const ids = Array.from({ length: count }, (_, i) => i);
+    Subscription.cache.addListenerList(
+        ids,
+        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        jest.fn()
+    );
+    Subscription.cache.addListenerList(
+        ids,
+        ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']],
+        jest.fn()
+    );
+    Subscription.cache.addListenerList(
+        ids,
+        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'group']],
+        jest.fn()
+    );
+    User.cache.addListener(jest.fn());
+    Subscription.cache.addListener(jest.fn());
+    Group.cache.addListener(jest.fn());
+    expect(
+        timeBlock(() => {
+            for (let i = 0; i < count; i++) {
+                Group.cache.add({
+                    id: i,
+                    name: 'Staff',
+                    ownerId: i,
+                });
+                User.cache.add({
+                    id: i,
+                    name: 'Bob',
+                    groupId: i,
+                });
+                Subscription.cache.add({
+                    id: i,
+                    userId: i,
+                });
+            }
+            for (let i = 0; i < count; i++) {
+                Subscription.cache.delete(i);
+                User.cache.delete(i);
+                Group.cache.delete(i);
+            }
+        })
+    ).toBeLessThan(1500);
+    for (const cb of cbs) {
+        expect(cb).toHaveBeenCalledTimes(2);
+    }
+});
+
+test('relation listeners should be cleaned up', async () => {
+    const { Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+        },
+    });
+    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(2);
+    Subscription.cache.delete(1, [['user', 'name']]);
+    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(1);
+    Subscription.cache.delete(1, [
+        ['user', 'name'],
+        ['user', 'group'],
+    ]);
+    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(0);
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+            group: {
+                id: 1,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        },
+    });
+    Subscription.cache.add({
+        id: 1,
+        user: {
+            id: 1,
+            name: 'Bob',
+        },
+    });
+    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(2);
+    Subscription.cache.delete(1);
+    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(0);
 });

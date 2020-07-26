@@ -1,8 +1,9 @@
 import isEqual from 'lodash/isEqual';
 import startCase from 'lodash/startCase';
-
 import Field, { RecordBoundField } from './fields/Field';
 import NumberField from './fields/NumberField';
+
+import RelatedViewModelField from './fields/RelatedViewModelField';
 import { freezeObject, isDev } from './util';
 import ViewModelCache from './ViewModelCache';
 
@@ -91,6 +92,7 @@ export type ViewModelInterface<
     clone<CloneFieldNames extends keyof FieldMappingType>(
         fieldNames?: readonly CloneFieldNames[]
     ): ViewModelInterface<FieldMappingType, CloneFieldNames, PkFieldType, PkType>;
+    clone(fieldNames?: FieldPath[]): ViewModelInterface<FieldMappingType, any, PkFieldType, PkType>;
 
     /**
      * Access record bound fields. A record bound field is a normal field with it's `value` property
@@ -204,6 +206,8 @@ export interface ViewModelConstructor<
      * - All fields have the `name` property set to match the key in `fields`
      * - All fields have `label` filled out if not explicitly set (eg. if name was `emailAddress` label will be created
      *   as `Email Address`)
+     *
+     * See also [getField](doc:viewModelFactory#method-getField) for getting a nested field using array notation.
      */
     readonly fields: FieldMappingType;
 
@@ -252,6 +256,20 @@ export interface ViewModelConstructor<
      * ```
      */
     readonly fieldNames: string[];
+
+    /**
+     * Get a field from this model or a related model
+     *
+     * Accepts either a string for a field on this record or array notation for traversing [RelatedViewModelField](doc:RelatedViewModelField)
+     * fields:
+     *
+     * ```jsx
+     * Subscription.getField(['user', 'group', 'owner'])
+     * ```
+     * @param fieldName Either a string or an array of strings where the last element is the final field name to return
+     * and each other element is a [RelatedViewModelField](doc:RelatedViewModelField) on a ViewModel.
+     */
+    getField(fieldName: FieldPath): Field<any>;
 
     /**
      * The cache instance for this ViewModel. A default instance of [ViewModelCache](doc:ViewModelCache)
@@ -499,6 +517,239 @@ function checkReservedFieldNames(fields): void {
         }
     });
 }
+
+export type FieldPath = string | string[];
+
+/**
+ * Get assigned field paths for the record.
+ *
+ * See test cases for example of what this looks like
+ */
+export function getAssignedFieldsDeep(record: ViewModelInterface<any, any>): FieldPath[] {
+    const fieldNames: FieldPath[] = [];
+    for (const fieldName of record._assignedFields as string[]) {
+        const data = record[fieldName];
+        if (isViewModelInstance(data)) {
+            for (const path of getAssignedFieldsDeep(data)) {
+                fieldNames.push([fieldName, ...(Array.isArray(path) ? path : [path])]);
+            }
+        } else {
+            fieldNames.push(fieldName);
+        }
+    }
+    return fieldNames;
+}
+
+/**
+ * Flatten a nested path to a single level with dot notation
+ *
+ * eg.
+ * ```
+ * flattenFieldPath([
+ *   'id',
+ *   ['user', ['group', 'id']],
+ *   ['user', 'groupId'],
+ *   ['user', 'id'],
+ *   'userId'
+ * ])
+ * // ['id', 'user.group.id', 'user.groupId', 'user.id', 'userId']
+ * ```
+ */
+export function flattenFieldPath(fieldPath: FieldPath[] | FieldPath, separator = '.'): string[] {
+    if (typeof fieldPath === 'string') {
+        return [fieldPath];
+    }
+    const flattenedPath: string[] = [];
+    for (const path of fieldPath) {
+        if (typeof path === 'string') {
+            flattenedPath.push(path);
+        } else {
+            flattenedPath.push(path.join(separator));
+        }
+    }
+    return flattenedPath;
+}
+
+/**
+ * For the given field `fieldName` on View Model `model` expand any RelatedViewModelField's to
+ * it's set of fields.
+ *
+ * eg. If `User` had a `RelatedViewModelField` on `group` to a model with a 'name' and 'ownerId' field then:
+ *
+ * ```js
+ * expandField(User, 'group')
+ * // [ ['group', 'name'], ['group', 'ownerId' ]
+ * ```
+ *
+ * For non relation fields the passed fieldName is returned as an array:
+ *
+ * ```
+ * expandField(User, 'name')
+ * // ['name']
+ * ```
+ *
+ * @param model
+ * @param fieldName
+ */
+function expandField(model: ViewModelConstructor<any>, fieldName: string): FieldPath[] {
+    const field = model.fields[fieldName];
+    if (field instanceof RelatedViewModelField) {
+        return field.to.fieldNames
+            .filter(
+                subFieldName => !(field.to.fields[subFieldName] instanceof RelatedViewModelField)
+            )
+            .map(subFieldName => [fieldName, subFieldName]);
+    }
+    return [fieldName];
+}
+
+/**
+ * Thrown when attempting to access a field that does not exist on a ViewModel
+ */
+export class InvalidFieldError extends Error {}
+
+/**
+ * For the given field paths expand any relation fields to include the nested non-relation fields
+ *
+ * ```
+ * [['user', 'group']]
+ * ```
+ *
+ * becomes
+ *
+ * ```
+ * [
+ *   ['user', 'group', 'name'],
+ *   ['user', 'group', 'ownerId'],
+ * ]
+ * ```
+ *
+ * Where 'user' is a foreign key to a model that has a foreign key on field 'group' with two fields.
+ *
+ * We exclude [RelatedViewModelField](doc:RelatedViewModelField)'s to avoid circular dependencies. In the
+ * example above this means the `owner` field is excluded but the source field `ownerId` is still included.
+ *
+ * @param model
+ * @param paths
+ */
+export function expandRelationFieldPaths(
+    model: ViewModelConstructor<any>,
+    paths: FieldPath[]
+): FieldPath[] {
+    const expanded: FieldPath[] = [];
+    const fieldsAdded = new Set<string>();
+    for (const path of paths) {
+        if (typeof path === 'string') {
+            const field = model.fields[path];
+            if (field instanceof RelatedViewModelField) {
+                fieldsAdded.add(field.sourceFieldName);
+                expanded.push(field.sourceFieldName);
+            }
+            for (const p of expandField(model, path)) {
+                const dottedP = Array.isArray(p) ? p.join('.') : p;
+                if (!fieldsAdded.has(dottedP)) {
+                    expanded.push(p);
+                    fieldsAdded.add(dottedP);
+                }
+            }
+        } else {
+            let currentModel = model;
+            let dottedPath = '';
+            for (let i = 0; i < path.length; i++) {
+                const fieldName = path[i];
+                if (!dottedPath) {
+                    dottedPath = fieldName;
+                } else {
+                    dottedPath = `${dottedPath}.${fieldName}`;
+                }
+                const field = currentModel.fields[fieldName];
+                if (!field) {
+                    throw new InvalidFieldError(
+                        `Invalid field ${fieldName} on model ${currentModel}`
+                    );
+                }
+                const isRelation = field instanceof RelatedViewModelField;
+                const isLast = i === path.length - 1;
+                if (!isLast && !isRelation) {
+                    throw new Error(
+                        `Nested paths are only valid for RelatedViewModelField. '${fieldName}' is a ${field}.`
+                    );
+                }
+                if (isRelation) {
+                    const sourcePath =
+                        i === 0
+                            ? field.sourceFieldName
+                            : [...path.slice(0, i), field.sourceFieldName];
+                    const sourceDottedPath = Array.isArray(sourcePath)
+                        ? sourcePath.join('.')
+                        : sourcePath;
+                    if (!fieldsAdded.has(sourceDottedPath)) {
+                        fieldsAdded.add(sourceDottedPath);
+                        expanded.push(sourcePath);
+                    }
+                    if (isLast) {
+                        for (const p of expandField(currentModel, fieldName).map(subPath => [
+                            ...path.slice(0, i),
+                            ...subPath,
+                        ])) {
+                            const dottedP = p.join('.');
+                            if (!fieldsAdded.has(dottedP)) {
+                                expanded.push(p);
+                                fieldsAdded.add(dottedP);
+                            }
+                        }
+                    }
+                    currentModel = field.to;
+                } else if (isLast && !fieldsAdded.has(dottedPath)) {
+                    fieldsAdded.add(dottedPath);
+                    expanded.push(path);
+                }
+            }
+        }
+    }
+    return expanded;
+}
+
+/**
+ * Thrown when cloning a record and requested fields cannot be found
+ *
+ * Gives details on missing fields and will indicate if related records are missing entirely vs
+ * just some fields
+ */
+export class MissingFieldsError extends Error {
+    missingFieldNames: string[];
+    missingRelations: [string, string[]][];
+    assignedFields: string[];
+    constructor(
+        record: ViewModelInterface<any, any>,
+        assignedFields: string[],
+        requestedFieldNames: FieldPath[],
+        missingFieldNames: string[],
+        missingRelations: [string, string[]][]
+    ) {
+        assignedFields = [...assignedFields];
+        assignedFields.sort();
+        missingFieldNames.sort();
+        let err = `Can't clone ${record._model.name} with fields ${flattenFieldPath(
+            requestedFieldNames
+        ).join(', ')} as only these fields are set: ${assignedFields.join(
+            ', '
+        )}.\n Missing fields: ${missingFieldNames.join(', ')}`;
+        if (missingRelations.length > 0) {
+            err +=
+                '\nThe following relations had no data so the associated fields could not be retrieved:\n';
+            err += missingRelations.map(
+                ([relationName, relationFieldNames]) =>
+                    ` The relation '${relationName}' for fields '${relationFieldNames.join(', ')}'`
+            );
+        }
+        super(err);
+        this.missingFieldNames = missingFieldNames;
+        this.missingRelations = missingRelations;
+        this.assignedFields = assignedFields;
+    }
+}
+
 // Using very strongly typed overloads instead a single type with optional properties so we can more accurately type
 // the primary key and fields (specifically for default case we can add the implicit 'id' field that will be created)
 export default function viewModelFactory<T extends FieldsMapping>(
@@ -609,6 +860,9 @@ export default function viewModelFactory<T extends FieldsMapping>(
     ): {
         [k in Extract<keyof IncomingData, keyof FinalFields>]: FinalFields[k]['__fieldValueType'];
     } {
+        if (!data) {
+            throw new Error('data must be specified');
+        }
         const pkFieldNames = this._model.pkFieldNames;
         const missing = pkFieldNames.filter(name => !(name in data));
         const empty = pkFieldNames.filter(name => name in data && data[name] == null);
@@ -637,6 +891,26 @@ export default function viewModelFactory<T extends FieldsMapping>(
             const field = fields[key];
             if (field) {
                 assignedData[key] = field.normalize(value);
+                if (field instanceof RelatedViewModelField) {
+                    // TODO: Make doing this part of interface rather than special case?
+                    if (
+                        assignedData[key] &&
+                        data[field.sourceFieldName] != null &&
+                        data[field.sourceFieldName] !== assignedData[key]._pk
+                    ) {
+                        const { name, sourceFieldName } = field;
+                        const pk = assignedData[key]._pk;
+                        console.warn(
+                            `Related field ${name} was created from nested object that had a different id to the source field name ${sourceFieldName}: ${data[sourceFieldName]} !== ${pk}. ${pk} has been used for both.`
+                        );
+                    }
+                    if (assignedData[key]) {
+                        assignedData[field.sourceFieldName] = assignedData[key]._pk;
+                        if (!data[field.sourceFieldName]) {
+                            assignedFields.push(field.sourceFieldName);
+                        }
+                    }
+                }
                 assignedFields.push(key);
             } else {
                 // TODO: Should extra keys in data be a warning or ignored?
@@ -645,9 +919,9 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 );
             }
         }
-
+        // Sort fields so consistent order; primarily as it makes testing easier
+        assignedFields.sort();
         this._assignedFields = assignedFields;
-        this._assignedFields.sort();
         this._data = freezeObject(assignedData);
 
         return this;
@@ -717,26 +991,82 @@ export default function viewModelFactory<T extends FieldsMapping>(
         },
         clone: {
             value<CloneFieldNames extends keyof FinalFields>(
-                fieldNames?: CloneFieldNames[]
+                fieldNames?: CloneFieldNames[] | FieldPath[]
             ): ViewModelInterface<FinalFields, CloneFieldNames, PkFieldType, PkValueType> {
-                const missingFieldNames = fieldNames
-                    ? fieldNames.filter(fieldName => !this._assignedFields.includes(fieldName))
-                    : [];
-                if (fieldNames && missingFieldNames.length > 0) {
-                    throw new Error(
-                        `Can't clone ${this._model.name} with fields ${fieldNames.join(
-                            ', '
-                        )} as only these fields are set: ${this._assignedFields.join(
-                            ', '
-                        )}. Missing fields: ${missingFieldNames.join(', ')}`
-                    );
-                }
                 if (!fieldNames) {
                     fieldNames = this._assignedFields;
                 }
-
+                const missingFieldNames: string[] = [];
+                const nestedToClone: Record<string, FieldPath[]> = {};
+                const nonRelatedFieldNames: string[] = [];
+                for (const pathElement of fieldNames as FieldPath[]) {
+                    if (typeof pathElement === 'string') {
+                        if (!this._assignedFields.includes(pathElement)) {
+                            missingFieldNames.push(pathElement);
+                        } else {
+                            nonRelatedFieldNames.push(pathElement);
+                        }
+                    } else {
+                        const [name, ...p] = pathElement;
+                        if (!nestedToClone[name]) {
+                            nestedToClone[name] = [];
+                        }
+                        if (p.length > 1) {
+                            // Nested fields - need to pass the whole array
+                            // eg. [user, group, id]
+                            nestedToClone[name].push(p);
+                        } else {
+                            // A specific field on this record
+                            // eg. [user, name]
+                            nestedToClone[name].push(p[0]);
+                        }
+                    }
+                }
                 const data: Record<string, any> = {};
-                for (const fieldName of fieldNames as CloneFieldNames[]) {
+                const missingRelations: [string, string[]][] = [];
+                const assignedFields: string[] = [...this._assignedFields];
+                for (const [name, nestedFieldNames] of Object.entries(nestedToClone)) {
+                    if (!this._assignedFields.includes(name)) {
+                        missingFieldNames.push(name);
+                        missingRelations.push([name, flattenFieldPath(nestedFieldNames)]);
+                    } else {
+                        try {
+                            data[name] = this[name].clone(nestedFieldNames);
+                        } catch (err) {
+                            if (err instanceof MissingFieldsError) {
+                                assignedFields.push(
+                                    ...err.assignedFields.map(fieldName => `${name}.${fieldName}`)
+                                );
+                                missingFieldNames.push(
+                                    ...err.missingFieldNames.map(
+                                        fieldName => `${name}.${fieldName}`
+                                    )
+                                );
+                                missingRelations.push(
+                                    ...(err.missingRelations.map(
+                                        ([relationName, relationFieldNames]) => [
+                                            `${name}.${relationName}`,
+                                            relationFieldNames,
+                                        ]
+                                    ) as [string, string[]][])
+                                );
+                            } else {
+                                throw err;
+                            }
+                        }
+                    }
+                }
+                if (fieldNames && missingFieldNames.length > 0) {
+                    throw new MissingFieldsError(
+                        this,
+                        assignedFields,
+                        fieldNames as FieldPath[],
+                        missingFieldNames,
+                        missingRelations
+                    );
+                }
+
+                for (const fieldName of nonRelatedFieldNames) {
                     // TODO: Unclear to me if this needs to call a method on the Field on not. Revisit this.
                     data[fieldName as string] = this[fieldName];
                 }
@@ -889,6 +1219,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 finalPkFieldName,
             ];
             boundFields.set(modelClass as ViewModelConstructor<FinalFields>, f);
+            Object.values(f[0]).forEach(field => field.contributeToClass(modelClass));
         }
         return f;
     }
@@ -936,6 +1267,56 @@ export default function viewModelFactory<T extends FieldsMapping>(
             get(): string[] {
                 const pkFieldNames = this.pkFieldNames;
                 return Object.keys(this.fields).filter(name => !pkFieldNames.includes(name));
+            },
+        },
+        getField: {
+            value(fieldName: FieldPath): Field<any> {
+                const [first, ...parts] = Array.isArray(fieldName) ? fieldName : [fieldName];
+                const firstField = this.fields[first];
+                if (!firstField) {
+                    throw new InvalidFieldError(
+                        `Unknown field '${first}' on ViewModel '${this.name}'`
+                    );
+                }
+                // Second condition redundant but makes typescript happy
+                if (parts.length === 0 || !Array.isArray(fieldName)) {
+                    return firstField;
+                }
+                if (!(firstField instanceof RelatedViewModelField)) {
+                    throw new Error(
+                        `Field '${first}' is not a RelatedViewModelField. When using array notation every element except the last must be a RelatedViewModelField. Received: ${fieldName.join(
+                            ', '
+                        )}`
+                    );
+                }
+                const last = parts.pop() as string;
+                let lastModel = firstField.to;
+                for (let i = 0; i < parts.length; i++) {
+                    const field = lastModel.fields[parts[i]];
+                    if (!field) {
+                        throw new InvalidFieldError(
+                            `Unknown field '${parts[i]}' (from [${fieldName.join(
+                                ', '
+                            )}]) on ViewModel '${lastModel.name}'`
+                        );
+                    }
+                    if (!(field instanceof RelatedViewModelField)) {
+                        throw new Error(
+                            `Field '${parts[i]}' (from [${fieldName.join(', ')}]) on ViewModel '${
+                                lastModel.name
+                            }' is not a RelatedViewModelField`
+                        );
+                    }
+                    lastModel = lastModel.fields[parts[i]].to;
+                }
+                if (!lastModel.fields[last]) {
+                    throw new InvalidFieldError(
+                        `Unknown field '${last}' (from [${fieldName.join(', ')}]) on ViewModel '${
+                            lastModel.name
+                        }'`
+                    );
+                }
+                return lastModel.fields[last];
             },
         },
         fields: {
