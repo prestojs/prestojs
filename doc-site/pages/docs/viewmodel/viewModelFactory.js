@@ -138,12 +138,9 @@ export async function getStaticProps(context) {
         datum =>
             ['viewModelFactory', 'ViewModelInterface', 'ViewModelConstructor'].includes(datum.name),
         items =>
-            items.reduce(
-                (acc, item) => {
-                    acc[item.name] = item;
-                    return acc;
-                },
-                { standalonePage: true }
-            )
+            items.reduce((acc, item) => {
+                acc[item.name] = item;
+                return acc;
+            }, {})
     );
 }
