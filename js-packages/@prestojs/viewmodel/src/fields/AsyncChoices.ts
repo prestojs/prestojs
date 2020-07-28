@@ -72,7 +72,7 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
 
     /**
      * Hook that returns props to pass through to `retrieve` in components/hooks that consume this (eg. [useAsyncChoices](doc:useAsyncChoices).
-     * This is useful for things like hooking into an existing cache (eg. [useViewModelCache](doc:useViewModelCache])).
+     * This is useful for things like hooking into an existing cache (eg. [useViewModelCache](doc:useViewModelCache)).
      * The value returned here is passed as the second parameter to `retrieve`. In addition the `existingValues` key is
      * passed through to `useAsyncValue` as the list of items it can resolve existing values from.
      *
@@ -166,7 +166,7 @@ export type AsyncChoicesOptions<ItemType, ValueType> = Omit<
  *
  * You must provide `list` and `retrieve` - everything else can be optional with the following restrictions:
  *
- * * `getLabel` - this is optional if items returned by `list` and `retrieve` implement [Labeled](doc:Labeled) otherwise it must be provided
+ * * `getLabel` - this is optional if items returned by `list` and `retrieve` implement [NodeLabeled](doc:NodeLabeled) otherwise it must be provided
  * * `getValue` - this is optional if items returned by `list` and `retrieve` implement [Identifiable](doc:Identifiable) otherwise it must be provided
  *
  * @extract-docs
