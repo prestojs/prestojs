@@ -5,6 +5,7 @@ import path from 'path';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import mdxComponents from './components/mdxComponents';
+import docLinks from './remark-plugins/docLinks';
 
 function traverse(obj, fn, visitedTracker = new Map()) {
     if (!obj || typeof obj !== 'object') {
@@ -43,6 +44,8 @@ export function prepareDocs(docs, extraNodes) {
     traverse(extraNodes, fn, visitedTracker);
 }
 
+const remarkPlugins = [docLinks];
+
 export default function getStaticProps(context, filter, transform = id => id) {
     const fn = path.join(process.cwd(), 'data/typeDocs.json');
     const data = JSON.parse(fs.readFileSync(fn, 'utf-8'));
@@ -52,20 +55,6 @@ export default function getStaticProps(context, filter, transform = id => id) {
     }, {});
     const items = data.filter(filter);
     const extraNodes = {};
-    function LinkWrapper(props) {
-        if (props.href.startsWith('doc:')) {
-            const [name, hash] = props.href.split(':')[1].split('#');
-            const target = data.filter(datum => datum.name === name)[0];
-            if (target) {
-                let href = `/docs/${target.slug}`;
-                if (hash) {
-                    href += `#${hash}`;
-                }
-                return <a {...props} href={href} />;
-            }
-        }
-        return <a {...props} />;
-    }
     function transformComment(obj) {
         if (obj.comment && (obj.comment.shortText || obj.comment.text)) {
             if (/```.*live/.test(obj.comment.text || '')) {
@@ -75,10 +64,16 @@ export default function getStaticProps(context, filter, transform = id => id) {
                 };
             } else {
                 obj.mdx = ReactDOMServer.renderToStaticMarkup(
-                    <MDXProvider components={{ ...mdxComponents, a: LinkWrapper }}>
+                    <MDXProvider components={mdxComponents}>
                         <div className="mdx">
-                            {obj.comment.shortText && <MDX>{obj.comment.shortText.trim()}</MDX>}
-                            {obj.comment.text && <MDX>{obj.comment.text.trim()}</MDX>}
+                            {obj.comment.shortText && (
+                                <MDX remarkPlugins={remarkPlugins}>
+                                    {obj.comment.shortText.trim()}
+                                </MDX>
+                            )}
+                            {obj.comment.text && (
+                                <MDX remarkPlugins={remarkPlugins}>{obj.comment.text.trim()}</MDX>
+                            )}
                         </div>
                     </MDXProvider>
                 );
@@ -86,9 +81,9 @@ export default function getStaticProps(context, filter, transform = id => id) {
         }
         if (obj.comment && obj.comment.returns) {
             obj.mdxReturns = ReactDOMServer.renderToStaticMarkup(
-                <MDXProvider components={{ ...mdxComponents, a: LinkWrapper }}>
+                <MDXProvider components={mdxComponents}>
                     <div className="mdx">
-                        <MDX>{obj.comment.returns.trim()}</MDX>
+                        <MDX remarkPlugins={remarkPlugins}>{obj.comment.returns.trim()}</MDX>
                     </div>
                 </MDXProvider>
             );
