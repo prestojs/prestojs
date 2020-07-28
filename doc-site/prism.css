@@ -29,6 +29,6 @@
 }
 
 .prism-highlight-code-line {
-    background-color: #353b45;
+    background-color: rgba(255, 255, 255, 0.2);
     @apply -mx-4 px-4 block;
 }
