@@ -1,0 +1,364 @@
+import { useState } from 'react';
+import Collapse from '../../../components/Collapse';
+import { metadata as indexMetadata} from './index.mdx';
+
+export const metadata = {
+    title: 'ViewModel & Caching',
+    className: 'docs',
+    generateInThisPage: true,
+    sideBarSections: indexMetadata.sideBarSections,
+};
+
+# ViewModel
+
+A lot of Presto is built around the concept of a _ViewModel_. In Presto a _ViewModel_ is a class that defines the list of
+fields & some metadata for some piece of data (eg. a record from a single database table, some data joined from multiple
+data sources, a form filled out by a user etc).
+
+---
+
+It's not specific to a backend implementation rather it's concerned with describing what the data is so that a UI can be
+generated from it & transformations can be done on the data (eg. from user input to specific format or vice versa).
+
+## Fields
+
+A field is defined using the [Field](doc:Field) class:
+
+```js
+new Field({ name: 'email', label: 'Email' });
+```
+
+This tells us the field name is `email` and when a label is needed (eg. on a form field or when displaying the value)
+`Email address` should be used. The first advantage of this is simply the DRY principle - you can render the `label`
+from the field instead of hardcoding it throughout your app.
+
+The second advantage is that it provides the basis for automatically generating UI for managing instances of the _ViewModel_
+For example using the details provided on a _Field_ a form for entering those details can be rendered.
+
+More specific field classes provide more details about how that field should be handled.
+
+> See the [ViewModel](/docs/viewmodel) documentation for the list of available fields or the [Field](doc:Field) documentation
+> for how to extend and implement your own.
+
+```js
+new IntegerField({ name: 'age', label: 'Age' });
+```
+
+The UI code now knows the field rendered should be treated as a numeric entry. More details can be specified:
+
+```js {4-5}
+new BooleanField({
+    name: 'optInCommunications',
+    label: 'Received Updates',
+    helpText: 'Receive periodic updates from us',
+    defaultValue: true,
+});
+```
+
+UI components now know the default value when creating a record should be `true` and there's some additional text that
+should be rendered around the field.
+
+## ViewModel Factory
+
+Fields are grouped together on class called a `ViewModel` that is created with the [viewModelFactory](doc:viewModelFactory)
+function:
+
+```js
+const userFields = {
+    name: new CharField(),
+    emailAddress: new EmailField(),
+};
+const User = viewModelFactory(userFields);
+```
+
+We can omit the `name` and `label` options for the fields when defining them with a `viewModelFactory`. The name must
+always match the object key it's defined against so can always be inferred. Label is inferred from the name - `emailAddress`
+becomes `Email Address`.
+
+`viewModelFactory` just returns a class so it can be extended and have extra properties or methods attached:
+
+```js
+class User extends viewModelFactory(userFields) {
+    static label = 'User';
+    static labelPlural = 'Users';
+}
+```
+
+The static properties `label` and `labelPlural` are useful for referring to the name of a single or many instances of
+a `ViewModel`.
+
+In some cases it may be desirable to have a base class that contains some field definitions and extend that base class
+with some new fields. This is possible using [augment](doc:viewModelFactory#method-augment):
+
+```js
+class StaffUser extends User.augment({ isSuperUser: new BooleanField() }) {
+    static label = 'Staff User';
+    static labelPlural = 'Staff';
+}
+```
+
+`StaffUser` will inherited all the same fields as `User` and add a new field called `isSuperUser`.
+
+We can create a record from a `ViewModel` class by instantiating it with it's data:
+
+```js
+const staffUser = new StaffUser({
+    id: 1,
+    name: 'Bob',
+    email: 'bob@example.com',
+    isSuperUser: true,
+});
+```
+
+The `id` field hasn't been mentioned thus far but must be present on all records to uniquely identify it. You can specify
+your own primary key field (or fields for compound keys) but by default a field called `id` is created. See [viewModelFactory](doc:viewModelFactory#method-viewmodel)
+documentation for details on customising the primary key name.
+
+You can always access the primary key for a record using the `_key` property regardless of what the underlying field(s)
+are.
+
+```js
+staffUser._key === 1;
+// true
+```
+
+Sometimes you only have _some_ of the fields on the record. Presto supports the concept of a _partial record_ which is
+simply a record with a subset of the fields filled in. To create a partial record simply instantiate the record with
+only the fields you have available. This concept becomes important when we start to deal with caching.
+
+> **NOTE**
+>
+> A partial record is not the same as a record with null values. A partial record has _no_ value for some fields whereas
+> a regular record may just have some values set to null.
+
+Fields can be accessed via the [fields](docs:ViewModel#var-fields) property or [getField](docs:ViewModel#method-getField)
+property. [getField](docs:ViewModel#method-getField) supports traversing related ViewModel fields which will be discussed
+later.
+
+## Related ViewModel's
+
+One _ViewModel_ often refers to another (eg. a foreign key from one table to another in a database). To model this use
+[RelatedViewModelField](doc:RelatedViewModelField).
+
+```js {3-4}
+class PhoneNumber extends viewModelFactory({
+    phoneNumber: new CharField(),
+    userId: new IntegerField(),
+    user: new RelatedViewModelField({ to: User, sourceFieldName: 'userId' }),
+}) {}
+```
+
+There's two fields required: the field that stores the actual ID of the related record and a field to store a link to
+actual related record itself.
+
+The `to` option can either be a `ViewModel` class directly, a function that returns a `ViewModel` class or a function
+that returns a `Promise` that resolves to a `ViewModel` class. The second form is useful when the class hasn't been
+defined yet and the `Promise` form can be used to dynamically import code. See [RelatedViewModelField](doc:RelatedViewModelField)
+for how that works.
+
+As mentioned above `getField` can be used to traverse related ViewModel fields. This is done using array notation where
+each entry in the array is a field name (all entries apart from the last must be a [RelatedViewModelField](doc:RelatedViewModelField)).
+
+```js
+PhoneNumber.getField(['user', 'email']);
+```
+
+This will return the `email` field from the `User` ViewModel.
+
+Circular references are also supported using the function form for `to`:
+
+```js {4-8}
+class User extends viewModelFactory({
+    name: new CharField(),
+    emailAddress: new EmailField(),
+    defaultPhoneNumberId: new IntegerField(),
+    defaultPhoneNumber: new RelatedViewModelField({
+        to: () => PhoneNumber,
+        sourceFieldName: 'defaultPhoneNumberId',
+    }),
+}) {}
+class PhoneNumber extends viewModelFactory({
+    phoneNumber: new CharField(),
+    userId: new IntegerField(),
+    user: new RelatedViewModelField({ to: User, sourceFieldName: 'userId' }),
+}) {}
+```
+
+Although somewhat useless in this case you can retrieve fields across the relations:
+
+```js
+User.getField(['defaultPhoneNumber', 'user', 'defaultPhoneNumber', 'phoneNumber']);
+```
+
+Relations become really useful when used in conjunction with caching.
+
+## ViewModel Caching
+
+Each `ViewModel` class has an associated cache that is created automatically. You can provide your own by extending
+[ViewModelCache](doc:ViewModelCache) and assigning it to the static `cache` property on the `ViewModel` class.
+
+To cache an entry call the `add` method with either an instance of the record or the data directly:
+
+```js
+// These two statements are equivalent
+User.cache.add(new User({ id: 1, name: 'John', email: 'john@example.com' });
+User.cache.add({ id: 1, name: 'John', email: 'john@example.com'  });
+```
+
+If you have nested data you can populate multiple caches based on defined [RelatedViewModelField](doc:RelatedViewModelField)
+fields:
+
+```js
+User.cache.add({
+    id: 1,
+    name: 'John',
+    email: 'john@example.com',
+    phoneNumber: { id: 5, phoneNumber: '(03) 5550 1234', userId: 1 },
+});
+```
+
+This will populate the `User` cache and `PhoneNumber` cache.
+
+To get an entry use [get](ViewModelCache#method-get) or [getList](ViewModelCache#method-getList) methods using the primary key of the record and the list of fields you want:
+
+```js
+const john = User.cache.get(1, ['name']);
+// User({
+//   id: 1,
+//   name: 'John',
+// })
+```
+
+This will return a _partial record_ that contains only the `name` field. Accessing any other field will result in a
+warning telling you the data was not available. Partial records are always kept in sync with the latest data where
+possible (ie. when new data is cached that is a _superset_ of the fields on the partial record).
+
+You can also retrieve the latest version of a record by passing a record instance:
+
+```js
+const latestJohn = User.cache.get(john);
+```
+
+> **NOTE**
+>
+> The primary key is _always_ returned regardless of whether you request it or not. If you request a `RelatedViewModelField`
+> then the associated `sourceFieldName` is also returned regardless of whether you request it.
+
+[getList](ViewModelCache#method-getList) can be used to retrieve multiple records. The options are the same as `get` except
+you pass an array instead of a single id or record:
+
+```js
+const people = User.cache.getList([1, 2, 3], ['name']);
+```
+
+or with records
+
+```js
+User.cache.getList([frodo, samwise]);
+```
+
+Any records missing will be null by default but they can be removed by passing the final argument `removeNulls` which,
+when `true`, will filter out any missing records.
+
+You can also retrieve data across caches by using array notation for fields:
+
+```js
+User.cache.get(1, ['name', ['phoneNumber', 'phone']]);
+// User({
+//   id: 1,
+//   name: 'John',
+//   phoneNumber: PhoneNumber({
+//     id: 5,
+//     phoneNumber: '(03) 5550 1234',
+//   })
+// })
+```
+
+> **NOTE**
+>
+> Cache `get` and `getList` always return instances of a `ViewModel` even if the data is cached directly. `RelatedViewModelField`'s
+> retrieved are also instances of the relevant `ViewModel` class.
+
+To get notified when something in the case changes use [addListener](doc:ViewModelCache#method-addListener) or
+[addListenerList](doc:ViewModelCache#method-addListenerList). To listen to any change just pass a function:
+
+```js
+cache.addListener(() => console.log('Change detected!'));
+```
+
+It will be called when anything at all changes in the cache.
+
+To listen to specific record changes pass the ID and field names:
+
+```js
+User.cache.addListener(1, ['name'], (prev, current) => {
+    console.log('Record changed from', prev, 'to', current);
+});
+```
+
+or to multiple values:
+
+```js
+User.cache.addListenerList([1, 2, 3, 4], ['name'], (prev, current) => {
+    console.log('Records changed from', prev, 'to', current);
+});
+```
+
+## useViewModelCache
+
+[useViewModelCache](doc:useViewModelCache) returns data from the cache and automatically re-renders whenever the
+underlying data in the cache changes. With this you can write UI that responds immediately to changes to the cached
+data it renders:
+
+```js
+const user = useViewModelCache(User, cache => cache.get(1, ['name', 'email']));
+```
+
+The second argument is just a selector function that gets passed the cache and can return any value. The selector will be called
+anytime the cache changes and will re-render your component if the value returned from the selector differs from the last
+time it was called.
+
+The selector can return anything. Here we return user records grouped by a field:
+
+```
+const usersByGroup = cache => cache.getAll(['groupId', 'firstName', 'email']).reduce((acc, record) => {
+  acc[record.groupId] = acc[record.firstName] || [];
+  acc[record.groupId].push(record);
+  return acc;
+}, {})
+const groupedUsers = useViewModelCache(User, usersByGroup);
+```
+
+By default `useViewModelCache` will compare the previous and current value from the selector function using a strict
+equality check. In the example above `usersByGroup` returns a new object each time and so will fail the equality check.
+In critical parts of you application this may have a performance impact so for those times you can provide your own
+equality check:
+
+```js
+import { isDeepEqual } from '@prestojs/util';
+
+const groupedUsers = useViewModelCache(User, usersByGroup, [], isDeepEqual);
+```
+
+Here it uses the [isDeepEqual](doc:isDeepEqual) function to do a deep equality to avoid re-rendering when the data is
+identical.
+
+The third argument is a list of arguments to pass to the selector function. This allows you to write re-usable selectors
+that can just be passed straight through to `useViewModelCache` that will only be called whenever any of the arguments
+change.
+
+```js
+// Define a selector that selects a record from a cache
+const selectRecord = (cache, id, fieldNames) => cache.get(id, fieldNames);
+
+const fieldNames = ['name', 'id']
+const id = 1;
+
+// selectRecord will be called only if id or fieldNames changes
+const record = useViewModelCache(User, selectRecord, [id, fieldNames]);
+
+// Alternatively you can use an arrow function. The difference is that
+// selectRecord will be called every time the containing component or
+// hook renders.
+const record = useViewModelCache(user, cache => selectRecord(cache, id, fieldNames));
+```

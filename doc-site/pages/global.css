@@ -1,3 +1,5 @@
+@import './docs.css';
+
 @tailwind base;
 
 h1 {
@@ -82,6 +84,7 @@ html {
 .code-editor-compiler .ant-radio {
    @apply mr-1;
 }
+
 
 @tailwind utilities;
 

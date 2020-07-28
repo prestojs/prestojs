@@ -7,7 +7,7 @@ export type Id = SingleId | CompoundId;
  *
  * To confirm to the interface provide a `_key` property or getter.
  *
- * [ViewModelFactory](doc:ViewModelFactory) conforms to this so anything that expects an Identifiable
+ * [ViewModelFactory](doc:viewModelFactory) conforms to this so anything that expects an Identifiable
  * will accept a ViewModel.
  *
  * Implementing this can save you having to pass explicit functions to identify an item in other parts of the system
