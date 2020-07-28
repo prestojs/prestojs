@@ -90,7 +90,6 @@ export default function Doc({ docs, extraNodes }) {
             </Article>
             <Sidebar currentTitle="On This Page">
                 <Sidebar.LinksSection
-                    title="On this page"
                     links={[
                         {
                             title: 'viewModelFactory',
