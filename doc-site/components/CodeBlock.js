@@ -46,6 +46,8 @@ export default function CodeBlock({
         wrapperProps.title =
             typeof collapsable == 'string' ? collapsable.split('_').join(' ') : 'Code block';
     }
+    // Strip extra space - specifically when used in MDX there's a trailing new line we need to get rid of
+    children = children.trim();
     if (stripImports) {
         children = children.replace(/import .*/g, '');
     }

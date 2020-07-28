@@ -109,7 +109,7 @@ function LinksSection({ title, links }) {
     );
 }
 
-export default function Sidebar({ children, links }) {
+export default function Sidebar({ children, currentTitle, links }) {
     return (
         <div
             id="sidebar"
@@ -123,14 +123,20 @@ export default function Sidebar({ children, links }) {
                     id="nav"
                     className="px-6 pt-6 overflow-y-auto text-base lg:text-sm lg:py-12 lg:pl-6 lg:pr-8 sticky?lg:h-(screen-16)"
                 >
-                    <div className="mb-10">
-                        {links &&
-                            links.map(l => (
+                    {currentTitle && (
+                        <h5 className="mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-md lg:text-sm">
+                            {currentTitle}
+                        </h5>
+                    )}
+                    {links && (
+                        <div className="mb-10">
+                            {links.map(l => (
                                 <NavItem key={l.href} href={l.href} as={l.as}>
                                     {l.title}
                                 </NavItem>
                             ))}
-                    </div>
+                        </div>
+                    )}
                     {children}
                 </nav>
             </div>

@@ -1,6 +1,7 @@
 import { MDXProvider } from '@mdx-js/react';
 import { UiProvider } from '@prestojs/ui';
 import { FormItemWrapper, FormWrapper } from '@prestojs/ui-antd';
+import cx from 'classnames';
 import Head from 'next/head';
 import React from 'react';
 import getFormatterForField from '../getFormatterForField';
@@ -15,6 +16,16 @@ import { MdxScopeContext } from './useMdxScope';
 
 function MDXWrapper({ metadata = {}, children, ...props }) {
     const { scope = {} } = metadata;
+    let sideLinkIds;
+    if (metadata.generateInThisPage) {
+        const matches = children.filter?.(
+            child => child.props.originalType === 'h2' && typeof child.props.children === 'string'
+        );
+        if (matches) {
+            // Should be kept in sync with mdxComponents.js where it generates id in h2 component
+            sideLinkIds = matches.map(child => child.props.children.replace(/ /g, '_'));
+        }
+    }
     return (
         <MdxScopeContext.Provider value={scope}>
             {metadata && metadata.title && (
@@ -30,8 +41,19 @@ function MDXWrapper({ metadata = {}, children, ...props }) {
                     ))}
             </MainMenuSidebar>
             <Article {...props}>
-                <div className="mdx">{children}</div>
+                <div className={cx('mdx', metadata.className)}>{children}</div>
             </Article>
+            {sideLinkIds?.length > 0 && (
+                <Sidebar>
+                    <Sidebar.LinksSection
+                        title="On This Page"
+                        links={sideLinkIds.map(linkId => ({
+                            href: `#${linkId}`,
+                            title: linkId.split('_').join(' '),
+                        }))}
+                    />
+                </Sidebar>
+            )}
         </MdxScopeContext.Provider>
     );
 }
