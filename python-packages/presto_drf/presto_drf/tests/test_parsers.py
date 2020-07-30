@@ -25,7 +25,7 @@ class TestParsers(SimpleTestCase):
             result, {"key_with_numeric_1": {"key_with_numeric2": 1, "key": 2}}
         )
 
-    def test_camel_case_json_parser_underscorize_ignore(self):
+    def test_camel_case_json_parser_underscoreize_ignore(self):
         class CustomCamelCaseJSONRenderer(CamelCaseJSONParser):
             def underscoreize(self, data, **kwargs):
                 return super().underscoreize(data, ignore=["*", "*.dEf.hIj"], **kwargs)

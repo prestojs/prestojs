@@ -26,8 +26,8 @@ export default function UserFilterForm({ initialValues, onApplyFilter }) {
             <Panel header="Filters" key="generatedFilterForm">
                 <Form onSubmit={onApplyFilter} initialValues={initialValues}>
                     <Form.Item field={UserFilterSet.fields.id} />
-                    <Form.Item field={UserFilterSet.fields.first_name} />
-                    <Form.Item field={UserFilterSet.fields.last_name} />
+                    <Form.Item field={UserFilterSet.fields.firstName} />
+                    <Form.Item field={UserFilterSet.fields.lastName} />
                     <Button htmlType="submit" type="primary">
                         Search
                     </Button>

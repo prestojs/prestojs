@@ -609,9 +609,13 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
         "allianceutils.api.permissions.SimpleDjangoObjectPermissions",
     ),
+    "DEFAULT_PARSER_CLASSES": (
+        "presto_drf.parsers.CamelCaseMultiPartJSONParser",
+        "presto_drf.parsers.CamelCaseJSONParser",
+    ),
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.BrowsableAPIRenderer",
-        "rest_framework.renderers.JSONRenderer",
+        "presto_drf.renderers.CamelCaseJSONRenderer",
         # Any other renders
     ),
     "PAGE_SIZE": 20,
