@@ -1,6 +1,6 @@
 {
   "name": "prestojs",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "author": "Dave Coates <david.coates@alliancesoftware.com.au>",
   "license": "MIT",
@@ -22,7 +22,9 @@
     "build": "wsrun -t -x doc-site -x django-testbed build",
     "build:docs": "yarn workspace doc-site run build",
     "build:watch": "wsrun --exclude django-testbed 'build:watch'",
-    "build:declarations": "yarn workspace @prestojs/routing run build:declaration && yarn workspace @prestojs/viewmodel run build:declaration && yarn workspace @prestojs/ui run build:declaration && yarn workspace @prestojs/rest run build:declaration && yarn workspace @prestojs/final-form run build:declaration && yarn workspace @prestojs/ui-antd run build:declaration"
+    "build:declarations": "yarn workspace @prestojs/routing run build:declaration && yarn workspace @prestojs/viewmodel run build:declaration && yarn workspace @prestojs/ui run build:declaration && yarn workspace @prestojs/rest run build:declaration && yarn workspace @prestojs/final-form run build:declaration && yarn workspace @prestojs/ui-antd run build:declaration",
+    "release": "yarn wsrun -x doc-site -x django-testbed publish",
+    "postversion": "node ./bin/sync-workspace-versions.js"
   },
   "devDependencies": {
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.7.4",

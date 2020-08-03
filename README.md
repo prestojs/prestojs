@@ -16,10 +16,25 @@ This is a monorepo. Structure:
 
 ### Releases
 
-TODO: Fill out more as we know what we are doing
+#### Javascript 
+
+* All packages are kept in sync to the same version. If 1 package releases all packages do.
+* To bump version run `yarn version`. All packages are kept in sync with the `./bin/sync-workspace-versions.js' command
+* To publish all packages run `yarn release` - this will do a build and release for everything
+    * You can pass a one time password with `yarn release --otp <code>`
 
 ```bash
 yarn publish
+```
+
+#### Python
+
+* Publish to pypi
+
+```bash
+cd python-packages/presto_drf
+python3 setup.py sdist bdist_wheel
+python3 -m twine upload dist/*
 ```
 
 ### Initial setup
