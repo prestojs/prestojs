@@ -54,9 +54,10 @@ const choicesMapping = new Map([
  * @extract-docs
  */
 export default function getFormatterForField(field) {
+    const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     const formatter = field.choices
-        ? choicesMapping.get(field.constructor.name) || mapping.get(field.constructor.name)
-        : mapping.get(field.constructor.name);
+        ? choicesMapping.get(fieldClassName) || mapping.get(fieldClassName)
+        : mapping.get(fieldClassName);
     const getReturnWithChoices = (w, f) => {
         if (f.choices) {
             if (Array.isArray(w)) {
@@ -75,8 +76,8 @@ export default function getFormatterForField(field) {
     let f = Object.getPrototypeOf(field.constructor);
     do {
         const formatterF = field.choices
-            ? choicesMapping.get(f.name) || mapping.get(f.name)
-            : mapping.get(f.name);
+            ? choicesMapping.get(f.fieldClassName) || mapping.get(f.fieldClassName)
+            : mapping.get(f.fieldClassName);
         if (formatterF) {
             return getReturnWithChoices(formatterF, field);
         }
