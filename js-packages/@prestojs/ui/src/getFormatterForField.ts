@@ -1,5 +1,5 @@
-import React from 'react';
 import { Field } from '@prestojs/viewmodel';
+import React from 'react';
 
 const LinkFormatter = React.lazy(() => import('./formatters/LinkFormatter'));
 const RangeFormatter = React.lazy(() => import('./formatters/RangeFormatter'));
@@ -74,9 +74,10 @@ const choicesMapping = new Map<string, any>([
 export default function getFormatterForField<FieldValue, T extends HTMLElement>(
     field: Field<FieldValue>
 ): React.ComponentType<T> | [React.ComponentType<T>, object] | string | null {
+    const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     const formatter: React.FunctionComponent | string | null | undefined = field.choices
-        ? choicesMapping.get(field.constructor.name) || mapping.get(field.constructor.name)
-        : mapping.get(field.constructor.name);
+        ? choicesMapping.get(fieldClassName) || mapping.get(fieldClassName)
+        : mapping.get(fieldClassName);
 
     const getReturnWithChoices = (
         w,
@@ -100,8 +101,8 @@ export default function getFormatterForField<FieldValue, T extends HTMLElement>(
     let f = Object.getPrototypeOf(field.constructor);
     do {
         const formatterF: React.FunctionComponent | string | null | undefined = field.choices
-            ? choicesMapping.get(f.name) || mapping.get(f.name)
-            : mapping.get(f.name);
+            ? choicesMapping.get(f.fieldClassName) || mapping.get(f.fieldClassName)
+            : mapping.get(f.fieldClassName);
         if (formatterF) {
             return getReturnWithChoices(formatterF, field);
         }
