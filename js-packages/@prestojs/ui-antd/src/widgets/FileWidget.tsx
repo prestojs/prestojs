@@ -69,7 +69,11 @@ async function blobToUploadFile(uid: string, name: string, blob: Blob): Promise<
             })
         );
         reader.addEventListener('error', error => reject(error));
-        reader.readAsDataURL(blob);
+        try {
+            reader.readAsDataURL(blob);
+        } catch (e) {
+            reject(e);
+        }
     });
 }
 
@@ -94,6 +98,8 @@ function urlToUploadFile(uid: string, url: string): Promise<UploadFile> {
  * of `UploadFile` to be used with the antd `Upload` component.
  * @param value The value to convert. This would typically come from the form state.
  * @param previewImage If true the `thumbUrl` property will be set for each `UploadFile`
+ *
+ * @extract-docs
  */
 export function useFileList(
     value: File | string | (File | string)[] | null | undefined,
@@ -111,10 +117,18 @@ export function useFileList(
             const values: (File | string)[] = Array.isArray(value) ? value : [value];
             // antd recommends using negative numbers to avoid internal conflicts
             let uid = -1;
+            // This will be set immediately so UI reflects immediately showing uploaded
+            // files even if we haven't yet generate thumbnail
             const fileList: FileWidgetUploadFile[] = [];
+            // This holds promises for files we need to load previews for. This will be
+            // set after it resolves.
             const promises: (Promise<UploadFile> | null)[] = [];
             for (const value of values) {
                 let uploadFile = filePreviews.current.get(value);
+                if (previewImage && uploadFile && uploadFile.thumbUrl) {
+                    // Preview was generated preciously with previewImage = false
+                    uploadFile = undefined;
+                }
                 if (!uploadFile) {
                     if (typeof value == 'string') {
                         uploadFile = {
@@ -134,6 +148,7 @@ export function useFileList(
                             name: value.name,
                             size: value.size,
                             type: value.type,
+                            originFileObj: value,
                         };
                         promises.push(blobToUploadFile(uid.toString(), value.name, value));
                     }
@@ -153,14 +168,18 @@ export function useFileList(
             // Then if preview images are needed wait for promises to resolve before updating
             // file list again
             if (previewImage && !promises.every(entry => entry === null)) {
-                const resolved = (await Promise.all(promises)).map((entry, i) =>
-                    entry === null ? fileList[i] : { ...entry, key: values[i] }
-                );
-                for (let i = 0; i < resolved.length; i++) {
-                    filePreviews.current.set(values[i], resolved[i]);
-                }
-                if (isCurrent) {
-                    setFileList(resolved);
+                try {
+                    const resolved = (await Promise.all(promises)).map((entry, i) =>
+                        entry === null ? fileList[i] : { ...entry, key: values[i] }
+                    );
+                    for (let i = 0; i < resolved.length; i++) {
+                        filePreviews.current.set(values[i], resolved[i]);
+                    }
+                    if (isCurrent) {
+                        setFileList(resolved);
+                    }
+                } catch (e) {
+                    console.error('Failed to generate preview for images', e);
                 }
             }
         };
