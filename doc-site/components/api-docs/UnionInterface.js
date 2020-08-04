@@ -1,7 +1,6 @@
 import { getClassDetails, getTypeArguments } from '../../util';
 import ApiDocHeader from '../ApiDocHeader';
 import Article from '../Article';
-import Sidebar from '../Sidebar';
 import TypeArgProvider from '../TypeArgProvider';
 import ClassDetails from './ClassDetails';
 
@@ -33,7 +32,6 @@ export default function UnionInterface({ doc }) {
                     );
                 })}
             </Article>
-            <Sidebar currentTitle="On This Page"></Sidebar>
         </TypeArgProvider>
     );
 }

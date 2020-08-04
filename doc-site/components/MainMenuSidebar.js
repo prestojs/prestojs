@@ -59,6 +59,7 @@ export default function MainMenuSidebar({ children }) {
     return (
         <Sidebar
             links={[
+                { href: '/docs/guide', title: 'Getting Started' },
                 { href: '/docs/tutorial', title: 'Tutorial' },
                 { href: '/docs/viewmodel', title: 'View Model' },
                 { href: '/docs/final-form', title: 'Final Form' },

@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '../components/Layout';
-import './global.css';
 import '../prism.css';
+import './global.css';
 
 export default function MyApp({ Component, pageProps }) {
     return (

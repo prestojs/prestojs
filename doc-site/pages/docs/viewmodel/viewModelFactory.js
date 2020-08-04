@@ -90,7 +90,6 @@ export default function Doc({ docs, extraNodes }) {
             </Article>
             <Sidebar currentTitle="On This Page">
                 <Sidebar.LinksSection
-                    title="On this page"
                     links={[
                         {
                             title: 'viewModelFactory',
@@ -138,12 +137,9 @@ export async function getStaticProps(context) {
         datum =>
             ['viewModelFactory', 'ViewModelInterface', 'ViewModelConstructor'].includes(datum.name),
         items =>
-            items.reduce(
-                (acc, item) => {
-                    acc[item.name] = item;
-                    return acc;
-                },
-                { standalonePage: true }
-            )
+            items.reduce((acc, item) => {
+                acc[item.name] = item;
+                return acc;
+            }, {})
     );
 }
