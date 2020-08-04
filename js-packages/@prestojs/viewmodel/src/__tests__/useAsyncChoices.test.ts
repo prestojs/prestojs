@@ -98,12 +98,17 @@ test('useAsyncChoices should support hooking up to ViewModelCache easily', async
         getLabel,
         getValue,
         useResolveItems<T extends ItemModelInstance | ItemModelInstance[] | null>(item: T): T {
-            return useViewModelCache<ItemModelInstance, T>(ItemModel, cache => {
-                if (item == null) {
-                    return item;
+            return useViewModelCache<typeof ItemModel, T>(
+                ItemModel,
+                (cache): T => {
+                    if (item == null) {
+                        return item;
+                    }
+                    return (Array.isArray(item)
+                        ? cache.getList(item as ItemModelInstance[])
+                        : cache.get(item as ItemModelInstance) || item) as T;
                 }
-                return Array.isArray(item) ? cache.getList(item) : cache.get(item) || item;
-            });
+            );
         },
     });
     const { rerender, result, waitForNextUpdate } = renderHook(
