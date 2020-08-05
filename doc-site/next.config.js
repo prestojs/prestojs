@@ -2,7 +2,11 @@
 const withMDX = require('@next/mdx')({
     extension: /\.mdx?$/,
     options: {
-        remarkPlugins: [require('remark-code-import'), require('./remark-plugins/docLinks.js')],
+        remarkPlugins: [
+            require('remark-code-import'),
+            require('./remark-plugins/docLinks.js'),
+            require('./remark-plugins/codesandbox'),
+        ],
     },
 });
 module.exports = withMDX({

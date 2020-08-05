@@ -24,6 +24,26 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     -   `@doc-class` - Specify what documentation component class to use. If not specified defaults based on type.
     -   `@forward-ref` - Indicate this function is used as a React.forwardRef. This allows doc site renderer to not document second `ref` parameter to the function as you don't pass it in yourself.
     
+### Codesandbox
+
+To create a codesandbox example using use a codeblock with a codesandbox meta tag like: `codesandbox=./codesandbox-example/FollowerList.js`. This
+will create & embed a sandbox to that file and automatically include any imported files.
+
+**NOTE:** Name directory of files with `codesandbox-` prefix. This is only so we apply a different
+layout when you preview the component locally. You can preview the component by going to the the
+path for the component same as any other page (eg. if sits under `pages/docs/sandbox-example1/` go to `/docs/sandbox-example1/`).
+See `_app.js` for where this logic sits.
+
+This works using the `codesandbox` plugin for `remark` that can be found in `remark-plugins`. To add additional styles
+for all examples add them to `remark-plugins/codesandbox/styles.css`.
+
+The following options are available:
+
+* `size=small|medium|large` - control the size of the embed (defaults to medium)
+* `highlight=1,5-10` - highlight lines in editor (eg. example here highlights line 1 and lines 5 through 10)
+* `view=editor|split|preview` - which view to open by default (defaults to preview)
+* `hidenavigation=0` - hide the navigation bar of preview (defaults to 0)
+* `editorsize=20` - size in percentage of editor (defaults to 50)
     
 ## Deployment
 
