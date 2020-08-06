@@ -8,7 +8,7 @@ import TypeArgProvider from '../TypeArgProvider';
 import ClassDetails from './ClassDetails';
 import SignatureDefinition from './SignatureDefinition';
 
-export default function ClassDoc({ doc }) {
+export default function ClassDoc({ doc, baseUrl }) {
     const classDetails = getClassDetails(doc);
     const { constructor, methods, properties, staticMethods, staticProperties } = classDetails;
     const typeArguments = getTypeArguments(doc);
@@ -30,7 +30,7 @@ export default function ClassDoc({ doc }) {
                 {sideLinkIds.length > 0 && (
                     <Sidebar.LinksSection
                         links={sideLinkIds.map(linkId => ({
-                            href: `#${linkId}`,
+                            href: `${baseUrl}#${linkId}`,
                             title: linkId.split('_').join(' '),
                         }))}
                     />
@@ -47,7 +47,7 @@ export default function ClassDoc({ doc }) {
                         links={methods.direct.reduce((acc, method) => {
                             method.signatures.forEach(sig => {
                                 acc.push({
-                                    href: `#${getSignatureId(method, sig)}`,
+                                    href: `${baseUrl}#${getSignatureId(method, sig)}`,
                                     title: (
                                         <SignatureDefinition
                                             name={sig.name}
@@ -68,7 +68,11 @@ export default function ClassDoc({ doc }) {
                         links={staticMethods.direct.reduce((acc, method) => {
                             method.signatures.forEach(sig => {
                                 acc.push({
-                                    href: `#${getSignatureId(method, sig, 'static-method')}`,
+                                    href: `${baseUrl}#${getSignatureId(
+                                        method,
+                                        sig,
+                                        'static-method'
+                                    )}`,
                                     title: (
                                         <SignatureDefinition
                                             name={sig.name}
@@ -87,7 +91,7 @@ export default function ClassDoc({ doc }) {
                     <Sidebar.LinksSection
                         title="Properties"
                         links={properties.direct.map(prop => ({
-                            href: `#var-${prop.name}`,
+                            href: `${baseUrl}#var-${prop.name}`,
                             title: prop.name,
                         }))}
                     />
@@ -96,7 +100,7 @@ export default function ClassDoc({ doc }) {
                     <Sidebar.LinksSection
                         title="Static Properties"
                         links={staticProperties.direct.map(prop => ({
-                            href: `#static-var-${prop.name}`,
+                            href: `${baseUrl}#static-var-${prop.name}`,
                             title: prop.name,
                         }))}
                     />
@@ -105,7 +109,7 @@ export default function ClassDoc({ doc }) {
                     <Sidebar.LinksSection
                         title="Inherited Methods"
                         links={methods.inherited.map(method => ({
-                            href: `#inh-method-${method.name}`,
+                            href: `${baseUrl}#inh-method-${method.name}`,
                             title: (
                                 <SignatureDefinition
                                     name={method.name}
@@ -119,7 +123,7 @@ export default function ClassDoc({ doc }) {
                     <Sidebar.LinksSection
                         title="Inherited Static Methods"
                         links={staticMethods.inherited.map(method => ({
-                            href: `#static-inh-method-${method.name}`,
+                            href: `${baseUrl}#static-inh-method-${method.name}`,
                             title: (
                                 <SignatureDefinition
                                     name={method.name}
@@ -133,7 +137,7 @@ export default function ClassDoc({ doc }) {
                     <Sidebar.LinksSection
                         title="Inherited Properties"
                         links={properties.inherited.map(prop => ({
-                            href: `#inh-var-${prop.name}`,
+                            href: `${baseUrl}#inh-var-${prop.name}`,
                             title: prop.name,
                         }))}
                     />
@@ -142,7 +146,7 @@ export default function ClassDoc({ doc }) {
                     <Sidebar.LinksSection
                         title="Inherited Static Properties"
                         links={staticProperties.inherited.map(prop => ({
-                            href: `#static-inh-var-${prop.name}`,
+                            href: `${baseUrl}#static-inh-var-${prop.name}`,
                             title: prop.name,
                         }))}
                     />

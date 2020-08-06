@@ -22,6 +22,7 @@ if (result.hasErrors) {
     process.exit(typedoc.ExitCode.OptionError);
 }
 
+const root = path.resolve(__dirname, '../');
 const src = app.expandInputFiles(['../js-packages/']);
 const project = app.convert(src);
 const tmpFile = './___temp.json';
@@ -60,6 +61,13 @@ function extractChildren(node) {
         menuGroup = tagsByName['menu-group'] || 'default';
         isForwardRef = 'forward-ref' in tagsByName;
         comment.tagsByName = tagsByName;
+        const dir = root + '/' + node.sources[0].fileName.split('/').slice(0, -1).join('/') + '/';
+        if (comment.shortText && comment.shortText.includes('codesandbox=')) {
+            comment.shortText = comment.shortText.replace(/codesandbox=/g, `codesandbox=${dir}`);
+        }
+        if (comment.text && comment.text.includes('codesandbox=')) {
+            comment.text = comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`);
+        }
     }
     rest.isForwardRef = isForwardRef;
     rest.docClass = docClass;

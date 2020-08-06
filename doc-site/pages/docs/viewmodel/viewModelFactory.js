@@ -7,10 +7,13 @@ import ApiDocHeader from '../../../components/ApiDocHeader';
 import Article from '../../../components/Article';
 import MainMenuSidebar from '../../../components/MainMenuSidebar';
 import Sidebar from '../../../components/Sidebar';
-import defaultGetStaticProps, { prepareDocs } from '../../../getStaticProps';
+import defaultGetStaticProps, { usePrepareDocs } from '../../../getStaticProps';
 
-export default function Doc({ docs, extraNodes }) {
-    prepareDocs(docs, extraNodes);
+export default function Doc({ docs, extraNodes, slug, ...rest }) {
+    if (!usePrepareDocs(docs, extraNodes)) {
+        return null;
+    }
+    const baseUrl = `/docs/viewmodel/viewModelFactory`;
     const staticGroups = docs.ViewModelConstructor.groups.reduce((acc, group) => {
         acc[group.title] = group;
         return acc;
@@ -93,7 +96,7 @@ export default function Doc({ docs, extraNodes }) {
                     links={[
                         {
                             title: 'viewModelFactory',
-                            href: `#method-viewmodel`,
+                            href: `${baseUrl}#method-viewmodel`,
                         },
                     ]}
                 />
@@ -102,28 +105,28 @@ export default function Doc({ docs, extraNodes }) {
                     title="Static Methods"
                     links={staticMethods.map(prop => ({
                         title: prop.name,
-                        href: `#method-${prop.name}`,
+                        href: `${baseUrl}#method-${prop.name}`,
                     }))}
                 />
                 <Sidebar.LinksSection
                     title="Static Properties"
                     links={staticProperties.map(prop => ({
                         title: prop.name,
-                        href: `#var-${prop.name}`,
+                        href: `${baseUrl}#var-${prop.name}`,
                     }))}
                 />
                 <Sidebar.LinksSection
                     title="Instance Methods"
                     links={instanceMethods.map(prop => ({
                         title: prop.name,
-                        href: `#method-${prop.name}`,
+                        href: `${baseUrl}#method-${prop.name}`,
                     }))}
                 />
                 <Sidebar.LinksSection
                     title="Instance Properties"
                     links={instanceProperties.map(prop => ({
                         title: prop.name,
-                        href: `#var-${prop.name}`,
+                        href: `${baseUrl}#var-${prop.name}`,
                     }))}
                 />
             </Sidebar>

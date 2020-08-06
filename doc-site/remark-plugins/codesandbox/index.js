@@ -2,13 +2,14 @@
 const qs = require('qs');
 const visit = require('unist-util-visit');
 const util = require('util');
-const exec = util.promisify(require('child_process').exec);
 const fs = require('fs');
 const path = require('path');
+const exec = util.promisify(require('child_process').exec);
 const { getParameters } = require('codesandbox/lib/api/define');
 const { assembleFiles } = require('codesandboxer-fs');
 require('isomorphic-unfetch');
 const FormData = require('form-data');
+const { version } = require('../../../package.json');
 
 const cache = new Map();
 
@@ -21,9 +22,9 @@ function getSandboxUrl(id, type, fileName) {
  *
  * Reads from 'style.css' and builds with tailwind
  */
-async function getStyles() {
-    const inPath = path.resolve(__dirname + '/styles.css');
-    const outPath = path.resolve(__dirname + '/output.css');
+async function getStyles(cwd) {
+    const inPath = path.resolve(cwd + '/remark-plugins/codesandbox/styles.css');
+    const outPath = path.resolve(cwd + '/remark-plugins/codesandbox/output.css');
     if (fs.existsSync(outPath)) {
         const a = fs.statSync(outPath);
         const b = fs.statSync(inPath);
@@ -36,20 +37,23 @@ async function getStyles() {
     return outPath;
 }
 
-async function generateSandbox(fn) {
+async function generateSandbox(fn, cwd) {
     const f = await assembleFiles(fn);
     delete f.parameters;
     const packageJson = JSON.parse(f.files['package.json'].content);
     packageJson.dependencies['react-scripts'] = '^3.0.1';
     // Temporary until prestojs/util new version published
-    packageJson.dependencies['qs'] = '*';
+    packageJson.dependencies['qs'] = '^6.9.4';
+    for (const name of ['viewmodel', 'ui', 'ui-antd', 'util', 'final-form', 'routing']) {
+        packageJson.dependencies[`@prestojs/${name}`] = version;
+    }
     packageJson.scripts = {
         start: 'react-scripts start',
         build: 'react-scripts build',
         test: 'react-scripts test --env=jsdom',
         eject: 'react-scripts eject',
     };
-    f.files['styles.css'] = { content: fs.readFileSync(await getStyles(), 'utf8') };
+    f.files['styles.css'] = { content: fs.readFileSync(await getStyles(cwd), 'utf8') };
     f.files['index.js'].content = `import React from 'react';
 import ReactDOM from 'react-dom';
 import Example from './example';
@@ -105,11 +109,14 @@ module.exports = function codesandbox() {
             if (!filePath) {
                 return;
             }
-
-            const fileAbsPath = path.resolve(file.dirname, filePath);
+            const fileAbsPath = file.dirname
+                ? path.resolve(file.dirname, filePath)
+                : path.resolve(filePath);
 
             if (!fs.existsSync(fileAbsPath)) {
-                console.error(`In ${file} codesandbox link for ${filePath} does not exist`);
+                const msg = `Codesandbox link for ${filePath} does not exist. Occurred in:\n\n${file}`;
+                console.error(msg);
+                node.value = msg;
                 return;
             }
             const {
@@ -155,7 +162,7 @@ module.exports = function codesandbox() {
             }
             const height = sizes[size] || sizes.medium;
             const queryString = qs.stringify(query);
-            const promise = generateSandbox(fileAbsPath)
+            const promise = generateSandbox(fileAbsPath, file.cwd)
                 .then(result => {
                     node.type = 'html';
                     node.value = `<iframe

@@ -7,7 +7,9 @@ import FunctionDoc from '../../components/api-docs/FunctionDoc';
 import UnionInterface from '../../components/api-docs/UnionInterface';
 import VariableDoc from '../../components/api-docs/VariableDoc';
 import MainMenuSidebar from '../../components/MainMenuSidebar';
-import defaultGetStaticProps, { prepareDocs } from '../../getStaticProps';
+import defaultGetStaticProps, { usePrepareDocs } from '../../getStaticProps';
+import codesandbox from '../../remark-plugins/codesandbox';
+import docLinks from '../../remark-plugins/docLinks';
 
 const kindComponents = {
     Function: FunctionDoc,
@@ -17,8 +19,10 @@ const kindComponents = {
     Interface: ClassDoc,
 };
 
-export default function Doc({ docs, extraNodes }) {
-    prepareDocs(docs, extraNodes);
+export default function Doc({ docs, extraNodes, slug }) {
+    if (!usePrepareDocs(docs, extraNodes)) {
+        return null;
+    }
     const doc = docs[0];
     const DocComponent = kindComponents[doc.docClass || doc.kindString];
     return (
@@ -27,14 +31,20 @@ export default function Doc({ docs, extraNodes }) {
                 <title>Presto - {doc.name}</title>
             </Head>
             <MainMenuSidebar />
-            <DocComponent doc={doc} />
+            <DocComponent doc={doc} baseUrl={`/docs/${slug}`} />
         </>
     );
 }
 
 export async function getStaticProps(context) {
     const slug = context.params.slug.join('/');
-    return defaultGetStaticProps(context, datum => datum.extractDocs && datum.slug === slug);
+    const remarkPlugins = [docLinks, codesandbox];
+    return defaultGetStaticProps(
+        context,
+        datum => datum.extractDocs && datum.slug === slug,
+        id => id,
+        remarkPlugins
+    );
 }
 
 export function getStaticPaths() {
