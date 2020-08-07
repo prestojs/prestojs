@@ -37,7 +37,7 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
             return err.content;
         }
     }
-    const fieldNames = ['first_name', 'last_name', 'email', 'region'];
+    const fieldNames = ['firstName', 'lastName', 'email', 'region'];
     const record = useViewModelCache(User, cache => data && cache.get(data.result, fieldNames));
     if (error) {
         return error.message;
@@ -51,7 +51,7 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
             <hr />
             {record && (
                 <p>
-                    Updating: {record.first_name} {record.last_name} ({record.email})
+                    Updating: {record.firstName} {record.lastName} ({record.email})
                 </p>
             )}
             {/* eslint-disable-next-line no-console */}
@@ -60,10 +60,10 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
                 initialValues={record && record.toJS()}
                 formProps={{ layout: 'horizontal' }}
             >
-                <Form.Item field={User.fields.first_name} />
-                <FieldErrors name="first_name" />
-                <Form.Item field={User.fields.last_name} />
-                <FieldErrors name="last_name" />
+                <Form.Item field={User.fields.firstName} />
+                <FieldErrors name="firstName" />
+                <Form.Item field={User.fields.lastName} />
+                <FieldErrors name="lastName" />
                 <Form.Item field={User.fields.email} />
                 <FieldErrors name="email" />
                 <Form.Item field={User.fields.region} />

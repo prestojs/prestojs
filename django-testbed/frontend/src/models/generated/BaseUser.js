@@ -1,15 +1,15 @@
-import { CharField, EmailField, viewModelFactory, NumberField } from '@prestojs/viewmodel';
+import { CharField, EmailField, NumberField, viewModelFactory } from '@prestojs/viewmodel';
 
 export default class Base extends viewModelFactory({
     id: new NumberField({
         label: 'Id',
     }),
     // eslint-disable-next-line @typescript-eslint/camelcase
-    first_name: new CharField({
+    firstName: new CharField({
         label: 'First Name',
     }),
     // eslint-disable-next-line @typescript-eslint/camelcase
-    last_name: new CharField({
+    lastName: new CharField({
         label: 'Last Name',
     }),
     email: new EmailField({

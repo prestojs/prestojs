@@ -38,7 +38,7 @@ const asyncChoicesOptions = {
         return {
             ...args,
             // Make everything in cache available so we can avoid new lookups if not required
-            existingValues: User.cache.getAll(['first_name', 'last_name', 'email', 'region']),
+            existingValues: User.cache.getAll(['firstName', 'lastName', 'email', 'region']),
         };
     },
     useListProps() {
@@ -91,12 +91,7 @@ export default class User extends BaseUser.augment({
                 return {
                     ...props,
                     paginator,
-                    existingValues: User.cache.getAll([
-                        'first_name',
-                        'last_name',
-                        'email',
-                        'region',
-                    ]),
+                    existingValues: User.cache.getAll(['firstName', 'lastName', 'email', 'region']),
                 };
             },
             async retrieve(value, deps) {
@@ -131,7 +126,7 @@ export default class User extends BaseUser.augment({
     static endpoints = endpoints;
 
     getLabel() {
-        return `${this.first_name} ${this.last_name} (${this.email})`;
+        return `${this.firstName} ${this.lastName} (${this.email})`;
     }
 }
 
@@ -146,11 +141,11 @@ export class UserFilterSet extends FilterSet {
             label: 'Id',
         }),
         // eslint-disable-next-line @typescript-eslint/camelcase
-        first_name: new CharField({
+        firstName: new CharField({
             label: 'First Name',
         }),
         // eslint-disable-next-line @typescript-eslint/camelcase
-        last_name: new CharField({
+        lastName: new CharField({
             label: 'Last Name',
         }),
     };

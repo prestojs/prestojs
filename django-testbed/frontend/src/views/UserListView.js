@@ -12,7 +12,7 @@ import UserCreateUpdateView from './UserCreateUpdateView';
 import UserFilterForm from './UserFilterForm';
 
 // TODO: We don't yet support selecting partial fields on backend
-const fieldList = ['email', 'first_name', 'last_name'];
+const fieldList = ['email', 'firstName', 'lastName'];
 
 export default function UserListView() {
     const { search, pathname, origin } = window.location;
@@ -111,12 +111,12 @@ export default function UserListView() {
                         <tr key={record._pk}>
                             <td>
                                 <FieldFormatter
-                                    field={User.fields.first_name}
-                                    value={record.first_name}
+                                    field={User.fields.firstName}
+                                    value={record.firstName}
                                 />
                                 <FieldFormatter
-                                    field={User.fields.last_name}
-                                    value={record.last_name}
+                                    field={User.fields.lastName}
+                                    value={record.lastName}
                                 />
                             </td>
                             <td>
