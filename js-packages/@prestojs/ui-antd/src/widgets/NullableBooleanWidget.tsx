@@ -1,4 +1,4 @@
-import { WidgetProps } from '@prestojs/ui';
+import type { WidgetProps } from '@prestojs/ui';
 import { Select } from 'antd';
 import React from 'react';
 import SelectChoiceWidget, { SelectChoiceProps } from './SelectChoiceWidget';
