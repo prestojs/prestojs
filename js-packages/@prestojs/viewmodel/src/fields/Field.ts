@@ -7,14 +7,15 @@ import { AsyncChoicesInterface } from './AsyncChoices';
  */
 export interface FieldProps<T> {
     /**
-     * Is this field required when saving a record?
+     * Is this field allowed to be assigned a blank (null, undefined, "") value?
      */
     blank?: boolean;
     /**
-     * If true an empty string value should be converted to a null value
-     *
-     * This is useful when backend considers an empty string different to `null` and specifically
-     * needs to handle empty values as `null`.
+     * Frontend values are often stored as strings even if they are not stored like that
+     * in a backend (eg. database). Depending on your backend implementation it may expect
+     * empty values to be represented as `null` rather than an empty string. Setting
+     * `blankAsNull` to `true` indicates that empty strings should be converted to `null`
+     * when being sent to the backend.
      */
     blankAsNull?: boolean;
     /**

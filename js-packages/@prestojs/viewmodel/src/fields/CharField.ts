@@ -20,9 +20,9 @@ export default class CharField extends Field<string> {
     constructor(values: CharFieldProps = {}) {
         const { maxLength, ...rest } = values;
 
-        if (maxLength !== undefined && typeof maxLength !== 'number')
+        if (maxLength != null && typeof maxLength !== 'number')
             throw new Error(`"maxLength" should be a number, received: ${maxLength}`);
-        if (maxLength !== undefined && maxLength <= 0)
+        if (maxLength != null && maxLength <= 0)
             throw new Error(`"maxLength" should be a positive number, received: ${maxLength}`);
 
         super(rest);

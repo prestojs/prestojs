@@ -24,9 +24,9 @@ export default class NumberField<T = string | number> extends Field<T> {
     constructor(values: NumberFieldProps<T> = {}) {
         const { minValue, maxValue, ...rest } = values;
 
-        if (minValue !== undefined && typeof minValue !== 'number')
+        if (minValue != null && typeof minValue !== 'number')
             throw new Error(`"minValue" should be a number, received: ${minValue}`);
-        if (maxValue !== undefined && typeof maxValue !== 'number')
+        if (maxValue != null && typeof maxValue !== 'number')
             throw new Error(`"maxValue" should be a number, received: ${maxValue}`);
 
         super(rest);
