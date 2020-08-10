@@ -84,8 +84,8 @@ export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement
         extraProps.label = field.label;
         extraProps.fieldName = field.name;
 
-        if (required == null && field.required) {
-            required = field.required;
+        if (required == null && field.blank !== undefined) {
+            required = !field.blank;
         }
         if (!children) {
             children = <FormField {...fieldProps} widgetProps={widgetProps} field={field} />;

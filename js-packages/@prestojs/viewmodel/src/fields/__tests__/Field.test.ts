@@ -5,8 +5,8 @@ test('Field options validation', () => {
     expect(
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
-        () => new Field({ label: 'phone number', required: 3 })
-    ).toThrowError('"required" should be a boolean, received: 3');
+        () => new Field({ label: 'phone number', blank: 3 })
+    ).toThrowError('"blank" should be a boolean, received: 3');
 
     expect(
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
@@ -34,7 +34,8 @@ test('Field options validation', () => {
 
     new Field({
         label: 'a',
-        required: false,
+        blank: true,
+        blankAsNull: true,
         helpText: 'Help',
         defaultValue: 1,
         choices: new Map(),
@@ -46,7 +47,8 @@ test('Field options validation', () => {
 test('Field should clone correctly', () => {
     const f1 = new CharField({
         label: 'a',
-        required: false,
+        blank: true,
+        blankAsNull: false,
         helpText: 'Help',
         defaultValue: 'default',
         choices: new Map(),
@@ -60,7 +62,8 @@ test('Field should clone correctly', () => {
     expect(f2).toBeInstanceOf(CharField);
     for (const prop of [
         'label',
-        'required',
+        'blank',
+        'blankAsNull',
         'helpText',
         'defaultValue',
         'choices',
