@@ -7,9 +7,17 @@ import { AsyncChoicesInterface } from './AsyncChoices';
  */
 export interface FieldProps<T> {
     /**
-     * True if field is required when creating or updating a model
+     * Is this field allowed to be assigned a blank (null, undefined, "") value?
      */
-    required?: boolean;
+    blank?: boolean;
+    /**
+     * Frontend values are often stored as strings even if they are not stored like that
+     * in a backend (eg. database). Depending on your backend implementation it may expect
+     * empty values to be represented as `null` rather than an empty string. Setting
+     * `blankAsNull` to `true` indicates that empty strings should be converted to `null`
+     * when being sent to the backend.
+     */
+    blankAsNull?: boolean;
     /**
      * Label for this field. If not specified will be generated from the name.
      */
@@ -104,8 +112,14 @@ export default class Field<T, ParsableType extends any = T> {
      */
     static fieldClassName: string | null = null;
 
-    /** Is this field required when saving a record? */
-    public required: boolean;
+    /**
+     * Is this field required when saving a record?
+     */
+    public blank: boolean;
+    /**
+     * If true an empty string value should be converted to a null value
+     */
+    public blankAsNull: boolean;
     /**
      * Label that can be displayed as the form label for a widget
      *
@@ -144,7 +158,8 @@ export default class Field<T, ParsableType extends any = T> {
 
     constructor(values: FieldProps<T> = {}) {
         const {
-            required = false,
+            blank = true,
+            blankAsNull = false,
             label,
             helpText,
             defaultValue,
@@ -157,9 +172,12 @@ export default class Field<T, ParsableType extends any = T> {
         if (choices && asyncChoices) {
             throw new Error("Only one of 'choices' and 'asyncChoices' should be provided");
         }
-
-        if (required !== undefined && typeof required !== 'boolean')
-            throw new Error(`"required" should be a boolean, received: ${required}`);
+        if (blank !== undefined && typeof blank !== 'boolean') {
+            throw new Error(`"blank" should be a boolean, received: ${blank}`);
+        }
+        if (blankAsNull !== undefined && typeof blankAsNull !== 'boolean') {
+            throw new Error(`"blankAsNull" should be a boolean, received: ${blankAsNull}`);
+        }
         if (choices !== undefined && !(Symbol.iterator in Object(choices)))
             throw new Error(`"choices" should be Iterable, received: ${choices}`);
         if (readOnly !== undefined && typeof readOnly !== 'boolean')
@@ -172,7 +190,8 @@ export default class Field<T, ParsableType extends any = T> {
         const unknowns = Object.keys(values).filter(
             key =>
                 ![
-                    'required',
+                    'blank',
+                    'blankAsNull',
                     'label',
                     'helpText',
                     'defaultValue',
@@ -187,7 +206,8 @@ export default class Field<T, ParsableType extends any = T> {
             throw new Error(`Received unknown option(s): ${unknowns.join(', ')}`);
         }
 
-        this.required = required;
+        this.blank = blank;
+        this.blankAsNull = blankAsNull;
         this.label = label;
         this.helpText = helpText;
         this._defaultValue = defaultValue;
