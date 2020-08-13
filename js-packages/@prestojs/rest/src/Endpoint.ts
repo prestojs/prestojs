@@ -131,7 +131,7 @@ type MiddlewareContext<T> = {
 
 /**
  * @param url The URL to call fetch with
- * @param requestInit See [fetch parameteres](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
+ * @param requestInit See [fetch parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
  * @param next The next function in the middleware chain. Must be passed the `url` and `requestInit` objects.
  * @param context The context for the current execute. This gives you access to the original options and a function to re-execute the command.
  * @returns Returns the value from `fetch` after it has been transformed by each middleware further down the chain
@@ -191,7 +191,7 @@ function mergeHeaders(headers1: Headers, headers2: Headers): Headers {
  *
  * @param args
  */
-function mergeRequestInit(...args: ExecuteInitOptions[]): RequestInit {
+function mergeRequestInit(...args: (ExecuteInitOptions | EndpointRequestInit)[]): RequestInit {
     return args.reduce((acc: RequestInit, init) => {
         const { headers: currentHeaders, ...rest } = init;
         Object.assign(acc, rest);
@@ -643,7 +643,7 @@ export default class Endpoint<ReturnT = any> {
             options = paginator.getRequestInit(restOptions);
         }
         const { urlArgs = {}, query, ...init } = options;
-        // Always make sure headers & method is set middleware implementations can assume it exists
+        // Always make sure headers & method is set so middleware implementations can assume it exists
         if (!init.headers) {
             init.headers = new Headers();
         }
@@ -741,7 +741,8 @@ export default class Endpoint<ReturnT = any> {
                     }
                     return r;
                 };
-                return next(url, requestInit);
+                // mergeRequestInit here is just used to clone requestInit
+                return next(url, mergeRequestInit(requestInit) as EndpointRequestInit);
             };
             returnVal.result = await executeWithMiddleware();
             return returnVal;

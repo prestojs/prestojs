@@ -552,3 +552,42 @@ test('middleware header mutations should not mutate source objects', async () =>
     await action2.execute({ headers });
     expect([...defaultHeaders.keys()]).toEqual(['token']);
 });
+
+test('middleware replays should not have mutations made in previous runs', async () => {
+    let runCount = 0;
+    let middlewareContext;
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    async function customHeaderMiddleware(url, requestInit, next, context) {
+        if (runCount === 0) {
+            runCount += 1;
+            // First run set a header and throw an error. When the call is replayed
+            // the header should not exist
+            requestInit.headers.set('X-ClientId', 'ABC123');
+            middlewareContext = context;
+            throw new Error('No good');
+        }
+        return next(url, requestInit);
+    }
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [customHeaderMiddleware],
+    });
+    fetchMock.mockResponse(request => {
+        return Promise.resolve({
+            // Mocked call just returns the set header keys
+            body: JSON.stringify([...request.headers.keys()]),
+            init: {
+                status: 200,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            },
+        });
+    });
+    const headers = new Headers({ 'x-csrf': '42' });
+    expect(action1.execute({ headers })).rejects.toThrowError(new Error('No good'));
+    // context options shouldn't have been mutated by the middleware
+    expect([...middlewareContext.executeOptions.headers.keys()]).toEqual(['x-csrf']);
+    expect([...headers.keys()]).toEqual(['x-csrf']);
+    // The header set in the original call to middleware shouldn't be here
+    expect(await middlewareContext.execute()).toEqual(['x-csrf']);
+});

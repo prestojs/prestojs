@@ -1,11 +1,25 @@
+import { isDeepEqual } from '@prestojs/util';
+import qs from 'querystring';
 import { EndpointRequestInit, MiddlewareFunction } from './Endpoint';
 
-function defaultGetKey(url: string, requestInit: EndpointRequestInit): string {
-    return [
-        url,
-        requestInit.method,
-        [...requestInit.headers.entries()].map(([key, value]) => `${key}⁞${value}`).join('__'),
-    ].join('|');
+function defaultGetKey(
+    url: string,
+    requestInit: EndpointRequestInit
+): { url: string; method: string; headers: Record<string, string>; query: Record<string, string> } {
+    const [u, q] = url.split('?');
+    let query = {};
+    if (q) {
+        query = qs.parse(q);
+    }
+    return {
+        url: u,
+        query,
+        method: requestInit.method,
+        headers: [...requestInit.headers.entries()].reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+        }, {}),
+    };
 }
 
 function defaultTest(url: string, requestInit: EndpointRequestInit): boolean {
@@ -25,8 +39,11 @@ type DedupeOptions = {
      * Function to get a key for a request. If the key matches another in flight request then it
      * is considered a duplicate. The default implementation includes the URL, the request method and all request
      * headers in the key.
+     *
+     * The key can be anything (object, string, number) - it will be compared deeply to existing keys
+     * for a match.
      */
-    getKey?: (url: string, requestInit: EndpointRequestInit) => string;
+    getKey?: (url: string, requestInit: EndpointRequestInit) => any;
 };
 
 /**
@@ -49,13 +66,19 @@ export default function dedupeInFlightRequestsMiddleware<T>(
     options: DedupeOptions = {}
 ): MiddlewareFunction<T> {
     const { test = defaultTest, getKey = defaultGetKey } = options;
-    const requestsInFlight = new Map<string, Promise<T>>();
+    const requestsInFlight = new Map<any, Promise<T>>();
     return async (url: string, requestInit: EndpointRequestInit, next): Promise<T> => {
         if (!test(url, requestInit)) {
             return next(url, requestInit);
         }
         const key = getKey(url, requestInit);
-        const currentRequest = requestsInFlight.get(key);
+        let currentRequest: Promise<T> | null = null;
+        for (const [k, value] of requestsInFlight.entries()) {
+            if (isDeepEqual(k, key)) {
+                currentRequest = value;
+                break;
+            }
+        }
         if (currentRequest) {
             return currentRequest;
         }

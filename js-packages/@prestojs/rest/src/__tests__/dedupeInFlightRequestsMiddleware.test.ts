@@ -47,6 +47,42 @@ test('should de-dupe in flight requests', async () => {
     expect((await p5).result).toBe('hello world 4');
     expect((await p6).result).toBe('hello world 5');
     expect(fetchMock).toHaveBeenCalledTimes(6);
+    // Headers defined in different order should be considered the same
+    const p7 = action1
+        .prepare()
+        .execute({ headers: new Headers({ 'x-test1': '1', 'x-test2': '2' }) });
+    const p8 = action1
+        .prepare()
+        .execute({ headers: new Headers({ 'x-test2': '2', 'x-test1': '1' }) });
+    expect((await p7).result).toBe('hello world 6');
+    expect((await p8).result).toBe('hello world 6');
+    expect(fetchMock).toHaveBeenCalledTimes(7);
+});
+
+test('should de-dupe in flight requests including query parameters in any order', async () => {
+    let i = 0;
+    fetchMock.mockResponse(() =>
+        Promise.resolve({
+            body: `hello world ${i++}`,
+            init: {
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+            },
+        })
+    );
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [dedupeInFlightRequestsMiddleware()],
+    });
+    const p1 = action1.execute({ query: { param1: '1', param2: '2' } });
+    const p2 = action1.execute({ query: { param2: '2', param1: '1' } });
+    expect((await p1).result).toBe('hello world 0');
+    expect((await p2).result).toBe('hello world 0');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const p3 = action1.execute({ query: { param1: '1', param2: '2' } });
+    const p4 = action1.execute({ query: { param2: 'two', param1: '1' } });
+    expect((await p3).result).toBe('hello world 1');
+    expect((await p4).result).toBe('hello world 2');
 });
 
 test('should support customising key', async () => {
@@ -65,7 +101,7 @@ test('should support customising key', async () => {
         middleware: [
             dedupeInFlightRequestsMiddleware({
                 // Set key to ignore headers, only care about url
-                getKey: url => url,
+                getKey: url => ({ url }),
             }),
         ],
     });
