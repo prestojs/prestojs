@@ -3,12 +3,9 @@ import { PaginatedViewModelEndpoint, ViewModelEndpoint } from '@prestojs/rest';
 import { usePaginator } from '@prestojs/util';
 import {
     AsyncChoices,
-    CharField,
-    FilterSet,
     ImageField,
     IntegerField,
     NullableBooleanField,
-    NumberField,
     useViewModelCache,
 } from '@prestojs/viewmodel';
 
@@ -128,25 +125,4 @@ export default class User extends BaseUser.augment({
     getLabel() {
         return `${this.firstName} ${this.lastName} (${this.email})`;
     }
-}
-
-window.User = User;
-window.BaseUser = BaseUser;
-
-export class UserFilterSet extends FilterSet {
-    static _model = User;
-
-    static _fields = {
-        id: new NumberField({
-            label: 'Id',
-        }),
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        firstName: new CharField({
-            label: 'First Name',
-        }),
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        lastName: new CharField({
-            label: 'Last Name',
-        }),
-    };
 }

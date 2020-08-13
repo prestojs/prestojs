@@ -1,8 +1,7 @@
-import React from 'react';
 import { Form, useForm } from '@prestojs/final-form';
 import { Button, Collapse } from 'antd';
-
-import { UserFilterSet } from '../models/User';
+import React from 'react';
+import User from '../models/User';
 
 const { Panel } = Collapse;
 
@@ -25,9 +24,9 @@ export default function UserFilterForm({ initialValues, onApplyFilter }) {
         <Collapse defaultActiveKey={['generatedFilterForm']}>
             <Panel header="Filters" key="generatedFilterForm">
                 <Form onSubmit={onApplyFilter} initialValues={initialValues}>
-                    <Form.Item field={UserFilterSet.fields.id} />
-                    <Form.Item field={UserFilterSet.fields.firstName} />
-                    <Form.Item field={UserFilterSet.fields.lastName} />
+                    <Form.Item field={User.fields.id} />
+                    <Form.Item field={User.fields.firstName} />
+                    <Form.Item field={User.fields.lastName} />
                     <Button htmlType="submit" type="primary">
                         Search
                     </Button>

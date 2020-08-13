@@ -1,6 +1,5 @@
 export { default as viewModelFactory } from './ViewModelFactory';
 export { default as ViewModelCache } from './ViewModelCache';
-export { default as FilterSet } from './FilterSet';
 export { default as Field } from './fields/Field';
 
 export { default as BooleanField } from './fields/BooleanField';

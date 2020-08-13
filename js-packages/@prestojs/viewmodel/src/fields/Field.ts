@@ -1,4 +1,3 @@
-import FieldBinder from '../FieldBinder';
 import { ViewModelConstructor } from '../ViewModelFactory';
 import { AsyncChoicesInterface } from './AsyncChoices';
 
@@ -79,11 +78,11 @@ export default class Field<T, ParsableType extends any = T> {
      */
     __parsableValueType: ParsableType;
 
-    private _model: typeof FieldBinder;
-    public set model(viewModel: typeof FieldBinder) {
+    private _model: ViewModelConstructor<any>;
+    public set model(viewModel: ViewModelConstructor<any>) {
         this._model = viewModel;
     }
-    public get model(): typeof FieldBinder {
+    public get model(): ViewModelConstructor<any> {
         if (!this._model) {
             throw new UnboundFieldError<T, ParsableType>(this);
         }

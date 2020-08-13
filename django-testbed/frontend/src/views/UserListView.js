@@ -25,7 +25,7 @@ export default function UserListView() {
         User.endpoints.list,
         {
             query: {
-                filter,
+                ...filter,
                 paginationType,
             },
         },
