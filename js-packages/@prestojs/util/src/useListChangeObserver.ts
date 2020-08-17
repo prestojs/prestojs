@@ -30,14 +30,14 @@ type ListChangeObserverOptions<T> = ChangeObserverOptions<T> & {
      * just changed position.
      *
      * Support for [ViewModel](doc:viewModelFactory) is provided out of the box by checking
-     * for the existence of a _pk property on any object passed in.
+     * for the existence of a _key property on any object passed in.
      */
     getId?: (item: T) => string | number;
 };
 
 function defaultGetId(item: any): any {
-    if (item != null && typeof item == 'object' && ('_pk' in item || 'id' in item)) {
-        const pk = item._pk || item.id;
+    if (item != null && typeof item == 'object' && ('_key' in item || 'id' in item)) {
+        const pk = item._key || item.id;
         if (Array.isArray(pk)) {
             return pk.join('|');
         }
@@ -77,7 +77,7 @@ type OnChange<T> = (change: Change<T>, lastValue: T, nextValue: T) => void;
  * allowing you to choose what changes you get (additions, updates, deletions) and to be passed the
  * changed items in the callback. In order to achieve this each item in the array needs to have a
  * unique ID which is obtained by calling the `options.getId` function. The default implementation will
- * look for a `_pk` or `id` property and return this, otherwise it return the value as is. This default
+ * look for a `_key` or `id` property and return this, otherwise it return the value as is. This default
  * implementation is compatible with [ViewModel](doc:viewModelFactory) so you can pass lists of
  * records returned from [useViewModelCache](doc:useViewModelCache).
  *

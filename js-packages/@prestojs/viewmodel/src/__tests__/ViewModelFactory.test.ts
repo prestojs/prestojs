@@ -209,7 +209,7 @@ test('ViewModel should validate primary key fields exist when binding fields', (
     class A extends ViewModelFactory({}) {}
     const record1 = new A({ id: 1 });
 
-    expect(record1._pk).toBe(1);
+    expect(record1._key).toBe(1);
 
     class B extends ViewModelFactory(
         {},
@@ -238,13 +238,13 @@ test('ViewModel should validate primary key fields exist when binding fields', (
     mockWarn.mockRestore();
 });
 
-test('_pk should return primary key', () => {
+test('_key should return primary key', () => {
     class A extends ViewModelFactory({
         id: new Field({ label: 'Id' }),
     }) {}
 
     const record1 = new A({ id: 1 });
-    expect(record1._pk).toBe(1);
+    expect(record1._key).toBe(1);
 
     class B extends ViewModelFactory(
         {
@@ -257,7 +257,7 @@ test('_pk should return primary key', () => {
     ) {}
 
     const record2 = new B({ id1: 1, id2: 2 });
-    expect(record2._pk).toEqual({ id1: 1, id2: 2 });
+    expect(record2._key).toEqual({ id1: 1, id2: 2 });
 });
 
 test('should validate primary key is provided', () => {

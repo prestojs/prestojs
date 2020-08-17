@@ -1080,10 +1080,10 @@ export default class ViewModelCache<
         if (!record._assignedFields) {
             throw new Error('_assignedFields not set on record; cannot be cached');
         }
-        const pkKey = this.getPkCacheKey(record._pk);
+        const pkKey = this.getPkCacheKey(record._key);
         let recordCache = this.cache.get(pkKey);
         if (!recordCache) {
-            recordCache = new RecordCache(this.viewModel, this.onAnyChange.bind(this), record._pk);
+            recordCache = new RecordCache(this.viewModel, this.onAnyChange.bind(this), record._key);
             this.cache.set(pkKey, recordCache);
         }
         // Reassign to const so typescript know won't change in closure below
@@ -1163,7 +1163,7 @@ export default class ViewModelCache<
                 );
             }
             fieldNames = pk._assignedFields as FieldNames[];
-            pk = pk._pk;
+            pk = pk._key;
         }
         if (!fieldNames) {
             throw new Error('fieldNames must be provided');

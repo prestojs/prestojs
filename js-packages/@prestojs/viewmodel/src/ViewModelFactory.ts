@@ -119,12 +119,6 @@ export type ViewModelInterface<
     };
 
     /**
-     * Returns the primary key value(s) for this instance. This is a shortcut
-     * for using the primary key field name(s) directly.
-     */
-    readonly _pk: PkType;
-
-    /**
      * Returns the primary key value(s) for this instance. This is to conform to the
      * [Identifiable](doc:Identifiable) interface.
      */
@@ -896,16 +890,16 @@ export default function viewModelFactory<T extends FieldsMapping>(
                     if (
                         assignedData[key] &&
                         data[field.sourceFieldName] != null &&
-                        data[field.sourceFieldName] !== assignedData[key]._pk
+                        data[field.sourceFieldName] !== assignedData[key]._key
                     ) {
                         const { name, sourceFieldName } = field;
-                        const pk = assignedData[key]._pk;
+                        const pk = assignedData[key]._key;
                         console.warn(
                             `Related field ${name} was created from nested object that had a different id to the source field name ${sourceFieldName}: ${data[sourceFieldName]} !== ${pk}. ${pk} has been used for both.`
                         );
                     }
                     if (assignedData[key]) {
-                        assignedData[field.sourceFieldName] = assignedData[key]._pk;
+                        assignedData[field.sourceFieldName] = assignedData[key]._key;
                         if (!data[field.sourceFieldName]) {
                             assignedFields.push(field.sourceFieldName);
                         }
@@ -943,7 +937,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 return Object.getPrototypeOf(this).constructor;
             },
         },
-        _pk: {
+        _key: {
             get(): PrimaryKey {
                 const { pkFieldName } = this._model;
                 if (Array.isArray(pkFieldName)) {
@@ -953,11 +947,6 @@ export default function viewModelFactory<T extends FieldsMapping>(
                     }, {});
                 }
                 return this[pkFieldName];
-            },
-        },
-        _key: {
-            get(): PrimaryKey {
-                return this._pk;
             },
         },
         toJS: {

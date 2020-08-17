@@ -108,7 +108,7 @@ export default function UserListView() {
                 </thead>
                 <tbody>
                     {records.map(record => (
-                        <tr key={record._pk}>
+                        <tr key={record._key}>
                             <td>
                                 <FieldFormatter
                                     field={User.fields.firstName}
@@ -126,7 +126,7 @@ export default function UserListView() {
                                 <FieldFormatter field={User.fields.region} value={record.region} />
                             </td>
                             <td>
-                                <button onClick={() => selectId(record._pk)}>Edit</button>
+                                <button onClick={() => selectId(record._key)}>Edit</button>
                             </td>
                         </tr>
                     ))}
