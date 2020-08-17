@@ -1,4 +1,4 @@
-import { PageNumberPaginator, useAsyncLookup, usePaginator } from '@prestojs/util';
+import { PageNumberPaginator, useAsyncListing, usePaginator } from '@prestojs/util';
 import React from 'react';
 import * as githubApi from '../../../../tutorial-code/github-api';
 import UserList from '../../../../tutorial-code/UserList';
@@ -7,7 +7,7 @@ import UserSearch from '../../../../tutorial-code/UserSearch';
 export default function FollowerList() {
     const [user, setUser] = React.useState();
     const paginator = usePaginator(PageNumberPaginator);
-    const { result, isLoading, error, run, reset, ...rest } = useAsyncLookup({
+    const { result, isLoading, error, run, reset, ...rest } = useAsyncListing({
         trigger: user ? 'DEEP' : 'MANUAL',
         execute: githubApi.getFollowers,
         paginator,

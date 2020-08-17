@@ -6,7 +6,7 @@ import useAsync from './useAsync';
 /**
  * @expand-properties
  */
-export type UseAsyncLookupProps<T> = {
+export type UseAsyncListingProps<T> = {
     /**
      * When to trigger the fetch. Defaults to `DEEP` which means whenever a deep
      * equality check on `query` or `paginator` state fails it will refetch.
@@ -54,13 +54,13 @@ export type UseAsyncLookupProps<T> = {
     }) => Promise<T>;
 };
 
-type UseAsyncLookupReturnCommon<T> = {
+type UseAsyncListingReturnCommon<T> = {
     /**
      * True while `execute` call is in progress.
      */
     isLoading: boolean;
     /**
-     * The same `paginator` passed in to `useAsyncLookup`
+     * The same `paginator` passed in to `useAsyncListing`
      */
     paginator: null | PaginatorInterface;
     /**
@@ -79,15 +79,15 @@ type UseAsyncLookupReturnCommon<T> = {
      */
     reset: () => void;
 };
-export type UseAsyncLookupReturn<T> =
-    | (UseAsyncLookupReturnCommon<T> & {
+export type UseAsyncListingReturn<T> =
+    | (UseAsyncListingReturnCommon<T> & {
           /**
            * Until first call has resolved neither error nor result will be set
            */
           error: null;
           result: null;
       })
-    | (UseAsyncLookupReturnCommon<T> & {
+    | (UseAsyncListingReturnCommon<T> & {
           /**
            * Set to the rejected value of the promise. Only one of `error` and `response` can be set. If
            * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
@@ -99,7 +99,7 @@ export type UseAsyncLookupReturn<T> =
            */
           result: null;
       })
-    | (UseAsyncLookupReturnCommon<T> & {
+    | (UseAsyncListingReturnCommon<T> & {
           /**
            * Error will not be set when result is set
            */
@@ -121,7 +121,9 @@ export type UseAsyncLookupReturn<T> =
  *
  * @extract-docs
  */
-export default function useAsyncLookup<T>(props: UseAsyncLookupProps<T>): UseAsyncLookupReturn<T> {
+export default function useAsyncListing<T>(
+    props: UseAsyncListingProps<T>
+): UseAsyncListingReturn<T> {
     const {
         trigger = 'DEEP',
         query = {},

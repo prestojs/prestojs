@@ -3,7 +3,7 @@ export { default as useListChangeObserver } from './useListChangeObserver';
 export { getId, hashId, isSameById, isIdentifiable } from './identifiable';
 export { default as useAsync } from './useAsync';
 export { default as useAsyncValue } from './useAsyncValue';
-export { default as useAsyncLookup } from './useAsyncLookup';
+export { default as useAsyncListing } from './useAsyncListing';
 export { default as useMemoOne } from './useMemoOne';
 export { isPromise } from './misc';
 export { isDeepEqual } from './comparison';
@@ -24,7 +24,7 @@ import type { PaginatorState } from './pagination/InferredPaginator';
 import type { LimitOffsetPaginationState } from './pagination/LimitOffsetPaginator';
 import type { PageNumberPaginationState } from './pagination/PageNumberPaginator';
 import type { PaginatorInterface, PaginatorInterfaceClass } from './pagination/Paginator';
-import type { UseAsyncLookupProps, UseAsyncLookupReturn } from './useAsyncLookup';
+import type { UseAsyncListingProps, UseAsyncListingReturn } from './useAsyncListing';
 import type {
     UseAsyncValuePropsMulti,
     UseAsyncValuePropsSingle,
@@ -34,8 +34,8 @@ import type {
 export type {
     TextLabeled,
     NodeLabeled,
-    UseAsyncLookupProps,
-    UseAsyncLookupReturn,
+    UseAsyncListingProps,
+    UseAsyncListingReturn,
     UseAsyncValuePropsMulti,
     UseAsyncValuePropsSingle,
     UseAsyncValueReturn,

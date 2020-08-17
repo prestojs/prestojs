@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import PageNumberPaginator from '../pagination/PageNumberPaginator';
 import usePaginator from '../pagination/usePaginator';
-import useAsyncLookup from '../useAsyncLookup';
+import useAsyncListing from '../useAsyncListing';
 
 type TestDataItem = { name: string; pk: number };
 const testData: TestDataItem[] = Array.from({ length: 20 }, (_, i) => ({
@@ -40,20 +40,20 @@ function advanceTimers(): Promise<any> {
     });
 }
 
-function usePaginatorTestHook(props): ReturnType<typeof useAsyncLookup> {
+function usePaginatorTestHook(props): ReturnType<typeof useAsyncListing> {
     const paginator = usePaginator(PageNumberPaginator);
-    return useAsyncLookup({
+    return useAsyncListing({
         ...props,
         paginator,
     });
 }
 
-test('useAsyncLookup should work without a paginator object', async () => {
+test('useAsyncListing should work without a paginator object', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
     const { result, rerender } = renderHook(
         ({ query }) =>
-            useAsyncLookup({
+            useAsyncListing({
                 execute,
                 query,
             }),
@@ -73,11 +73,11 @@ test('useAsyncLookup should work without a paginator object', async () => {
     expect(execute).toHaveBeenCalledTimes(2);
 });
 
-test('useAsyncLookup should handle errors', async () => {
+test('useAsyncListing should handle errors', async () => {
     jest.useFakeTimers();
     const execute = jest.fn((): Promise<TestDataItem[]> => delay(reject => reject('No good')));
     const { result } = renderHook(() =>
-        useAsyncLookup({
+        useAsyncListing({
             execute,
         })
     );
@@ -88,7 +88,7 @@ test('useAsyncLookup should handle errors', async () => {
     expect(result.current.error).toEqual('No good');
 });
 
-test('useAsyncLookup should support paginator', async () => {
+test('useAsyncListing should support paginator', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
     const { result, rerender } = renderHook(
@@ -125,7 +125,7 @@ test('useAsyncLookup should support paginator', async () => {
     expect(result.current.result).toEqual(testData.slice(14, 19));
 });
 
-test('useAsyncLookup should support accumulatePages', async () => {
+test('useAsyncListing should support accumulatePages', async () => {
     jest.useFakeTimers();
     const execute1 = jest.fn(mockedPaginatedResponse);
     const execute2 = jest.fn(mockedPaginatedResponse);
@@ -205,7 +205,7 @@ test('useAsyncLookup should support accumulatePages', async () => {
     expect(result.current.result).toEqual(testData.slice(0, 6));
 });
 
-test('useAsyncLookup should support trigger option', async () => {
+test('useAsyncListing should support trigger option', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
     const { result, rerender } = renderHook(
@@ -258,12 +258,12 @@ test('useAsyncLookup should support trigger option', async () => {
     expect(result.current.result).toEqual([testData[2]]);
 });
 
-test('useAsyncLookup should not cause issues if unmounted', async () => {
+test('useAsyncListing should not cause issues if unmounted', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
     const { result, unmount } = renderHook(
         ({ query }) =>
-            useAsyncLookup({
+            useAsyncListing({
                 execute,
                 query,
             }),
@@ -277,12 +277,12 @@ test('useAsyncLookup should not cause issues if unmounted', async () => {
     expect(errorSpy).not.toHaveBeenCalled();
 });
 
-test('useAsyncLookup should support reset', async () => {
+test('useAsyncListing should support reset', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
     const { result, rerender } = renderHook(
         ({ query }) =>
-            useAsyncLookup({
+            useAsyncListing({
                 execute,
                 query,
             }),
@@ -307,12 +307,12 @@ test('useAsyncLookup should support reset', async () => {
     expect(execute).toHaveBeenCalledTimes(2);
 });
 
-test('useAsyncLookup should support run', async () => {
+test('useAsyncListing should support run', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
     const { result, rerender } = renderHook(
         ({ query }) =>
-            useAsyncLookup({
+            useAsyncListing({
                 execute,
                 query,
                 trigger: 'MANUAL',
@@ -341,12 +341,12 @@ test('useAsyncLookup should support run', async () => {
     expect(execute).toHaveBeenCalledTimes(2);
 });
 
-test('useAsyncLookup should make sure `paginator` provided when `accumulatePages` is true', async () => {
+test('useAsyncListing should make sure `paginator` provided when `accumulatePages` is true', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
     const { result } = renderHook(
         props =>
-            useAsyncLookup({
+            useAsyncListing({
                 accumulatePages: true,
                 execute,
                 ...props,
@@ -358,13 +358,13 @@ test('useAsyncLookup should make sure `paginator` provided when `accumulatePages
     );
 });
 
-test('useAsyncLookup should support changing execute function', async () => {
+test('useAsyncListing should support changing execute function', async () => {
     jest.useFakeTimers();
     const execute1 = jest.fn(mockedPaginatedResponse);
     const execute2 = jest.fn(mockedPaginatedResponse);
     const { result, rerender } = renderHook(
         ({ query, execute }) =>
-            useAsyncLookup({
+            useAsyncListing({
                 execute,
                 query,
             }),

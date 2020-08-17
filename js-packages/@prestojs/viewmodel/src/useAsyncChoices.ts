@@ -1,8 +1,8 @@
 import {
     isDeepEqual,
-    useAsyncLookup,
-    UseAsyncLookupProps,
-    UseAsyncLookupReturn,
+    useAsyncListing,
+    UseAsyncListingProps,
+    UseAsyncListingReturn,
     useAsyncValue,
     UseAsyncValueReturn,
     useMemoOne,
@@ -13,7 +13,7 @@ import { AsyncChoicesInterface } from './fields/AsyncChoices';
  * @expand-properties
  */
 type UseAsyncChoicesProps<ItemT, ValueT> = Pick<
-    UseAsyncLookupProps<ItemT[]>,
+    UseAsyncListingProps<ItemT[]>,
     'accumulatePages' | 'query' | 'trigger'
 > & {
     /**
@@ -59,9 +59,9 @@ type UseAsyncChoicesProps<ItemT, ValueT> = Pick<
  */
 type UseAsyncChoicesReturn<ItemT, ValueT> = {
     /**
-     * See [useAsyncLookup](doc:useAsyncLookup#return-type)
+     * See [useAsyncListing](doc:useAsyncListing#return-type)
      */
-    list: UseAsyncLookupReturn<ItemT[]>;
+    list: UseAsyncListingReturn<ItemT[]>;
     /**
      * See [useAsyncValue](doc:useAsyncValue#return-type)
      */
@@ -114,7 +114,7 @@ export default function useAsyncChoices<ItemT, ValueT>(
         [listOptions, listProps, asyncChoices],
         isDeepEqual
     );
-    const list = useAsyncLookup<ItemT[]>({
+    const list = useAsyncListing<ItemT[]>({
         trigger,
         // If useListDeps has overridden query we should use it, otherwise default to original query
         query: listProps?.query ?? query,

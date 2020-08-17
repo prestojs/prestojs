@@ -8,6 +8,9 @@ const DEFAULTS_PROCESSED = Symbol.for('DEFAULTS_PROCESSED');
 if (!menuByName[DEFAULTS_PROCESSED]) {
     menuByName[DEFAULTS_PROCESSED] = true;
     // Any customisations to generated menu are done here
+    if (!menuByName.viewmodel.default) {
+        menuByName.viewmodel.default = [];
+    }
     menuByName.viewmodel.default.push({
         slug: 'viewmodel/viewModelFactory',
         title: 'viewModelFactory',

@@ -66,16 +66,16 @@ we manually call `run`).
 
 The `reset` function can be called to clear `error` and `response`.
 
-## useAsyncLookup
+## useAsyncListing
 
-[useAsyncLookup](doc:useAsyncLookup) is more specialised and works with lists of data and assists with handling
+[useAsyncListing](doc:useAsyncListing) is more specialised and works with lists of data and assists with handling
 pagination.
 
 ```jsx
 async function getUsers({ query }) {
     // Call an API endpoint with the specified `query` parameters
 }
-const { result, isLoading, error } = useAsyncLookup({
+const { result, isLoading, error } = useAsyncListing({
     trigger: 'SHALLOW',
     execute: getUsers,
     query: { keywords },
@@ -105,7 +105,7 @@ async function getUsers({ query, paginator }) {
     paginator.setResponse({ total: response.count, response.pageSize });
 }
 const paginator = usePaginator(PageNumberPaginator);
-const { result, isLoading, error } = useAsyncLookup({
+const { result, isLoading, error } = useAsyncListing({
     trigger: 'SHALLOW',
     execute: getUsers,
     paginator,
@@ -120,7 +120,7 @@ The second highlighted row shows usage of [usePaginator](doc:usePaginator) to cr
 instance that is hooked up to some local state. The local state is where the pagination state is
 stored so that we can re-render React components whenever it changes.
 
-The third highlighted row shows how you pass it to `useAsyncLookup`.
+The third highlighted row shows how you pass it to `useAsyncListing`.
 
 To then change page call the relevant functions on the paginator:
 
@@ -129,14 +129,14 @@ To then change page call the relevant functions on the paginator:
 ```
 
 When the button is pressed `paginator.next()` will be called which will update
-the pagination state which will trigger a new call to `useAsyncLookup`.
+the pagination state which will trigger a new call to `useAsyncListing`.
 
-[useAsyncLookup](doc:useAsyncLookup) also provides the `accumulatePages` option
+[useAsyncListing](doc:useAsyncListing) also provides the `accumulatePages` option
 to make it easy to implement a UI where each page of results is appended to the
 last (eg. infinite scroll).
 
 ```jsx {6}
-const { result, isLoading, error } = useAsyncLookup({
+const { result, isLoading, error } = useAsyncListing({
     trigger: 'SHALLOW',
     execute: getUsers,
     paginator,
