@@ -29,6 +29,10 @@ export type EndpointRequestInit = { headers: Headers; method: string } & Omit<
     'headers' | 'method'
 >;
 
+interface Query {
+    [key: string]: any;
+}
+
 /**
  * @expand-properties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
  */
@@ -57,11 +61,7 @@ export type EndpointOptions = ExecuteInitOptions & {
      * urlPattern.resolve(urlArgs, { query });
      * ```
      */
-    resolveUrl?: (
-        urlPattern: UrlPattern,
-        urlArgs?: Record<string, any>,
-        query?: Record<string, boolean | string | null | number>
-    ) => string;
+    resolveUrl?: (urlPattern: UrlPattern, urlArgs?: Record<string, any>, query?: Query) => string;
     /**
      * Middleware to apply for this endpoint. Defaults to [Endpoint.defaultConfig.middleware](http://localhost:3000/docs/rest/Endpoint#static-var-defaultConfig) - global
      * middleware options can be set there.
@@ -73,7 +73,7 @@ export type EndpointOptions = ExecuteInitOptions & {
 
 type UrlResolveOptions = {
     urlArgs?: Record<string, any>;
-    query?: Record<string, boolean | string | null | number>;
+    query?: Query;
 };
 
 /**
@@ -91,7 +91,7 @@ export type ExecuteReturnVal<T> = {
     /**
      * Any query string parameters
      */
-    query?: Record<string, boolean | string | null | number>;
+    query?: Query;
     /**
      * The options used to execute the endpoint with
      */
@@ -318,7 +318,7 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
 function defaultResolveUrl(
     urlPattern: UrlPattern,
     urlArgs?: Record<string, any>,
-    query?: Record<string, boolean | string | null | number>
+    query?: Query
 ): string {
     return this.urlPattern.resolve(urlArgs, { query });
 }
@@ -534,7 +534,7 @@ export default class Endpoint<ReturnT = any> {
     private resolveUrl: (
         urlPattern: UrlPattern,
         urlArgs?: Record<string, any>,
-        query?: Record<string, boolean | string | null | number>
+        query?: Query
     ) => string;
     private middleware: MiddlewareFunction<ReturnT>[];
 

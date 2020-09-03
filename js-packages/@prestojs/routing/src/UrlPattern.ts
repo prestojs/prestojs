@@ -2,7 +2,7 @@ import { compile, Key, PathFunction, pathToRegexp } from 'path-to-regexp';
 import qs from 'query-string';
 
 export interface ResolveOptions {
-    query?: {};
+    query?: { [key: string]: any };
 }
 
 /**
