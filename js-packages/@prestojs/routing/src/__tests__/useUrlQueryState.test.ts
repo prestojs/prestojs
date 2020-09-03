@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import qs from 'qs';
+import { act, renderHook, RenderHookResult } from '@testing-library/react-hooks';
 import diff from 'jest-diff';
-import { useState, useEffect } from 'react';
-import { renderHook, act, RenderHookResult } from '@testing-library/react-hooks';
+import qs from 'query-string';
+import { useEffect, useState } from 'react';
 import useUrlQueryState from '../useUrlQueryState';
 
 declare global {
@@ -16,10 +16,7 @@ declare global {
 
 expect.extend({
     queryStateEquals(params, expected) {
-        const received =
-            typeof params == 'string'
-                ? qs.parse(params, { ignoreQueryPrefix: true })
-                : params.result.current[0];
+        const received = typeof params == 'string' ? qs.parse(params) : params.result.current[0];
         const pass = this.equals(received, expected);
         const message = pass
             ? (): string =>
@@ -282,7 +279,7 @@ test('useUrlQueryState should retain null values', () => {
     const setQueryState = (nextState: {}): void => hookStatus.result.current[1](nextState);
     expect(hookStatus).queryStateEquals({ q: '1' });
     act(() => setQueryState({ q: null }));
-    expect(hookStatus).queryStateEquals({ q: '' });
+    expect(hookStatus).queryStateEquals({ q: null });
 });
 
 test('useUrlQueryState should support prefixed keys', () => {
@@ -375,7 +372,7 @@ test('useUrlQueryState should support custom parse rules', () => {
     );
     const setQueryState = (nextState: {}): void => hookStatus.result.current[1](nextState);
     expect(hookStatus).queryStateEquals({ a: {}, q: { test: 1 }, bool: true });
-    expect(navigation.search).toBe('q=%7B%22test%22%3A1%7D&bool=1&a=%7B%7D');
+    expect(navigation.search).toBe('a=%7B%7D&bool=1&q=%7B%22test%22%3A1%7D');
     act(() => setQueryState({ a: { ok: 'yes' }, q: { test: [1] } }));
     expect(hookStatus).queryStateEquals({ a: { ok: 'yes' }, q: { test: [1] } });
     expect(navigation.search).toBe('a=%7B%22ok%22%3A%22yes%22%7D&q=%7B%22test%22%3A%5B1%5D%7D');

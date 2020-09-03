@@ -518,7 +518,7 @@ export default class Endpoint<ReturnT = any> {
     /**
      * This defines the default settings to use on an endpoint globally.
      *
-     * All these options can be customised on individual Endpoint's.
+     * All these options can be customised on individual Endpoints.
      */
     // Init for this is after class definition
     static defaultConfig: DefaultConfig;

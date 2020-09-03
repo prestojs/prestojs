@@ -1,4 +1,4 @@
-import qs from 'qs';
+import qs from 'query-string';
 import InferredPaginator from './InferredPaginator';
 import Paginator from './Paginator';
 
@@ -57,11 +57,9 @@ export default function getPaginationState<State, InternalState, Data>(
     if (isCursorLink(decodedBody.next) || isCursorLink(decodedBody.previous)) {
         const state: Record<string, any> = {
             results: decodedBody.results,
-            nextCursor: decodedBody.next
-                ? qs.parse(decodedBody.next.split('?').pop()).cursor
-                : null,
+            nextCursor: decodedBody.next ? qs.parse(qs.extract(decodedBody.next)).cursor : null,
             previousCursor: decodedBody.previous
-                ? qs.parse(decodedBody.previous.split('?').pop()).cursor
+                ? qs.parse(qs.extract(decodedBody.previous)).cursor
                 : null,
         };
         if (decodedBody.pageSize) {
@@ -78,7 +76,7 @@ export default function getPaginationState<State, InternalState, Data>(
     const isLimitOffsetLink = (link: any): boolean =>
         typeof link == 'string' && link.includes('limit=');
     if (isLimitOffsetLink(decodedBody.next) || isLimitOffsetLink(decodedBody.previous)) {
-        const { limit } = qs.parse((decodedBody.previous || decodedBody.next).split('?').pop());
+        const { limit } = qs.parse(qs.extract(decodedBody.previous || decodedBody.next));
         return {
             total: decodedBody.count,
             results: decodedBody.results,
