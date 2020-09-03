@@ -83,6 +83,19 @@ test('should de-dupe in flight requests including query parameters in any order'
     const p4 = action1.execute({ query: { param2: 'two', param1: '1' } });
     expect((await p3).result).toBe('hello world 1');
     expect((await p4).result).toBe('hello world 2');
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const p5 = action1.execute({ query: { param1: ['one', 'two'], param2: 'test?this?' } });
+    const p6 = action1.execute({ query: { param1: ['one', 'two'], param2: 'test?this?' } });
+    const p7 = action1.execute({ query: { param1: 'one', param2: 'test' } });
+    expect((await p5).result).toBe('hello world 3');
+    expect((await p6).result).toBe('hello world 3');
+    expect((await p7).result).toBe('hello world 4');
+    expect(fetchMock).toHaveBeenCalledTimes(5);
+    expect(fetchMock).toHaveBeenNthCalledWith(
+        4,
+        '/whatever/?param1=one&param1=two&param2=test%3Fthis%3F',
+        expect.objectContaining({})
+    );
 });
 
 test('should support customising key', async () => {

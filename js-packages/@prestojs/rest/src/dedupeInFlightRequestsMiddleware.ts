@@ -1,16 +1,17 @@
 import { isDeepEqual } from '@prestojs/util';
-import qs from 'querystring';
+import qs from 'query-string';
 import { EndpointRequestInit, MiddlewareFunction } from './Endpoint';
 
 function defaultGetKey(
     url: string,
     requestInit: EndpointRequestInit
-): { url: string; method: string; headers: Record<string, string>; query: Record<string, string> } {
-    const [u, q] = url.split('?');
-    let query = {};
-    if (q) {
-        query = qs.parse(q);
-    }
+): {
+    url: string;
+    method: string;
+    headers: Record<string, string>;
+    query: Record<string, string | string[] | null | undefined>;
+} {
+    const { url: u, query } = qs.parseUrl(url);
     return {
         url: u,
         query,
