@@ -31,12 +31,31 @@ export type UploadWidgetProps<FieldValue, T extends HTMLElement> = Omit<
     > & {
         input: UploadWidgetInputType;
         /**
-         * Number of files to allow. `null` means unlimited. Defaults to `1`.
+         * Number of files to allow. `null` means unlimited.
+         *
+         * If `limit` is `1` then after uploading a file the UI will change from an Add icon to an Edit icon and
+         * uploading a new file will replace the original.
+         *
+         * If `limit` is > `1` then once the limit has been reached the UI will disallow adding new files. To add a
+         * new file an existing one must be removed.
+         *
+         * If `limit` > `1` OR `multiple` is `true` then the value passed to `onChange` will be an array, otherwise
+         * it will be a `File` object or null. It is valid to set `limit` to `1` and `multiple` to `true`.
+         *
+         * Defaults to `1`.
          */
         limit: number | null;
         /**
-         * If true multiple files are accepted otherwise enforces a single value. When true `input.value` must be an
-         * array when set.
+         * Whether multiple values are accepted. In most cases you can set `limit` to `null` or a value greater than
+         * `1` instead of explicitly setting this. This can be set to `true` when `limit` is `1` in order to enforce
+         * the value being an array (eg. this could be useful if `limit` increases based on something else).
+         *
+         * If true `input.value` must be an array when set and `onChange` will be passed an array of
+         * [File](https://developer.mozilla.org/en-US/docs/Web/API/File) objects, otherwise it will be passed a single
+         * value or null.
+         *
+         * If `multiple` is `true` and `limit` is 1 then the only difference to `multiple={false}` is that the `value`
+         * will be an array.
          *
          * Defaults to `false` if `limit` is `1` otherwise `true`.
          */
@@ -194,8 +213,12 @@ export function useFileList(
 
 /**
  * File upload widget that wraps the antd [Upload](https://ant.design/components/upload/#API) component. Unlike
- * that component this one never uploads immediately - the raw `File` object will be passed to `onChange` and it's
- * expected the upload will happen externally (eg. on a form submit).
+ * that component this one never uploads immediately - the raw [File](https://developer.mozilla.org/en-US/docs/Web/API/File)
+ * object will be passed to `onChange` and it's expected the upload will happen externally (eg. on a form submit).
+ *
+ * If `multiple` is true then the value passed to `onChange` will be an array of `File` objects or an empty array when clearing the value.
+ *
+ * If `multiple` is false then the value passed to `onChange` will be a `File` object or `null` when clearing the value.
  *
  * For very custom requirements consider using the [useFileList](doc:useFileList) in a custom component.
  *
@@ -228,6 +251,9 @@ function FileWidget(
     }
     if (value && multiple && !Array.isArray(value)) {
         throw new Error(`When 'multiple' is true 'value' must be an array`);
+    }
+    if (limit && limit > 1 && !multiple) {
+        throw new Error(`When 'limit' is greater than 1 'multiple' must be true`);
     }
     const beforeUploadFile = (file: File, files: RcFile[]): false | Promise<void> => {
         if (beforeUpload) {
@@ -262,10 +288,10 @@ function FileWidget(
         return false;
     };
     const handleRemove = (f: FileWidgetUploadFile): void => {
-        if (!multiple) {
-            onChange(null);
-        } else if (value) {
+        if (value) {
             onChange((value as (string | File)[]).filter(key => key !== f.key));
+        } else if (!multiple) {
+            onChange(null);
         }
     };
     const fileList = useFileList(value, listType.startsWith('picture'));
