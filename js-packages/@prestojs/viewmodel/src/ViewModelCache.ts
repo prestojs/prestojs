@@ -1425,13 +1425,14 @@ export default class ViewModelCache<
         fieldNames: readonly FieldNames[]
     ): PartialViewModel<ViewModelClassType, FieldNames>[] {
         const records: PartialViewModel<ViewModelClassType, FieldNames>[] = [];
-        let isSame = true;
         let index = 0;
         const key = getFieldNameCacheKey(fieldNames as readonly string[], this.viewModel);
         const lastRecords = (this._lastAllRecords.get(key) || []) as PartialViewModel<
             ViewModelClassType,
             FieldNames
         >[];
+        // Tracks if records have changed from what is stored in `lastRecords`
+        let isRecordsSame = true;
         for (const cacheValue of this.cache.values()) {
             const record = cacheValue.get(fieldNames) as PartialViewModel<
                 ViewModelClassType,
@@ -1440,12 +1441,14 @@ export default class ViewModelCache<
             if (record) {
                 records.push(record);
                 if (index > lastRecords.length - 1 || lastRecords[index] !== record) {
-                    isSame = false;
+                    isRecordsSame = false;
                 }
                 index += 1;
             }
         }
-        if (isSame) {
+        // we need to also check the size because if the last record was removed then no
+        // comparison of that record will have taken place so isRecordsSame will still be true
+        if (isRecordsSame && lastRecords.length === records.length) {
             return lastRecords;
         }
         this._lastAllRecords.set(key, records);

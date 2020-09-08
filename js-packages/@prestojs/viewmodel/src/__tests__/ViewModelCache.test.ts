@@ -379,6 +379,16 @@ test('should support removing records from cache', () => {
     expect(Test1.cache.get(2, ['id', 'email'])).toBeNull();
     expect(Test1.cache.get(2, ['id', 'firstName'])).toBeNull();
     expect(Test1.cache.get(2, ['id', 'lastName'])).toBeNull();
+    for (let i = 0; i < 5; i++) {
+        Test1.cache.add(new Test1({ id: i, firstName: `${i}` }));
+    }
+    expect(new Set(Test1.cache.getAll(['firstName']).map(r => r.id))).toEqual(
+        new Set([0, 1, 2, 3, 4])
+    );
+    Test1.cache.delete(4);
+    expect(new Set(Test1.cache.getAll(['firstName']).map(r => r.id))).toEqual(
+        new Set([0, 1, 2, 3])
+    );
 });
 
 test('should support removing records from cache for only specified field names', () => {
