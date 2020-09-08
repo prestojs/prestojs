@@ -397,7 +397,9 @@ VERSION_JSON_FILE = _Path(PROJECT_DIR, "frontend/dist/version.json")
 
 # Used by https://gitlab.internal.alliancesoftware.com.au/alliance/alliance-django-utils/#render_entry_point
 WEBPACK_LOADER = {
-    "DEFAULT": {"STATS_FILE": PROJECT_DIR / "frontend/dist/webpack-stats.json",},
+    "DEFAULT": {
+        "STATS_FILE": PROJECT_DIR / "frontend/dist/webpack-stats.json",
+    },
 }
 
 # - We don't use django-compress' minifier since webpack production build has already done that for us
@@ -430,10 +432,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {"min_length": 8,},
+        "OPTIONS": {
+            "min_length": 8,
+        },
     },
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
 
 # Contains all permissions for this site.
@@ -484,11 +492,15 @@ LOGGING = {
         },
     },
     "filters": {
-        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse",},
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
         "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
     },
     "handlers": {
-        "null": {"class": "logging.NullHandler",},
+        "null": {
+            "class": "logging.NullHandler",
+        },
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
@@ -526,7 +538,11 @@ LOGGING = {
     },
     "loggers": {
         # user debugging logs
-        "debug": {"handlers": ["console"], "level": "DEBUG", "propagate": False,},
+        "debug": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
         # django catch-all
         "django": {
             "handlers": ["console", "mail_admins"],
@@ -547,12 +563,18 @@ LOGGING = {
         },
         # todo: what is this used for?
         "net": {
-            "handlers": ["mail_admins", "file_request",],
+            "handlers": [
+                "mail_admins",
+                "file_request",
+            ],
             "level": "INFO",
             "propagate": True,
         },
         "py.warnings": {
-            "handlers": ["console", "file_error",],
+            "handlers": [
+                "console",
+                "file_error",
+            ],
             "level": "DEBUG",
             "propagate": True,
         },

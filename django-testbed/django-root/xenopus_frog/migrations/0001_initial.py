@@ -92,7 +92,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "xenopus_frog_user",},
+            options={
+                "db_table": "xenopus_frog_user",
+            },
         ),
         migrations.CreateModel(
             name="AdminProfile",

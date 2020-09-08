@@ -90,7 +90,11 @@ SERVER_EMAIL = "webmaster@localhost"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Cache configuration
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache",}}
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
 
 
 # ----------------------------------------------------------------------------------------------------------------------

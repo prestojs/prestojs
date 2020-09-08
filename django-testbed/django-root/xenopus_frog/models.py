@@ -83,13 +83,21 @@ class User(GenericUserProfile, AbstractEmailUser):
     def generate_activation_token(self) -> str:
         """Generate a time-stamped token for use in activation url"""
         return signing.dumps(
-            {"id": self.id, "email": self.email,}, salt=USER_ACTIVATION_TOKEN_SALT
+            {
+                "id": self.id,
+                "email": self.email,
+            },
+            salt=USER_ACTIVATION_TOKEN_SALT,
         )
 
     def generate_password_reset_token(self) -> str:
         """Generate a token based on the current password for use in password reset url"""
         return signing.dumps(
-            {"id": self.id, "email": self.email, "password": self.password,},
+            {
+                "id": self.id,
+                "email": self.email,
+                "password": self.password,
+            },
             key=settings.PASSWORD_RESET_TOKEN_KEY,
             salt=PASSWORD_RESET_TOKEN_SALT,
             compress=True,

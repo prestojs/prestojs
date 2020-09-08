@@ -42,7 +42,10 @@ urlpatterns += [
     # you probably want to include (eg password change, password reset)
     url(
         r"^.*",
-        django_site.views.FrontendView.as_view(basename="app", entry_point="app",),
+        django_site.views.FrontendView.as_view(
+            basename="app",
+            entry_point="app",
+        ),
     ),
 ]
 

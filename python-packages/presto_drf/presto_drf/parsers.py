@@ -27,12 +27,12 @@ class CamelCaseJSONParser(JSONParser):
             data = stream.read().decode(encoding)
             return self.underscoreize(json.loads(data))
         except ValueError as exc:
-            raise ParseError(f"JSON parse error") from exc
+            raise ParseError("JSON parse error") from exc
 
 
 class CamelCaseMultiPartJSONParser(MultiPartParser):
     """Parser that recursively turns camelcase keys into underscored keys for JSON data and handles file uploads
-    
+
     This parser supports receiving JSON data where a field value anywhere in the structure can be a file.
 
     This is achieved on the frontend by converting a structure like:

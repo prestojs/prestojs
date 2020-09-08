@@ -52,8 +52,12 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user1 = CustomerFactory(email="user1@localhost.test",)
-            user2 = AdminFactory(email="user2@localhost.test",)
+            user1 = CustomerFactory(
+                email="user1@localhost.test",
+            )
+            user2 = AdminFactory(
+                email="user2@localhost.test",
+            )
 
             expected_results = (
                 # (model, permission, pass_model, has_perm(USER1)?, has_perm(USER2)? )
@@ -128,7 +132,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = CustomerFactory(email="user@localhost.test",)
+            user = CustomerFactory(
+                email="user@localhost.test",
+            )
 
             with self.assertRaises(RuntimeError):
                 user.has_perm("test_csv_permissions.detail_testmodela")
@@ -140,7 +146,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = CustomerFactory(email="user@localhost.test",)
+            user = CustomerFactory(
+                email="user@localhost.test",
+            )
 
             with self.assertRaises(RuntimeError):
                 user.has_perm("test_csv_permissions.detail_testmodela")
@@ -152,7 +160,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = CustomerFactory(email="user@localhost.test",)
+            user = CustomerFactory(
+                email="user@localhost.test",
+            )
 
             with self.assertRaises(RuntimeError):
                 user.has_perm("test_csv_permissions.detail_testmodela")
@@ -168,7 +178,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = CustomerFactory(email="user@localhost.test",)
+            user = CustomerFactory(
+                email="user@localhost.test",
+            )
 
             self.assertEqual(
                 user.has_perm("test_csv_permissions.nonexistentperm_detail"), False
@@ -180,7 +192,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = CustomerFactory(email="user@localhost.test",)
+            user = CustomerFactory(
+                email="user@localhost.test",
+            )
 
             with self.assertRaisesMessage(RuntimeError, "Empty permissions file"):
                 user.has_perm("test_csv_permissions.testmodelb_detail")
@@ -195,7 +209,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = CustomerFactory(email="user@localhost.test",)
+            user = CustomerFactory(
+                email="user@localhost.test",
+            )
 
             with self.assertRaisesMessage(
                 RuntimeError,
@@ -213,7 +229,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = CustomerFactory(email="user@localhost.test",)
+            user = CustomerFactory(
+                email="user@localhost.test",
+            )
 
             with self.assertRaisesMessage(
                 RuntimeError, "Invalid action / global combination for list_testmodela"
@@ -231,7 +249,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = CustomerFactory(email="user@localhost.test",)
+            user = CustomerFactory(
+                email="user@localhost.test",
+            )
 
             with self.assertRaises(RuntimeError):
                 user.has_perm("test_csv_permissions.detail_testmodela", None)
@@ -267,7 +287,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = USER2_MODEL.objects.create_user(email="user@localhost.test",)
+            user = USER2_MODEL.objects.create_user(
+                email="user@localhost.test",
+            )
 
             self.assertTrue(
                 user.has_perm("test_csv_permissions.list_testmodeld", None),
@@ -303,7 +325,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = CustomerFactory(email="user@localhost.test",)
+            user = CustomerFactory(
+                email="user@localhost.test",
+            )
 
             self.assertFalse(
                 user.has_perm("test_csv_permissions.list_testmodeld", None),
@@ -341,7 +365,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = AdminFactory(email="user@localhost.test",)
+            user = AdminFactory(
+                email="user@localhost.test",
+            )
 
             with self.assertRaises(RuntimeError):
                 user.has_perm("test_csv_permissions.detail_testmodela", None)
@@ -377,7 +403,9 @@ class CsvRulesTests(TestCase):
         """.strip()
 
         with override_csv_permissions(csv_data):
-            user = USER2_MODEL.objects.create_user(email="user@localhost.test",)
+            user = USER2_MODEL.objects.create_user(
+                email="user@localhost.test",
+            )
 
             self.assertFalse(
                 user.has_perm("test_csv_permissions.change_testmodele", None),

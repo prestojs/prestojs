@@ -139,9 +139,7 @@ def _resolve_function(
 
 def _parse_csv(
     file_path: str,
-) -> Tuple[
-    Dict[PermName, bool], Dict[PermName, Dict[GroupName, Dict[str, str]]],
-]:
+) -> Tuple[Dict[PermName, bool], Dict[PermName, Dict[GroupName, Dict[str, str]]],]:
     """
     Parses the CSV of group permissions returns a list of permissions for further processing.
 
@@ -288,7 +286,10 @@ def _resolve_functions(
 
             try:
                 permission_to_group_to_function[permission][group] = _resolve_function(
-                    detail["module"], access_level, function_name, is_global,
+                    detail["module"],
+                    access_level,
+                    function_name,
+                    is_global,
                 )
             except RuntimeError as e:
                 raise RuntimeError(f"{e} Permission: {permission}")

@@ -26,7 +26,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"default_permissions": (),},
+            options={
+                "default_permissions": (),
+            },
         ),
         migrations.CreateModel(
             name="TestModelB",
@@ -41,7 +43,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"default_permissions": (),},
+            options={
+                "default_permissions": (),
+            },
         ),
         migrations.CreateModel(
             name="TestModelC",
@@ -56,7 +60,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"default_permissions": (),},
+            options={
+                "default_permissions": (),
+            },
         ),
         migrations.CreateModel(
             name="TestModelD",
@@ -71,7 +77,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"default_permissions": (),},
+            options={
+                "default_permissions": (),
+            },
         ),
         migrations.CreateModel(
             name="TestModelE",
@@ -86,6 +94,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"default_permissions": (),},
+            options={
+                "default_permissions": (),
+            },
         ),
     ]
