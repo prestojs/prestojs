@@ -39,7 +39,7 @@ export type UploadWidgetProps<FieldValue, T extends HTMLElement> = Omit<
          * If `limit` is > `1` then once the limit has been reached the UI will disallow adding new files. To add a
          * new file an existing one must be removed.
          *
-         * If `limit` > `1` OR `multiple` is `true` then the value passed to `onChange` will be an array, otherwise
+         * If `multiple` is `true` then the value passed to `onChange` will be an array, otherwise
          * it will be a `File` object or null. It is valid to set `limit` to `1` and `multiple` to `true`.
          *
          * Defaults to `1`.
@@ -288,9 +288,9 @@ function FileWidget(
         return false;
     };
     const handleRemove = (f: FileWidgetUploadFile): void => {
-        if (value) {
+        if (multiple) {
             onChange((value as (string | File)[]).filter(key => key !== f.key));
-        } else if (!multiple) {
+        } else {
             onChange(null);
         }
     };
