@@ -639,10 +639,9 @@ export default class Endpoint<ReturnT = any> {
      */
     async execute(options: EndpointExecuteOptions = {}): Promise<ExecuteReturnVal<ReturnT>> {
         const { paginator, ...restOptions } = options;
-        if (paginator) {
-            options = paginator.getRequestInit(restOptions);
-        }
-        const { urlArgs = {}, query, ...init } = options;
+        const { urlArgs = {}, query, ...init } = paginator
+            ? paginator.getRequestInit(restOptions)
+            : options;
         // Always make sure headers & method is set so middleware implementations can assume it exists
         if (!init.headers) {
             init.headers = new Headers();
