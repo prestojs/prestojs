@@ -11,7 +11,7 @@ const ImageWidget = React.forwardRef(
         props: UploadWidgetProps<File, HTMLElement>,
         ref: React.RefObject<Upload>
     ): React.ReactElement => {
-        return <FileWidget ref={ref} listType="picture-card" {...props} />;
+        return <FileWidget ref={ref} listType="picture-card" accept="image/*" {...props} />;
     }
 );
 
