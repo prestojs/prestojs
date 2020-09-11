@@ -125,6 +125,25 @@ test('should support transformation function', async () => {
     expect((await action2.prepare().execute()).result).toEqual({ b: 'a', d: 'c' });
 });
 
+test('should support merging endpoint options and execute options', async () => {
+    fetchMock.mockResponse(request => {
+        return Promise.resolve({
+            body: request.method,
+            init: {
+                status: 200,
+                headers: {
+                    'Content-Type': 'text/html',
+                },
+            },
+        });
+    });
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        method: 'POST',
+    });
+    expect((await action1.execute()).result).toBe('POST');
+    expect((await action1.execute({ method: 'PATCH' })).result).toBe('PATCH');
+});
+
 test('should support merging global headers with action specific headers', async () => {
     fetchMock.mockResponse('');
     const expectHeadersEqual = (headers2): void => {
