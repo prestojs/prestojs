@@ -642,13 +642,6 @@ export default class Endpoint<ReturnT = any> {
         const { urlArgs = {}, query, ...init } = paginator
             ? paginator.getRequestInit(restOptions)
             : options;
-        // Always make sure headers & method is set so middleware implementations can assume it exists
-        if (!init.headers) {
-            init.headers = new Headers();
-        }
-        if (!init.method) {
-            init.method = 'GET';
-        }
         const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         try {
             const cls = Object.getPrototypeOf(this).constructor;
@@ -657,6 +650,13 @@ export default class Endpoint<ReturnT = any> {
                 this.requestInit,
                 init
             ) as EndpointRequestInit;
+            // Always make sure headers & method is set so middleware implementations can assume it exists
+            if (!requestInit.headers) {
+                requestInit.headers = new Headers();
+            }
+            if (!requestInit.method) {
+                requestInit.method = 'GET';
+            }
             const returnVal: ExecuteReturnVal<ReturnT> = {
                 url,
                 urlArgs,
