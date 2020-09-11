@@ -2,7 +2,7 @@ import { FieldFormatter } from '@prestojs/ui';
 import { useListChangeObserver } from '@prestojs/util';
 import { useViewModelCache } from '@prestojs/viewmodel';
 import { Button, Modal } from 'antd';
-import qs from 'qs';
+import qs from 'query-string';
 import React, { useState } from 'react';
 
 import User from '../models/User';
@@ -16,7 +16,7 @@ const fieldList = ['email', 'firstName', 'lastName'];
 
 export default function UserListView() {
     const { search, pathname, origin } = window.location;
-    const { paginationType } = qs.parse(search, { ignoreQueryPrefix: true });
+    const { paginationType } = qs.parse(search);
     const [filter, setFilter] = useNaviUrlQueryState();
     const paginationStatePair = useNaviUrlQueryState({}, { prefix: 'p_' });
     const [selectedId, selectId] = useState();

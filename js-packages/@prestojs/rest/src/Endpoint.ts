@@ -21,6 +21,19 @@ type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
 };
 
 /**
+ * Same as [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) but
+ * guarantees `headers` is set and is a `Headers` instance, and `method` is set.
+ */
+export type EndpointRequestInit = { headers: Headers; method: string } & Omit<
+    RequestInit,
+    'headers' | 'method'
+>;
+
+interface Query {
+    [key: string]: any;
+}
+
+/**
  * @expand-properties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
  */
 export type EndpointOptions = ExecuteInitOptions & {
@@ -48,16 +61,19 @@ export type EndpointOptions = ExecuteInitOptions & {
      * urlPattern.resolve(urlArgs, { query });
      * ```
      */
-    resolveUrl?: (
-        urlPattern: UrlPattern,
-        urlArgs?: Record<string, any>,
-        query?: Record<string, boolean | string | null | number>
-    ) => string;
+    resolveUrl?: (urlPattern: UrlPattern, urlArgs?: Record<string, any>, query?: Query) => string;
+    /**
+     * Middleware to apply for this endpoint. Defaults to [Endpoint.defaultConfig.middleware](http://localhost:3000/docs/rest/Endpoint#static-var-defaultConfig) - global
+     * middleware options can be set there.
+     *
+     * See [middleware](#Middleware) for more details
+     */
+    middleware?: MiddlewareFunction<any>[];
 };
 
 type UrlResolveOptions = {
     urlArgs?: Record<string, any>;
-    query?: Record<string, boolean | string | null | number>;
+    query?: Query;
 };
 
 /**
@@ -75,7 +91,7 @@ export type ExecuteReturnVal<T> = {
     /**
      * Any query string parameters
      */
-    query?: Record<string, boolean | string | null | number>;
+    query?: Query;
     /**
      * The options used to execute the endpoint with
      */
@@ -96,9 +112,67 @@ export type ExecuteReturnVal<T> = {
 };
 
 /**
- * @expand-properties
+ * @expand-properties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
  */
 export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
+
+type MiddlewareContext<T> = {
+    /**
+     * Function to re-execute the Endpoint. Accepts no arguments - it replays the request with identical arguments
+     * as the first time. This will go through the full middleware cycle again. This is useful for middleware
+     * that may replay a request after an initial failure, eg. if user isn't authenticated on initial attempt.
+     */
+    execute: () => Promise<T>;
+    /**
+     * The original options passed to [execute](doc:Endpoint#method-execute)
+     */
+    executeOptions: EndpointExecuteOptions;
+};
+
+/**
+ * @param url The URL to call fetch with
+ * @param requestInit See [fetch parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
+ * @param next The next function in the middleware chain. Must be passed the `url` and `requestInit` objects.
+ * @param context The context for the current execute. This gives you access to the original options and a function to re-execute the command.
+ * @returns Returns the value from `fetch` after it has been transformed by each middleware further down the chain
+ */
+export type MiddlewareFunction<T> = (
+    url: string,
+    requestInit: EndpointRequestInit,
+    next: (url: string, requestInit: RequestInit) => Promise<T>,
+    context: MiddlewareContext<T>
+) => Promise<T>;
+
+/**
+ * @expand-properties
+ */
+type DefaultConfig = {
+    /**
+     * Default options used to execute the endpoint with
+     */
+    requestInit: RequestInit;
+    /**
+     * Function that returns the state for a paginator based on the response.
+     *
+     * See [getPaginationState](doc:getPaginationState] for the default implementation
+     */
+    getPaginationState: (
+        paginator: PaginatorInterface,
+        executeReturnVal: ExecuteReturnVal<any>
+    ) => Record<string, any> | false;
+    /**
+     * Default default Paginator class to use on [PaginatedEndpoint](doc:PaginatedEndpoint)'s.
+     *
+     * Defaults to [InferredPaginator](doc:InferredPaginator)
+     */
+    paginatorClass: PaginatorInterfaceClass;
+    /**
+     * Default middleware to use on an endpoint.
+     *
+     * See [middleware](#Middleware) for more details
+     */
+    middleware: MiddlewareFunction<any>[];
+};
 
 /**
  * Merge two Headers instances together
@@ -117,7 +191,7 @@ function mergeHeaders(headers1: Headers, headers2: Headers): Headers {
  *
  * @param args
  */
-function mergeRequestInit(...args: ExecuteInitOptions[]): RequestInit {
+function mergeRequestInit(...args: (ExecuteInitOptions | EndpointRequestInit)[]): RequestInit {
     return args.reduce((acc: RequestInit, init) => {
         const { headers: currentHeaders, ...rest } = init;
         Object.assign(acc, rest);
@@ -244,7 +318,7 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
 function defaultResolveUrl(
     urlPattern: UrlPattern,
     urlArgs?: Record<string, any>,
-    query?: Record<string, boolean | string | null | number>
+    query?: Query
 ): string {
     return this.urlPattern.resolve(urlArgs, { query });
 }
@@ -378,33 +452,91 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  *
  * See `usePaginator` for more details about how to use a paginator in React.
  *
+ * ## Middleware
+ *
+ * Middleware functions can be provided to alter the `url` or fetch options and transform the
+ * response in some way.
+ *
+ * A middleware function is passed the url, the fetch options, the next middleware function and a context object.
+ * The function can then make changes to the `url` or `requestInit` and pass it through to the next middleware function.
+ * The call to `next` returns a `Promise` that resolves to the response of the endpoint after it's been processed
+ * by any middleware further down the chain. You can return a modified response here.
+ *
+ * This middleware sets a custom header on a request but does nothing with the response:
+ *
+ * ```js
+ * function clientHeaderMiddleware(url, requestInit, next, context) {
+ *   requestInit.headers.set('X-ClientId', 'ABC123');
+ *   // Return response unmodified
+ *   return next(url.toUpperCase(), requestInit)
+ * }
+ * ```
+ *
+ * This  middleware just transforms the response - converting it to uppercase.
+ *
+ * ```js
+ * function upperCaseResponseMiddleware(url, requestInit, next, context) {
+ *   const r = await next(url.toUpperCase(), requestInit)
+ *   return r.toUpperCase();
+ * }
+ * ```
+ *
+ * The context object can be used to retrieve the original options from the [Endpoint.execute](doc:Endpoint#method-execute)
+ * call and re-execute the command. This is useful for middleware that may replay a request after an initial failure,
+ * eg. if user isn't authenticated on initial attempt.
+ *
+ * ```js
+ * // Access the original parameters passed to execute
+ * context.executeOptions
+ * // Re-execute the endpoint.
+ * context.execute()
+ * ```
+ *
+ * **NOTE:** Calling `context.execute()` will go through all the middleware again
+ *
+ * Middleware can be set globally for all [Endpoint](doc:Endpoint)'s on the [Endpoint.defaultConfig.middleware](http://localhost:3000/docs/rest/Endpoint#static-var-defaultConfig)
+ * option or individually for each Endpoint by passing the `middleware` as an option when creating the endpoint.
+ *
+ * Set globally:
+ *
+ * ```js
+ * Endpoint.defaultConfig.middleware = [
+ *    dedupeInflightRequestsMiddleware,
+ * ];
+ * ```
+ *
+ * Or customise it per Endpoint:
+ *
+ * ```js
+ * new Endpoint('/users/', { middleware: [csrfTokenMiddleware] })
+ * ```
+ *
  * @menu-group Endpoint
  * @extract-docs
  */
 export default class Endpoint<ReturnT = any> {
-    static defaultConfig: {
-        requestInit: RequestInit;
-        getPaginationState: (
-            paginator: PaginatorInterface,
-            executeReturnVal: ExecuteReturnVal<any>
-        ) => Record<string, any> | false;
-        paginatorClass: PaginatorInterfaceClass;
-    } = {
-        requestInit: {},
-        getPaginationState: defaultGetPaginationState,
-        paginatorClass: InferredPaginator,
-    };
+    /**
+     * This defines the default settings to use on an endpoint globally.
+     *
+     * All these options can be customised on individual Endpoints.
+     */
+    // Init for this is after class definition
+    static defaultConfig: DefaultConfig;
 
+    /**
+     * The [UrlPattern](doc:UrlPattern) this endpoint hits when executed.
+     */
     urlPattern: UrlPattern;
-    transformResponseBody?: (data: any) => any;
-    urlCache: Map<string, Map<{}, PreparedAction>>;
-    decodeBody: (res: Response) => any;
-    requestInit: ExecuteInitOptions;
-    resolveUrl: (
+    private transformResponseBody?: (data: any) => any;
+    private urlCache: Map<string, Map<{}, PreparedAction>>;
+    private decodeBody: (res: Response) => any;
+    private requestInit: ExecuteInitOptions;
+    private resolveUrl: (
         urlPattern: UrlPattern,
         urlArgs?: Record<string, any>,
-        query?: Record<string, boolean | string | null | number>
+        query?: Query
     ) => string;
+    private middleware: MiddlewareFunction<ReturnT>[];
 
     /**
      * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint
@@ -414,6 +546,7 @@ export default class Endpoint<ReturnT = any> {
             decodeBody = defaultDecodeBody,
             transformResponseBody,
             resolveUrl = defaultResolveUrl,
+            middleware = Endpoint.defaultConfig.middleware,
             ...requestInit
         } = options;
         this.urlPattern = urlPattern;
@@ -422,6 +555,7 @@ export default class Endpoint<ReturnT = any> {
         this.decodeBody = decodeBody;
         this.requestInit = requestInit;
         this.resolveUrl = resolveUrl;
+        this.middleware = middleware;
     }
 
     /**
@@ -505,10 +639,16 @@ export default class Endpoint<ReturnT = any> {
      */
     async execute(options: EndpointExecuteOptions = {}): Promise<ExecuteReturnVal<ReturnT>> {
         const { paginator, ...restOptions } = options;
-        if (paginator) {
-            options = paginator.getRequestInit(restOptions);
+        const { urlArgs = {}, query, ...init } = paginator
+            ? paginator.getRequestInit(restOptions)
+            : options;
+        // Always make sure headers & method is set so middleware implementations can assume it exists
+        if (!init.headers) {
+            init.headers = new Headers();
         }
-        const { urlArgs = {}, query, ...init } = options;
+        if (!init.method) {
+            init.method = 'GET';
+        }
         const url = this.resolveUrl(this.urlPattern, urlArgs, query);
         try {
             const cls = Object.getPrototypeOf(this).constructor;
@@ -516,7 +656,7 @@ export default class Endpoint<ReturnT = any> {
                 cls.defaultConfig.requestInit,
                 this.requestInit,
                 init
-            );
+            ) as EndpointRequestInit;
             const returnVal: ExecuteReturnVal<ReturnT> = {
                 url,
                 urlArgs,
@@ -524,39 +664,86 @@ export default class Endpoint<ReturnT = any> {
                 requestInit,
                 result: null,
             };
-            returnVal.result = await fetch(url, requestInit)
-                .then(async res => {
-                    returnVal.response = res;
-                    if (!res.ok) {
-                        throw new ApiError(res.status, res.statusText, await this.decodeBody(res));
-                    }
-                    return res;
-                })
-                .then(res => this.decodeBody(res))
-                .then(data => {
-                    returnVal.decodedBody = data;
-                    if (paginator) {
-                        // If we have a paginator update its state based on response
-                        // This runs for all requests but should return false if response
-                        // is not paginated.
-                        const paginationState = cls.defaultConfig.getPaginationState(
-                            paginator,
-                            returnVal
-                        );
-                        if (paginationState) {
-                            paginator.setResponse(paginationState);
-                            data = paginationState.results;
-                        } else {
-                            // TODO: If you specify a paginator and the response is not paginated should
-                            // we warn? I think yes as I can't think of a reason why not but may need to
-                            // revisit this if we find a usecase
-                            console.warn(
-                                'A paginator was defined but the response was not paginated. Paginator state has not been updated.'
+            const runFetch = (url: string, requestInit: RequestInit): Promise<ReturnT> =>
+                fetch(url, requestInit)
+                    .then(async res => {
+                        returnVal.response = res;
+                        if (!res.ok) {
+                            throw new ApiError(
+                                res.status,
+                                res.statusText,
+                                await this.decodeBody(res)
                             );
                         }
+                        return res;
+                    })
+                    .then(res => this.decodeBody(res))
+                    .then(data => {
+                        returnVal.decodedBody = data;
+                        if (paginator) {
+                            // If we have a paginator update its state based on response
+                            // This runs for all requests but should return false if response
+                            // is not paginated.
+                            const paginationState = cls.defaultConfig.getPaginationState(
+                                paginator,
+                                returnVal
+                            );
+                            if (paginationState) {
+                                paginator.setResponse(paginationState);
+                                data = paginationState.results;
+                            } else {
+                                // TODO: If you specify a paginator and the response is not paginated should
+                                // we warn? I think yes as I can't think of a reason why not but may need to
+                                // revisit this if we find a usecase
+                                console.warn(
+                                    'A paginator was defined but the response was not paginated. Paginator state has not been updated.'
+                                );
+                            }
+                        }
+                        return this.transformResponseBody ? this.transformResponseBody(data) : data;
+                    });
+            const executeWithMiddleware = (): Promise<ReturnT> => {
+                const middleware = [...this.middleware];
+                let lastMiddleware;
+                const next = async (
+                    url: string,
+                    requestInit: EndpointRequestInit
+                ): Promise<ReturnT> => {
+                    let errors: string[] = [];
+                    if (typeof url !== 'string') {
+                        errors.push(`'url' arg from middleware was not a string, received: ${url}`);
                     }
-                    return this.transformResponseBody ? this.transformResponseBody(data) : data;
-                });
+                    if (!requestInit || typeof requestInit != 'object') {
+                        errors.push(
+                            `'requestInit' arg from middleware was not an object, received: ${requestInit}`
+                        );
+                    }
+                    if (errors.length > 0) {
+                        const err = errors.join('\n');
+                        throw new Error(
+                            `Bad middleware implementation; invalid arguments\n\n${err}\n\nOccurred in middleware:\n\n${lastMiddleware}`
+                        );
+                    }
+                    const nextMiddleware = middleware.shift();
+                    if (!nextMiddleware) {
+                        return runFetch(url, requestInit);
+                    }
+                    lastMiddleware = nextMiddleware;
+                    const r = nextMiddleware(url, requestInit, next, {
+                        execute: executeWithMiddleware,
+                        executeOptions: options,
+                    });
+                    if (r === undefined) {
+                        throw new Error(
+                            `Bad middleware implementation; function did not return anything\n\nOccurred in middleware:\n\n${lastMiddleware}`
+                        );
+                    }
+                    return r;
+                };
+                // mergeRequestInit here is just used to clone requestInit
+                return next(url, mergeRequestInit(requestInit) as EndpointRequestInit);
+            };
+            returnVal.result = await executeWithMiddleware();
             return returnVal;
         } catch (err) {
             if (err instanceof ApiError) {
@@ -569,3 +756,11 @@ export default class Endpoint<ReturnT = any> {
         }
     }
 }
+
+// Initialisation is not done inline in class as doc extractor doesn't handle object literals well
+Endpoint.defaultConfig = {
+    requestInit: {},
+    getPaginationState: defaultGetPaginationState,
+    paginatorClass: InferredPaginator,
+    middleware: [],
+};

@@ -1,8 +1,8 @@
 // @flow
-import { useCallback, useEffect, useRef, useMemo } from 'react';
-import pickBy from 'lodash/pickBy';
 import isEqual from 'lodash/isEqual';
-import qs from 'qs';
+import pickBy from 'lodash/pickBy';
+import qs from 'query-string';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 type Decode = (value: string, paramName: string) => any;
 type Encode = (value: any, paramName: string) => string;
@@ -376,7 +376,7 @@ export default function useUrlQueryState(
     // specified in initialState. It only runs once - any subsequent changes to
     // initialState have no effect.
     useEffect(() => {
-        const query = qs.parse(search, { ignoreQueryPrefix: true });
+        const query = qs.parse(search);
         const invalidKeys: string[] = [];
         const missingKeys = Object.keys(initialState).filter(key => {
             if (
@@ -419,7 +419,7 @@ export default function useUrlQueryState(
         if (prefixCache.current === prefix) {
             return;
         }
-        const query = qs.parse(search, { ignoreQueryPrefix: true });
+        const query = qs.parse(search);
         const existingQuery = buildQueryForState(query, prefixCache.current, params);
         const keys = Object.keys(query).filter(key => key.startsWith(prefixCache.current));
         replaceUrl(
@@ -433,13 +433,7 @@ export default function useUrlQueryState(
 
     // Return the current query params without the prefix
     const unPrefixedQueryObject = useMemo(
-        () =>
-            buildQueryForState(
-                qs.parse(search, { ignoreQueryPrefix: true }),
-                prefix,
-                params,
-                controlledKeys
-            ),
+        () => buildQueryForState(qs.parse(search), prefix, params, controlledKeys),
         [controlledKeys, search, params, prefix]
     );
 
@@ -448,7 +442,7 @@ export default function useUrlQueryState(
     // state value.
     const setUrlState = useCallback(
         (nextQuery: {}) => {
-            const query = qs.parse(search, { ignoreQueryPrefix: true });
+            const query = qs.parse(search);
             if (typeof nextQuery === 'function') {
                 nextQuery = nextQuery(unPrefixedQueryObject);
             }

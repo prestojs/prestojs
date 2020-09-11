@@ -138,7 +138,7 @@ export default function TypeDesc({ doc, type, isArray, isReturnType, isTypeParam
         );
         return (
             <Popover content={content} title={doc?.name || 'Function'}>
-                <span className="text-orange-400">Function</span>
+                <span className="text-orange-400 underline cursor-pointer">Function</span>
             </Popover>
         );
     }
@@ -171,7 +171,7 @@ export default function TypeDesc({ doc, type, isArray, isReturnType, isTypeParam
                 <>
                     A <span className="text-pink-400">Promise</span> that resolves to an object with
                     the following keys:
-                    <ParameterTable parameters={c} nameHeader="Key" isReturnType />
+                    <ParameterTable parameters={c} nameHeader="Key" isReturnType={isReturnType} />
                 </>
             );
         }
