@@ -1,6 +1,6 @@
 {
   "name": "@prestojs/routing",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "license": "MIT",
   "typings": "build/module/index.d.ts",
   "main": "build/cjs/index.js",
