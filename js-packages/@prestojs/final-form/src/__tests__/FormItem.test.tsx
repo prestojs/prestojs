@@ -1,10 +1,10 @@
-import React from 'react';
-import { render } from '@testing-library/react';
 import { UiProvider } from '@prestojs/ui';
 import { NumberField, viewModelFactory } from '@prestojs/viewmodel';
+import { render } from '@testing-library/react';
+import React from 'react';
 import Form from '../Form';
 
-class User extends viewModelFactory({ age: new NumberField({ label: 'Age' }) }) {}
+class User extends viewModelFactory({ age: new NumberField({ blank: true, label: 'Age' }) }) {}
 
 function Widget({ input }): React.ReactElement {
     return <input name={input.name} placeholder={input.name} />;

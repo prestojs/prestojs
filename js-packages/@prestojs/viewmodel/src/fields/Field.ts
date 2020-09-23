@@ -7,6 +7,8 @@ import { AsyncChoicesInterface } from './AsyncChoices';
 export interface FieldProps<T> {
     /**
      * Is this field allowed to be assigned a blank (null, undefined, "") value?
+     *
+     * Defaults to false
      */
     blank?: boolean;
     /**
@@ -157,7 +159,7 @@ export default class Field<T, ParsableType extends any = T> {
 
     constructor(values: FieldProps<T> = {}) {
         const {
-            blank = true,
+            blank = false,
             blankAsNull = false,
             label,
             helpText,
