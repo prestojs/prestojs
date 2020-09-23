@@ -30,6 +30,7 @@ export { default as UUIDField } from './fields/UUIDField';
 export { default as useViewModelCache } from './useViewModelCache';
 export { default as AsyncChoices } from './fields/AsyncChoices';
 export { default as RelatedViewModelField } from './fields/RelatedViewModelField';
+export { default as ListField } from './fields/ListField';
 export { default as useAsyncChoices } from './useAsyncChoices';
 
 export {

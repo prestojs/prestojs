@@ -4,7 +4,7 @@ import { AsyncChoicesInterface } from './AsyncChoices';
 /**
  * @expand-properties
  */
-export interface FieldProps<T> {
+export interface FieldProps<T, SingleType = T> {
     /**
      * Is this field allowed to be assigned a blank (null, undefined, "") value?
      *
@@ -30,7 +30,7 @@ export interface FieldProps<T> {
     /**
      * Default value for this field. This can either be a function that returns a value or the value directly.
      */
-    defaultValue?: T | (() => Promise<T> | T);
+    defaultValue?: T | null | (() => Promise<T | null> | T | null);
     // A field can have choices regardless of it's type.
     // eg. A CharField and IntegerField might both optionally have choices
     // TODO: Best way to handle remote choices? Should this be part of this
@@ -39,13 +39,13 @@ export interface FieldProps<T> {
     /**
      * Choices for this field. Should be a mapping of value to the label for the choice.
      */
-    choices?: Map<T, string> | [T, string][];
+    choices?: Map<SingleType, string> | [SingleType, string][];
     /**
      * Asynchronous choices for this field.
      *
      * Only one of `asyncChoices` and `choices` should be passed.
      */
-    asyncChoices?: AsyncChoicesInterface<any, T>;
+    asyncChoices?: AsyncChoicesInterface<any, SingleType>;
     /**
      * True if field should be considered read only (eg. excluded from forms)
      */
@@ -56,8 +56,8 @@ export interface FieldProps<T> {
     writeOnly?: boolean;
 }
 
-class UnboundFieldError<T, K> extends Error {
-    constructor(field: Field<T, K>) {
+class UnboundFieldError<T, ParsableType, SingleType> extends Error {
+    constructor(field: Field<T, ParsableType, SingleType>) {
         const msg = `Field ${field} has not been bound to it's model. Check that the fields of the associated class are defined on the static '_fields' property and not 'fields'.`;
         super(msg);
     }
@@ -69,7 +69,7 @@ class UnboundFieldError<T, K> extends Error {
  * @extract-docs
  * @menu-group Fields
  */
-export default class Field<T, ParsableType extends any = T> {
+export default class Field<T, ParsableType extends any = T, SingleType = T> {
     // These are just for internal usage with typescript
     /**
      * @private
@@ -86,7 +86,7 @@ export default class Field<T, ParsableType extends any = T> {
     }
     public get model(): ViewModelConstructor<any> {
         if (!this._model) {
-            throw new UnboundFieldError<T, ParsableType>(this);
+            throw new UnboundFieldError<T, ParsableType, SingleType>(this);
         }
         return this._model;
     }
@@ -97,7 +97,7 @@ export default class Field<T, ParsableType extends any = T> {
     }
     public get name(): string {
         if (!this._name) {
-            throw new UnboundFieldError<T, ParsableType>(this);
+            throw new UnboundFieldError<T, ParsableType, SingleType>(this);
         }
         return this._name;
     }
@@ -136,11 +136,11 @@ export default class Field<T, ParsableType extends any = T> {
     // TODO: Best way to handle remote choices? Should this be part of this
     // interface, eg. make it async?
     // In djrad we had: choiceRefinementUrl
-    public choices?: Map<T, string>;
+    public choices?: Map<SingleType, string>;
     /**
      * Async choices for this field.
      */
-    public asyncChoices?: AsyncChoicesInterface<any, T>;
+    public asyncChoices?: AsyncChoicesInterface<any, SingleType>;
     /**
      * Indicates this field should only be read, not written. Not enforced but can be used by components to adjust their
      * output accordingly (eg. exclude it from a form or show it on a form with a read only input)
@@ -155,9 +155,9 @@ export default class Field<T, ParsableType extends any = T> {
     /**
      * @private
      */
-    protected _defaultValue?: T | (() => Promise<T> | T);
+    protected _defaultValue?: T | null | (() => Promise<T | null> | T | null);
 
-    constructor(values: FieldProps<T> = {}) {
+    constructor(values: FieldProps<T, SingleType> = {}) {
         const {
             blank = false,
             blankAsNull = false,
@@ -235,7 +235,7 @@ export default class Field<T, ParsableType extends any = T> {
      * into a `Date`.
      * @param value
      */
-    public parse(value: ParsableType): T | null {
+    public parse(value: ParsableType | null): T | null {
         return (value as unknown) as T;
     }
 
@@ -342,7 +342,8 @@ export default class Field<T, ParsableType extends any = T> {
     }
 }
 
-export interface RecordBoundField<T, ParsableType extends any = T> extends Field<T, ParsableType> {
+export interface RecordBoundField<T, ParsableType extends any = T, SingleType = T>
+    extends Field<T, ParsableType, SingleType> {
     readonly value: T;
     readonly isBound: true;
 }

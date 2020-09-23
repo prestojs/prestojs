@@ -1,0 +1,94 @@
+import Field, { FieldProps } from './Field';
+
+/**
+ * A container field for an array of values
+ *
+ * You must pass `childField` which is the underlying field for each value in the
+ * list. `ListField` will call `format`, `parse`, and `normalize` on this field for
+ * each value in the list.
+ *
+ * By default `defaultValue` will be set to an empty array unless `blankAsNull` is
+ * `true` in which case it will be set to `null`. `normalize` and `parse` also behave
+ * in the same way (a falsy value passed to these will either return an empty array
+ * when `blankAsNull` is false or null when it is true).
+ *
+ * ```js
+ * const listOfInts = new ListField({ childField: new IntegerField() });
+ * ```
+ *
+ * @extract-docs
+ * @menu-group Fields
+ */
+export default class ListField<T, ParsableType = T> extends Field<T[], ParsableType[], T> {
+    public childField: Field<T, ParsableType>;
+
+    constructor({
+        childField,
+        blankAsNull,
+        // Default to an empty array as the default value in fields. This allows
+        // widgets to (by default) assume that the value will always be an array.
+        // This is required with antd (it's an error not to do this - results in
+        // a warning and the multiselect widget to be populated with an empty item)
+        // If `blankAsNull` is set we instead default to `null` to bypass this.
+        defaultValue = blankAsNull ? null : [],
+        ...rest
+    }: { childField: Field<T, ParsableType> } & FieldProps<T[], T>) {
+        super({ ...rest, blankAsNull, defaultValue });
+        this.childField = childField;
+        this.choices = childField.choices;
+    }
+
+    /**
+     * Calls `childField.format` on each entry in the passed array
+     */
+    public format(value: T[]): any {
+        if (!value) {
+            return value;
+        }
+        return value.map(v => this.childField.format(v));
+    }
+
+    /**
+     * Calls `childField.parse` on each entry in the passed array
+     *
+     * If `value` is falsy or an empty array and `blankAsNull` is true
+     * it will return `null` or if `blankAsNull` is false then it
+     * will return an empty array.
+     */
+    public parse(value: ParsableType[] | null): T[] | null {
+        if (!value) {
+            if (this.blankAsNull) {
+                return null;
+            }
+            return [];
+        }
+        if (value.length === 0 && this.blankAsNull) {
+            return null;
+        }
+        return value.map((v: ParsableType) => this.childField.parse(v)) as T[];
+    }
+
+    /**
+     * Calls `childField.parse` on each entry in the passed array
+     *
+     * If `value` is falsy or an empty array and `blankAsNull` is true
+     * it will return `null` or if `blankAsNull` is false then it
+     * will return an empty array.
+     */
+    public normalize(value: any): T[] | null {
+        if (!value) {
+            if (this.blankAsNull) {
+                return null;
+            }
+            return [];
+        }
+        if (!Array.isArray(value)) {
+            throw new Error('List field must be passed an array of data');
+        }
+        if (value.length === 0 && this.blankAsNull) {
+            return null;
+        }
+
+        return value.map(v => this.childField.normalize(v) as T);
+    }
+}
