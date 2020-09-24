@@ -91,4 +91,22 @@ export default class ListField<T, ParsableType = T> extends Field<T[], ParsableT
 
         return value.map(v => this.childField.normalize(v) as T);
     }
+
+    public isEqual(value1: T[], value2: T[]): boolean {
+        if (value1 === value2) {
+            return true;
+        }
+        if (!value1 || !value2) {
+            return value1 === value2;
+        }
+        if (value1?.length !== value2.length) {
+            return false;
+        }
+        for (let i = 0; i < value1.length; i++) {
+            if (!this.childField.isEqual(value1[i], value2[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

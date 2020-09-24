@@ -3,7 +3,7 @@ import { getId, isIdentifiable } from '@prestojs/util';
 import CharField from '../fields/CharField';
 import Field from '../fields/Field';
 import NumberField from '../fields/NumberField';
-import RelatedViewModelField from '../fields/RelatedViewModelField';
+import { RelatedViewModelField } from '../fields/RelatedViewModelField';
 import viewModelFactory from '../ViewModelFactory';
 import ViewModelFactory, {
     expandRelationFieldPaths,
@@ -1100,7 +1100,7 @@ test('getField should support traversing relations', async () => {
 
     expect(() => Subscription.getField(['user', 'name', 'id'])).toThrow(
         new Error(
-            "Field 'name' (from [user, name, id]) on ViewModel 'User' is not a RelatedViewModelField"
+            "Field 'name' (from [user, name, id]) on ViewModel 'User' is not a field that extends BaseRelatedViewModelField"
         )
     );
 });

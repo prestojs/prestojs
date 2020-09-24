@@ -1,9 +1,10 @@
+import intersectionBy from 'lodash/intersectionBy';
 import isEqual from 'lodash/isEqual';
 import startCase from 'lodash/startCase';
 import Field, { RecordBoundField } from './fields/Field';
 import NumberField from './fields/NumberField';
 
-import RelatedViewModelField from './fields/RelatedViewModelField';
+import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
 import { freezeObject, isDev } from './util';
 import ViewModelCache from './ViewModelCache';
 
@@ -515,26 +516,6 @@ function checkReservedFieldNames(fields): void {
 export type FieldPath = string | string[];
 
 /**
- * Get assigned field paths for the record.
- *
- * See test cases for example of what this looks like
- */
-export function getAssignedFieldsDeep(record: ViewModelInterface<any, any>): FieldPath[] {
-    const fieldNames: FieldPath[] = [];
-    for (const fieldName of record._assignedFields as string[]) {
-        const data = record[fieldName];
-        if (isViewModelInstance(data)) {
-            for (const path of getAssignedFieldsDeep(data)) {
-                fieldNames.push([fieldName, ...(Array.isArray(path) ? path : [path])]);
-            }
-        } else {
-            fieldNames.push(fieldName);
-        }
-    }
-    return fieldNames;
-}
-
-/**
  * Flatten a nested path to a single level with dot notation
  *
  * eg.
@@ -565,6 +546,42 @@ export function flattenFieldPath(fieldPath: FieldPath[] | FieldPath, separator =
 }
 
 /**
+ * Get assigned field paths for the record.
+ *
+ * See test cases for example of what this looks like
+ */
+export function getAssignedFieldsDeep(record: ViewModelInterface<any, any>): FieldPath[] {
+    const fieldNames: FieldPath[] = [];
+    for (const fieldName of record._assignedFields as string[]) {
+        const data = record[fieldName];
+        const field = record._model.fields[fieldName];
+        if (field instanceof BaseRelatedViewModelField && data) {
+            if (field.many) {
+                if (data.length === 0) {
+                    fieldNames.push([fieldName]);
+                } else {
+                    // If we have many records we can only take the common set of fields
+                    // Failing to do this will cause various issues with caching.
+                    const paths = intersectionBy(...data.map(getAssignedFieldsDeep), p =>
+                        flattenFieldPath(p).join('|')
+                    );
+                    for (const path of paths) {
+                        fieldNames.push([fieldName, ...(Array.isArray(path) ? path : [path])]);
+                    }
+                }
+            } else {
+                for (const path of getAssignedFieldsDeep(data)) {
+                    fieldNames.push([fieldName, ...(Array.isArray(path) ? path : [path])]);
+                }
+            }
+        } else {
+            fieldNames.push(fieldName);
+        }
+    }
+    return fieldNames;
+}
+
+/**
  * For the given field `fieldName` on View Model `model` expand any RelatedViewModelField's to
  * it's set of fields.
  *
@@ -587,10 +604,11 @@ export function flattenFieldPath(fieldPath: FieldPath[] | FieldPath, separator =
  */
 function expandField(model: ViewModelConstructor<any>, fieldName: string): FieldPath[] {
     const field = model.fields[fieldName];
-    if (field instanceof RelatedViewModelField) {
+    if (field instanceof BaseRelatedViewModelField) {
         return field.to.fieldNames
             .filter(
-                subFieldName => !(field.to.fields[subFieldName] instanceof RelatedViewModelField)
+                subFieldName =>
+                    !(field.to.fields[subFieldName] instanceof BaseRelatedViewModelField)
             )
             .map(subFieldName => [fieldName, subFieldName]);
     }
@@ -635,7 +653,7 @@ export function expandRelationFieldPaths(
     for (const path of paths) {
         if (typeof path === 'string') {
             const field = model.fields[path];
-            if (field instanceof RelatedViewModelField) {
+            if (field instanceof BaseRelatedViewModelField) {
                 fieldsAdded.add(field.sourceFieldName);
                 expanded.push(field.sourceFieldName);
             }
@@ -662,11 +680,11 @@ export function expandRelationFieldPaths(
                         `Invalid field ${fieldName} on model ${currentModel}`
                     );
                 }
-                const isRelation = field instanceof RelatedViewModelField;
+                const isRelation = field instanceof BaseRelatedViewModelField;
                 const isLast = i === path.length - 1;
                 if (!isLast && !isRelation) {
                     throw new Error(
-                        `Nested paths are only valid for RelatedViewModelField. '${fieldName}' is a ${field}.`
+                        `Nested paths are only valid for classes that extend BaseRelatedViewModelField. '${fieldName}' is a ${field}.`
                     );
                 }
                 if (isRelation) {
@@ -885,21 +903,23 @@ export default function viewModelFactory<T extends FieldsMapping>(
             const field = fields[key];
             if (field) {
                 assignedData[key] = field.normalize(value);
-                if (field instanceof RelatedViewModelField) {
+                if (field instanceof BaseRelatedViewModelField) {
                     // TODO: Make doing this part of interface rather than special case?
-                    if (
-                        assignedData[key] &&
-                        data[field.sourceFieldName] != null &&
-                        data[field.sourceFieldName] !== assignedData[key]._key
-                    ) {
+                    const pkOrPks = field.many
+                        ? assignedData[key]?.map(r => r._key)
+                        : assignedData[key]?._key;
+                    const hasValue = Array.isArray(pkOrPks)
+                        ? pkOrPks.length > 0 && data[field.sourceFieldName]?.length > 0
+                        : pkOrPks != null && data[field.sourceFieldName];
+                    if (hasValue && !isEqual(data[field.sourceFieldName], pkOrPks)) {
                         const { name, sourceFieldName } = field;
-                        const pk = assignedData[key]._key;
+                        const pk = Array.isArray(pkOrPks) ? pkOrPks.join(', ') : pkOrPks;
                         console.warn(
                             `Related field ${name} was created from nested object that had a different id to the source field name ${sourceFieldName}: ${data[sourceFieldName]} !== ${pk}. ${pk} has been used for both.`
                         );
                     }
                     if (assignedData[key]) {
-                        assignedData[field.sourceFieldName] = assignedData[key]._key;
+                        assignedData[field.sourceFieldName] = pkOrPks;
                         if (!data[field.sourceFieldName]) {
                             assignedFields.push(field.sourceFieldName);
                         }
@@ -1020,7 +1040,11 @@ export default function viewModelFactory<T extends FieldsMapping>(
                         missingRelations.push([name, flattenFieldPath(nestedFieldNames)]);
                     } else {
                         try {
-                            data[name] = this[name].clone(nestedFieldNames);
+                            if (Array.isArray(this[name])) {
+                                data[name] = this[name].map(r => r.clone(nestedFieldNames));
+                            } else {
+                                data[name] = this[name].clone(nestedFieldNames);
+                            }
                         } catch (err) {
                             if (err instanceof MissingFieldsError) {
                                 assignedFields.push(
@@ -1271,9 +1295,9 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 if (parts.length === 0 || !Array.isArray(fieldName)) {
                     return firstField;
                 }
-                if (!(firstField instanceof RelatedViewModelField)) {
+                if (!(firstField instanceof BaseRelatedViewModelField)) {
                     throw new Error(
-                        `Field '${first}' is not a RelatedViewModelField. When using array notation every element except the last must be a RelatedViewModelField. Received: ${fieldName.join(
+                        `Field '${first}' does not extend BaseRelatedViewModelField. When using array notation every element except the last must be a field that extends BaseRelatedViewModelField. Received: ${fieldName.join(
                             ', '
                         )}`
                     );
@@ -1289,11 +1313,11 @@ export default function viewModelFactory<T extends FieldsMapping>(
                             )}]) on ViewModel '${lastModel.name}'`
                         );
                     }
-                    if (!(field instanceof RelatedViewModelField)) {
+                    if (!(field instanceof BaseRelatedViewModelField)) {
                         throw new Error(
                             `Field '${parts[i]}' (from [${fieldName.join(', ')}]) on ViewModel '${
                                 lastModel.name
-                            }' is not a RelatedViewModelField`
+                            }' is not a field that extends BaseRelatedViewModelField`
                         );
                     }
                     lastModel = lastModel.fields[parts[i]].to;

@@ -1,11 +1,31 @@
-import { isViewModelClass, ViewModelConstructor, ViewModelInterface } from '../ViewModelFactory';
+import { isEqual } from '@prestojs/util';
+import {
+    FieldDataMappingRaw,
+    isViewModelClass,
+    ViewModelConstructor,
+    ViewModelInterface,
+} from '../ViewModelFactory';
 import Field, { FieldProps } from './Field';
+import ListField from './ListField';
+
+type RelatedViewModelValueType<T extends ViewModelConstructor<any>> = ViewModelInterface<
+    T['fields'],
+    any,
+    T['__pkFieldType'],
+    T['__pkType']
+>;
+type BaseRelatedViewModelValueType<T extends ViewModelConstructor<any>> =
+    | RelatedViewModelValueType<T>
+    | RelatedViewModelValueType<T>[];
+type RelatedViewModelParsableType<T extends ViewModelConstructor<any>> =
+    | FieldDataMappingRaw<T['fields']>
+    | FieldDataMappingRaw<T['fields']>[];
 
 /**
  * @expand-properties
  */
-type RelatedViewModelFieldProps<T extends ViewModelConstructor<any>> = FieldProps<
-    ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']>
+type RelatedViewModelFieldProps<T extends ViewModelConstructor<any>, FieldValueType> = FieldProps<
+    FieldValueType
 > & {
     /**
      * The name of the field on the [ViewModel](doc:viewModelFactory) that stores the
@@ -20,12 +40,142 @@ type RelatedViewModelFieldProps<T extends ViewModelConstructor<any>> = FieldProp
 };
 
 export class UnresolvedRelatedViewModelFieldError<
-    T extends ViewModelConstructor<any> = ViewModelConstructor<any>
+    T extends ViewModelConstructor<any>,
+    FieldValueType extends BaseRelatedViewModelValueType<T>,
+    ParsableType extends RelatedViewModelParsableType<T>
 > extends Error {
-    field: RelatedViewModelField<T>;
-    constructor(field: RelatedViewModelField<T>, message) {
+    field: BaseRelatedViewModelField<T, FieldValueType, ParsableType>;
+    constructor(field: BaseRelatedViewModelField<T, FieldValueType, ParsableType>, message) {
         super(message);
         this.field = field;
+    }
+}
+
+/**
+ * We split into RelatedViewModelField (for single records) and ManyRelatedViewModelField (for multiple records)
+ * mainly to making typing easier.
+ *
+ * Use `ManyRelatedViewModelField` if `sourceFieldName` refers to a `ListField` otherwise `RelatedViewModelField`.
+ */
+export abstract class BaseRelatedViewModelField<
+    T extends ViewModelConstructor<any>,
+    FieldValueType extends BaseRelatedViewModelValueType<T>,
+    ParsableType extends RelatedViewModelParsableType<T>
+> extends Field<FieldValueType, ParsableType> {
+    private _loadTo: () => Promise<T> | T;
+    private _resolvedTo: T;
+    private _resolvingTo?: Promise<T>;
+    sourceFieldName: string;
+    sourceField: Field<any>;
+
+    get many(): boolean {
+        return this.sourceField instanceof ListField;
+    }
+
+    constructor({
+        to,
+        sourceFieldName,
+        ...fieldProps
+    }: RelatedViewModelFieldProps<T, FieldValueType>) {
+        super(fieldProps);
+        if (isViewModelClass(to)) {
+            this._resolvedTo = to;
+        } else {
+            this._loadTo = to;
+        }
+        this.sourceFieldName = sourceFieldName;
+        this._isResolvingDeps = false;
+    }
+
+    /**
+     * @private
+     */
+    contributeToClass(viewModel: T): void {
+        if (!viewModel.fields[this.sourceFieldName]) {
+            throw new Error(
+                `Specified sourceFieldName '${this.sourceFieldName}' does not exist on model. Either add the missing field or change 'sourceFieldName' to the correct field.`
+            );
+        }
+        this.sourceField = viewModel.fields[this.sourceFieldName];
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        if (this.many && !(this instanceof ManyRelatedViewModelField)) {
+            throw new Error(
+                'When `sourceFieldName` refers to a `ListField` you must use `ManyRelatedViewModelField` instead of `RelatedViewModelField`'
+            );
+        }
+    }
+
+    _isResolvingDeps: boolean;
+
+    /**
+     * Resolves the ViewModel this field links to. This is necessary as the ViewModel might be a dynamic
+     * import that hasn't yet loaded.
+     *
+     * This needs to be called manually before `to` can be accessed.
+     */
+    resolveViewModel(): Promise<T> {
+        if (this._resolvedTo) {
+            return Promise.resolve(this._resolvedTo);
+        }
+        if (!this._resolvingTo) {
+            const maybeViewModel = this._loadTo();
+            if (isViewModelClass(maybeViewModel)) {
+                this._resolvedTo = maybeViewModel;
+                return Promise.resolve(maybeViewModel);
+            }
+            this._resolvingTo = maybeViewModel.then(async r => {
+                this._isResolvingDeps = true;
+                // Resolve all dependencies of dependencies
+                await Promise.all(
+                    r.fieldNames
+                        .filter(
+                            fieldName =>
+                                r.fields[fieldName] instanceof BaseRelatedViewModelField &&
+                                // This avoids lock when there is a circular dep
+                                !r.fields[fieldName]._isResolvingDeps
+                        )
+                        .map(fieldName => r.fields[fieldName].resolveViewModel())
+                );
+                this._isResolvingDeps = false;
+                this._resolvedTo = r;
+                return r;
+            });
+        }
+        return this._resolvingTo;
+    }
+
+    /**
+     * Compares to relations for equality - if the ViewModel has the same data this returns true
+     */
+    isEqual(value1: FieldValueType, value2: FieldValueType): boolean {
+        return isEqual(value1, value2);
+    }
+
+    /**
+     * Get the [ViewModel](doc:viewModelFactory) this related field is to.
+     *
+     * If `to` was defined as a function returning a `Promise` then you must call `resolveViewModel`
+     * and wait for the returned `Promise` to resolve before accessing this otherwise an error will be thrown
+     */
+    get to(): T {
+        if (!this._resolvedTo) {
+            if (this._resolvingTo) {
+                throw new UnresolvedRelatedViewModelFieldError(
+                    this,
+                    `${this.model.name}.fields.${this.name}.resolveViewModel() has been called but hasn't yet resolved. Did you forgot to wait for the promise to resolve?`
+                );
+            }
+            const maybeViewModel = this._loadTo();
+            if (isViewModelClass(maybeViewModel)) {
+                this._resolvedTo = maybeViewModel;
+            } else {
+                throw new UnresolvedRelatedViewModelFieldError(
+                    this,
+                    `Call ${this.model.name}.fields.${this.name}.resolveViewModel() first`
+                );
+            }
+        }
+        return this._resolvedTo;
     }
 }
 
@@ -140,140 +290,74 @@ export class UnresolvedRelatedViewModelFieldError<
  * @extract-docs
  * @menu-group Fields
  */
-export default class RelatedViewModelField<
-    T extends ViewModelConstructor<any> = ViewModelConstructor<any>
-> extends Field<
-    ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']>,
-    {
-        [K in keyof T['fields']]?: T['fields'][K]['__parsableValueType'];
-    }
+export class RelatedViewModelField<
+    T extends ViewModelConstructor<any>
+> extends BaseRelatedViewModelField<
+    T,
+    RelatedViewModelValueType<T>,
+    FieldDataMappingRaw<T['fields']>
 > {
-    private _loadTo: () => Promise<T> | T;
-    private _resolvedTo: T;
-    private _resolvingTo?: Promise<T>;
-    sourceFieldName: string;
-
-    constructor(props: RelatedViewModelFieldProps<T>) {
-        const { to, sourceFieldName, ...fieldProps } = props;
-        super(fieldProps);
-        if (isViewModelClass(to)) {
-            this._resolvedTo = to;
-        } else {
-            this._loadTo = to;
-        }
-        this.sourceFieldName = sourceFieldName;
-        this._isResolvingDeps = false;
-    }
-
-    /**
-     * @private
-     */
-    contributeToClass(viewModel: T): void {
-        if (!viewModel.fields[this.sourceFieldName]) {
-            throw new Error(
-                `Specified sourceFieldName '${this.sourceFieldName}' does not exist on model. Either add the missing field or change 'sourceFieldName' to the correct field.`
-            );
-        }
-    }
-
-    _isResolvingDeps: boolean;
-
-    /**
-     * Resolves the ViewModel this field links to. This is necessary as the ViewModel might be a dynamic
-     * import that hasn't yet loaded.
-     *
-     * This needs to be called manually before `to` can be accessed.
-     */
-    resolveViewModel(): Promise<T> {
-        if (this._resolvedTo) {
-            return Promise.resolve(this._resolvedTo);
-        }
-        if (!this._resolvingTo) {
-            const maybeViewModel = this._loadTo();
-            if (isViewModelClass(maybeViewModel)) {
-                this._resolvedTo = maybeViewModel;
-                return Promise.resolve(maybeViewModel);
-            }
-            this._resolvingTo = maybeViewModel.then(async r => {
-                this._isResolvingDeps = true;
-                // Resolve all dependencies of dependencies
-                await Promise.all(
-                    r.fieldNames
-                        .filter(
-                            fieldName =>
-                                r.fields[fieldName] instanceof RelatedViewModelField &&
-                                // This avoids lock when there is a circular dep
-                                !r.fields[fieldName]._isResolvingDeps
-                        )
-                        .map(fieldName => r.fields[fieldName].resolveViewModel())
-                );
-                this._isResolvingDeps = false;
-                this._resolvedTo = r;
-                return r;
-            });
-        }
-        return this._resolvingTo;
-    }
-
     /**
      * Converts a value into the relations [ViewModel](doc:viewModelFactory) instance.
      */
-    normalize(value): ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']> {
-        if (value && !(value instanceof this.to)) {
+    normalize(value): RelatedViewModelValueType<T> {
+        if (!value) {
+            return value;
+        }
+        if (!(value instanceof this.to)) {
             return new this.to(value);
         }
         return value;
     }
 
     /**
-     * Compares to relations for equality - if the ViewModel has the same data this returns true
+     * Converts the linked record to a plain javascript object
      */
-    isEqual(
-        value1: ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']>,
-        value2: ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']>
-    ): boolean {
-        if (!value1) {
-            return value1 === value2;
+    toJS(value: RelatedViewModelValueType<T>): Record<string, any> {
+        if (!value) {
+            return value;
         }
-        return value1.isEqual(value2);
+        if (Array.isArray(value)) {
+            return value.map(v => v.toJS());
+        }
+        return value.toJS();
+    }
+}
+
+export class ManyRelatedViewModelField<
+    T extends ViewModelConstructor<any>
+> extends BaseRelatedViewModelField<
+    T,
+    RelatedViewModelValueType<T>[],
+    FieldDataMappingRaw<T['fields']>[]
+> {
+    /**
+     * Converts a value into the relations [ViewModel](doc:viewModelFactory) instance.
+     */
+    normalize(value): RelatedViewModelValueType<T>[] {
+        if (!value) {
+            return value;
+        }
+        if (!Array.isArray(value)) {
+            throw new Error(
+                `The source field (${this.sourceFieldName}) for ${this.name} is a ListField so the value passed to normalize must be an array. Received: ${value}`
+            );
+        }
+        return value.map(v => {
+            if (!(v instanceof this.to)) {
+                return new this.to(v);
+            }
+            return v;
+        });
     }
 
     /**
      * Converts the linked record to a plain javascript object
      */
-    toJS(
-        value: ViewModelInterface<T['fields'], any, T['__pkFieldType'], T['__pkType']>
-    ): Record<string, any> {
+    toJS(value: RelatedViewModelValueType<T>[]): Record<string, any> {
         if (!value) {
             return value;
         }
-        return value.toJS();
-    }
-
-    /**
-     * Get the [ViewModel](doc:viewModelFactory) this related field is to.
-     *
-     * If `to` was defined as a function returning a `Promise` then you must call `resolveViewModel`
-     * and wait for the returned `Promise` to resolve before accessing this otherwise an error will be thrown
-     */
-    get to(): T {
-        if (!this._resolvedTo) {
-            if (this._resolvingTo) {
-                throw new UnresolvedRelatedViewModelFieldError(
-                    this,
-                    `${this.model.name}.fields.${this.name}.resolveViewModel() has been called but hasn't yet resolved. Did you forgot to wait for the promise to resolve?`
-                );
-            }
-            const maybeViewModel = this._loadTo();
-            if (isViewModelClass(maybeViewModel)) {
-                this._resolvedTo = maybeViewModel;
-            } else {
-                throw new UnresolvedRelatedViewModelFieldError(
-                    this,
-                    `Call ${this.model.name}.fields.${this.name}.resolveViewModel() first`
-                );
-            }
-        }
-        return this._resolvedTo;
+        return value.map(v => v.toJS());
     }
 }
