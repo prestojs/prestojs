@@ -72,11 +72,8 @@ export abstract class BaseRelatedViewModelField<
         return this.sourceField instanceof ListField;
     }
 
-    constructor({
-        to,
-        sourceFieldName,
-        ...fieldProps
-    }: RelatedViewModelFieldProps<T, FieldValueType>) {
+    constructor(props: RelatedViewModelFieldProps<T, FieldValueType>) {
+        const { to, sourceFieldName, ...fieldProps } = props;
         super(fieldProps);
         if (isViewModelClass(to)) {
             this._resolvedTo = to;
@@ -101,6 +98,12 @@ export abstract class BaseRelatedViewModelField<
         if (this.many && !(this instanceof ManyRelatedViewModelField)) {
             throw new Error(
                 'When `sourceFieldName` refers to a `ListField` you must use `ManyRelatedViewModelField` instead of `RelatedViewModelField`'
+            );
+        }
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        if (!this.many && this instanceof ManyRelatedViewModelField) {
+            throw new Error(
+                '`ManyRelatedViewModelField` must specify a `ListField` in `sourceFieldName`. For other field types use `RelatedViewModelField`.'
             );
         }
     }
@@ -287,6 +290,8 @@ export abstract class BaseRelatedViewModelField<
  *
  * Failure to do this will result in an error being thrown the first time it's accessed.
  *
+ * If you have multiple values use [ManyRelatedViewModelField](doc:ManyrelatedViewModelField) instead.
+ *
  * @extract-docs
  * @menu-group Fields
  */
@@ -324,6 +329,15 @@ export class RelatedViewModelField<
     }
 }
 
+/**
+ * Define a field that contains multiple records from another ViewModel
+ *
+ * This behaves the same as [RelatedViewModelField](doc:RelatedViewModelField) but `sourceFieldName`
+ * must refer to a [ListField](doc:ListField) and all values are an array instead of a single value.
+ *
+ * @extract-docs
+ * @menu-group Fields
+ */
 export class ManyRelatedViewModelField<
     T extends ViewModelConstructor<any>
 > extends BaseRelatedViewModelField<
