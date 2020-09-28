@@ -1,10 +1,9 @@
-import { UrlPattern } from '@prestojs/routing';
 import { isViewModelClass, ViewModelConstructor } from '@prestojs/viewmodel';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import set from 'lodash/set';
 
-import Endpoint, { EndpointOptions } from './Endpoint';
+import { EndpointRequestInit, MiddlewareFunction, MiddlewareUrlConfig } from './Endpoint';
 
 function cacheDataForModel<T extends ViewModelConstructor<any>>(model: T, data): T | T[] {
     if (Array.isArray(data)) {
@@ -21,13 +20,15 @@ type ViewModelMapping = ViewModelConstructor<any> | Record<string, ViewModelCons
 type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<ViewModelMapping>);
 
 /**
- * Define an endpoint for a ViewModel. The response is transformed & cached according
- * to `viewModelMapping`.
+ * Middleware to transform and cache a response
+ *
+ * The response is transformed & cached according to `viewModelMapping`.
  *
  * The simplest form of a mapping is to a Model:
  *
  * ```js
- * const getUser = new ViewModelEndpoint(new UrlPattern('/users/:id/'), User);
+ * const middleware = [viewModelCachingMiddleware(User)];
+ * const getUser = new Endpoint(new UrlPattern('/users/:id/'), { middleware });
  * ```
  *
  * If an element is a response is an array then it will transparently be treated as a list
@@ -35,11 +36,12 @@ type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<
  * element one by one:
  *
  * ```js
+ * const middleware = [viewModelCachingMiddleware(User)];
  * // Response is a single User instance:
- * const userRetrieve = new ViewModelEndpoint(new UrlPattern('/users/:id/'), User);
+ * const userRetrieve = new ViewModelEndpoint(new UrlPattern('/users/:id/'), { middleware });
  * // Response is an array of User instances
  * // (declaration is the same but the response handler will treat it differently)
- * const userList = new ViewModelEndpoint(new UrlPattern('/users/'), User);
+ * const userList = new ViewModelEndpoint(new UrlPattern('/users/'), { middleware });
  * ```
  *
  * If the response is an object mapping different models you can specify how each
@@ -47,7 +49,7 @@ type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<
  * automatically:
  *
  * ```js
- * new ViewModelEndpoint(new UrlPattern('/users/'), {
+ * const middleware = viewModelCachingMiddleware({
  *     users: User,
  *     bookings: Booking,
  * });
@@ -57,7 +59,7 @@ type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<
  * single object or an array of objects)
  *
  * ```js
- * new ViewModelEndpoint(new UrlPattern('/users/'), {
+ * const middleware = viewModelCachingMiddleware({
  *     "records.users": User,
  *     "records.bookings": Booking,
  * });
@@ -68,7 +70,7 @@ type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<
  * that isn't yet defined.
  *
  * ```js
- * new ViewModelEndpoint(new UrlPattern('/users/'), () => {
+ * const middleware = paginationMiddleware(() => {
  *   const Booking = (await import('./Booking')).default;
  *   return {
  *     "records.users": User,
@@ -79,46 +81,41 @@ type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<
  *
  * Each record instance created is also automatically added to the cache.
  *
- * If the endpoint is paginated use [PaginatedViewModelEndpoint](doc:PaginatedViewModelEndpoint).
+ * NOTE: If using with [paginationMiddleware](doc:paginationMiddleware) then this must come
+ * before `paginationMiddleware`.
  *
  * TODO: Convention for deleting an item?
  *
  * @extract-docs
+ * @menu-group Middleware
  */
-export default class ViewModelEndpoint<ReturnT = any> extends Endpoint<ReturnT> {
-    viewModelMapping: ViewModelMappingDef;
-    constructor(
-        urlPattern: UrlPattern,
-        viewModelMapping: ViewModelMappingDef,
-        options: EndpointOptions = {}
-    ) {
-        super(urlPattern, {
-            ...options,
-            transformResponseBody: (data: any): any => {
-                if (options.transformResponseBody) {
-                    data = options.transformResponseBody(data);
-                }
-                return this.cacheAndTransform(data);
-            },
-        });
-        this.viewModelMapping = viewModelMapping;
-    }
-
-    async cacheAndTransform(data: any): Promise<any> {
-        const viewModelMapping =
-            !isViewModelClass(this.viewModelMapping) && typeof this.viewModelMapping === 'function'
-                ? await this.viewModelMapping()
-                : this.viewModelMapping;
-        if (isViewModelClass(viewModelMapping)) {
-            return cacheDataForModel(viewModelMapping, data);
+export default function viewModelCachingMiddleware<TReturn = any>(
+    viewModelMapping: ViewModelMappingDef
+): MiddlewareFunction<TReturn> {
+    const cacheAndTransform = async (data: any): Promise<any> => {
+        const _viewModelMapping =
+            !isViewModelClass(viewModelMapping) && typeof viewModelMapping === 'function'
+                ? await viewModelMapping()
+                : viewModelMapping;
+        if (isViewModelClass(_viewModelMapping)) {
+            return cacheDataForModel(_viewModelMapping, data);
         }
         const transformed = cloneDeep(data);
-        Object.entries(viewModelMapping).forEach(([key, viewModel]) => {
+        Object.entries(_viewModelMapping).forEach(([key, viewModel]) => {
             const value = get(data, key);
             if (value !== undefined) {
                 set(transformed, key, cacheDataForModel(viewModel, value));
             }
         });
         return transformed;
-    }
+    };
+
+    return async (
+        urlConfig: MiddlewareUrlConfig,
+        requestInit: EndpointRequestInit,
+        next: (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit) => Promise<TReturn>
+    ): Promise<TReturn> => {
+        const response = await next(urlConfig, requestInit);
+        return cacheAndTransform(response);
+    };
 }

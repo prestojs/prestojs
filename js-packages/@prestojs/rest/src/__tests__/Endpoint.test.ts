@@ -1,6 +1,5 @@
 import { UrlPattern } from '@prestojs/routing';
 import {
-    getPaginationState,
     InferredPaginator,
     LimitOffsetPaginator,
     PageNumberPaginator,
@@ -12,7 +11,7 @@ import { FetchMock } from 'jest-fetch-mock';
 import { useState } from 'react';
 import { act } from 'react-test-renderer';
 import Endpoint, { ApiError, RequestError } from '../Endpoint';
-import PaginatedEndpoint from '../PaginatedEndpoint';
+import paginationMiddleware from '../paginationMiddleware';
 
 const fetchMock = fetch as FetchMock;
 
@@ -26,7 +25,7 @@ function useTestHook(
 beforeEach(() => {
     fetchMock.resetMocks();
     Endpoint.defaultConfig.requestInit = {};
-    Endpoint.defaultConfig.getPaginationState = getPaginationState;
+    Endpoint.defaultConfig.middleware = [];
 });
 
 test('prepare should maintain equality based on inputs', () => {
@@ -102,20 +101,27 @@ test('should support calling execute without prepare', () => {
     expect(fetchMock.mock.calls[3][0]).toEqual('/whatever/?a=b');
 });
 
-test('should support transformation function', async () => {
+test('should support middleware function', async () => {
     fetchMock.mockResponseOnce('hello world', {
         headers: {
             'Content-Type': 'text/plain',
         },
     });
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
-        transformResponseBody: (data: Record<string, any>): Record<string, any> =>
-            data.toUpperCase(),
+        middleware: [
+            async (url, requestInit, next): Promise<string> => {
+                return (await next(url, requestInit)).toUpperCase();
+            },
+        ],
     });
     expect((await action1.prepare().execute()).result).toBe('HELLO WORLD');
     const action2 = new Endpoint(new UrlPattern('/whatever/'), {
-        transformResponseBody: (data: Record<string, any>): Record<string, any> =>
-            Object.entries(data).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {}),
+        middleware: [
+            async (url, requestInit, next): Promise<Record<string, any>> => {
+                const data: Record<string, any> = await next(url, requestInit);
+                return Object.entries(data).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {});
+            },
+        ],
     });
     fetchMock.mockResponseOnce(JSON.stringify({ a: 'b', c: 'd' }), {
         headers: {
@@ -266,7 +272,11 @@ test('should raise ApiError on non-2xx response', async () => {
 });
 
 test('should update paginator state on response', async () => {
-    const action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [paginationMiddleware()],
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     let { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
     const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));
@@ -287,6 +297,8 @@ test('should update paginator state on response', async () => {
     });
 
     // Should also work by passing paginator to prepare
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     hookResult = renderHook(() => useTestHook(action1.getPaginatorClass())).result;
     fetchMock.mockResponseOnce(
         JSON.stringify({
@@ -316,8 +328,7 @@ test('should update paginator state on response', async () => {
 });
 
 test('should support changing paginatorClass & getPaginationState', async () => {
-    Endpoint.defaultConfig.paginatorClass = PageNumberPaginator;
-    Endpoint.defaultConfig.getPaginationState = (paginator, execReturnVal): Record<string, any> => {
+    const getPaginationState = (paginator, execReturnVal): Record<string, any> => {
         const { total, records, pageSize } = execReturnVal.decodedBody;
         return {
             total,
@@ -325,7 +336,11 @@ test('should support changing paginatorClass & getPaginationState', async () => 
             pageSize,
         };
     };
-    const action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [paginationMiddleware(PageNumberPaginator, getPaginationState)],
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     const { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
     const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));

@@ -1,11 +1,15 @@
 import { UrlPattern } from '@prestojs/routing';
 import { InferredPaginator, PageNumberPaginator, usePaginator } from '@prestojs/util';
+import { PaginatorClassProvider } from '@prestojs/util/build/module/pagination/usePaginator';
 import { act, renderHook } from '@testing-library/react-hooks';
-import PaginatedEndpoint from '../PaginatedEndpoint';
+import Endpoint from '../Endpoint';
+import paginationMiddleware from '../paginationMiddleware';
 
 test('should accept endpoint', async () => {
-    const action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
-    const { result } = renderHook(() => usePaginator(action1));
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [paginationMiddleware()],
+    });
+    const { result } = renderHook(() => usePaginator(action1 as PaginatorClassProvider));
 
     act(() => result.current.setResponse({ total: 10, pageSize: 5 }));
 
@@ -21,12 +25,16 @@ test('should accept endpoint', async () => {
 });
 
 test('should accept no value', async () => {
-    let action1: null | PaginatedEndpoint = null;
-    const { result, rerender } = renderHook(() => usePaginator(action1));
+    let action1: null | Endpoint = null;
+    const { result, rerender } = renderHook(() =>
+        usePaginator(action1 as PaginatorClassProvider<any>)
+    );
 
     expect(result.current).toBe(null);
 
-    action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
+    action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [paginationMiddleware()],
+    });
     rerender();
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

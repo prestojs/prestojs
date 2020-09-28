@@ -44,7 +44,8 @@ export type PaginatorState =
  * @menu-group Pagination
  * @extract-docs
  */
-export default class InferredPaginator implements PaginatorInterface {
+export default class InferredPaginator
+    implements PaginatorInterface<PaginatorState, Record<string, any>> {
     __paginator?: CursorPaginator | PageNumberPaginator | LimitOffsetPaginator;
     get responseIsSet(): boolean {
         return !!this.internalState.responseIsSet;

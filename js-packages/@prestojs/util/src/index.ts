@@ -20,6 +20,7 @@ export { getNodeLabel, isTextLabeled, isLabeled } from './Labeled';
 import type { Id, Identifiable } from './identifiable';
 import type { NodeLabeled, TextLabeled } from './Labeled';
 import type { CursorPaginationState } from './pagination/CursorPaginator';
+import type { PaginationRequestDetails } from './pagination/getPaginationState';
 import type { PaginatorState } from './pagination/InferredPaginator';
 import type { LimitOffsetPaginationState } from './pagination/LimitOffsetPaginator';
 import type { PageNumberPaginationState } from './pagination/PageNumberPaginator';
@@ -39,6 +40,7 @@ export type {
     UseAsyncValuePropsMulti,
     UseAsyncValuePropsSingle,
     UseAsyncValueReturn,
+    PaginationRequestDetails,
     PaginatorInterface,
     PaginatorInterfaceClass,
     PageNumberPaginationState,
