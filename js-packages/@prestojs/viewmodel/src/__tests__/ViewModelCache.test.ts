@@ -1,7 +1,8 @@
 import process from 'process';
 import { recordEqualTo } from '../../../../../js-testing/matchers';
 import Field from '../fields/Field';
-import RelatedViewModelField from '../fields/RelatedViewModelField';
+import ListField from '../fields/ListField';
+import { ManyRelatedViewModelField, RelatedViewModelField } from '../fields/RelatedViewModelField';
 import ViewModelCache from '../ViewModelCache';
 import viewModelFactory, { isViewModelInstance, ViewModelConstructor } from '../ViewModelFactory';
 
@@ -748,7 +749,7 @@ test('should support listening all changes on a ViewModel', () => {
 });
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function createTestModels(circular = false) {
+function createTestModels(circular = false, many = false) {
     class Group extends viewModelFactory({
         name: new Field<string>(),
         ...(circular
@@ -766,8 +767,10 @@ function createTestModels(circular = false) {
     }) {}
     class User extends viewModelFactory({
         name: new Field<string>(),
-        groupId: new Field<number | null>(),
-        group: new RelatedViewModelField({
+        groupId: many
+            ? new ListField({ childField: new Field<number | null>() })
+            : new Field<number | null>(),
+        group: new (many ? ManyRelatedViewModelField : RelatedViewModelField)({
             to: (): Promise<typeof Group> => Promise.resolve(Group),
             sourceFieldName: 'groupId',
         }),
@@ -2788,4 +2791,416 @@ test('relation listeners should be cleaned up', async () => {
     expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(2);
     Subscription.cache.delete(1);
     expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(0);
+});
+
+test('listeners should work across related models (many)', async () => {
+    const { User, Group } = createTestModels(true, true);
+    await User.fields.group.resolveViewModel();
+    const userListenerSimple = jest.fn();
+    const userListenerNested = jest.fn();
+    const userListenerAll = jest.fn();
+    const groupListenerSimple = jest.fn();
+    const groupListenerNested = jest.fn();
+    const groupListenerAll = jest.fn();
+    const listeners = [
+        userListenerAll,
+        userListenerNested,
+        userListenerSimple,
+        groupListenerSimple,
+        groupListenerAll,
+        groupListenerNested,
+    ];
+    const resetCbs = (): void => {
+        listeners.forEach(cb => {
+            cb.mockReset();
+        });
+    };
+    const unsubFns = [
+        User.cache.addListener(1, ['id', 'name'], userListenerSimple),
+        User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested),
+        User.cache.addListener(userListenerAll),
+        Group.cache.addListener(2, ['id', 'name', 'ownerId'], groupListenerSimple),
+        Group.cache.addListener(2, ['id', 'name', 'owner'], groupListenerNested),
+        Group.cache.addListener(groupListenerAll),
+    ];
+    User.cache.add({
+        id: 1,
+        name: 'Bob',
+        group: [
+            {
+                id: 2,
+                name: 'Staff',
+                ownerId: 1,
+            },
+            {
+                id: 3,
+                name: 'Admins',
+                ownerId: 1,
+            },
+        ],
+    });
+    expect(userListenerAll).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new User({ id: 1, name: 'Bob' }))
+    );
+    expect(userListenerNested).toHaveBeenCalledTimes(1);
+    expect(userListenerNested).toHaveBeenLastCalledWith(
+        null,
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                group: [
+                    { id: 2, name: 'Staff', ownerId: 1 },
+                    {
+                        id: 3,
+                        name: 'Admins',
+                        ownerId: 1,
+                    },
+                ],
+            })
+        )
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new Group({ id: 2, name: 'Staff', ownerId: 1 }))
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(
+            new Group({ id: 2, name: 'Staff', owner: { id: 1, name: 'Bob', groupId: [2, 3] } })
+        )
+    );
+    resetCbs();
+
+    Group.cache.add({
+        id: 2,
+        name: 'Management',
+        ownerId: 1,
+    });
+    expect(userListenerAll).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledTimes(0);
+    expect(userListenerNested).toHaveBeenCalledTimes(1);
+    expect(userListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                group: [
+                    { id: 2, name: 'Staff', ownerId: 1 },
+                    { id: 3, name: 'Admins', ownerId: 1 },
+                ],
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                group: [
+                    { id: 2, name: 'Management', ownerId: 1 },
+                    { id: 3, name: 'Admins', ownerId: 1 },
+                ],
+            })
+        )
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledWith(
+        recordEqualTo(new Group({ id: 2, name: 'Staff', ownerId: 1 })),
+        recordEqualTo(new Group({ id: 2, name: 'Management', ownerId: 1 }))
+    );
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Group({ id: 2, name: 'Staff', owner: { id: 1, name: 'Bob', groupId: [2, 3] } })
+        ),
+        recordEqualTo(
+            new Group({ id: 2, name: 'Management', owner: { id: 1, name: 'Bob', groupId: [2, 3] } })
+        )
+    );
+    resetCbs();
+    User.cache.add({
+        id: 1,
+        name: 'Bobby',
+        groupId: [2],
+    });
+    expect(groupListenerNested).toHaveBeenCalledWith(
+        recordEqualTo(
+            new Group({ id: 2, name: 'Management', owner: { id: 1, name: 'Bob', groupId: [2, 3] } })
+        ),
+        recordEqualTo(
+            new Group({ id: 2, name: 'Management', owner: { id: 1, name: 'Bobby', groupId: [2] } })
+        )
+    );
+    expect(groupListenerAll).toHaveBeenCalledTimes(1);
+    expect(groupListenerSimple).toHaveBeenCalledTimes(0);
+
+    resetCbs();
+
+    unsubFns.forEach(unsub => unsub());
+
+    User.cache.add({
+        id: 1,
+        name: 'Bob',
+        group: [
+            {
+                id: 2,
+                name: 'Staff',
+                ownerId: 1,
+            },
+        ],
+    });
+    listeners.forEach(listener => {
+        expect(listener).not.toHaveBeenCalled();
+    });
+});
+
+/**
+ * The skip tests below highlight some edge case bugs I haven't yet been able to solve.
+ * They are related to the the order which stuff happens, whether things exist in the cache
+ * already at the point of certain operations etc. It's very difficult to solve right now
+ * because the implementation is so complicated and because you can currently only listen
+ * on id's (if the id isn't known yet you can't add a listener.. which means you have
+ * to add listeners as records with the requisite ids are added etc).
+ *
+ * I think we are going to have to significantly rework or completely rewrite the internals
+ * of the caching to make it easier to work with and make it possible to solve these issues.
+ * As it stands I have a lot of trouble trying to debug this stuff and work out where to make
+ * changes and I wrote the whole thing... someone else is going to have even more trouble.
+ */
+// eslint-disable-next-line no-only-tests/no-only-tests
+test.skip.each([
+    // There's different ways the required records could end up in the cache. They
+    // could be added Group first then User, User first then Group or inline in User
+    // (User links to multiple groups - so it has the id's set but the Group records
+    // themselves can get added in different ways)
+    [
+        'group added before',
+        ({ User, Group }): void => {
+            Group.cache.addList([
+                {
+                    id: 2,
+                    name: 'Staff',
+                    ownerId: 1,
+                },
+                {
+                    id: 3,
+                    name: 'Admins',
+                    // Has no ownerId so not same fields as Staff
+                },
+            ]);
+            User.cache.add({
+                id: 1,
+                name: 'Bob',
+                groupId: [2, 3],
+            });
+        },
+    ],
+    [
+        'group added after',
+        ({ User, Group }): void => {
+            User.cache.add({
+                id: 1,
+                name: 'Bob',
+                groupId: [2, 3],
+            });
+            Group.cache.addList([
+                {
+                    id: 2,
+                    name: 'Staff',
+                    ownerId: 1,
+                },
+                {
+                    id: 3,
+                    name: 'Admins',
+                    // Has no ownerId so not same fields as Staff
+                },
+            ]);
+        },
+    ],
+    [
+        'group added inline',
+        ({ User, Group }): void => {
+            User.cache.add({
+                id: 1,
+                name: 'Bob',
+                group: [
+                    {
+                        id: 2,
+                        name: 'Staff',
+                        ownerId: 1,
+                    },
+                    {
+                        id: 3,
+                        name: 'Admins',
+                        // Has no ownerId so not same fields as Staff
+                    },
+                ],
+            });
+        },
+    ],
+])('should handle missing records for many fields [%s]', async (label, cacheRecords) => {
+    const { User, Group } = createTestModels(true, true);
+    await User.fields.group.resolveViewModel();
+    const userListenerSimple = jest.fn();
+    const userListenerNestedFull = jest.fn();
+    const userListenerNestedName = jest.fn();
+    User.cache.addListener(1, ['id', 'name'], userListenerSimple);
+    User.cache.addListener(1, ['id', 'name', 'group'], userListenerNestedFull);
+    User.cache.addListener(1, ['id', 'name', ['group', 'name']], userListenerNestedName);
+    cacheRecords({ User, Group });
+    expect(userListenerSimple).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new User({ id: 1, name: 'Bob' }))
+    );
+    expect(userListenerNestedName).toHaveBeenCalledTimes(1);
+    expect(userListenerNestedName).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                group: [
+                    { id: 2, name: 'Staff' },
+                    { id: 3, name: 'Admins' },
+                ],
+            })
+        )
+    );
+    expect(userListenerNestedFull).not.toHaveBeenCalled();
+    expect(User.cache.get(1, ['id', 'name', 'group'])).toBeNull();
+    expect(User.cache.get(1, ['id', 'name', 'groupId'])).toBeEqualToRecord(
+        new User({
+            id: 1,
+            name: 'Bob',
+            groupId: [2, 3],
+        })
+    );
+    userListenerSimple.mockReset();
+    userListenerNestedName.mockReset();
+    // If we add the missing field then userListenerNestedFull should be called
+    Group.cache.add({
+        id: 3,
+        name: 'Admins',
+        ownerId: 1,
+    });
+    expect(userListenerSimple).not.toHaveBeenCalled();
+    expect(userListenerNestedName).not.toHaveBeenCalled();
+    expect(userListenerNestedFull).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                group: [
+                    { id: 2, name: 'Staff', ownerId: 1 },
+                    { id: 3, name: 'Admins', ownerId: 1 },
+                ],
+            })
+        )
+    );
+});
+// eslint-disable-next-line no-only-tests/no-only-tests
+test.skip.each([
+    // There's different ways the required records could end up in the cache. They
+    // could be added Group first then User, User first then Group or inline in User
+    // (User links to a groups- so it has the id set but the Group record itself can
+    // get added in different ways)
+    [
+        'group added before',
+        ({ User, Group }): void => {
+            Group.cache.add({
+                id: 2,
+                name: 'Staff',
+            });
+            User.cache.add({
+                id: 1,
+                name: 'Bob',
+                groupId: 2,
+            });
+        },
+    ],
+    [
+        'group added after',
+        ({ User, Group }): void => {
+            User.cache.add({
+                id: 1,
+                name: 'Bob',
+                groupId: 2,
+            });
+            Group.cache.add({
+                id: 2,
+                name: 'Staff',
+            });
+        },
+    ],
+    [
+        'group added inline',
+        ({ User, Group }): void => {
+            User.cache.add({
+                id: 1,
+                name: 'Bob',
+                group: {
+                    id: 2,
+                    name: 'Staff',
+                },
+            });
+        },
+    ],
+])('should handle missing records for related fields [%s]', async (label, cacheRecords) => {
+    const { User, Group } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    const userListenerSimple = jest.fn();
+    const userListenerNestedFull = jest.fn();
+    const userListenerNestedName = jest.fn();
+    User.cache.addListener(1, ['id', 'name'], userListenerSimple);
+    User.cache.addListener(1, ['id', 'name', 'group'], userListenerNestedFull);
+    User.cache.addListener(1, ['id', 'name', ['group', 'name']], userListenerNestedName);
+    cacheRecords({ User, Group });
+    expect(userListenerSimple).toHaveBeenCalledTimes(1);
+    expect(userListenerSimple).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(new User({ id: 1, name: 'Bob' }))
+    );
+    expect(userListenerNestedName).toHaveBeenCalledTimes(1);
+    expect(userListenerNestedName).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                group: { id: 2, name: 'Staff' },
+            })
+        )
+    );
+    expect(userListenerNestedFull).not.toHaveBeenCalled();
+    expect(User.cache.get(1, ['id', 'name', 'group'])).toBeNull();
+    expect(User.cache.get(1, ['id', 'name', 'groupId'])).toBeEqualToRecord(
+        new User({
+            id: 1,
+            name: 'Bob',
+            groupId: 2,
+        })
+    );
+    userListenerSimple.mockReset();
+    userListenerNestedName.mockReset();
+    // If we add the missing field then userListenerNestedFull should be called
+    Group.cache.add({
+        id: 2,
+        name: 'Staff',
+        ownerId: 1,
+    });
+    expect(userListenerSimple).not.toHaveBeenCalled();
+    expect(userListenerNestedName).not.toHaveBeenCalled();
+    expect(userListenerNestedFull).toHaveBeenCalledWith(
+        null,
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                group: { id: 2, name: 'Staff', ownerId: 1 },
+            })
+        )
+    );
 });

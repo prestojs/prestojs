@@ -6,7 +6,7 @@ export { default as useAsyncValue } from './useAsyncValue';
 export { default as useAsyncListing } from './useAsyncListing';
 export { default as useMemoOne } from './useMemoOne';
 export { isPromise } from './misc';
-export { isDeepEqual } from './comparison';
+export { isDeepEqual, isEqual } from './comparison';
 
 export { default as usePaginator } from './pagination/usePaginator';
 export { default as InferredPaginator } from './pagination/InferredPaginator';

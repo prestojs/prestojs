@@ -1,5 +1,6 @@
+import { isEqual as isShallowEqual } from '@prestojs/util';
 import pick from 'lodash/pick';
-import RelatedViewModelField from './fields/RelatedViewModelField';
+import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
 import { isDev } from './util';
 import {
     expandRelationFieldPaths,
@@ -167,7 +168,11 @@ function getFieldNameCacheKey(
         } else {
             // getField guarantees that the field will be a RelatedViewModelField so we
             // don't need to check it here
-            const relatedField = viewModel.getField(path.slice(0, -1)) as RelatedViewModelField;
+            const relatedField = viewModel.getField(path.slice(0, -1)) as BaseRelatedViewModelField<
+                any,
+                any,
+                any
+            >;
             if (!relatedField.to.pkFieldNames.includes(path[path.length - 1])) {
                 flatFieldNames.add(path.join('.'));
             }
@@ -279,7 +284,7 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                 } else {
                     relations[fieldName[0]].push(fieldName.slice(1));
                 }
-            } else if (viewModel.fields[fieldName] instanceof RelatedViewModelField) {
+            } else if (viewModel.fields[fieldName] instanceof BaseRelatedViewModelField) {
                 relations[fieldName] = relations[fieldName] || [];
                 nonRelationFieldNames.push(viewModel.fields[fieldName].sourceFieldName);
             } else {
@@ -294,7 +299,9 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                 // If field names for relation haven't been specified default to all non-relation fields
                 relationFieldNames.push(
                     ...relation.to.fieldNames.filter(fieldName => {
-                        return !(relation.to.fields[fieldName] instanceof RelatedViewModelField);
+                        return !(
+                            relation.to.fields[fieldName] instanceof BaseRelatedViewModelField
+                        );
                     })
                 );
             }
@@ -437,7 +444,7 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                             if (record) {
                                 if (!after) {
                                     this.cleanupKey(fieldsKey);
-                                } else if (!after.isEqual(record[fieldName])) {
+                                } else if (!isShallowEqual(after, record[fieldName])) {
                                     const newRecord = new this.viewModel({
                                         ...record._data,
                                         [fieldName]: after,
@@ -493,7 +500,10 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                         data[fieldName] = null;
                         data[relation.sourceFieldName] = null;
                     } else {
-                        let relationRecord = relation.to.cache.get(id, relationFields);
+                        let relationRecord = relation.many
+                            ? relation.to.cache.getList(id, relationFields)
+                            : relation.to.cache.get(id, relationFields);
+
                         if (
                             !relationRecord &&
                             record._assignedFields.includes(fieldName) &&
@@ -501,6 +511,15 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                         ) {
                             relation.to.cache.add(record[fieldName]);
                             relationRecord = relation.to.cache.get(id, relationFields);
+                        }
+                        // If we have multiple records but only some of them are found then ignore
+                        // it entirely - we count it as not found
+                        if (
+                            relation.many &&
+                            relationRecord &&
+                            relationRecord.length !== id.length
+                        ) {
+                            relationRecord = null;
                         }
                         if (!relationRecord) {
                             return null;
@@ -548,10 +567,16 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
         // Update cache for any nested records
         for (const fieldName of record._assignedFields as string[]) {
             if (
-                this.viewModel.fields[fieldName] instanceof RelatedViewModelField &&
+                this.viewModel.fields[fieldName] instanceof BaseRelatedViewModelField &&
                 record[fieldName]
             ) {
-                this.viewModel.fields[fieldName].to.cache.add(record[fieldName]);
+                if (this.viewModel.fields[fieldName].many) {
+                    if (record[fieldName].length > 0) {
+                        this.viewModel.fields[fieldName].to.cache.addList(record[fieldName]);
+                    }
+                } else {
+                    this.viewModel.fields[fieldName].to.cache.add(record[fieldName]);
+                }
             }
         }
 
@@ -1227,7 +1252,7 @@ export default class ViewModelCache<
         if (record) {
             return record;
         }
-        const relations: RelatedViewModelField[] = [];
+        const relations: BaseRelatedViewModelField<any, any, any>[] = [];
         const sourceFieldNames: FieldNames[] = [];
         const nestedFields: Record<string, FieldPath[]> = {};
         for (const pathElement of fieldNames) {
@@ -1251,7 +1276,7 @@ export default class ViewModelCache<
                 }
             }
             let sourceFieldName = fieldName as FieldNames;
-            if (field instanceof RelatedViewModelField) {
+            if (field instanceof BaseRelatedViewModelField) {
                 sourceFieldName = field.sourceFieldName as FieldNames;
                 if (!relations.includes(field)) {
                     relations.push(field);
@@ -1263,7 +1288,7 @@ export default class ViewModelCache<
                     nestedFields[fieldName].push(
                         ...field.to.fieldNames.filter(
                             f =>
-                                !(field.to.fields[f] instanceof RelatedViewModelField) &&
+                                !(field.to.fields[f] instanceof BaseRelatedViewModelField) &&
                                 !nestedFields[fieldName].includes(f)
                         )
                     );
@@ -1291,7 +1316,9 @@ export default class ViewModelCache<
                 const relatedFieldNames =
                     nestedFields[relation.name] ||
                     relation.to.fieldNames.filter(fieldName => {
-                        return !(relation.to.fields[fieldName] instanceof RelatedViewModelField);
+                        return !(
+                            relation.to.fields[fieldName] instanceof BaseRelatedViewModelField
+                        );
                     });
                 if (!nestedFields[relation.name]) {
                     const index = cacheFieldNames.indexOf(relation.name);
@@ -1305,10 +1332,24 @@ export default class ViewModelCache<
                     relationData[relation.name] = null;
                     continue;
                 }
-                let relatedRecord = relation.to.cache.get(
-                    record[relation.sourceFieldName],
-                    relatedFieldNames
-                );
+                let relatedRecord;
+                if (relation.many) {
+                    relatedRecord = relation.to.cache.getList(
+                        record[relation.sourceFieldName],
+                        relatedFieldNames
+                    );
+                    if (
+                        relatedRecord &&
+                        relatedRecord.length !== record[relation.sourceFieldName].length
+                    ) {
+                        relatedRecord = null;
+                    }
+                } else {
+                    relatedRecord = relation.to.cache.get(
+                        record[relation.sourceFieldName],
+                        relatedFieldNames
+                    );
+                }
                 // We had an id but the underlying record isn't available
                 if (!relatedRecord) {
                     return null;
