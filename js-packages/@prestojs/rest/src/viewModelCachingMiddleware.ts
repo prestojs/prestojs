@@ -1,10 +1,20 @@
-import { isViewModelClass, ViewModelConstructor } from '@prestojs/viewmodel';
+import { isViewModelClass, PrimaryKey, ViewModelConstructor } from '@prestojs/viewmodel';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import set from 'lodash/set';
 
-import { EndpointRequestInit, MiddlewareFunction, MiddlewareUrlConfig } from './Endpoint';
+import Endpoint, {
+    EndpointRequestInit,
+    MiddlewareContext,
+    MiddlewareObject,
+    MiddlewareUrlConfig,
+} from './Endpoint';
 
+/**
+ * Transform data into either a single instance of a ViewModel or an array of instances and cache them.
+ *
+ * The instance(s) of the ViewModel are then returned.
+ */
 function cacheDataForModel<T extends ViewModelConstructor<any>>(model: T, data): T | T[] {
     if (Array.isArray(data)) {
         const records = data.map(datum => new model(datum));
@@ -18,6 +28,35 @@ function cacheDataForModel<T extends ViewModelConstructor<any>>(model: T, data):
 
 type ViewModelMapping = ViewModelConstructor<any> | Record<string, ViewModelConstructor<any>>;
 type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<ViewModelMapping>);
+
+/**
+ * @expand-properties
+ */
+type ViewModelCachingOptions<T> = {
+    /**
+     * A function to return the ID to used when a DELETE occurs. This id is used to remove the item with that ID
+     * from the cache.
+     *
+     * Defaults to returning the url argument `id` (eg. from a UrlPattern like `/users/:id`).
+     *
+     * Specify this function if you use a different argument name or the ID is passed some other way (eg. in query string)
+     *
+     * @param context The middleware context.
+     */
+    getDeleteId?: (context: MiddlewareContext<T>) => PrimaryKey;
+};
+
+/**
+ * Default function to get ID used on delete calls. Expects a URL arg called `id`, eg. `/users/:id`.
+ */
+function defaultGetDeleteId<T>(context: MiddlewareContext<T>): PrimaryKey {
+    if (!context.executeOptions.urlArgs?.id) {
+        throw new Error(
+            "Expected 'id' argument for URL when handling DELETE. To customise this behaviour pass `getDeleteId` to `viewModelCachingMiddleware` for this Endpoint."
+        );
+    }
+    return context.executeOptions.urlArgs.id;
+}
 
 /**
  * Middleware to transform and cache a response
@@ -84,19 +123,24 @@ type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<
  * NOTE: If using with [paginationMiddleware](doc:paginationMiddleware) then this must come
  * before `paginationMiddleware`.
  *
- * TODO: Convention for deleting an item?
+ * @param viewModelMapping The mapping to use for caching as described above
+ * @param options
  *
  * @extract-docs
  * @menu-group Middleware
  */
-export default function viewModelCachingMiddleware<TReturn = any>(
-    viewModelMapping: ViewModelMappingDef
-): MiddlewareFunction<TReturn> {
+export default function viewModelCachingMiddleware<ReturnT = any>(
+    viewModelMapping: ViewModelMappingDef,
+    options: ViewModelCachingOptions<ReturnT> = {}
+): MiddlewareObject<ReturnT> {
+    const { getDeleteId = defaultGetDeleteId } = options;
+    const resolveViewModelMapping = async (): Promise<ViewModelMapping> =>
+        !isViewModelClass(viewModelMapping) && typeof viewModelMapping === 'function'
+            ? viewModelMapping()
+            : viewModelMapping;
     const cacheAndTransform = async (data: any): Promise<any> => {
-        const _viewModelMapping =
-            !isViewModelClass(viewModelMapping) && typeof viewModelMapping === 'function'
-                ? await viewModelMapping()
-                : viewModelMapping;
+        const _viewModelMapping = await resolveViewModelMapping();
+
         if (isViewModelClass(_viewModelMapping)) {
             return cacheDataForModel(_viewModelMapping, data);
         }
@@ -110,12 +154,44 @@ export default function viewModelCachingMiddleware<TReturn = any>(
         return transformed;
     };
 
-    return async (
-        urlConfig: MiddlewareUrlConfig,
-        requestInit: EndpointRequestInit,
-        next: (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit) => Promise<TReturn>
-    ): Promise<TReturn> => {
-        const response = await next(urlConfig, requestInit);
-        return cacheAndTransform(response);
+    return {
+        contributeToClass(endpoint: Endpoint): void {
+            // When using the default implementation we can check things are setup correctly on initialisation and
+            // throw an error. For custom implementations we have to wait until the method is called to do the check.
+            if (getDeleteId === defaultGetDeleteId && endpoint.requestInit.method === 'DELETE') {
+                if (!endpoint.urlPattern.requiredArgNames.includes('id')) {
+                    throw new Error(
+                        `When using 'viewModelCachingMiddleware' on a DELETE endpoint it is expected the UrlPattern includes an 'id' parameter. Known parameters are: ${endpoint.urlPattern.validArgNames.join(
+                            ', '
+                        )}. You can pass 'getDeleteId' to override this behavior.`
+                    );
+                }
+            }
+        },
+        process: async (
+            urlConfig: MiddlewareUrlConfig,
+            requestInit: EndpointRequestInit,
+            next: (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit) => Promise<ReturnT>,
+            context: MiddlewareContext<ReturnT>
+        ): Promise<ReturnT> => {
+            const response = await next(urlConfig, requestInit);
+            if (context.requestInit.method?.toUpperCase() === 'DELETE') {
+                const _viewModelMapping = await resolveViewModelMapping();
+                if (!isViewModelClass(_viewModelMapping)) {
+                    throw new Error(
+                        'When handling DELETE the view model mapping must be a single ViewModelClass'
+                    );
+                }
+                const id = getDeleteId(context);
+                if (id == null) {
+                    console.warn(
+                        'Expected `getDeleteId` to return the id to use to remove the deleted item from the cache but nothing was returned.'
+                    );
+                } else {
+                    _viewModelMapping.cache.delete(id);
+                }
+            }
+            return cacheAndTransform(response);
+        },
     };
 }

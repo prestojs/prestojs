@@ -149,6 +149,10 @@ export type MiddlewareContext<T> = {
      * Only available in the response part of the middleware.
      */
     decodedBody: any;
+    /**
+     * The options used to execute the endpoint with
+     */
+    requestInit: EndpointRequestInit;
 };
 
 export type MiddlewareUrlConfig = {
@@ -465,7 +469,7 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * ## Pagination
  *
  * Pagination for an endpoint is handled by [paginationMiddleware](doc:paginationMiddleware). This middleware
- * will add a `getPaginatorClass` method to the `Endpoint` which makes it compatible with [usePaginator](doc:uusePaginator).
+ * will add a `getPaginatorClass` method to the `Endpoint` which makes it compatible with [usePaginator](doc:usePaginator).
  * The default implementation chooses a paginator based on the shape of the response (eg. if the response looks like
  * cursor based paginator it will use `CursorPaginator`, if page number based `PageNumberPaginator` or if limit/offset
  * use `LimitOffsetPaginator` - see [InferredPaginator](doc:InferredPaginator). The pagination state as returned by the
@@ -588,9 +592,9 @@ export default class Endpoint<ReturnT = any> {
      * The [UrlPattern](doc:UrlPattern) this endpoint hits when executed.
      */
     urlPattern: UrlPattern;
+    public requestInit: ExecuteInitOptions;
     private urlCache: Map<string, Map<{}, PreparedAction>>;
     private decodeBody: (res: Response) => any;
-    private requestInit: ExecuteInitOptions;
     private resolveUrl: (
         urlPattern: UrlPattern,
         urlArgs?: Record<string, any>,
@@ -726,6 +730,7 @@ export default class Endpoint<ReturnT = any> {
                 const middlewareContext: MiddlewareContext<ReturnT> = {
                     execute: executeWithMiddleware,
                     executeOptions: options,
+                    requestInit,
                     endpoint: this,
                     get url(): string {
                         if (!returnVal.url) {
