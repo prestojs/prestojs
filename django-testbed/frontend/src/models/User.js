@@ -34,6 +34,10 @@ const endpoints = {
         method: 'post',
         middleware,
     }),
+    delete: new Endpoint(namedUrls.get('users-detail'), {
+        method: 'DELETE',
+        middleware,
+    }),
 };
 const asyncChoicesOptions = {
     useRetrieveProps(args) {

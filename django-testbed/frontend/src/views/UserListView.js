@@ -1,5 +1,5 @@
 import { FieldFormatter } from '@prestojs/ui';
-import { useListChangeObserver } from '@prestojs/util';
+import { useAsync, useListChangeObserver } from '@prestojs/util';
 import { useViewModelCache } from '@prestojs/viewmodel';
 import { Button, Modal } from 'antd';
 import qs from 'query-string';
@@ -21,6 +21,11 @@ export default function UserListView() {
     const paginationStatePair = useNaviUrlQueryState({}, { prefix: 'p_' });
     const [selectedId, selectId] = useState();
     const [showCreate, setShowCreate] = useState(false);
+    const { run: runDelete } = useAsync(id =>
+        User.endpoints.delete.execute({
+            urlArgs: { id },
+        })
+    );
     const { data, error, paginator, revalidate, isValidating } = useEndpoint(
         User.endpoints.list,
         {
@@ -127,6 +132,7 @@ export default function UserListView() {
                             </td>
                             <td>
                                 <button onClick={() => selectId(record._key)}>Edit</button>
+                                <button onClick={() => runDelete(record._key)}>Delete</button>
                             </td>
                         </tr>
                     ))}
