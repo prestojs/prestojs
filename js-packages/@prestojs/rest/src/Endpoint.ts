@@ -180,10 +180,10 @@ export type MiddlewareFunction<T> = (
  * to define how it interacts with `Endpoint.prepare` and allows modifications to the `Endpoint` via `contributeToClass`.
  *
  * @param prepare Function that is called in `Endpoint.prepare` to modify the options used. Specifically this allows middleware
- * to apply it's changes to option (eg. change URL etc) such that `Endpoint` correctly caches the call.
+ * to apply it's changes to the options used (eg. change URL etc) such that `Endpoint` correctly caches the call.
  * @param process Process the request through the middleware
  * @param contributeToClass Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
- * class or otherwise to some kind of initialisation.
+ * class or otherwise do some kind of initialisation.
  */
 export interface MiddlewareObject<T> {
     prepare?: (options: EndpointExecuteOptions) => EndpointExecuteOptions;
@@ -381,13 +381,15 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
 /**
  * Describe an REST API endpoint that can then be executed.
  *
- * Accepts a `UrlPattern` and optionally a `decodeBody` function which decodes the `Response` body as returned by
- * `fetch` and `middleware` functions that can transform the decoded body. The default `decodeBody` handles
- * decoding the data based on content type and is suitable for endpoints that return JSON or text with the appropriate
- * content types. If you just wish to do something with the decoded data (eg. the JSON data) use `middleware`.
- *
- * In addition you can pass all options accepted by `fetch` and these will be used as defaults to any call to `execute`
- * or `prepare`.
+ * * Accepts a [UrlPattern](doc:UrlPattern) to define the URL used. Any arguments & query parameters can be passed at execution time
+ * * Accepts a `decodeBody` function that decodes the `Response` body as returned from [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). The
+ *   default `decodeBody` will interpret the response based on the content type
+ *   * If type includes 'json' (eg. application/json) returns decoded json
+ *   * If type includes 'text (eg. text/plain, text/html) returns text
+ *   * If status is 204 or 205 will return null
+ * * [middleware](#Middleware) can be passed to transform the request before it is passed to `fetch` and/or the response after
+ *   it has passed through `decodeBody`.
+ * * All options accepted by `fetch` and these will be used as defaults to any call to `execute` or `prepare`.
  *
  * Usage:
  *
@@ -498,10 +500,10 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * Middleware functions can be provided to alter the `url` or fetch options and transform the
  * response in some way.
  *
- * A middleware function is passed the url, the fetch options, the next middleware function and a context object.
- * The function can then make changes to the `url` or `requestInit` and pass it through to the next middleware function.
- * The call to `next` returns a `Promise` that resolves to the response of the endpoint after it's been processed
- * by any middleware further down the chain. You can return a modified response here.
+ * Middleware can be defined as either an object or as a function that is passed the url, the fetch options, the next
+ * middleware function and a context object. The function can then make changes to the `url` or `requestInit` and pass
+ * it through to the next middleware function. The call to `next` returns a `Promise` that resolves to the response of
+ * the endpoint after it's been processed by any middleware further down the chain. You can return a modified response here.
  *
  * This middleware sets a custom header on a request but does nothing with the response:
  *
@@ -575,6 +577,14 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * middleware.
  *
  * You can change the default implementation on [Endpoint.defaultConfig.getMiddleware](doc:Endpoint#static-var-defaultConfig)
+ *
+ * Middleware can also be defined as an object with any of the following properties:
+ *
+ * * `contributeToClass` - Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
+ *   class or otherwise do some kind of initialisation.
+ * * `prepare` - A function that is called in `Endpoint.prepare` to modify the options used. Specifically this allows middleware
+ *   to apply it's changes to the options used (eg. change URL etc) such that `Endpoint` correctly caches the call.
+ * * `process` - Process the middleware. This behaves the same as the function form described above.
  *
  * @menu-group Endpoint
  * @extract-docs
