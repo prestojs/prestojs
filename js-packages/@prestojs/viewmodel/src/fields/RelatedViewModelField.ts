@@ -8,11 +8,13 @@ import {
 import Field, { FieldProps } from './Field';
 import ListField from './ListField';
 
-type RelatedViewModelValueType<T extends ViewModelConstructor<any>> = ViewModelInterface<
-    T['fields'],
+type RelatedViewModelValueType<
+    TargetViewModelT extends ViewModelConstructor<any>
+> = ViewModelInterface<
+    TargetViewModelT['fields'],
     any,
-    T['__pkFieldType'],
-    T['__pkType']
+    TargetViewModelT['__pkFieldType'],
+    TargetViewModelT['__pkType']
 >;
 type BaseRelatedViewModelValueType<T extends ViewModelConstructor<any>> =
     | RelatedViewModelValueType<T>
@@ -24,9 +26,10 @@ type RelatedViewModelParsableType<T extends ViewModelConstructor<any>> =
 /**
  * @expand-properties
  */
-type RelatedViewModelFieldProps<T extends ViewModelConstructor<any>, FieldValueType> = FieldProps<
-    FieldValueType
-> & {
+type RelatedViewModelFieldProps<
+    TargetViewModelT extends ViewModelConstructor<any>,
+    FieldValueT
+> = FieldProps<FieldValueT> & {
     /**
      * The name of the field on the [ViewModel](doc:viewModelFactory) that stores the
      * ID for this relation
@@ -36,16 +39,19 @@ type RelatedViewModelFieldProps<T extends ViewModelConstructor<any>, FieldValueT
      * Either a [ViewModel](doc:viewModelFactory), a function that returns a [ViewModel](doc:viewModelFactory)
      * or a function that returns a `Promise` that resolves to a [ViewModel](doc:viewModelFactory).
      */
-    to: (() => Promise<T> | T) | T;
+    to: (() => Promise<TargetViewModelT> | TargetViewModelT) | TargetViewModelT;
 };
 
 export class UnresolvedRelatedViewModelFieldError<
-    T extends ViewModelConstructor<any>,
-    FieldValueType extends BaseRelatedViewModelValueType<T>,
-    ParsableType extends RelatedViewModelParsableType<T>
+    TargetViewModelT extends ViewModelConstructor<any>,
+    FieldValueT extends BaseRelatedViewModelValueType<TargetViewModelT>,
+    ParsableValueT extends RelatedViewModelParsableType<TargetViewModelT>
 > extends Error {
-    field: BaseRelatedViewModelField<T, FieldValueType, ParsableType>;
-    constructor(field: BaseRelatedViewModelField<T, FieldValueType, ParsableType>, message) {
+    field: BaseRelatedViewModelField<TargetViewModelT, FieldValueT, ParsableValueT>;
+    constructor(
+        field: BaseRelatedViewModelField<TargetViewModelT, FieldValueT, ParsableValueT>,
+        message
+    ) {
         super(message);
         this.field = field;
     }
@@ -58,13 +64,13 @@ export class UnresolvedRelatedViewModelFieldError<
  * Use `ManyRelatedViewModelField` if `sourceFieldName` refers to a `ListField` otherwise `RelatedViewModelField`.
  */
 export abstract class BaseRelatedViewModelField<
-    T extends ViewModelConstructor<any>,
-    FieldValueType extends BaseRelatedViewModelValueType<T>,
-    ParsableType extends RelatedViewModelParsableType<T>
-> extends Field<FieldValueType, ParsableType> {
-    private _loadTo: () => Promise<T> | T;
-    private _resolvedTo: T;
-    private _resolvingTo?: Promise<T>;
+    TargetViewModelT extends ViewModelConstructor<any>,
+    FieldValueT extends BaseRelatedViewModelValueType<TargetViewModelT>,
+    ParsableValueT extends RelatedViewModelParsableType<TargetViewModelT>
+> extends Field<FieldValueT, ParsableValueT> {
+    private _loadTo: () => Promise<TargetViewModelT> | TargetViewModelT;
+    private _resolvedTo: TargetViewModelT;
+    private _resolvingTo?: Promise<TargetViewModelT>;
     sourceFieldName: string;
     sourceField: Field<any>;
 
@@ -72,7 +78,7 @@ export abstract class BaseRelatedViewModelField<
         return this.sourceField instanceof ListField;
     }
 
-    constructor(props: RelatedViewModelFieldProps<T, FieldValueType>) {
+    constructor(props: RelatedViewModelFieldProps<TargetViewModelT, FieldValueT>) {
         const { to, sourceFieldName, ...fieldProps } = props;
         super(fieldProps);
         if (isViewModelClass(to)) {
@@ -87,7 +93,7 @@ export abstract class BaseRelatedViewModelField<
     /**
      * @private
      */
-    contributeToClass(viewModel: T): void {
+    contributeToClass(viewModel: TargetViewModelT): void {
         if (!viewModel.fields[this.sourceFieldName]) {
             throw new Error(
                 `Specified sourceFieldName '${this.sourceFieldName}' does not exist on model. Either add the missing field or change 'sourceFieldName' to the correct field.`
@@ -116,7 +122,7 @@ export abstract class BaseRelatedViewModelField<
      *
      * This needs to be called manually before `to` can be accessed.
      */
-    resolveViewModel(): Promise<T> {
+    resolveViewModel(): Promise<TargetViewModelT> {
         if (this._resolvedTo) {
             return Promise.resolve(this._resolvedTo);
         }
@@ -150,7 +156,7 @@ export abstract class BaseRelatedViewModelField<
     /**
      * Compares to relations for equality - if the ViewModel has the same data this returns true
      */
-    isEqual(value1: FieldValueType, value2: FieldValueType): boolean {
+    isEqual(value1: FieldValueT, value2: FieldValueT): boolean {
         return isEqual(value1, value2);
     }
 
@@ -160,7 +166,7 @@ export abstract class BaseRelatedViewModelField<
      * If `to` was defined as a function returning a `Promise` then you must call `resolveViewModel`
      * and wait for the returned `Promise` to resolve before accessing this otherwise an error will be thrown
      */
-    get to(): T {
+    get to(): TargetViewModelT {
         if (!this._resolvedTo) {
             if (this._resolvingTo) {
                 throw new UnresolvedRelatedViewModelFieldError(
@@ -296,16 +302,16 @@ export abstract class BaseRelatedViewModelField<
  * @menu-group Fields
  */
 export class RelatedViewModelField<
-    T extends ViewModelConstructor<any>
+    TargetViewModelT extends ViewModelConstructor<any>
 > extends BaseRelatedViewModelField<
-    T,
-    RelatedViewModelValueType<T>,
-    FieldDataMappingRaw<T['fields']>
+    TargetViewModelT,
+    RelatedViewModelValueType<TargetViewModelT>,
+    FieldDataMappingRaw<TargetViewModelT['fields']>
 > {
     /**
      * Converts a value into the relations [ViewModel](doc:viewModelFactory) instance.
      */
-    normalize(value): RelatedViewModelValueType<T> {
+    normalize(value): RelatedViewModelValueType<TargetViewModelT> {
         if (!value) {
             return value;
         }
@@ -318,7 +324,7 @@ export class RelatedViewModelField<
     /**
      * Converts the linked record to a plain javascript object
      */
-    toJS(value: RelatedViewModelValueType<T>): Record<string, any> {
+    toJS(value: RelatedViewModelValueType<TargetViewModelT>): Record<string, any> {
         if (!value) {
             return value;
         }
@@ -339,16 +345,16 @@ export class RelatedViewModelField<
  * @menu-group Fields
  */
 export class ManyRelatedViewModelField<
-    T extends ViewModelConstructor<any>
+    TargetViewModelT extends ViewModelConstructor<any>
 > extends BaseRelatedViewModelField<
-    T,
-    RelatedViewModelValueType<T>[],
-    FieldDataMappingRaw<T['fields']>[]
+    TargetViewModelT,
+    RelatedViewModelValueType<TargetViewModelT>[],
+    FieldDataMappingRaw<TargetViewModelT['fields']>[]
 > {
     /**
      * Converts a value into the relations [ViewModel](doc:viewModelFactory) instance.
      */
-    normalize(value): RelatedViewModelValueType<T>[] {
+    normalize(value): RelatedViewModelValueType<TargetViewModelT>[] {
         if (!value) {
             return value;
         }
@@ -368,7 +374,7 @@ export class ManyRelatedViewModelField<
     /**
      * Converts the linked record to a plain javascript object
      */
-    toJS(value: RelatedViewModelValueType<T>[]): Record<string, any> {
+    toJS(value: RelatedViewModelValueType<TargetViewModelT>[]): Record<string, any> {
         if (!value) {
             return value;
         }
