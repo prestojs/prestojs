@@ -98,7 +98,6 @@ export default class User extends BaseUser.augment({
     }),
     region: new IntegerField({
         label: 'region',
-        blank: false,
         helpText: 'Region Coding of the user',
         choices: [
             [1, 'Oceania'],
