@@ -204,3 +204,63 @@ test('should support defining mapping as a function/promise', async () => {
     expect(Food.cache.get(1, ['name'])).toBeEqualToRecord(bagel);
     expect(Food.cache.get(2, ['name'])).toBeEqualToRecord(sausage);
 });
+
+test('should support deletes', async () => {
+    const { User, users, bilbo } = createData();
+    User.cache.add(users);
+    expect(User.cache.get(1, '*')).toEqual(bilbo);
+    const endpoint = new Endpoint(new UrlPattern('/user/:id'), {
+        middleware: [viewModelCachingMiddleware(User)],
+        method: 'DELETE',
+    });
+    fetchMock.mockResponse('', {
+        status: 204,
+    });
+    await endpoint.execute({ urlArgs: { id: 1 } });
+    expect(User.cache.get(1, '*')).toBe(null);
+
+    expect(() => {
+        new Endpoint(new UrlPattern('/user/:userId'), {
+            middleware: [viewModelCachingMiddleware(User)],
+            method: 'DELETE',
+        });
+    }).toThrowError(/UrlPattern includes an 'id' parameter/);
+});
+
+test('should support custom getDeleteId', async () => {
+    const { User, users, bilbo } = createData();
+    User.cache.add(users);
+    expect(User.cache.get(1, '*')).toEqual(bilbo);
+    function getDeleteId(context): string {
+        return context.executeOptions.urlArgs?.userId;
+    }
+    getDeleteId.validateEndpoint = (endpoint): void => {
+        if (!endpoint.urlPattern.requiredArgNames.includes('userId')) {
+            throw new Error('Endpoint pattern wrong');
+        }
+    };
+    const endpoint = new Endpoint(new UrlPattern('/user/:userId'), {
+        middleware: [
+            viewModelCachingMiddleware(User, {
+                getDeleteId,
+            }),
+        ],
+        method: 'DELETE',
+    });
+    fetchMock.mockResponse('', {
+        status: 204,
+    });
+    await endpoint.execute({ urlArgs: { userId: 1 } });
+    expect(User.cache.get(1, '*')).toBe(null);
+
+    expect(() => {
+        new Endpoint(new UrlPattern('/user/:id'), {
+            middleware: [
+                viewModelCachingMiddleware(User, {
+                    getDeleteId,
+                }),
+            ],
+            method: 'DELETE',
+        });
+    }).toThrowError(new Error('Endpoint pattern wrong'));
+});

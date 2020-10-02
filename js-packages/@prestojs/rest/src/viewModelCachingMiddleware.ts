@@ -41,9 +41,15 @@ type ViewModelCachingOptions<T> = {
      *
      * Specify this function if you use a different argument name or the ID is passed some other way (eg. in query string)
      *
+     * The function can have an optional `validateEndpoint` property attached which should be a function that accepts the
+     * `Endpoint` instance. This allows the function to validate the endpoint when it is created to eg. check that the
+     * UrlPattern includes the expected argument name.
+     *
      * @param context The middleware context.
      */
-    getDeleteId?: (context: MiddlewareContext<T>) => PrimaryKey;
+    getDeleteId?: ((context: MiddlewareContext<T>) => PrimaryKey) & {
+        validateEndpoint?: (endpoint: Endpoint) => void;
+    };
 };
 
 /**
@@ -57,6 +63,16 @@ function defaultGetDeleteId<T>(context: MiddlewareContext<T>): PrimaryKey {
     }
     return context.executeOptions.urlArgs.id;
 }
+
+defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
+    if (!endpoint.urlPattern.requiredArgNames.includes('id')) {
+        throw new Error(
+            `When using 'viewModelCachingMiddleware' on a DELETE endpoint it is expected the UrlPattern includes an 'id' parameter. Known parameters are: ${endpoint.urlPattern.validArgNames.join(
+                ', '
+            )}. You can pass 'getDeleteId' to override this behavior.`
+        );
+    }
+};
 
 /**
  * Middleware to transform and cache a response
@@ -155,17 +171,12 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
     };
 
     return {
-        contributeToClass(endpoint: Endpoint): void {
+        init(endpoint: Endpoint): void {
+            getDeleteId;
             // When using the default implementation we can check things are setup correctly on initialisation and
             // throw an error. For custom implementations we have to wait until the method is called to do the check.
-            if (getDeleteId === defaultGetDeleteId && endpoint.requestInit.method === 'DELETE') {
-                if (!endpoint.urlPattern.requiredArgNames.includes('id')) {
-                    throw new Error(
-                        `When using 'viewModelCachingMiddleware' on a DELETE endpoint it is expected the UrlPattern includes an 'id' parameter. Known parameters are: ${endpoint.urlPattern.validArgNames.join(
-                            ', '
-                        )}. You can pass 'getDeleteId' to override this behavior.`
-                    );
-                }
+            if (endpoint.requestInit.method === 'DELETE') {
+                getDeleteId.validateEndpoint?.(endpoint);
             }
         },
         process: async (
@@ -189,6 +200,9 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
                     );
                 } else {
                     _viewModelMapping.cache.delete(id);
+                }
+                if (!response) {
+                    return {} as ReturnT;
                 }
             }
             return cacheAndTransform(response);
