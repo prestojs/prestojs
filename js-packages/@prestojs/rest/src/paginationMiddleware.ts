@@ -51,7 +51,7 @@ export default function paginationMiddleware<T>(
     ) => Record<string, any> | false = defaultGetPaginationState
 ): MiddlewareObject<T> {
     return {
-        contributeToClass(endpoint: Endpoint): void {
+        init(endpoint: Endpoint): void {
             // Add getPaginatorClass to Endpoint so that it conforms to
             // PaginatorClassProvider and will work with usePaginator
             // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
@@ -87,6 +87,12 @@ export default function paginationMiddleware<T>(
             const response = await next(urlConfig, requestInit);
             if (paginator) {
                 if (response !== context.decodedBody) {
+                    // This middleware needs to handle the response first and transform it from the paginated
+                    // shape to just the shape of the results. eg.
+                    // { count: 10, results: [...records...] }
+                    // just returns
+                    // [...records...]
+                    // And the `count` goes into the paginator internal state
                     throw new Error('paginatorMiddleware must be the first to handle the response');
                 }
                 // If we have a paginator update its state based on response

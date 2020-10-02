@@ -54,15 +54,16 @@ export type EndpointOptions<ReturnT> = ExecuteInitOptions & {
      */
     resolveUrl?: (urlPattern: UrlPattern, urlArgs?: Record<string, any>, query?: Query) => string;
     /**
-     * Middleware to apply for this endpoint. Defaults to [Endpoint.defaultConfig.middleware](doc:Endpoint#static-var-defaultConfig) - global
-     * middleware options can be set there.
+     * Middleware to apply for this endpoint. By default `getMiddleware` concatenates this with the global
+     * [Endpoint.defaultConfig.middleware](doc:Endpoint#static-var-defaultConfig)
      *
      * See [middleware](#Middleware) for more details
      */
     middleware?: Middleware<ReturnT>[];
     /**
      * Get the final middleware to apply for this endpoint. This combines the global middleware and the middleware
-     * specific to this endpoint. Defaults to [Endpoint.defaultConfig.getMiddleware](doc:Endpoint#static-var-defaultConfig).
+     * specific to this endpoint. Defaults to [Endpoint.defaultConfig.getMiddleware](doc:Endpoint#static-var-defaultConfig)
+     * which applies the global middleware followed by the endpoint specific middleware.
      *
      * See [middleware](#Middleware) for more details
      */
@@ -84,15 +85,15 @@ export type ExecuteReturnVal<T> = {
     /**
      * The url that the endpoint was called with
      */
-    url?: string;
+    url: string;
     /**
      * Any arguments that were used to resolve the URL.
      */
-    urlArgs?: Record<string, any>;
+    urlArgs: Record<string, any>;
     /**
      * Any query string parameters
      */
-    query?: Query;
+    query: Query;
     /**
      * The options used to execute the endpoint with
      */
@@ -100,11 +101,11 @@ export type ExecuteReturnVal<T> = {
     /**
      * The response as returned by fetch
      */
-    response?: Response;
+    response: Response;
     /**
      * The value returned by `decodedBody`
      */
-    decodedBody?: any;
+    decodedBody: any;
     /**
      * The value returned from the endpoint after it has passed through `decodeBody` and any middleware
      */
@@ -177,18 +178,18 @@ export type MiddlewareFunction<T> = (
 
 /**
  * Object form of middleware. This allows more control over what the middleware can do. Specifically allows middleware
- * to define how it interacts with `Endpoint.prepare` and allows modifications to the `Endpoint` via `contributeToClass`.
+ * to define how it interacts with `Endpoint.prepare` and allows modifications to the `Endpoint` via `init`.
  *
  * @param prepare Function that is called in `Endpoint.prepare` to modify the options used. Specifically this allows middleware
  * to apply it's changes to the options used (eg. change URL etc) such that `Endpoint` correctly caches the call.
  * @param process Process the request through the middleware
- * @param contributeToClass Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
+ * @param init Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
  * class or otherwise do some kind of initialisation.
  */
 export interface MiddlewareObject<T> {
     prepare?: (options: EndpointExecuteOptions) => EndpointExecuteOptions;
     process?: MiddlewareFunction<T>;
-    contributeToClass?: (endpoint: Endpoint) => void;
+    init?: (endpoint: Endpoint) => void;
 }
 
 export type Middleware<T> = MiddlewareFunction<T> | MiddlewareObject<T>;
@@ -202,13 +203,16 @@ type DefaultConfig<ReturnT = any> = {
      */
     requestInit: RequestInit;
     /**
-     * Default middleware to use on an endpoint.
+     * Default middleware to use on an endpoint. It is strongly recommended to append to this rather than replace it.
+     *
+     * Defaults to [requestDefaultsMiddleware](doc:requestDefaultsMiddleware).
      *
      * See [middleware](#Middleware) for more details
      */
     middleware: Middleware<ReturnT>[];
     /**
-     * Get the final middleware to apply to the specified endpoint
+     * Get the final middleware to apply to the specified endpoint. By default applies the global middleware followed
+     * by the endpoint specific middleware.
      */
     getMiddleware: (middleware: Middleware<ReturnT>[], endpoint: Endpoint) => Middleware<ReturnT>[];
 };
@@ -554,7 +558,7 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * new Endpoint('/users/', { middleware: [csrfTokenMiddleware] })
  * ```
  *
- * When middleware is passed to the `Endpoint` it is _appended_ by to the default
+ * When middleware is passed to the `Endpoint` it is _appended_ to the default
  * middleware specified in `Endpoint.defaultConfig.middleware`.
  *
  * To change how middleware is combined per `Endpoint` you can specify the
@@ -565,25 +569,19 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  *
  * ```js
  * (middleware) => [
- *   requestDefaultsMiddleware,
  *   ...Endpoint.defaultConfig.middleware,
  *   ...middleware,
  * ]
  * ```
  *
- * The [requestDefaultsMiddleware](doc:requestDefaultsMiddleware) is included here
- * rather than in `Endpoint.defaultConfig.middleware` as it's strongly recommended
- * to have this on and would be easy to inadvertently remove it from the global
- * middleware.
- *
  * You can change the default implementation on [Endpoint.defaultConfig.getMiddleware](doc:Endpoint#static-var-defaultConfig)
  *
  * Middleware can also be defined as an object with any of the following properties:
  *
- * * `contributeToClass` - Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
+ * * `init` - Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
  *   class or otherwise do some kind of initialisation.
  * * `prepare` - A function that is called in `Endpoint.prepare` to modify the options used. Specifically this allows middleware
- *   to apply it's changes to the options used (eg. change URL etc) such that `Endpoint` correctly caches the call.
+ *   to apply its changes to the options used (eg. change URL etc) such that `Endpoint` correctly caches the call.
  * * `process` - Process the middleware. This behaves the same as the function form described above.
  *
  * @menu-group Endpoint
@@ -631,8 +629,8 @@ export default class Endpoint<ReturnT = any> {
         this.resolveUrl = resolveUrl;
         this.middleware = getMiddleware(middleware, this);
         this.middleware.forEach(m => {
-            if (typeof m !== 'function' && m.contributeToClass) {
-                m.contributeToClass(this);
+            if (typeof m !== 'function' && m.init) {
+                m.init(this);
             }
         });
     }
@@ -719,7 +717,7 @@ export default class Endpoint<ReturnT = any> {
                 init
             ) as EndpointRequestInit;
 
-            const returnVal: ExecuteReturnVal<ReturnT> = {
+            const returnVal: Record<string, any> = {
                 requestInit,
                 result: null,
             };
@@ -821,7 +819,7 @@ export default class Endpoint<ReturnT = any> {
                 return next(urlConfig, mergeRequestInit(requestInit) as EndpointRequestInit);
             };
             returnVal.result = await executeWithMiddleware();
-            return returnVal;
+            return returnVal as ExecuteReturnVal<ReturnT>;
         } catch (err) {
             if (err instanceof ApiError) {
                 throw err;
@@ -837,9 +835,8 @@ export default class Endpoint<ReturnT = any> {
 // Initialisation is not done inline in class as doc extractor doesn't handle object literals well
 Endpoint.defaultConfig = {
     requestInit: {},
-    middleware: [],
+    middleware: [requestDefaultsMiddleware],
     getMiddleware: <T>(middleware: Middleware<T>[]): Middleware<T>[] => [
-        requestDefaultsMiddleware,
         ...Endpoint.defaultConfig.middleware,
         ...middleware,
     ],

@@ -19,7 +19,7 @@ const endpoints = {
     retrieve: new Endpoint(namedUrls.get('users-detail'), { middleware }),
     update: new Endpoint(namedUrls.get('users-detail'), {
         middleware,
-        method: 'patch',
+        method: 'PATCH',
     }),
     list: new Endpoint(namedUrls.get('users-list'), {
         middleware: [...middleware, paginationMiddleware()],
@@ -31,7 +31,7 @@ const endpoints = {
         },
     }),
     create: new Endpoint(namedUrls.get('users-list'), {
-        method: 'post',
+        method: 'POST',
         middleware,
     }),
     delete: new Endpoint(namedUrls.get('users-detail'), {

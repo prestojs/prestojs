@@ -183,7 +183,7 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
                     );
                 }
                 const id = getDeleteId(context);
-                if (id == null) {
+                if (id == null || id === '') {
                     console.warn(
                         'Expected `getDeleteId` to return the id to use to remove the deleted item from the cache but nothing was returned.'
                     );
