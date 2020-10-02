@@ -52,6 +52,13 @@ export default function paginationMiddleware<T>(
 ): MiddlewareObject<T> {
     return {
         init(endpoint: Endpoint): void {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+            // @ts-ignore
+            if (endpoint.getPaginatorClass) {
+                throw new Error(
+                    "Endpoint already has 'getPaginatorClass'. This could be because paginationMiddleware is included twice."
+                );
+            }
             // Add getPaginatorClass to Endpoint so that it conforms to
             // PaginatorClassProvider and will work with usePaginator
             // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

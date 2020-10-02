@@ -625,3 +625,11 @@ test('middleware replays should not have mutations made in previous runs', async
     // The header set in the original call to middleware shouldn't be here
     expect(await middlewareContext.execute()).toEqual(['x-csrf']);
 });
+
+test('pagination middleware should error if included twice', async () => {
+    expect(() => {
+        new Endpoint(new UrlPattern('/whatever/'), {
+            middleware: [paginationMiddleware(), paginationMiddleware()],
+        });
+    }).toThrowError(/Endpoint already has 'getPaginatorClass'/);
+});
