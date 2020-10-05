@@ -181,12 +181,12 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
             }
         },
         process: async (
-            urlConfig: MiddlewareUrlConfig,
-            requestInit: EndpointRequestInit,
             next: (
                 urlConfig: MiddlewareUrlConfig,
                 requestInit: RequestInit
             ) => Promise<MiddlewareNextReturn<ReturnT>>,
+            urlConfig: MiddlewareUrlConfig,
+            requestInit: EndpointRequestInit,
             context: MiddlewareContext<ReturnT>
         ): Promise<ReturnT> => {
             const { result } = await next(urlConfig, requestInit);

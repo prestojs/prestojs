@@ -173,19 +173,19 @@ export type MiddlewareUrlConfig = {
 };
 
 /**
- * @param url The URL to call fetch with
- * @param requestInit See [fetch parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
  * @param next The next function in the middleware chain. Must be passed the `url` and `requestInit` objects.
+ * @param urlConfig The URL config
+ * @param requestInit See [fetch parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
  * @param context The context for the current execute. This gives you access to the original options and a function to re-execute the command.
  * @returns Returns the value from `fetch` after it has been transformed by each middleware further down the chain
  */
 export type MiddlewareFunction<T> = (
-    urlConfig: MiddlewareUrlConfig,
-    requestInit: EndpointRequestInit,
     next: (
         urlConfig: MiddlewareUrlConfig,
         requestInit: RequestInit
     ) => Promise<MiddlewareNextReturn<T>>,
+    urlConfig: MiddlewareUrlConfig,
+    requestInit: EndpointRequestInit,
     context: MiddlewareContext<T>
 ) => MiddlewareReturn<T>;
 
@@ -525,7 +525,7 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * This middleware sets a custom header on a request but does nothing with the response:
  *
  * ```js
- * function clientHeaderMiddleware(url, requestInit, next, context) {
+ * function clientHeaderMiddleware(next, urlConfig, requestInit, context) {
  *   requestInit.headers.set('X-ClientId', 'ABC123');
  *   // Return response unmodified
  *   return next(url.toUpperCase(), requestInit)
@@ -535,7 +535,7 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * This middleware just transforms the response - converting it to uppercase.
  *
  * ```js
- * function upperCaseResponseMiddleware(url, requestInit, next, context) {
+ * function upperCaseResponseMiddleware(next, urlConfig, requestInit, context) {
  *   const { result } = await next(url.toUpperCase(), requestInit)
  *   return result.toUpperCase();
  * }
@@ -811,7 +811,7 @@ export default class Endpoint<ReturnT = any> {
                         // For MiddlewareObject `process` is optional - if not set just proceed to next middleware in chain
                         result = await next(urlConfig, requestInit);
                     } else {
-                        result = await process(urlConfig, requestInit, next, middlewareContext);
+                        result = await process(next, urlConfig, requestInit, middlewareContext);
                         if (result === undefined) {
                             throw new Error(
                                 `Bad middleware implementation; function did not return anything\n\nOccurred in middleware:\n\n${lastMiddleware}`

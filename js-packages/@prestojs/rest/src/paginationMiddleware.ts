@@ -76,12 +76,12 @@ export default function paginationMiddleware<T>(
         },
 
         async process(
-            urlConfig: MiddlewareUrlConfig,
-            requestInit: EndpointRequestInit,
             next: (
                 urlConfig: MiddlewareUrlConfig,
                 requestInit: RequestInit
             ) => Promise<MiddlewareNextReturn<T>>,
+            urlConfig: MiddlewareUrlConfig,
+            requestInit: EndpointRequestInit,
             context: MiddlewareContext<T>
         ): MiddlewareReturn<T> {
             const {

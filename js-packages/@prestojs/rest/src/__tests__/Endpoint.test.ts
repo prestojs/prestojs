@@ -109,16 +109,16 @@ test('should support middleware function', async () => {
     });
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [
-            async (url, requestInit, next): Promise<string> => {
-                return (await next(url, requestInit)).result.toUpperCase();
+            async (next, urlConfig, requestInit): Promise<string> => {
+                return (await next(urlConfig, requestInit)).result.toUpperCase();
             },
         ],
     });
     expect((await action1.prepare().execute()).result).toBe('HELLO WORLD');
     const action2 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [
-            async (url, requestInit, next): Promise<Record<string, any>> => {
-                const data: Record<string, any> = (await next(url, requestInit)).result;
+            async (next, urlConfig, requestInit): Promise<Record<string, any>> => {
+                const data: Record<string, any> = (await next(urlConfig, requestInit)).result;
                 return Object.entries(data).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {});
             },
         ],
@@ -419,15 +419,15 @@ test('should be possible to implement auth replay middleware', async () => {
     const middleware3Start = jest.fn();
     const middleware3End = jest.fn();
     Endpoint.defaultConfig.middleware = [
-        async (url, requestInit, next): Promise<any> => {
+        async (next, urlConfig, requestInit): Promise<any> => {
             middleware1Start();
-            const r = await next(url, requestInit);
+            const r = await next(urlConfig, requestInit);
             middleware1End();
             return r;
         },
-        async (url, requestInit, next, { execute }): Promise<any> => {
+        async (next, urlConfig, requestInit, { execute }): Promise<any> => {
             try {
-                return await next(url, requestInit);
+                return await next(urlConfig, requestInit);
             } catch (e) {
                 resolveOuter();
                 if (e.status === 401) {
@@ -440,11 +440,11 @@ test('should be possible to implement auth replay middleware', async () => {
                 throw e;
             }
         },
-        async (url, requestInit, next): Promise<any> => {
+        async (next, urlConfig, requestInit): Promise<any> => {
             middleware3Start();
             let r;
             try {
-                r = await next(url, requestInit);
+                r = await next(urlConfig, requestInit);
             } catch (e) {
                 middleware3End();
                 throw e;
@@ -499,19 +499,19 @@ test('should be possible to implement auth replay middleware', async () => {
 test('middleware should be able to de-dupe requests', async () => {
     const requestsInFlight = {};
     const middleware = [
-        async (url, requestInit, next): Promise<any> => {
+        async (next, urlConfig, requestInit): Promise<any> => {
             // For simplicity sake just cache by URL here - real implementation would consider headers, query string etc
-            if (requestsInFlight[url]) {
-                return (await requestsInFlight[url]).result;
+            if (requestsInFlight[urlConfig]) {
+                return (await requestsInFlight[urlConfig]).result;
             } else {
-                requestsInFlight[url] = next(url, requestInit);
-                const promise = requestsInFlight[url];
+                requestsInFlight[urlConfig] = next(urlConfig, requestInit);
+                const promise = requestsInFlight[urlConfig];
                 try {
                     const r = await promise;
-                    delete requestsInFlight[url];
+                    delete requestsInFlight[urlConfig];
                     return r.result;
                 } catch (err) {
-                    delete requestsInFlight[url];
+                    delete requestsInFlight[urlConfig];
                     throw err;
                 }
             }
@@ -534,7 +534,7 @@ test('middleware should be able to de-dupe requests', async () => {
 
 test('middleware should detect bad implementations', async () => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    function badMiddleware1(url, requestInit, next) {
+    function badMiddleware1(next, urlConfig, requestInit) {
         return next();
     }
     const action1 = new Endpoint(new UrlPattern('/whatever/'), { middleware: [badMiddleware1] });
@@ -548,8 +548,8 @@ test('middleware should detect bad implementations', async () => {
         },
     });
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    function badMiddleware2(url, requestInit, next) {
-        next(url, requestInit);
+    function badMiddleware2(next, urlConfig, requestInit) {
+        next(urlConfig, requestInit);
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
@@ -561,9 +561,9 @@ test('middleware should detect bad implementations', async () => {
 
 test('middleware header mutations should not mutate source objects', async () => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    function customHeaderMiddleware(url, requestInit, next) {
+    function customHeaderMiddleware(next, urlConfig, requestInit) {
         requestInit.headers.set('X-ClientId', 'ABC123');
-        return next(url, requestInit);
+        return next(urlConfig, requestInit);
     }
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [customHeaderMiddleware],
@@ -591,7 +591,7 @@ test('middleware replays should not have mutations made in previous runs', async
     let runCount = 0;
     let middlewareContext;
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    async function customHeaderMiddleware(url, requestInit, next, context) {
+    async function customHeaderMiddleware(next, urlConfig, requestInit, context) {
         if (runCount === 0) {
             runCount += 1;
             // First run set a header and throw an error. When the call is replayed
@@ -600,7 +600,7 @@ test('middleware replays should not have mutations made in previous runs', async
             middlewareContext = context;
             throw new Error('No good');
         }
-        return next(url, requestInit);
+        return next(urlConfig, requestInit);
     }
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [customHeaderMiddleware],
@@ -635,14 +635,14 @@ test('pagination middleware should error if included twice', async () => {
 });
 
 test('middleware can return either next() directly or result', async () => {
-    async function middleware1(urlConfig, requestInit, next): Promise<string> {
+    async function middleware1(next, urlConfig, requestInit): Promise<string> {
         // This handles the response last after middleware2 has finished
-        const { result } = await next(urlConfig, requestInit, next);
+        const { result } = await next(urlConfig, requestInit);
         return result.toUpperCase();
     }
-    function middleware2(urlConfig, requestInit, next): Promise<MiddlewareNextReturn<string>> {
+    function middleware2(next, urlConfig, requestInit): Promise<MiddlewareNextReturn<string>> {
         // This handles the response first and does nothing; just returns the full MiddlewareNextReturn object
-        return next(urlConfig, requestInit, next);
+        return next(urlConfig, requestInit);
     }
     const endpoint = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [middleware1, middleware2],

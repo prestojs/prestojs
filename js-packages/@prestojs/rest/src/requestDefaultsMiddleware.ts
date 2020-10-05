@@ -15,9 +15,9 @@ import { EndpointRequestInit, MiddlewareReturn, MiddlewareUrlConfig } from './En
  * @menu-group Middleware
  */
 export default function requestDefaultsMiddleware<T>(
+    next: (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit) => Promise<T>,
     urlConfig: MiddlewareUrlConfig,
-    requestInit: EndpointRequestInit,
-    next: (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit) => Promise<T>
+    requestInit: EndpointRequestInit
 ): MiddlewareReturn<T> {
     // Always make sure headers & method is set so middleware implementations can assume it exists
     if (!requestInit.headers) {

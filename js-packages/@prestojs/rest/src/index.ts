@@ -4,6 +4,26 @@ export { default as dedupeInFlightRequestsMiddleware } from './dedupeInFlightReq
 export { default as paginationMiddleware } from './paginationMiddleware';
 export { default as requestDefaultsMiddleware } from './requestDefaultsMiddleware';
 
-import type { EndpointExecuteOptions, ExecuteReturnVal } from './Endpoint';
+import type {
+    EndpointExecuteOptions,
+    ExecuteReturnVal,
+    Middleware,
+    MiddlewareContext,
+    MiddlewareFunction,
+    MiddlewareNextReturn,
+    MiddlewareObject,
+    MiddlewareReturn,
+    MiddlewareUrlConfig,
+} from './Endpoint';
 
-export type { EndpointExecuteOptions, ExecuteReturnVal };
+export type {
+    EndpointExecuteOptions,
+    ExecuteReturnVal,
+    Middleware,
+    MiddlewareContext,
+    MiddlewareFunction,
+    MiddlewareNextReturn,
+    MiddlewareObject,
+    MiddlewareReturn,
+    MiddlewareUrlConfig,
+};

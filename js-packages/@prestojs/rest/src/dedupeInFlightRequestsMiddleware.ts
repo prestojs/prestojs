@@ -71,9 +71,9 @@ export default function dedupeInFlightRequestsMiddleware<T>(
     const { test = defaultTest, getKey = defaultGetKey } = options;
     const requestsInFlight = new Map<any, Promise<MiddlewareNextReturn<T>>>();
     return async (
+        next,
         urlConfig: MiddlewareUrlConfig,
-        requestInit: EndpointRequestInit,
-        next
+        requestInit: EndpointRequestInit
     ): MiddlewareReturn<T> => {
         if (!test(urlConfig, requestInit)) {
             return (await next(urlConfig, requestInit)).result;
