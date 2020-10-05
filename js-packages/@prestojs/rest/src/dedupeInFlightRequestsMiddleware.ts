@@ -1,5 +1,11 @@
 import { isDeepEqual } from '@prestojs/util';
-import { EndpointRequestInit, MiddlewareFunction, MiddlewareUrlConfig } from './Endpoint';
+import {
+    EndpointRequestInit,
+    MiddlewareFunction,
+    MiddlewareNextReturn,
+    MiddlewareReturn,
+    MiddlewareUrlConfig,
+} from './Endpoint';
 
 function defaultGetKey(
     urlConfig: MiddlewareUrlConfig,
@@ -63,17 +69,17 @@ export default function dedupeInFlightRequestsMiddleware<T>(
     options: DedupeOptions = {}
 ): MiddlewareFunction<T> {
     const { test = defaultTest, getKey = defaultGetKey } = options;
-    const requestsInFlight = new Map<any, Promise<T>>();
+    const requestsInFlight = new Map<any, Promise<MiddlewareNextReturn<T>>>();
     return async (
         urlConfig: MiddlewareUrlConfig,
         requestInit: EndpointRequestInit,
         next
-    ): Promise<T> => {
+    ): MiddlewareReturn<T> => {
         if (!test(urlConfig, requestInit)) {
-            return next(urlConfig, requestInit);
+            return (await next(urlConfig, requestInit)).result;
         }
         const key = getKey(urlConfig, requestInit);
-        let currentRequest: Promise<T> | null = null;
+        let currentRequest: Promise<MiddlewareNextReturn<T>> | null = null;
         for (const [k, value] of requestsInFlight.entries()) {
             if (isDeepEqual(k, key)) {
                 currentRequest = value;
@@ -81,14 +87,14 @@ export default function dedupeInFlightRequestsMiddleware<T>(
             }
         }
         if (currentRequest) {
-            return currentRequest;
+            return (await currentRequest).result;
         }
         const promise = next(urlConfig, requestInit);
         requestsInFlight.set(key, promise);
         try {
             const r = await promise;
             requestsInFlight.delete(key);
-            return r;
+            return r.result;
         } catch (err) {
             requestsInFlight.delete(key);
             throw err;

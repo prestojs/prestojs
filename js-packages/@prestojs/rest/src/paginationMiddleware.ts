@@ -10,7 +10,9 @@ import Endpoint, {
     EndpointRequestInit,
     mergeRequestInit,
     MiddlewareContext,
+    MiddlewareNextReturn,
     MiddlewareObject,
+    MiddlewareReturn,
     MiddlewareUrlConfig,
 } from './Endpoint';
 
@@ -76,9 +78,12 @@ export default function paginationMiddleware<T>(
         async process(
             urlConfig: MiddlewareUrlConfig,
             requestInit: EndpointRequestInit,
-            next: (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit) => Promise<T>,
+            next: (
+                urlConfig: MiddlewareUrlConfig,
+                requestInit: RequestInit
+            ) => Promise<MiddlewareNextReturn<T>>,
             context: MiddlewareContext<T>
-        ): Promise<T> {
+        ): MiddlewareReturn<T> {
             const {
                 executeOptions: { paginator },
             } = context;
@@ -91,9 +96,9 @@ export default function paginationMiddleware<T>(
                 Object.assign(urlConfig, urlConfigChanges);
                 requestInit = mergeRequestInit(requestInit, { headers }) as EndpointRequestInit;
             }
-            const response = await next(urlConfig, requestInit);
+            const { url, response, decodedBody, result } = await next(urlConfig, requestInit);
             if (paginator) {
-                if (response !== context.decodedBody) {
+                if (result !== decodedBody) {
                     // This middleware needs to handle the response first and transform it from the paginated
                     // shape to just the shape of the results. eg.
                     // { count: 10, results: [...records...] }
@@ -107,10 +112,10 @@ export default function paginationMiddleware<T>(
                 // is not paginated.
                 const paginationState = getPaginationState(paginator, {
                     query: urlConfig.query,
-                    decodedBody: context.decodedBody,
-                    url: context.url,
+                    decodedBody,
+                    url,
                     urlArgs: urlConfig.args,
-                    response: context.response,
+                    response,
                 });
                 if (paginationState) {
                     paginator.setResponse(paginationState);
@@ -124,7 +129,7 @@ export default function paginationMiddleware<T>(
                     );
                 }
             }
-            return response;
+            return result;
         },
     };
 }

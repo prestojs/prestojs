@@ -6,6 +6,7 @@ import set from 'lodash/set';
 import Endpoint, {
     EndpointRequestInit,
     MiddlewareContext,
+    MiddlewareNextReturn,
     MiddlewareObject,
     MiddlewareUrlConfig,
 } from './Endpoint';
@@ -182,10 +183,13 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
         process: async (
             urlConfig: MiddlewareUrlConfig,
             requestInit: EndpointRequestInit,
-            next: (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit) => Promise<ReturnT>,
+            next: (
+                urlConfig: MiddlewareUrlConfig,
+                requestInit: RequestInit
+            ) => Promise<MiddlewareNextReturn<ReturnT>>,
             context: MiddlewareContext<ReturnT>
         ): Promise<ReturnT> => {
-            const response = await next(urlConfig, requestInit);
+            const { result } = await next(urlConfig, requestInit);
             if (context.requestInit.method?.toUpperCase() === 'DELETE') {
                 const _viewModelMapping = await resolveViewModelMapping();
                 if (!isViewModelClass(_viewModelMapping)) {
@@ -201,11 +205,11 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
                 } else {
                     _viewModelMapping.cache.delete(id);
                 }
-                if (!response) {
+                if (!result) {
                     return {} as ReturnT;
                 }
             }
-            return cacheAndTransform(response);
+            return cacheAndTransform(result);
         },
     };
 }

@@ -133,6 +133,13 @@ export type MiddlewareContext<T> = {
      */
     endpoint: Endpoint;
     /**
+     * The options used to execute the endpoint with
+     */
+    requestInit: EndpointRequestInit;
+};
+
+export type MiddlewareNextReturn<ReturnT> = {
+    /**
      * The resolved URL.
      *
      * Only available in the response part of the middleware.
@@ -151,10 +158,13 @@ export type MiddlewareContext<T> = {
      */
     decodedBody: any;
     /**
-     * The options used to execute the endpoint with
+     * The final value to return from middleware. This starts as `decodedBody` but can be modified
+     * by middleware as it passes through them.
      */
-    requestInit: EndpointRequestInit;
+    result: ReturnT;
 };
+
+export type MiddlewareReturn<ReturnT> = Promise<ReturnT | MiddlewareNextReturn<ReturnT>>;
 
 export type MiddlewareUrlConfig = {
     pattern: UrlPattern;
@@ -172,9 +182,12 @@ export type MiddlewareUrlConfig = {
 export type MiddlewareFunction<T> = (
     urlConfig: MiddlewareUrlConfig,
     requestInit: EndpointRequestInit,
-    next: (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit) => Promise<T>,
+    next: (
+        urlConfig: MiddlewareUrlConfig,
+        requestInit: RequestInit
+    ) => Promise<MiddlewareNextReturn<T>>,
     context: MiddlewareContext<T>
-) => Promise<T>;
+) => MiddlewareReturn<T>;
 
 /**
  * Object form of middleware. This allows more control over what the middleware can do. Specifically allows middleware
@@ -519,14 +532,19 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * }
  * ```
  *
- * This  middleware just transforms the response - converting it to uppercase.
+ * This middleware just transforms the response - converting it to uppercase.
  *
  * ```js
  * function upperCaseResponseMiddleware(url, requestInit, next, context) {
- *   const r = await next(url.toUpperCase(), requestInit)
- *   return r.toUpperCase();
+ *   const { result } = await next(url.toUpperCase(), requestInit)
+ *   return result.toUpperCase();
  * }
  * ```
+ *
+ * Note that `next` will return an object containing `url`, `response`, `decodedBody` and `result`.
+ * As a convenience you can return this object directly when you do not need to modify the result
+ * in any way (the first example above). `result` contains the value returned from any middleware
+ * that handled the response before this one or otherwise `decodedBody` for the first middleware.
  *
  * The context object can be used to retrieve the original options from the [Endpoint.execute](doc:Endpoint#method-execute)
  * call and re-execute the command. This is useful for middleware that may replay a request after an initial failure,
@@ -709,6 +727,7 @@ export default class Endpoint<ReturnT = any> {
             args: urlArgs,
             query: query,
         };
+
         try {
             const cls = Object.getPrototypeOf(this).constructor;
             const requestInit = mergeRequestInit(
@@ -732,7 +751,7 @@ export default class Endpoint<ReturnT = any> {
                         return res;
                     })
                     .then(async res => (returnVal.decodedBody = await this.decodeBody(res)));
-            const executeWithMiddleware = (): Promise<ReturnT> => {
+            const executeWithMiddleware = async (): Promise<ReturnT> => {
                 const middleware = [...this.middleware];
                 let lastMiddleware;
                 const middlewareContext: MiddlewareContext<ReturnT> = {
@@ -740,35 +759,12 @@ export default class Endpoint<ReturnT = any> {
                     executeOptions: options,
                     requestInit,
                     endpoint: this,
-                    get url(): string {
-                        if (!returnVal.url) {
-                            throw new Error(
-                                "'url' accessed on middleware context before request made. You can only access url after the request has been made (eg. after await next(urlConfig, requestInit))"
-                            );
-                        }
-                        return returnVal.url;
-                    },
-                    get response(): Response {
-                        if (!returnVal.response) {
-                            throw new Error(
-                                "'response' accessed on middleware context before request made. You can only access response after the request has been made (eg. after await next(urlConfig, requestInit))"
-                            );
-                        }
-                        return returnVal.response;
-                    },
-                    get decodedBody(): any {
-                        if (!returnVal.response) {
-                            throw new Error(
-                                "'decodedBody' accessed on middleware context before request made. You can only access decodeBody after the request has been made (eg. after await next(urlConfig, requestInit))"
-                            );
-                        }
-                        return returnVal.decodedBody;
-                    },
                 };
+                let lastMiddlewareReturn: MiddlewareNextReturn<ReturnT>;
                 const next = async (
                     urlConfig: MiddlewareUrlConfig,
                     requestInit: EndpointRequestInit
-                ): Promise<ReturnT> => {
+                ): Promise<MiddlewareNextReturn<ReturnT>> => {
                     let errors: string[] = [];
                     if (typeof urlConfig !== 'object') {
                         errors.push(
@@ -796,27 +792,46 @@ export default class Endpoint<ReturnT = any> {
                         returnVal.url = url;
                         returnVal.urlArgs = urlConfig.args;
                         returnVal.query = urlConfig.query;
-                        return runFetch(url, requestInit);
+                        const result = await runFetch(url, requestInit);
+                        lastMiddlewareReturn = {
+                            result,
+                            url,
+                            response: returnVal.response,
+                            decodedBody: returnVal.decodedBody,
+                        };
+                        return lastMiddlewareReturn;
                     }
                     lastMiddleware = nextMiddleware;
                     const process =
                         typeof nextMiddleware === 'function'
                             ? nextMiddleware
                             : nextMiddleware.process;
+                    let result: MiddlewareNextReturn<ReturnT> | ReturnT;
                     if (!process) {
                         // For MiddlewareObject `process` is optional - if not set just proceed to next middleware in chain
-                        return next(urlConfig, requestInit);
+                        result = await next(urlConfig, requestInit);
+                    } else {
+                        result = await process(urlConfig, requestInit, next, middlewareContext);
+                        if (result === undefined) {
+                            throw new Error(
+                                `Bad middleware implementation; function did not return anything\n\nOccurred in middleware:\n\n${lastMiddleware}`
+                            );
+                        }
                     }
-                    const r = process(urlConfig, requestInit, next, middlewareContext);
-                    if (r === undefined) {
-                        throw new Error(
-                            `Bad middleware implementation; function did not return anything\n\nOccurred in middleware:\n\n${lastMiddleware}`
-                        );
+                    if (result === lastMiddlewareReturn) {
+                        return result;
                     }
-                    return r;
+                    lastMiddlewareReturn = {
+                        result: result as ReturnT,
+                        url: returnVal.url,
+                        response: returnVal.response,
+                        decodedBody: returnVal.decodedBody,
+                    };
+                    return lastMiddlewareReturn;
                 };
                 // mergeRequestInit here is just used to clone requestInit
-                return next(urlConfig, mergeRequestInit(requestInit) as EndpointRequestInit);
+                return (await next(urlConfig, mergeRequestInit(requestInit) as EndpointRequestInit))
+                    .result;
             };
             returnVal.result = await executeWithMiddleware();
             return returnVal as ExecuteReturnVal<ReturnT>;

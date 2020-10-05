@@ -10,7 +10,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
 import { useState } from 'react';
 import { act } from 'react-test-renderer';
-import Endpoint, { ApiError, RequestError } from '../Endpoint';
+import Endpoint, { ApiError, MiddlewareNextReturn, RequestError } from '../Endpoint';
 import paginationMiddleware from '../paginationMiddleware';
 
 const fetchMock = fetch as FetchMock;
@@ -110,7 +110,7 @@ test('should support middleware function', async () => {
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [
             async (url, requestInit, next): Promise<string> => {
-                return (await next(url, requestInit)).toUpperCase();
+                return (await next(url, requestInit)).result.toUpperCase();
             },
         ],
     });
@@ -118,7 +118,7 @@ test('should support middleware function', async () => {
     const action2 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [
             async (url, requestInit, next): Promise<Record<string, any>> => {
-                const data: Record<string, any> = await next(url, requestInit);
+                const data: Record<string, any> = (await next(url, requestInit)).result;
                 return Object.entries(data).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {});
             },
         ],
@@ -502,14 +502,14 @@ test('middleware should be able to de-dupe requests', async () => {
         async (url, requestInit, next): Promise<any> => {
             // For simplicity sake just cache by URL here - real implementation would consider headers, query string etc
             if (requestsInFlight[url]) {
-                return requestsInFlight[url];
+                return (await requestsInFlight[url]).result;
             } else {
                 requestsInFlight[url] = next(url, requestInit);
                 const promise = requestsInFlight[url];
                 try {
                     const r = await promise;
                     delete requestsInFlight[url];
-                    return r;
+                    return r.result;
                 } catch (err) {
                     delete requestsInFlight[url];
                     throw err;
@@ -632,4 +632,25 @@ test('pagination middleware should error if included twice', async () => {
             middleware: [paginationMiddleware(), paginationMiddleware()],
         });
     }).toThrowError(/Endpoint already has 'getPaginatorClass'/);
+});
+
+test('middleware can return either next() directly or result', async () => {
+    async function middleware1(urlConfig, requestInit, next): Promise<string> {
+        // This handles the response last after middleware2 has finished
+        const { result } = await next(urlConfig, requestInit, next);
+        return result.toUpperCase();
+    }
+    function middleware2(urlConfig, requestInit, next): Promise<MiddlewareNextReturn<string>> {
+        // This handles the response first and does nothing; just returns the full MiddlewareNextReturn object
+        return next(urlConfig, requestInit, next);
+    }
+    const endpoint = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [middleware1, middleware2],
+    });
+    fetchMock.mockResponseOnce('hello world', {
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+    });
+    expect((await endpoint.execute()).result).toBe('HELLO WORLD');
 });
