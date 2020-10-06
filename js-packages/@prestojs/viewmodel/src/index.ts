@@ -52,10 +52,13 @@ import type {
 } from './fields/AsyncChoices';
 import type { FieldProps, RecordBoundField } from './fields/Field';
 import type {
+    CompoundPrimaryKey,
     FieldDataMapping,
     FieldDataMappingRaw,
     FieldsMapping,
     PartialViewModel,
+    PrimaryKey,
+    SinglePrimaryKey,
     ViewModelConstructor,
     ViewModelInterface,
     ViewModelValues,
@@ -75,4 +78,7 @@ export type {
     AsyncChoicesInterface,
     AsyncChoicesOptions,
     Choice,
+    PrimaryKey,
+    CompoundPrimaryKey,
+    SinglePrimaryKey,
 };

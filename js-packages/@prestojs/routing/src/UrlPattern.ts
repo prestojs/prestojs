@@ -65,7 +65,7 @@ export default class UrlPattern {
             throw new Error(`Missing required arguments: ${missingArgs.join(', ')}.`);
         }
         let url = this.toPath(kwargs);
-        if (query) {
+        if (query && Object.keys(query).length > 0) {
             // TODO: Will need support to change how indices etc are done, eg.
             // https://www.npmjs.com/package/query-string#arrayformat
             // Default option does what we want currently

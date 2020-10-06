@@ -1,6 +1,5 @@
 import { UrlPattern } from '@prestojs/routing';
 import {
-    getPaginationState,
     InferredPaginator,
     LimitOffsetPaginator,
     PageNumberPaginator,
@@ -11,8 +10,8 @@ import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
 import { useState } from 'react';
 import { act } from 'react-test-renderer';
-import Endpoint, { ApiError, RequestError } from '../Endpoint';
-import PaginatedEndpoint from '../PaginatedEndpoint';
+import Endpoint, { ApiError, MiddlewareNextReturn, RequestError } from '../Endpoint';
+import paginationMiddleware from '../paginationMiddleware';
 
 const fetchMock = fetch as FetchMock;
 
@@ -26,7 +25,7 @@ function useTestHook(
 beforeEach(() => {
     fetchMock.resetMocks();
     Endpoint.defaultConfig.requestInit = {};
-    Endpoint.defaultConfig.getPaginationState = getPaginationState;
+    Endpoint.defaultConfig.middleware = [];
 });
 
 test('prepare should maintain equality based on inputs', () => {
@@ -102,20 +101,27 @@ test('should support calling execute without prepare', () => {
     expect(fetchMock.mock.calls[3][0]).toEqual('/whatever/?a=b');
 });
 
-test('should support transformation function', async () => {
+test('should support middleware function', async () => {
     fetchMock.mockResponseOnce('hello world', {
         headers: {
             'Content-Type': 'text/plain',
         },
     });
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
-        transformResponseBody: (data: Record<string, any>): Record<string, any> =>
-            data.toUpperCase(),
+        middleware: [
+            async (next, urlConfig, requestInit): Promise<string> => {
+                return (await next(urlConfig, requestInit)).result.toUpperCase();
+            },
+        ],
     });
     expect((await action1.prepare().execute()).result).toBe('HELLO WORLD');
     const action2 = new Endpoint(new UrlPattern('/whatever/'), {
-        transformResponseBody: (data: Record<string, any>): Record<string, any> =>
-            Object.entries(data).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {}),
+        middleware: [
+            async (next, urlConfig, requestInit): Promise<Record<string, any>> => {
+                const data: Record<string, any> = (await next(urlConfig, requestInit)).result;
+                return Object.entries(data).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {});
+            },
+        ],
     });
     fetchMock.mockResponseOnce(JSON.stringify({ a: 'b', c: 'd' }), {
         headers: {
@@ -266,7 +272,11 @@ test('should raise ApiError on non-2xx response', async () => {
 });
 
 test('should update paginator state on response', async () => {
-    const action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [paginationMiddleware()],
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     let { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
     const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));
@@ -287,6 +297,8 @@ test('should update paginator state on response', async () => {
     });
 
     // Should also work by passing paginator to prepare
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     hookResult = renderHook(() => useTestHook(action1.getPaginatorClass())).result;
     fetchMock.mockResponseOnce(
         JSON.stringify({
@@ -316,8 +328,7 @@ test('should update paginator state on response', async () => {
 });
 
 test('should support changing paginatorClass & getPaginationState', async () => {
-    Endpoint.defaultConfig.paginatorClass = PageNumberPaginator;
-    Endpoint.defaultConfig.getPaginationState = (paginator, execReturnVal): Record<string, any> => {
+    const getPaginationState = (paginator, execReturnVal): Record<string, any> => {
         const { total, records, pageSize } = execReturnVal.decodedBody;
         return {
             total,
@@ -325,7 +336,11 @@ test('should support changing paginatorClass & getPaginationState', async () => 
             pageSize,
         };
     };
-    const action1 = new PaginatedEndpoint(new UrlPattern('/whatever/'));
+    const action1 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [paginationMiddleware(PageNumberPaginator, getPaginationState)],
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     const { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
     const records = Array.from({ length: 5 }, (_, i) => ({ id: i }));
@@ -404,15 +419,15 @@ test('should be possible to implement auth replay middleware', async () => {
     const middleware3Start = jest.fn();
     const middleware3End = jest.fn();
     Endpoint.defaultConfig.middleware = [
-        async (url, requestInit, next): Promise<any> => {
+        async (next, urlConfig, requestInit): Promise<any> => {
             middleware1Start();
-            const r = await next(url, requestInit);
+            const r = await next(urlConfig, requestInit);
             middleware1End();
             return r;
         },
-        async (url, requestInit, next, { execute }): Promise<any> => {
+        async (next, urlConfig, requestInit, { execute }): Promise<any> => {
             try {
-                return await next(url, requestInit);
+                return await next(urlConfig, requestInit);
             } catch (e) {
                 resolveOuter();
                 if (e.status === 401) {
@@ -425,11 +440,11 @@ test('should be possible to implement auth replay middleware', async () => {
                 throw e;
             }
         },
-        async (url, requestInit, next): Promise<any> => {
+        async (next, urlConfig, requestInit): Promise<any> => {
             middleware3Start();
             let r;
             try {
-                r = await next(url, requestInit);
+                r = await next(urlConfig, requestInit);
             } catch (e) {
                 middleware3End();
                 throw e;
@@ -484,19 +499,19 @@ test('should be possible to implement auth replay middleware', async () => {
 test('middleware should be able to de-dupe requests', async () => {
     const requestsInFlight = {};
     const middleware = [
-        async (url, requestInit, next): Promise<any> => {
+        async (next, urlConfig, requestInit): Promise<any> => {
             // For simplicity sake just cache by URL here - real implementation would consider headers, query string etc
-            if (requestsInFlight[url]) {
-                return requestsInFlight[url];
+            if (requestsInFlight[urlConfig]) {
+                return (await requestsInFlight[urlConfig]).result;
             } else {
-                requestsInFlight[url] = next(url, requestInit);
-                const promise = requestsInFlight[url];
+                requestsInFlight[urlConfig] = next(urlConfig, requestInit);
+                const promise = requestsInFlight[urlConfig];
                 try {
                     const r = await promise;
-                    delete requestsInFlight[url];
-                    return r;
+                    delete requestsInFlight[urlConfig];
+                    return r.result;
                 } catch (err) {
-                    delete requestsInFlight[url];
+                    delete requestsInFlight[urlConfig];
                     throw err;
                 }
             }
@@ -519,7 +534,7 @@ test('middleware should be able to de-dupe requests', async () => {
 
 test('middleware should detect bad implementations', async () => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    function badMiddleware1(url, requestInit, next) {
+    function badMiddleware1(next, urlConfig, requestInit) {
         return next();
     }
     const action1 = new Endpoint(new UrlPattern('/whatever/'), { middleware: [badMiddleware1] });
@@ -533,8 +548,8 @@ test('middleware should detect bad implementations', async () => {
         },
     });
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    function badMiddleware2(url, requestInit, next) {
-        next(url, requestInit);
+    function badMiddleware2(next, urlConfig, requestInit) {
+        next(urlConfig, requestInit);
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
@@ -546,9 +561,9 @@ test('middleware should detect bad implementations', async () => {
 
 test('middleware header mutations should not mutate source objects', async () => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    function customHeaderMiddleware(url, requestInit, next) {
+    function customHeaderMiddleware(next, urlConfig, requestInit) {
         requestInit.headers.set('X-ClientId', 'ABC123');
-        return next(url, requestInit);
+        return next(urlConfig, requestInit);
     }
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [customHeaderMiddleware],
@@ -576,7 +591,7 @@ test('middleware replays should not have mutations made in previous runs', async
     let runCount = 0;
     let middlewareContext;
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    async function customHeaderMiddleware(url, requestInit, next, context) {
+    async function customHeaderMiddleware(next, urlConfig, requestInit, context) {
         if (runCount === 0) {
             runCount += 1;
             // First run set a header and throw an error. When the call is replayed
@@ -585,7 +600,7 @@ test('middleware replays should not have mutations made in previous runs', async
             middlewareContext = context;
             throw new Error('No good');
         }
-        return next(url, requestInit);
+        return next(urlConfig, requestInit);
     }
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [customHeaderMiddleware],
@@ -609,4 +624,33 @@ test('middleware replays should not have mutations made in previous runs', async
     expect([...headers.keys()]).toEqual(['x-csrf']);
     // The header set in the original call to middleware shouldn't be here
     expect(await middlewareContext.execute()).toEqual(['x-csrf']);
+});
+
+test('pagination middleware should error if included twice', async () => {
+    expect(() => {
+        new Endpoint(new UrlPattern('/whatever/'), {
+            middleware: [paginationMiddleware(), paginationMiddleware()],
+        });
+    }).toThrowError(/Endpoint already has 'getPaginatorClass'/);
+});
+
+test('middleware can return either next() directly or result', async () => {
+    async function middleware1(next, urlConfig, requestInit): Promise<string> {
+        // This handles the response last after middleware2 has finished
+        const { result } = await next(urlConfig, requestInit);
+        return result.toUpperCase();
+    }
+    function middleware2(next, urlConfig, requestInit): Promise<MiddlewareNextReturn<string>> {
+        // This handles the response first and does nothing; just returns the full MiddlewareNextReturn object
+        return next(urlConfig, requestInit);
+    }
+    const endpoint = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [middleware1, middleware2],
+    });
+    fetchMock.mockResponseOnce('hello world', {
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+    });
+    expect((await endpoint.execute()).result).toBe('HELLO WORLD');
 });

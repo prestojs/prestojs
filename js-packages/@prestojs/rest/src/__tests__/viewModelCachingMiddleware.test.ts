@@ -4,7 +4,8 @@ import { FetchMock } from 'jest-fetch-mock';
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 import { recordEqualTo } from '../../../../../js-testing/matchers';
-import ViewModelEndpoint from '../ViewModelEndpoint';
+import Endpoint from '../Endpoint';
+import viewModelCachingMiddleware from '../viewModelCachingMiddleware';
 
 const fetchMock = fetch as FetchMock;
 
@@ -76,7 +77,9 @@ function mockJsonResponse(data): void {
 
 test('should support single ViewModel as mapping for standard single/list responses', async () => {
     const { User, users, bilbo, frodo, gandalf } = createData();
-    const endpoint = new ViewModelEndpoint(new UrlPattern('/user/'), User);
+    const endpoint = new Endpoint(new UrlPattern('/user/'), {
+        middleware: [viewModelCachingMiddleware(User)],
+    });
     mockJsonResponse(users[0]);
     expect((await endpoint.execute()).result).toBeEqualToRecord(bilbo);
     expect(User.cache.get(1, ['firstName', 'lastName'])).toBeEqualToRecord(bilbo);
@@ -103,9 +106,13 @@ test('should support object mapping', async () => {
         frodo,
         gandalf,
     } = createData();
-    const endpoint = new ViewModelEndpoint(new UrlPattern('/combined/'), {
-        user: User,
-        food: Food,
+    const endpoint = new Endpoint(new UrlPattern('/combined/'), {
+        middleware: [
+            viewModelCachingMiddleware({
+                user: User,
+                food: Food,
+            }),
+        ],
     });
     mockJsonResponse({ user: users[0] });
     expect((await endpoint.execute()).result).toEqual({ user: recordEqualTo(bilbo) });
@@ -128,9 +135,13 @@ test('should support object mapping', async () => {
 
 test('should support nested object mapping', async () => {
     const { User, Food, users, foodItems, sausage, bagel, bilbo } = createData();
-    const endpoint = new ViewModelEndpoint(new UrlPattern('/combined/'), {
-        'records.user': User,
-        'records.food': Food,
+    const endpoint = new Endpoint(new UrlPattern('/combined/'), {
+        middleware: [
+            viewModelCachingMiddleware({
+                'records.user': User,
+                'records.food': Food,
+            }),
+        ],
     });
     mockJsonResponse({ records: { user: users[0], food: foodItems.slice(0, 2) } });
     expect((await endpoint.execute()).result).toEqual({
@@ -147,9 +158,13 @@ test('should support nested object mapping', async () => {
 
 test('extra keys should be retained', async () => {
     const { User, Food, users, foodItems, sausage, bagel, bilbo } = createData();
-    const endpoint = new ViewModelEndpoint(new UrlPattern('/combined/'), {
-        'records.user': User,
-        'records.food': Food,
+    const endpoint = new Endpoint(new UrlPattern('/combined/'), {
+        middleware: [
+            viewModelCachingMiddleware({
+                'records.user': User,
+                'records.food': Food,
+            }),
+        ],
     });
     mockJsonResponse({
         records: { user: users[0], food: foodItems.slice(0, 2), numbers: [1, 2, 3] },
@@ -167,12 +182,16 @@ test('extra keys should be retained', async () => {
 
 test('should support defining mapping as a function/promise', async () => {
     const { User, Food, users, foodItems, sausage, bagel, bilbo } = createData();
-    const endpoint = new ViewModelEndpoint(new UrlPattern('/combined/'), () =>
-        Promise.resolve({
-            'records.user': User,
-            'records.food': Food,
-        })
-    );
+    const endpoint = new Endpoint(new UrlPattern('/combined/'), {
+        middleware: [
+            viewModelCachingMiddleware(() =>
+                Promise.resolve({
+                    'records.user': User,
+                    'records.food': Food,
+                })
+            ),
+        ],
+    });
     mockJsonResponse({ records: { user: users[0], food: foodItems.slice(0, 2) } });
     expect((await endpoint.execute()).result).toEqual({
         records: {
@@ -184,4 +203,64 @@ test('should support defining mapping as a function/promise', async () => {
 
     expect(Food.cache.get(1, ['name'])).toBeEqualToRecord(bagel);
     expect(Food.cache.get(2, ['name'])).toBeEqualToRecord(sausage);
+});
+
+test('should support deletes', async () => {
+    const { User, users, bilbo } = createData();
+    User.cache.add(users);
+    expect(User.cache.get(1, '*')).toEqual(bilbo);
+    const endpoint = new Endpoint(new UrlPattern('/user/:id'), {
+        middleware: [viewModelCachingMiddleware(User)],
+        method: 'DELETE',
+    });
+    fetchMock.mockResponse('', {
+        status: 204,
+    });
+    await endpoint.execute({ urlArgs: { id: 1 } });
+    expect(User.cache.get(1, '*')).toBe(null);
+
+    expect(() => {
+        new Endpoint(new UrlPattern('/user/:userId'), {
+            middleware: [viewModelCachingMiddleware(User)],
+            method: 'DELETE',
+        });
+    }).toThrowError(/UrlPattern includes an 'id' parameter/);
+});
+
+test('should support custom getDeleteId', async () => {
+    const { User, users, bilbo } = createData();
+    User.cache.add(users);
+    expect(User.cache.get(1, '*')).toEqual(bilbo);
+    function getDeleteId(context): string {
+        return context.executeOptions.urlArgs?.userId;
+    }
+    getDeleteId.validateEndpoint = (endpoint): void => {
+        if (!endpoint.urlPattern.requiredArgNames.includes('userId')) {
+            throw new Error('Endpoint pattern wrong');
+        }
+    };
+    const endpoint = new Endpoint(new UrlPattern('/user/:userId'), {
+        middleware: [
+            viewModelCachingMiddleware(User, {
+                getDeleteId,
+            }),
+        ],
+        method: 'DELETE',
+    });
+    fetchMock.mockResponse('', {
+        status: 204,
+    });
+    await endpoint.execute({ urlArgs: { userId: 1 } });
+    expect(User.cache.get(1, '*')).toBe(null);
+
+    expect(() => {
+        new Endpoint(new UrlPattern('/user/:id'), {
+            middleware: [
+                viewModelCachingMiddleware(User, {
+                    getDeleteId,
+                }),
+            ],
+            method: 'DELETE',
+        });
+    }).toThrowError(new Error('Endpoint pattern wrong'));
 });

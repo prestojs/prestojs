@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define,@typescript-eslint/no-use-before-define */
-import { PaginatedViewModelEndpoint, ViewModelEndpoint } from '@prestojs/rest';
+import { Endpoint, paginationMiddleware, viewModelCachingMiddleware } from '@prestojs/rest';
 import { usePaginator } from '@prestojs/util';
 import {
     AsyncChoices,
@@ -13,12 +13,16 @@ import namedUrls from '../namedUrls';
 
 import BaseUser from './generated/BaseUser';
 
+const middleware = [viewModelCachingMiddleware(() => User)];
+
 const endpoints = {
-    retrieve: new ViewModelEndpoint(namedUrls.get('users-detail'), () => User),
-    update: new ViewModelEndpoint(namedUrls.get('users-detail'), () => User, {
-        method: 'patch',
+    retrieve: new Endpoint(namedUrls.get('users-detail'), { middleware }),
+    update: new Endpoint(namedUrls.get('users-detail'), {
+        middleware,
+        method: 'PATCH',
     }),
-    list: new PaginatedViewModelEndpoint(namedUrls.get('users-list'), () => User, {
+    list: new Endpoint(namedUrls.get('users-list'), {
+        middleware: [...middleware, paginationMiddleware()],
         resolveUrl(urlPattern, urlArgs, query) {
             return urlPattern.resolve(urlArgs, {
                 // default to pageNumber pagination if not specified
@@ -26,8 +30,13 @@ const endpoints = {
             });
         },
     }),
-    create: new ViewModelEndpoint(namedUrls.get('users-list'), () => User, {
-        method: 'post',
+    create: new Endpoint(namedUrls.get('users-list'), {
+        method: 'POST',
+        middleware,
+    }),
+    delete: new Endpoint(namedUrls.get('users-detail'), {
+        method: 'DELETE',
+        middleware,
     }),
 };
 const asyncChoicesOptions = {

@@ -1,20 +1,22 @@
 import { isDeepEqual } from '@prestojs/util';
-import qs from 'query-string';
-import { EndpointRequestInit, MiddlewareFunction } from './Endpoint';
+import {
+    EndpointRequestInit,
+    MiddlewareFunction,
+    MiddlewareNextReturn,
+    MiddlewareReturn,
+    MiddlewareUrlConfig,
+} from './Endpoint';
 
 function defaultGetKey(
-    url: string,
+    urlConfig: MiddlewareUrlConfig,
     requestInit: EndpointRequestInit
-): {
-    url: string;
+): MiddlewareUrlConfig & {
     method: string;
     headers: Record<string, string>;
     query: Record<string, string | string[] | null | undefined>;
 } {
-    const { url: u, query } = qs.parseUrl(url);
     return {
-        url: u,
-        query,
+        ...urlConfig,
         method: requestInit.method,
         headers: [...requestInit.headers.entries()].reduce((acc, [key, value]) => {
             acc[key] = value;
@@ -23,7 +25,7 @@ function defaultGetKey(
     };
 }
 
-function defaultTest(url: string, requestInit: EndpointRequestInit): boolean {
+function defaultTest(urlConfig: MiddlewareUrlConfig, requestInit: EndpointRequestInit): boolean {
     return requestInit.method.toUpperCase() === 'GET';
 }
 
@@ -35,7 +37,7 @@ type DedupeOptions = {
      * Function to test whether a request is subject to de-duping. The default implementation only
      * de-dupes requests with `method` set to `GET`.
      */
-    test?: (url: string, requestInit: EndpointRequestInit) => boolean;
+    test?: (urlConfig: MiddlewareUrlConfig, requestInit: EndpointRequestInit) => boolean;
     /**
      * Function to get a key for a request. If the key matches another in flight request then it
      * is considered a duplicate. The default implementation includes the URL, the request method and all request
@@ -44,7 +46,7 @@ type DedupeOptions = {
      * The key can be anything (object, string, number) - it will be compared deeply to existing keys
      * for a match.
      */
-    getKey?: (url: string, requestInit: EndpointRequestInit) => any;
+    getKey?: (urlConfig: MiddlewareUrlConfig, requestInit: EndpointRequestInit) => any;
 };
 
 /**
@@ -67,13 +69,17 @@ export default function dedupeInFlightRequestsMiddleware<T>(
     options: DedupeOptions = {}
 ): MiddlewareFunction<T> {
     const { test = defaultTest, getKey = defaultGetKey } = options;
-    const requestsInFlight = new Map<any, Promise<T>>();
-    return async (url: string, requestInit: EndpointRequestInit, next): Promise<T> => {
-        if (!test(url, requestInit)) {
-            return next(url, requestInit);
+    const requestsInFlight = new Map<any, Promise<MiddlewareNextReturn<T>>>();
+    return async (
+        next,
+        urlConfig: MiddlewareUrlConfig,
+        requestInit: EndpointRequestInit
+    ): MiddlewareReturn<T> => {
+        if (!test(urlConfig, requestInit)) {
+            return (await next(urlConfig, requestInit)).result;
         }
-        const key = getKey(url, requestInit);
-        let currentRequest: Promise<T> | null = null;
+        const key = getKey(urlConfig, requestInit);
+        let currentRequest: Promise<MiddlewareNextReturn<T>> | null = null;
         for (const [k, value] of requestsInFlight.entries()) {
             if (isDeepEqual(k, key)) {
                 currentRequest = value;
@@ -81,14 +87,14 @@ export default function dedupeInFlightRequestsMiddleware<T>(
             }
         }
         if (currentRequest) {
-            return currentRequest;
+            return (await currentRequest).result;
         }
-        const promise = next(url, requestInit);
+        const promise = next(urlConfig, requestInit);
         requestsInFlight.set(key, promise);
         try {
             const r = await promise;
             requestsInFlight.delete(key);
-            return r;
+            return r.result;
         } catch (err) {
             requestsInFlight.delete(key);
             throw err;

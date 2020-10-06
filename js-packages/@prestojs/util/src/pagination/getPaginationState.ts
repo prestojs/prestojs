@@ -5,11 +5,23 @@ import Paginator from './Paginator';
 /**
  * @expand-properties eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)
  */
-type PaginationRequestDetails<T> = {
+export type PaginationRequestDetails = {
     /**
      * Any query string parameters
      */
     query?: Record<string, boolean | string | null | number>;
+    /**
+     * Any arguments used to resolve URL
+     */
+    urlArgs?: Record<string, any>;
+    /**
+     * Resolved URL
+     */
+    url: string;
+    /**
+     * The `Response` object, if available
+     */
+    response?: Response;
     /**
      * The value returned by `decodedBody`. See [Endpoint.execute](doc:Endpoint#method-execute).
      */
@@ -39,9 +51,9 @@ type PaginationRequestDetails<T> = {
  * @menu-group Pagination
  * @extract-docs
  */
-export default function getPaginationState<State, InternalState, Data>(
+export default function getPaginationState<State, InternalState>(
     paginator: Paginator<State, InternalState> | InferredPaginator,
-    requestDetails: PaginationRequestDetails<Data>
+    requestDetails: PaginationRequestDetails
 ): Record<string, any> | false {
     const { query, decodedBody } = requestDetails;
     // If it's an array then it's assumed to be unpaginated data
