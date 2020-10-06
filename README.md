@@ -19,7 +19,7 @@ This is a monorepo. Structure:
 #### Javascript 
 
 * All packages are kept in sync to the same version. If 1 package releases all packages do.
-* To bump version run `yarn version`. All packages are kept in sync with the `./bin/sync-workspace-versions.js` command
+* To bump version run `yarn version`. All packages are kept in sync with the `./bin/sync-workspace-versions.js` command which is run automatically when version is changed.
 * To publish all packages run `yarn release` - this will do a build and release for everything
     * This will prompt you to enter a one time password for 2FA on npm
 
@@ -49,7 +49,7 @@ yarn install
 
 ### Installing new dependencies
 
-See [lerna add](https://github.com/lerna/lerna/tree/master/commands/add#readme)
+See [yarn workspace add](https://github.com/lerna/lerna/tree/master/commands/add#readme)
 
 If you need to add things for dev that aren't part of the actual packages you can do
 so with `yarn add -DW`, eg.
