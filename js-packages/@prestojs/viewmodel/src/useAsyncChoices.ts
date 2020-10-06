@@ -139,6 +139,7 @@ export default function useAsyncChoices<ItemT, ValueT>(
     // This allows overriding this behaviour from useRetrieveProps if necessary
     const { existingValues = list.result } = retrieveProps;
     const selected = useAsyncValue({
+        getId: asyncChoices.getValue.bind(asyncChoices),
         existingValues: existingValues,
         // Haven't been able to workout typing on this yet
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
