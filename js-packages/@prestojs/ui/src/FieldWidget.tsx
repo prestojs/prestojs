@@ -1,5 +1,5 @@
-import React from 'react';
 import { Field } from '@prestojs/viewmodel';
+import React from 'react';
 import { RangedWidgetProps, WidgetProps } from './FieldWidgetInterface';
 import useUi from './useUi';
 
@@ -8,15 +8,20 @@ import useUi from './useUi';
  *
  * @extract-docs
  */
-export default function FieldWidget<FieldValue, T extends HTMLElement>({
+export default function FieldWidget<
+    FieldValue,
+    ParsableValueT,
+    SingleValueT,
+    T extends HTMLElement
+>({
     field,
     ...rest
 }: (RangedWidgetProps<FieldValue, T, any> | WidgetProps<FieldValue, T>) & {
-    field: Field<FieldValue>;
+    field: Field<FieldValue, ParsableValueT, SingleValueT>;
 }): React.ReactElement | null {
     const { getWidgetForField } = useUi();
 
-    const Widget = getWidgetForField<FieldValue, HTMLElement>(field);
+    const Widget = getWidgetForField<FieldValue, ParsableValueT, SingleValueT, HTMLElement>(field);
 
     if (Array.isArray(Widget)) {
         const [ActualWidget, props] = Widget;

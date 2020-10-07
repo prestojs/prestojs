@@ -1,20 +1,20 @@
-import React from 'react';
 import { Field } from '@prestojs/viewmodel';
+import React from 'react';
 import useUi from './useUi';
 
 /**
  * @expand-properties Any extra props are passed directly through to the formatter component.
  */
-type FieldFormatterProps<FieldValue> = {
+type FieldFormatterProps<FieldValueT, ParsableValueT, SingleValueT> = {
     /**
      * The field used to determine the formatter to use. If field is [bound to the record](doc:viewModelFactory#var-_f)
      * then `value` is not required and will be set to `field.value`.
      */
-    field: Field<FieldValue>;
+    field: Field<FieldValueT, ParsableValueT, SingleValueT>;
     /**
      * Value to format. If `field` is a [record bound field](doc:viewModelFactory#var-_f) then this is not required.
      */
-    value?: FieldValue;
+    value?: FieldValueT;
     [rest: string]: any;
 };
 
@@ -25,8 +25,8 @@ type FieldFormatterProps<FieldValue> = {
  *
  * @extract-docs
  */
-export default function FieldFormatter<FieldValue>(
-    props: FieldFormatterProps<FieldValue>
+export default function FieldFormatter<FieldValueT, ParsableValueT, SingleValueT>(
+    props: FieldFormatterProps<FieldValueT, ParsableValueT, SingleValueT>
 ): React.ReactElement {
     const { field, ...rest } = props;
 
