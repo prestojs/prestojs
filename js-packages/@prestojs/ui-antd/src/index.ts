@@ -28,6 +28,7 @@ export { default as TextWidget } from './widgets/TextWidget';
 export { default as TimeWidget } from './widgets/TimeWidget';
 export { default as URLWidget } from './widgets/URLWidget';
 export { default as UUIDWidget } from './widgets/UUIDWidget';
+export { default as SelectAsyncChoiceWidget } from './widgets/SelectAsyncChoiceWidget';
 
 export { default as getWidgetForField } from './getWidgetForField';
 export { default as FormItemWrapper } from './FormItemWrapper';
