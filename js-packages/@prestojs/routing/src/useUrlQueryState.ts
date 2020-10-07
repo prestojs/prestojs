@@ -2,7 +2,7 @@
 import isEqual from 'lodash/isEqual';
 import pickBy from 'lodash/pickBy';
 import qs from 'query-string';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 
 type Decode = (value: string, paramName: string) => any;
 type Encode = (value: any, paramName: string) => string;
@@ -155,7 +155,9 @@ const DEFAULT_PARAMS = {};
  * URL to match the query params specified.
  *
  * As different router integrations handle history and navigation differently you
- * must pass the current location and a function to replace the current URL to options.
+ * can pass the current location and a function to replace the current URL to options.
+ *
+ * By default it will work with `window.location` and the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)
  *
  * For react-router:
  *
@@ -361,15 +363,44 @@ export default function useUrlQueryState(
         params = DEFAULT_PARAMS,
         controlledKeys,
         location = typeof window != 'undefined' && window.location,
-        replaceUrl = typeof window != 'undefined' &&
-            ((url: string): void => window.history.pushState(null, '', url)),
     } = options;
-    if (!location || !replaceUrl) {
+    if (
+        !location ||
+        (!options.replaceUrl && typeof window !== 'undefined' && location !== window.location)
+    ) {
         throw new Error('The url and replaceUrl options must be provided');
     }
     if (controlledKeys === true && params[WILDCARD]) {
         throw new Error('controlledKeys=true cannot be used with a wildcard in `params`');
     }
+
+    // Only used when using window.location to force render on change
+    const [, forceRender] = useReducer(s => !s, false);
+    const replaceUrl = useMemo(() => {
+        if (options.replaceUrl) {
+            return options.replaceUrl;
+        }
+        if (typeof window !== 'undefined' && location === window.location) {
+            return (url: string): void => {
+                window.history.pushState(null, '', url);
+                forceRender();
+            };
+        }
+        // This should never happen; we check above
+        throw new Error('replaceUrl must be specified');
+    }, [options.replaceUrl, location]);
+
+    // When using window.location we need to handle back/forward navigation. When this occurs update
+    // query params. This is a no-op when not using window.location.
+    useEffect(() => {
+        if (typeof window !== 'undefined' && location === window.location) {
+            const listener = (): void => {
+                forceRender();
+            };
+            window.addEventListener('popstate', listener);
+            return (): void => window.removeEventListener('popstate', listener);
+        }
+    }, [location]);
     const { search, pathname } = location;
 
     // This effect is used to update URL to include any missing keys that are
