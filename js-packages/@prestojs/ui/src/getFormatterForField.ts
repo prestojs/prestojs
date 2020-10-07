@@ -71,8 +71,13 @@ const choicesMapping = new Map<string, any>([
  *
  * @extract-docs
  */
-export default function getFormatterForField<FieldValue, T extends HTMLElement>(
-    field: Field<FieldValue>
+export default function getFormatterForField<
+    FieldValue,
+    ParsableValueT,
+    SingleValueT,
+    T extends HTMLElement
+>(
+    field: Field<FieldValue, ParsableValueT, SingleValueT>
 ): React.ComponentType<T> | [React.ComponentType<T>, object] | string | null {
     const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     const formatter: React.FunctionComponent | string | null | undefined = field.choices

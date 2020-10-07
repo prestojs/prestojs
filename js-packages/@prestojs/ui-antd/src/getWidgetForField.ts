@@ -44,8 +44,13 @@ const choicesMapping = new Map<string, FieldWidgetType<any, any>>([
  *
  * @extract-docs
  */
-export default function getWidgetForField<FieldValue, T extends HTMLElement>(
-    field: Field<FieldValue>
+export default function getWidgetForField<
+    FieldValue,
+    ParsableValueT,
+    SingleValueT,
+    T extends HTMLElement
+>(
+    field: Field<FieldValue, ParsableValueT, SingleValueT>
 ): FieldWidgetType<FieldValue, T> | [FieldWidgetType<FieldValue, T>, object] | null {
     const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     // Couldn't work out what to type this as so field.constructor was accepted
