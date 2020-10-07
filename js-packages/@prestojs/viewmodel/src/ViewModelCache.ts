@@ -1147,6 +1147,34 @@ export default class ViewModelCache<
     }
 
     /**
+     * Resolves '*' to all fields and validates passed fields are all valid
+     */
+    private resolveFieldNames<FieldNames extends keyof ViewModelClassType['fields']>(
+        fieldNames: readonly FieldNames[] | FieldPath[] | '*'
+    ): readonly FieldNames[] | FieldPath[] {
+        if (fieldNames === '*') {
+            return this.viewModel.fieldNames as FieldNames[];
+        }
+        const fieldErrors = (fieldNames as FieldPath[])
+            .map(fieldName => {
+                try {
+                    this.viewModel.getField(fieldName);
+                    return false;
+                } catch (err) {
+                    if (err instanceof InvalidFieldError) {
+                        return err.message;
+                    }
+                    throw err;
+                }
+            })
+            .filter(Boolean);
+        if (fieldErrors.length > 0) {
+            throw new Error(`Invalid field(s) provided: ${fieldErrors.join(', ')}`);
+        }
+        return fieldNames;
+    }
+
+    /**
      * Get the currently cached version of the specified version
      *
      * @param record a current instance of a ViewModel to get the latest cached version of
@@ -1221,26 +1249,7 @@ export default class ViewModelCache<
             );
         }
 
-        if (fieldNames === '*') {
-            fieldNames = this.viewModel.fieldNames as FieldNames[];
-        } else {
-            const fieldErrors = (fieldNames as FieldPath[])
-                .map(fieldName => {
-                    try {
-                        this.viewModel.getField(fieldName);
-                        return false;
-                    } catch (err) {
-                        if (err instanceof InvalidFieldError) {
-                            return err.message;
-                        }
-                        throw err;
-                    }
-                })
-                .filter(Boolean);
-            if (fieldErrors.length > 0) {
-                throw new Error(`Invalid field(s) provided: ${fieldErrors.join(', ')}`);
-            }
-        }
+        fieldNames = this.resolveFieldNames(fieldNames);
 
         const pkKey = this.getPkCacheKey(pk);
         const recordCache = this.cache.get(pkKey);
@@ -1415,7 +1424,7 @@ export default class ViewModelCache<
      */
     getList<FieldNames extends keyof ViewModelClassType['fields']>(
         pks: PrimaryKey[],
-        fieldNames: readonly FieldNames[],
+        fieldNames: readonly FieldNames[] | '*',
         removeNulls?: boolean
     ): (PartialViewModel<ViewModelClassType, FieldNames> | null)[];
     getList(
@@ -1427,7 +1436,7 @@ export default class ViewModelCache<
         T extends InstanceType<ViewModelClassType>
     >(
         pksOrRecords: (T | PrimaryKey)[],
-        fieldNames?: readonly FieldNames[] | boolean | readonly FieldPath[],
+        fieldNames?: readonly FieldNames[] | boolean | readonly FieldPath[] | '*',
         removeNulls = true
     ): (T | null)[] {
         if (pksOrRecords.length === 0) {
@@ -1463,8 +1472,13 @@ export default class ViewModelCache<
      * @param fieldNames List of field names to return records for. See [Field notation](#Field_notation) for supported format.
      */
     getAll<FieldNames extends keyof ViewModelClassType['fields']>(
-        fieldNames: readonly FieldNames[]
+        fieldNames: readonly FieldNames[] | '*'
+    ): PartialViewModel<ViewModelClassType, FieldNames>[];
+    getAll(fieldNames: FieldPath[]): InstanceType<ViewModelClassType>[];
+    getAll<FieldNames extends keyof ViewModelClassType['fields']>(
+        fieldNames: readonly FieldNames[] | FieldPath[] | '*'
     ): PartialViewModel<ViewModelClassType, FieldNames>[] {
+        fieldNames = this.resolveFieldNames(fieldNames);
         const records: PartialViewModel<ViewModelClassType, FieldNames>[] = [];
         let index = 0;
         const key = getFieldNameCacheKey(fieldNames as readonly string[], this.viewModel);
@@ -1474,11 +1488,8 @@ export default class ViewModelCache<
         >[];
         // Tracks if records have changed from what is stored in `lastRecords`
         let isRecordsSame = true;
-        for (const cacheValue of this.cache.values()) {
-            const record = cacheValue.get(fieldNames) as PartialViewModel<
-                ViewModelClassType,
-                FieldNames
-            >;
+        for (const pk of this.cache.keys()) {
+            const record = this.get(pk, fieldNames as FieldNames[]);
             if (record) {
                 records.push(record);
                 if (index > lastRecords.length - 1 || lastRecords[index] !== record) {

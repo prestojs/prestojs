@@ -442,6 +442,33 @@ test('should support retrieving multiple records', () => {
     ]);
 });
 
+test('should support using * for all fields', () => {
+    class Test1 extends viewModelFactory({
+        id: F('id'),
+        firstName: F('firstName'),
+        lastName: F('lastName'),
+        email: F('email'),
+    }) {}
+
+    const bob = { id: 2, firstName: 'Bob', lastName: 'So', email: 'bob@b.com' };
+    const jack = { id: 3, lastName: 'Jack', email: 'jack@b.com' };
+    const sam = { id: 4, firstName: 'Sam', lastName: 'Gee', email: 'sam@b.com' };
+
+    Test1.cache.add(new Test1(bob));
+    Test1.cache.add(new Test1(jack));
+    Test1.cache.add(new Test1(sam));
+
+    expect(Test1.cache.get(2, '*')).toBeEqualToRecord(new Test1(bob));
+    expect(Test1.cache.get(3, '*')).toEqual(null);
+    expect(Test1.cache.get(4, '*')).toBeEqualToRecord(new Test1(sam));
+
+    const records1 = Test1.cache.getList([2, 3, 4], '*', false);
+    expect(records1).toEqual([recordEqualTo(bob), null, recordEqualTo(sam)]);
+
+    const records2 = Test1.cache.getAll('*');
+    expect(records2).toEqual([recordEqualTo(bob), recordEqualTo(sam)]);
+});
+
 test('should notify listeners on add, change, delete', () => {
     class Test1 extends viewModelFactory({
         id: F('id'),
@@ -2510,7 +2537,7 @@ test('should support manual nested batching', async () => {
     );
 });
 
-test('getList from work across caches', async () => {
+test('getList should work across caches', async () => {
     const { User, Group } = createTestModels(true);
     await User.fields.group.resolveViewModel();
     Group.cache.add({ id: 1, name: 'Staff', ownerId: 1 });
@@ -2624,6 +2651,120 @@ test('getList from work across caches', async () => {
     ]);
 });
 
+test('getAll should work across caches', async () => {
+    const { User, Group } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    Group.cache.add({ id: 1, name: 'Staff', ownerId: 1 });
+    User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
+    User.cache.add({ id: 2, name: 'Sam', groupId: null });
+    User.cache.add({ id: 3, name: 'Godfrey', groupId: 2 });
+    Group.cache.add({ id: 2, name: 'Customers', ownerId: 2 });
+    expect(User.cache.getAll(['name', ['group', 'name'], ['group', 'owner']])).toEqual([
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                    owner: {
+                        id: 1,
+                        name: 'Bob',
+                        groupId: 1,
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 2,
+                name: 'Sam',
+                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // @ts-ignore
+                group: null,
+                groupId: null,
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 3,
+                name: 'Godfrey',
+                groupId: 2,
+                group: {
+                    id: 2,
+                    name: 'Customers',
+                    ownerId: 2,
+                    owner: {
+                        id: 2,
+                        name: 'Sam',
+                        groupId: null,
+                    },
+                },
+            })
+        ),
+    ]);
+    expect(User.cache.getAll(['name', ['group', 'name'], ['group', 'owner']])).toBe(
+        User.cache.getAll(['name', ['group', 'name'], ['group', 'owner']])
+    );
+
+    expect(
+        User.cache.getAll(['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']])
+    ).toEqual([
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                    owner: {
+                        id: 1,
+                        name: 'Bob',
+                        groupId: 1,
+                        group: {
+                            id: 1,
+                            name: 'Staff',
+                            ownerId: 1,
+                        },
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 2,
+                name: 'Sam',
+                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // @ts-ignore
+                group: null,
+                groupId: null,
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 3,
+                name: 'Godfrey',
+                groupId: 2,
+                group: {
+                    id: 2,
+                    name: 'Customers',
+                    ownerId: 2,
+                    owner: {
+                        id: 2,
+                        name: 'Sam',
+                        groupId: null,
+                        group: null,
+                    },
+                },
+            })
+        ),
+    ]);
+});
+
 test('should validate field names', async () => {
     const { Subscription } = createTestModels(true);
     await Subscription.fields.user.resolveViewModel();
@@ -2632,6 +2773,25 @@ test('should validate field names', async () => {
     );
     expect(() =>
         Subscription.cache.get(1, [
+            ['use', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'own'],
+        ])
+    ).toThrowError(/Invalid field\(s\) provided:/);
+
+    expect(() =>
+        Subscription.cache.getList(
+            [1],
+            [
+                ['use', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'own'],
+            ]
+        )
+    ).toThrowError(/Invalid field\(s\) provided:/);
+
+    expect(() =>
+        Subscription.cache.getAll([
             ['use', 'name'],
             ['user', 'group', 'name'],
             ['user', 'group', 'own'],
