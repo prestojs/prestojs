@@ -432,3 +432,25 @@ test('useUrlQueryState should accept function for setState', () => {
     expect(hookStatus).queryStateEquals({ q: '1', p: '0' });
     expect(navigation.search).queryStateEquals({ p_q: '1', p_p: '0' });
 });
+
+test('useUrlQueryState default implementation with window.location', async () => {
+    const hook = renderHook(() => useUrlQueryState());
+    const setQueryState = (nextState: {}): void => hook.result.current[1](nextState);
+    expect(hook).queryStateEquals({});
+    act(() => setQueryState({ q: '1' }));
+    expect(hook).queryStateEquals({ q: '1' });
+    expect(window.location.search).toBe('?q=1');
+    act(() => setQueryState({ q: '1', p: '2' }));
+    expect(hook).queryStateEquals({ q: '1', p: '2' });
+    expect(window.location.search).toBe('?p=2&q=1');
+    act(() => {
+        history.back();
+    });
+    await hook.waitForNextUpdate();
+    expect(hook).queryStateEquals({ q: '1' });
+    act(() => {
+        history.forward();
+    });
+    await hook.waitForNextUpdate();
+    expect(hook).queryStateEquals({ q: '1', p: '2' });
+});
