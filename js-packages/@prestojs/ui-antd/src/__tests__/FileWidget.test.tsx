@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
 import { useFileList } from '../widgets/FileWidget';
 
@@ -11,10 +11,10 @@ test('useFileList should convert File objects to antd representation', async () 
         ({ value, preview }: Props) => useFileList(value, preview),
         { initialProps: { value: null, preview: false } }
     );
-    expect(result.current).toEqual([]);
+    expect(result.current.fileList).toEqual([]);
     const file1 = new File([], 'test.png', { type: 'image/png' });
     rerender({ value: file1, preview: false });
-    expect(result.current).toEqual([
+    expect(result.current.fileList).toEqual([
         {
             key: file1,
             uid: '-1',
@@ -26,7 +26,7 @@ test('useFileList should convert File objects to antd representation', async () 
     ]);
     rerender({ value: file1, preview: true });
     await waitForNextUpdate();
-    expect(result.current).toEqual([
+    expect(result.current.fileList).toEqual([
         {
             key: file1,
             uid: '-1',
@@ -42,7 +42,7 @@ test('useFileList should convert File objects to antd representation', async () 
     rerender({ value: [file1, file2], preview: true });
 
     await waitForNextUpdate();
-    expect(result.current).toEqual([
+    expect(result.current.fileList).toEqual([
         {
             key: file1,
             uid: '-1',
@@ -64,7 +64,7 @@ test('useFileList should convert File objects to antd representation', async () 
     ]);
     rerender({ value: [file1], preview: true });
     await waitForNextUpdate();
-    expect(result.current).toEqual([
+    expect(result.current.fileList).toEqual([
         {
             key: file1,
             uid: '-1',
@@ -76,9 +76,9 @@ test('useFileList should convert File objects to antd representation', async () 
         },
     ]);
     rerender({ value: [], preview: true });
-    expect(result.current).toEqual([]);
+    expect(result.current.fileList).toEqual([]);
     rerender({ value: undefined, preview: true });
-    expect(result.current).toEqual([]);
+    expect(result.current.fileList).toEqual([]);
 });
 
 test('useFileList should convert string urls to antd representation', async () => {
@@ -86,10 +86,10 @@ test('useFileList should convert string urls to antd representation', async () =
         ({ value, preview }: Props) => useFileList(value, preview),
         { initialProps: { value: null, preview: false } }
     );
-    expect(result.current).toEqual([]);
+    expect(result.current.fileList).toEqual([]);
     const file1 = 'test1.png';
     rerender({ value: file1, preview: false });
-    expect(result.current).toEqual([
+    expect(result.current.fileList).toEqual([
         {
             key: file1,
             uid: '-1',
@@ -119,4 +119,60 @@ test('useFileList should convert string urls to antd representation', async () =
     //         originFileObj: file1,
     //     },
     // ]);
+});
+
+test('useFileList should handle file status updates', async () => {
+    const file1 = new File([], 'test.png', { type: 'image/png' });
+    const { result, rerender } = renderHook(
+        ({ value, preview }: Props) => useFileList(value, preview),
+        { initialProps: { value: file1, preview: false } }
+    );
+    expect(result.current.fileList).toEqual([
+        {
+            key: file1,
+            uid: '-1',
+            name: 'test.png',
+            size: 0,
+            type: 'image/png',
+            originFileObj: file1,
+        },
+    ]);
+    act(() =>
+        result.current.updateFileStatus({
+            ...result.current.fileList[0],
+            percent: 10,
+            status: 'uploading',
+        })
+    );
+    expect(result.current.fileList).toEqual([
+        {
+            key: file1,
+            uid: '-1',
+            name: 'test.png',
+            size: 0,
+            type: 'image/png',
+            originFileObj: file1,
+            percent: 10,
+            status: 'uploading',
+        },
+    ]);
+    act(() =>
+        result.current.updateFileStatus({
+            ...result.current.fileList[0],
+            percent: 100,
+            status: 'done',
+        })
+    );
+    expect(result.current.fileList).toEqual([
+        {
+            key: file1,
+            uid: '-1',
+            name: 'test.png',
+            size: 0,
+            type: 'image/png',
+            originFileObj: file1,
+            percent: 100,
+            status: 'done',
+        },
+    ]);
 });

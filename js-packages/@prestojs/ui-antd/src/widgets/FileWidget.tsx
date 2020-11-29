@@ -3,7 +3,7 @@ import { InputProps, WidgetProps } from '@prestojs/ui';
 import { isPromise } from '@prestojs/util';
 import { Button, Upload } from 'antd';
 import { RcFile, UploadFile, UploadProps } from 'antd/lib/upload/interface';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 type UploadWidgetInputType = Omit<
     InputProps<File | string | (File | string)[], HTMLElement>,
@@ -21,13 +21,7 @@ export type UploadWidgetProps<FieldValue, T extends HTMLElement> = Omit<
 > &
     Omit<
         UploadProps,
-        | 'data'
-        | 'method'
-        | 'customRequest'
-        | 'headers'
-        | 'onChange'
-        | 'withCredentials'
-        | 'progress'
+        'data' | 'method' | 'headers' | 'onChange' | 'withCredentials' | 'progress'
     > & {
         input: UploadWidgetInputType;
         /**
@@ -66,7 +60,8 @@ export type UploadWidgetProps<FieldValue, T extends HTMLElement> = Omit<
         children: React.ReactNode;
     };
 
-type FileWidgetUploadFile = UploadFile & { key: string | File };
+type FileLike = Blob | File | string;
+type FileWidgetUploadFile = UploadFile & { key: FileLike };
 
 /**
  * Given a Blob return a UploadFile object for use with FileWidget
@@ -112,9 +107,24 @@ function urlToUploadFile(uid: string, url: string): Promise<UploadFile> {
         .then(blob => blobToUploadFile(uid, url.split('/').pop() || url, blob));
 }
 
+type UseFileListReturn = {
+    /**
+     * List of objects that can be passed to the `fileList` prop on [Upload](https://ant.design/components/upload)
+     */
+    fileList: UploadFile[];
+    /**
+     * Should be called from the `onChange` prop on [Upload](https://ant.design/components/upload) and passed the
+     * changed file. This is used to update the progress on overall status of the file. Only applicable when an
+     * upload is occurring immediately (eg. when you pass `customRequest`) instead of as part of the final form submission.
+     */
+    updateFileStatus: (file: UploadFile) => void;
+};
+
 /**
  * Given a value that could either be a URL, a File or an array of either return an array
- * of `UploadFile` to be used with the antd `Upload` component.
+ * of `UploadFile` to be used with the antd `Upload` component. A function `updateFileStatus`
+ * is returned to allow updating the progress and final status of a file.
+ *
  * @param value The value to convert. This would typically come from the form state.
  * @param previewImage If true the `thumbUrl` property will be set for each `UploadFile`
  *
@@ -122,19 +132,24 @@ function urlToUploadFile(uid: string, url: string): Promise<UploadFile> {
  * @menu-group Widget Hooks
  */
 export function useFileList(
-    value: File | string | (File | string)[] | null | undefined,
+    value: FileLike | FileLike[] | null | undefined,
     previewImage: boolean
-): UploadFile[] {
+): UseFileListReturn {
     const [fileList, setFileList] = useState<FileWidgetUploadFile[]>([]);
-    const filePreviews = useRef<Map<string | File, FileWidgetUploadFile>>(new Map());
+    const filePreviews = useRef<Map<FileLike, FileWidgetUploadFile>>(new Map());
+    const isMounted = useRef(true);
     useEffect(() => {
-        let isCurrent = true;
+        return (): void => {
+            isMounted.current = false;
+        };
+    }, []);
+    useEffect(() => {
         const run = async (): Promise<void> => {
             if (!value) {
                 setFileList([]);
                 return;
             }
-            const values: (File | string)[] = Array.isArray(value) ? value : [value];
+            const values: FileLike[] = Array.isArray(value) ? value : [value];
             // antd recommends using negative numbers to avoid internal conflicts
             let uid = -1;
             // This will be set immediately so UI reflects immediately showing uploaded
@@ -162,15 +177,33 @@ export function useFileList(
                             promises.push(urlToUploadFile(uid.toString(), value));
                         }
                     } else {
+                        // antd seems to attach a uid to the file which we need to use if available
+                        // without this the onChange event seems to end up with multiple entries - one
+                        // with the uid from antd and one that is assigned here
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                        // @ts-ignore
+                        const valueUid = value.uid || uid.toString();
+                        // If a Blob is passed it won't necessarily have a `name` (in some cases it appears antd
+                        // libraries attach this, eg. antd-img-crop). Log a warning if name isn't available but
+                        // set it to `uid` so things continue to work (preview may not work properly).
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                        // @ts-ignore
+                        let name = value.name;
+                        if (!name) {
+                            console.warn(
+                                'No name set for uploaded file. Consider adding a `name` property if passing a `Blob`.'
+                            );
+                            name = `${valueUid}`;
+                        }
                         uploadFile = {
                             key: value,
-                            uid: uid.toString(),
-                            name: value.name,
+                            uid: valueUid,
+                            name,
                             size: value.size,
                             type: value.type,
                             originFileObj: value,
                         };
-                        promises.push(blobToUploadFile(uid.toString(), value.name, value));
+                        promises.push(blobToUploadFile(uid.toString(), name, value));
                     }
                     filePreviews.current.set(value, uploadFile);
                 } else if (previewImage) {
@@ -195,8 +228,25 @@ export function useFileList(
                     for (let i = 0; i < resolved.length; i++) {
                         filePreviews.current.set(values[i], resolved[i]);
                     }
-                    if (isCurrent) {
-                        setFileList(resolved);
+                    // If component unmounted do nothing. Previously we used the cleanup
+                    // for this hook to track whether this was still 'current' but was problematic
+                    // in that the hook could re-render before this finished and the generation
+                    // of preview would essentially be lost. There might be the possibility of
+                    // a race condition here so try to avoid any issues by using callback version
+                    // of setFileList and lookup entries based on UID.
+                    if (isMounted.current) {
+                        setFileList(currentFileList => {
+                            const nextFileList = [...currentFileList];
+                            for (const resolvedFile of resolved) {
+                                const index = nextFileList.findIndex(
+                                    f => f.uid === resolvedFile.uid
+                                );
+                                if (index !== -1) {
+                                    nextFileList[index] = resolvedFile;
+                                }
+                            }
+                            return nextFileList;
+                        });
                     }
                 } catch (e) {
                     console.error('Failed to generate preview for images', e);
@@ -204,12 +254,25 @@ export function useFileList(
             }
         };
         run();
-        return (): void => {
-            isCurrent = false;
-        };
     }, [previewImage, value]);
 
-    return fileList;
+    const updateFileStatus = useCallback((file: UploadFile): void => {
+        setFileList(fileList => {
+            const index = fileList.findIndex(f => f.uid === file.uid);
+            if (index !== -1) {
+                const entry = fileList[index];
+                const nextFileList = [...fileList];
+                nextFileList[index] = {
+                    ...entry,
+                    percent: file.percent,
+                    status: file.status,
+                };
+                return nextFileList;
+            }
+            return fileList;
+        });
+    }, []);
+    return { fileList, updateFileStatus };
 }
 
 /**
@@ -244,6 +307,9 @@ function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): Reac
         ...rest
     } = props;
     const { value, onChange } = input;
+    // Track value in ref so can access it in beforeUpload. See notes there.
+    const lastValue = useRef(value);
+    lastValue.current = value;
     if (Array.isArray(value) && !multiple) {
         throw new Error(`When 'value' is an array 'multiple' must be set to true`);
     }
@@ -259,26 +325,30 @@ function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): Reac
             // - return false to stop upload from occurring
             // - return a new Blob to replace uploaded File (eg. to implement Crop)
             // - return undefined to do nothing
-            // - Any of the above via a Promise
+            // - return a promise that returns undefined. in this case customRequest will be called.
             const response = beforeUpload(file as RcFile, files);
             if (response === false) {
                 return false;
             }
             if (isPromise(response)) {
-                return response.then(file => {
+                return response.then(f => {
                     if (multiple) {
                         // We know value is either not set or an array due to the checks above
-                        const currentValue = (value ?? []) as (string | File)[];
-                        onChange([...currentValue, file]);
+                        // value could be an empty string, not just undefined or null
+                        // Read from ref instead of currentValue; if multiple files are uploaded at once (eg.
+                        // drag and drop multiple files to uploader) then beforeUploadFile is called for each
+                        // one but they each file after the first will have a stale reference to the original `value`.
+                        const currentValue = (lastValue.current || []) as (string | File)[];
+                        onChange([...currentValue, f]);
                     } else {
-                        onChange(file);
+                        onChange(f);
                     }
                 });
             }
         }
         if (multiple) {
             // We know value is either not set or an array due to the checks above
-            const currentValue = (value ?? []) as (string | File)[];
+            const currentValue = (lastValue.current ?? []) as (string | File)[];
             onChange([...currentValue, file]);
         } else {
             onChange(file);
@@ -287,13 +357,14 @@ function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): Reac
     };
     const handleRemove = (f: FileWidgetUploadFile): void => {
         if (multiple) {
-            onChange((value as (string | File)[]).filter(key => key !== f.key));
+            onChange((lastValue.current as (string | File)[]).filter(key => key !== f.key));
         } else {
             onChange(null);
         }
     };
-    const fileList = useFileList(value, listType.startsWith('picture'));
-    const shouldAllowUpload = limit == null || limit > fileList.length || limit === 1;
+    const { fileList, updateFileStatus } = useFileList(value, listType.startsWith('picture'));
+    const shouldAllowUpload =
+        limit == null || limit > fileList.length || (!multiple && limit === 1);
     if (shouldAllowUpload && !children) {
         const isEdit = limit === 1 && fileList.length === 1;
         if (rest.type === 'drag') {
@@ -330,9 +401,14 @@ function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): Reac
                 // however if you return a Promise then internally antd (or more specifically rc-upload) will
                 // always do the request. In that case we can just do nothing here (which is considered a success
                 // as nothing is thrown).
+                // Note: This can be overridden by passing `customRequest` if the upload needs to happen immediately.
             }}
             onRemove={handleRemove}
+            multiple={multiple}
             {...rest}
+            onChange={(info): void => {
+                updateFileStatus(info.file);
+            }}
         >
             {children}
         </Upload>
