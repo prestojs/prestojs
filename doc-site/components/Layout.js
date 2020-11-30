@@ -44,7 +44,7 @@ function MDXWrapper({ metadata = {}, children, ...props }) {
                 <div className={cx('mdx', metadata.className)}>{children}</div>
             </Article>
             {sideLinkIds?.length > 0 && (
-                <Sidebar>
+                <Sidebar id="secondary-nav">
                     <Sidebar.LinksSection
                         title="On This Page"
                         links={sideLinkIds.map(linkId => ({

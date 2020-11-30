@@ -89,7 +89,7 @@ export default function Doc({ docs, extraNodes, slug, ...rest }) {
                     <VariableDoc key={prop.name} doc={prop} />
                 ))}
             </Article>
-            <Sidebar currentTitle="On This Page">
+            <Sidebar currentTitle="On This Page" id="secondary-nav">
                 <Sidebar.LinksSection
                     links={[
                         {

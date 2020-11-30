@@ -26,7 +26,7 @@ export default function ClassDoc({ doc, baseUrl }) {
                 {doc.mdx && <div className="mb-20" dangerouslySetInnerHTML={{ __html: doc.mdx }} />}
                 <ClassDetails {...classDetails} />
             </Article>
-            <Sidebar currentTitle="On This Page">
+            <Sidebar currentTitle="On This Page" id="secondary-nav">
                 {sideLinkIds.length > 0 && (
                     <Sidebar.LinksSection
                         links={sideLinkIds.map(linkId => ({
