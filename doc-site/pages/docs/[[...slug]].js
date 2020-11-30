@@ -10,6 +10,7 @@ import MainMenuSidebar from '../../components/MainMenuSidebar';
 import defaultGetStaticProps, { usePrepareDocs } from '../../getStaticProps';
 import codesandbox from '../../remark-plugins/codesandbox';
 import docLinks from '../../remark-plugins/docLinks';
+import ViewModelFactoryDoc from './viewmodel/viewModelFactory';
 
 const kindComponents = {
     Function: FunctionDoc,
@@ -21,6 +22,11 @@ const kindComponents = {
 
 export default function Doc({ docs, extraNodes, slug }) {
     usePrepareDocs(docs, extraNodes);
+    if (docs.viewModelFactory) {
+        // For some reason in production this component ([[...slug.js]]) is rendered
+        // instead of ViewModelFactoryDoc
+        return <ViewModelFactoryDoc {...{ docs, extraNodes, slug }} />;
+    }
     const doc = docs[0];
     const DocComponent = kindComponents[doc.docClass || doc.kindString];
     return (
