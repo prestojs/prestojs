@@ -32,10 +32,9 @@ module.exports = withMDX({
         return config;
     },
     // This makes it so next export works with our linking but now without trailing
-    // slash in dev you get 404's. To fix dev as well we set `trailingSlash` to true.
+    // slash in dev you get 404's.
     // Without this option everything must have .html suffix... but trying to get that
     // working in dev also failed (worked in dev but doing a build would complain
     // about moving a file with a .html.html extension...)
-    exportTrailingSlash: true,
     trailingSlash: true,
 });

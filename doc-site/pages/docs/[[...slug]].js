@@ -20,9 +20,7 @@ const kindComponents = {
 };
 
 export default function Doc({ docs, extraNodes, slug }) {
-    if (!usePrepareDocs(docs, extraNodes)) {
-        return null;
-    }
+    usePrepareDocs(docs, extraNodes);
     const doc = docs[0];
     const DocComponent = kindComponents[doc.docClass || doc.kindString];
     return (

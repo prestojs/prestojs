@@ -10,9 +10,7 @@ import Sidebar from '../../../components/Sidebar';
 import defaultGetStaticProps, { usePrepareDocs } from '../../../getStaticProps';
 
 export default function Doc({ docs, extraNodes, slug, ...rest }) {
-    if (!usePrepareDocs(docs, extraNodes)) {
-        return null;
-    }
+    usePrepareDocs(docs, extraNodes);
     const baseUrl = `/docs/viewmodel/viewModelFactory`;
     const staticGroups = docs.ViewModelConstructor.groups.reduce((acc, group) => {
         acc[group.title] = group;

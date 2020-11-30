@@ -296,7 +296,7 @@ export abstract class BaseRelatedViewModelField<
  *
  * Failure to do this will result in an error being thrown the first time it's accessed.
  *
- * If you have multiple values use [ManyRelatedViewModelField](doc:ManyrelatedViewModelField) instead.
+ * If you have multiple values use [ManyRelatedViewModelField](doc:ManyRelatedViewModelField) instead.
  *
  * @extract-docs
  * @menu-group Fields

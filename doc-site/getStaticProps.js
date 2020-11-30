@@ -34,6 +34,32 @@ async function traverse(obj, fn, visitedTracker = new Map()) {
     return obj;
 }
 
+function traverseSync(obj, fn, visitedTracker = new Map()) {
+    if (!obj || typeof obj !== 'object') {
+        return obj;
+    }
+    if (visitedTracker.has(obj)) {
+        return obj;
+    }
+    visitedTracker.set(obj, true);
+
+    if (fn(obj)) {
+        return obj;
+    }
+    for (const value of Object.values(obj)) {
+        if (Array.isArray(value)) {
+            for (const v of value) {
+                if (value && typeof value == 'object') {
+                    traverse(v, fn, visitedTracker);
+                }
+            }
+        } else if (value && typeof value == 'object') {
+            traverse(value, fn, visitedTracker);
+        }
+    }
+    return obj;
+}
+
 async function transformMdx(contents, remarkPlugins, { scope = {}, components = {}, props }) {
     const fullScope = {
         mdx: createElement,
@@ -73,39 +99,21 @@ async function transformMdx(contents, remarkPlugins, { scope = {}, components = 
     return fn({}, React, ...values);
 }
 
-async function prepareDocs(docs, extraNodes) {
+function prepareDocs(docs, extraNodes) {
     const fn = obj => {
         if (obj.type === 'reference' && extraNodes[obj.id]) {
             obj.referencedType = () => extraNodes[obj.id];
         }
     };
     const visitedTracker = new Map();
-    await traverse(docs, fn, visitedTracker);
-    await traverse(extraNodes, fn, visitedTracker);
+    traverseSync(docs, fn, visitedTracker);
+    traverseSync(extraNodes, fn, visitedTracker);
 }
 
-/**
- * Returns true once prepareDocs has finished running. Necessary as it is async.
- */
 export function usePrepareDocs(docs, extraNodes) {
-    const [loaded, setLoaded] = React.useState(false);
     React.useEffect(() => {
-        let isCurrent = true;
-        async function run() {
-            await prepareDocs(docs, extraNodes);
-            if (isCurrent) {
-                setLoaded(true);
-            }
-        }
-
-        run();
-
-        return () => {
-            isCurrent = false;
-        };
+        prepareDocs(docs, extraNodes);
     }, [docs, extraNodes]);
-
-    return loaded;
 }
 
 export default async function getStaticProps(
