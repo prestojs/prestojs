@@ -12,6 +12,7 @@ export default function SignatureDoc({
     method,
     anchorLink,
     isConstructor,
+    signatureDefinitionTag = 'h4',
     bordered = true,
     hideName = false,
     excludeParameters = [],
@@ -58,6 +59,7 @@ export default function SignatureDoc({
         <span className="flex items-center justify-between">
             <SignatureDefinition
                 name={signature.name}
+                tag={signatureDefinitionTag}
                 parameters={rawParameters.map(p => ({
                     ...p,
                     name: p.name === '__namedParameters' ? 'props' : p.name,

@@ -36,7 +36,7 @@ export default function ReturnType({ signature }) {
     }
     return (
         <div className="mt-5">
-            <AnchorLink id="return-type" Component="h3" className="text-4xl">
+            <AnchorLink id="return-type" Component="div" className="text-xl">
                 Returns
             </AnchorLink>
             {returnTypes.length > 1 && <p className="my-5">One of the following:</p>}

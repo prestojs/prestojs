@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function AnchorLink({ Component, children, id, className = '' }) {
     return (
-        <Component id={id} className={`anchor-link ${className}`}>
+        <div id={id} className={`anchor-link ${className}`}>
             <a
                 className="text-gray-500 no-underline absolute anchor-link-a hover hidden"
                 aria-label="Anchor"
@@ -11,7 +11,7 @@ export default function AnchorLink({ Component, children, id, className = '' }) 
             >
                 #
             </a>
-            {children}
-        </Component>
+            <Component>{children}</Component>
+        </div>
     );
 }

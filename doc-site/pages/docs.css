@@ -1,9 +1,6 @@
 .docs h1 {
     @apply text-6xl font-bold;
 }
-.docs h2 {
-    @apply text-3xl font-bold my-4;
-}
 .docs > p:first-of-type {
     @apply text-2xl text-gray-600;
 }

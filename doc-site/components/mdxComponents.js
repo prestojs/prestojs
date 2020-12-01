@@ -12,6 +12,6 @@ export default {
             return <h2 {...props} />;
         }
         const id = props.children.replace(/ /g, '_');
-        return <AnchorLink {...props} Component="h2" id={id} />;
+        return <AnchorLink {...props} Component="h2" id={id} className="text-3xl font-bold my-4" />;
     },
 };

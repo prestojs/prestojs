@@ -1,8 +1,11 @@
+import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { useEffect, useRef } from 'react';
 import SearchIcon from '../assets/search.svg';
 
 function SearchBar() {
     const inputRef = useRef();
+    const router = useRouter();
     useEffect(() => {
         const cb = e => {
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
@@ -14,28 +17,58 @@ function SearchBar() {
             }
         };
         document.body.addEventListener('keydown', cb);
+        docsearch({
+            apiKey: 'a174d5aef3f073d6502856e595a673ba',
+            indexName: 'prestojs',
+            inputSelector: '#search-input',
+            debug: false, // Set debug to true if you want to inspect the dropdown
+            handleSelected: function (input, event, suggestion, datasetNumber, context) {
+                const { url } = suggestion;
+                const a = document.createElement('a');
+                a.href = url;
+                const localUrl = url.replace(a.origin, '');
+                console.log(localUrl);
+                router.push(localUrl);
+                // NOTE: This means cmd-click etc don't work. This is actually docsearch
+                // doing it - if you provide a handleSelected it prevents default - would be
+                // better if it left that to you.
+            },
+        });
         return () => document.body.removeEventListener('keydown', cb);
     }, []);
     return (
-        <div className="w-full lg:px-6 xl:w-3/4 xl:px-12">
-            <div className="relative">
-                <input
-                    ref={inputRef}
-                    className="transition-colors duration-100 ease-in-out focus:outline-0 border border-transparent focus:bg-white focus:border-gray-300 placeholder-gray-600 rounded-lg bg-gray-200 py-2 pr-4 pl-10 block w-full appearance-none leading-normal ds-input"
-                    type="text"
-                    placeholder="Search"
-                    autoComplete="off"
-                    spellCheck="false"
-                    role="combobox"
-                    aria-autocomplete="list"
-                    aria-expanded="false"
-                    aria-label="search input"
+        <>
+            <Head>
+                <script
+                    type="text/javascript"
+                    src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"
                 />
-                <div className="pointer-events-none absolute inset-y-0 left-0 pl-4 flex items-center">
-                    <SearchIcon className="fill-current pointer-events-none text-gray-600 w-4 h-4" />
+                <link
+                    rel="stylesheet"
+                    href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css"
+                />
+            </Head>
+            <div className="w-full lg:px-6 xl:w-3/4 xl:px-12">
+                <div className="relative">
+                    <input
+                        ref={inputRef}
+                        className="transition-colors duration-100 ease-in-out focus:outline-0 border border-transparent focus:bg-white focus:border-gray-300 placeholder-gray-600 rounded-lg bg-gray-200 py-2 pr-4 pl-10 block w-full appearance-none leading-normal ds-input"
+                        id="search-input"
+                        type="text"
+                        placeholder="Search"
+                        autoComplete="off"
+                        spellCheck="false"
+                        role="combobox"
+                        aria-autocomplete="list"
+                        aria-expanded="false"
+                        aria-label="search input"
+                    />
+                    <div className="pointer-events-none absolute inset-y-0 left-0 pl-4 flex items-center">
+                        <SearchIcon className="fill-current pointer-events-none text-gray-600 w-4 h-4" />
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 

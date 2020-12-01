@@ -50,6 +50,9 @@ html {
 .anchor-link:hover .anchor-link-a {
     display: block;
 }
+.anchor-link h3, .anchor-link h4, .anchor-link h2 {
+    font-size: inherit;
+}
 
 .table-mdx p {
     margin: 0;
@@ -96,4 +99,11 @@ html {
 
 .max-w-screen-2xl {
     max-width: 1600px;
+}
+
+[aria-current="page"] {
+    font-weight: bold;
+}
+.algolia-autocomplete {
+    width: 100%;
 }

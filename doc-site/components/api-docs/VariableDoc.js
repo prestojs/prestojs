@@ -16,7 +16,7 @@ export default function VariableDoc({ doc, anchorPrefix = 'var' }) {
         <div className="border-t-2 border-gray-200 mt-3 pt-3">
             <AnchorLink
                 id={`${anchorPrefix}-${doc.name}`}
-                Component="div"
+                Component="h4"
                 className="text-2xl text-gray-700 mt-12"
             >
                 <span className="flex">

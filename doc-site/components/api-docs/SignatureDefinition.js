@@ -1,9 +1,10 @@
 import React from 'react';
 import TypeDesc from './TypeDesc';
 
-export default function SignatureDefinition({ name, parameters, returnType }) {
+export default function SignatureDefinition({ name, parameters, returnType, tag = 'div' }) {
+    const Tag = tag;
     return (
-        <div>
+        <Tag>
             <span className="font-bold">{name}</span>(
             {parameters.map((param, i) => (
                 <React.Fragment key={param.name}>
@@ -21,6 +22,6 @@ export default function SignatureDefinition({ name, parameters, returnType }) {
                     => <TypeDesc type={returnType} />
                 </>
             )}
-        </div>
+        </Tag>
     );
 }

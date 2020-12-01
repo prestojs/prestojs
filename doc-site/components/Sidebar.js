@@ -1,10 +1,28 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React from 'react';
 
+function isCurrent(router, href) {
+    if (!href.endsWith('/')) {
+        href += '/';
+    }
+    let { asPath } = router;
+    if (!asPath.endsWith('/')) {
+        asPath += '/';
+    }
+    return asPath.startsWith(href);
+}
+
 function NavItem({ href, children, as }) {
+    const router = useRouter();
+    if (isCurrent) console.log(href);
     return (
         <Link href={href} as={as}>
-            <a className="block px-2 -mx-2 py-1 hover:text-gray-900 font-medium text-gray-600">
+            <a
+                className={`block px-2 -mx-2 py-1 hover:text-gray-900 font-medium text-gray-600${
+                    isCurrent(router, href || as) ? 'font-bold bg-gray-200' : ''
+                }`}
+            >
                 {children}
             </a>
         </Link>
@@ -12,20 +30,33 @@ function NavItem({ href, children, as }) {
 }
 
 function Links({ links }) {
+    const router = useRouter();
     return links.map((m, i) => (
         <li key={i}>
             <Link href={m.href} as={m.as}>
-                <a className="hover:underline text-gray-800">{m.title}</a>
+                <a
+                    className="hover:underline text-gray-800"
+                    aria-current={isCurrent(router, m.as || m.href) ? 'page' : 'false'}
+                >
+                    {m.title}
+                </a>
             </Link>
         </li>
     ));
 }
 
 function LinksSection_({ title, links }) {
+    const router = useRouter();
+    const anyActive = links.filter(({ href, as }) => isCurrent(router, as || href)).length > 0;
+    console.log({ title, anyActive });
     return (
         <div className="mb-8">
             {title && (
-                <h5 className="mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-sm lg:text-xs">
+                <h5
+                    className={`mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-sm lg:text-xs${
+                        anyActive ? ' current-section' : ''
+                    }`}
+                >
                     {title}
                 </h5>
             )}
