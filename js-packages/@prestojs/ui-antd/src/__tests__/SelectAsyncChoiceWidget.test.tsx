@@ -328,6 +328,7 @@ test('should call onChange with selected value', async () => {
     });
     expect(input.onChange).toHaveBeenCalledWith(2);
     openDropDown(container);
+    await waitForOptions(baseElement, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
@@ -737,6 +738,51 @@ test('search triggered after unmount due to debounce should not error', async ()
         jest.runAllTimers();
     });
     expect(errorSpy).not.toHaveBeenCalled();
+});
+
+test('should support clearOnOpen', async () => {
+    const input = buildInput();
+    const list = jest.fn(resolveMulti);
+    const asyncChoices = buildAsyncChoices({ list });
+    const { baseElement, container, getByText, rerender } = render(
+        <SelectAsyncChoiceWidget
+            asyncChoices={asyncChoices}
+            input={input}
+            virtual={false}
+            clearOnOpen={false}
+            {...widgetProps}
+        />
+    );
+    openDropDown(container);
+    expect(getByText('Fetching results...')).toBeInTheDocument();
+    expect(list).toHaveBeenCalled();
+    await waitForOptions(baseElement, namesForRange(0, 5));
+    act(() => {
+        fireEvent.click(getByText('Fetch More'));
+    });
+    await waitForOptions(baseElement, namesForRange(0, 10));
+    act(() => {
+        fireEvent.click(getByText('Item 7'));
+    });
+    // Opening drop down again should have retained all fetched records
+    openDropDown(container);
+    await waitForOptions(baseElement, namesForRange(0, 10));
+    act(() => {
+        fireEvent.click(getByText('Item 1'));
+    });
+    // Re-render with clearOnOpen=true and it should only have the first page of results again
+    rerender(
+        <SelectAsyncChoiceWidget
+            asyncChoices={asyncChoices}
+            input={input}
+            virtual={false}
+            clearOnOpen={true}
+            {...widgetProps}
+        />
+    );
+    openDropDown(container);
+    expect(getByText('Fetching results...')).toBeInTheDocument();
+    await waitForOptions(baseElement, namesForRange(0, 5));
 });
 
 test.todo('should support tags mode');
