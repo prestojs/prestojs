@@ -203,6 +203,19 @@ test('useAsyncListing should support accumulatePages', async () => {
     act(() => paginator.next());
     await advanceTimers();
     expect(result.current.result).toEqual(testData.slice(0, 6));
+    expect(paginator.currentState).toEqual({ page: 2, pageSize: 3 });
+    // Calling reset should clear accumulated items
+    act(() => {
+        result.current.reset();
+    });
+    expect(result.current.result).toEqual(null);
+    await advanceTimers();
+    act(() => {
+        result.current.paginator.first();
+    });
+    await advanceTimers();
+    expect(paginator.currentState).toEqual({ page: 1, pageSize: 3 });
+    expect(result.current.result).toEqual(testData.slice(0, 3));
 });
 
 test('useAsyncListing should support trigger option', async () => {
