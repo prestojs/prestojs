@@ -65,6 +65,12 @@ html {
 .mdx code {
     background-color: rgba(255, 230, 100, 0.2);
 }
+.mdx ul {
+    @apply m-5;
+}
+.mdx li {
+    @apply my-1 list-disc;
+}
 
 .code-editor-compiler input[type="text"] {
     @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight;

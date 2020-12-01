@@ -1,5 +1,15 @@
 export const metadata = {
-   title: 'Routing'
-}
+    title: 'Routing',
+};
 
 # Routing
+
+You can use any client side router with Presto - it is not tied to any particular implementation. It provides some
+general utilities to assist with routing (both client or server side).
+
+-   [UrlPattern](doc:UrlPattern) provides a standard way to define URL patterns with functions to resolve any arguments
+    or append query string parameters.
+-   [NamedUrlPatterns](doc:NamedUrlPatterns) lets you specify a name for a `UrlPattern` and use that throughout your site
+    rather than hardcoding a URL.
+-   [useUrlQueryState](doc:useUrlQueryState) makes dealing with state stored in URL query parameters as convenient as the
+    `useState` hook.

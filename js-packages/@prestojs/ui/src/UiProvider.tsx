@@ -63,7 +63,7 @@ export const UiContext = React.createContext<UiContextValue | null>(null);
 /**
  * @expand-properties
  */
-type Props = {
+type UiProviderProps = {
     /**
      * Children to render
      */
@@ -140,7 +140,7 @@ type Props = {
  *
  * @extract-docs
  */
-export default function UiProvider(props: Props): React.ReactElement {
+export default function UiProvider(props: UiProviderProps): React.ReactElement {
     const {
         children,
         getWidgetForField,

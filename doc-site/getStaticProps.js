@@ -16,11 +16,10 @@ async function traverse(obj, fn, visitedTracker = new Map()) {
         return obj;
     }
     visitedTracker.set(obj, true);
-
     if (await fn(obj)) {
         return obj;
     }
-    for (const value of Object.values(obj)) {
+    for (const value of Array.isArray(obj) ? obj : Object.values(obj)) {
         if (Array.isArray(value)) {
             for (const v of value) {
                 if (value && typeof value == 'object') {
@@ -50,11 +49,11 @@ function traverseSync(obj, fn, visitedTracker = new Map()) {
         if (Array.isArray(value)) {
             for (const v of value) {
                 if (value && typeof value == 'object') {
-                    traverse(v, fn, visitedTracker);
+                    traverseSync(v, fn, visitedTracker);
                 }
             }
         } else if (value && typeof value == 'object') {
-            traverse(value, fn, visitedTracker);
+            traverseSync(value, fn, visitedTracker);
         }
     }
     return obj;
@@ -110,10 +109,12 @@ function prepareDocs(docs, extraNodes) {
     traverseSync(extraNodes, fn, visitedTracker);
 }
 
+const preparedDocs = new Map();
 export function usePrepareDocs(docs, extraNodes) {
-    React.useEffect(() => {
+    if (!preparedDocs.has(docs)) {
         prepareDocs(docs, extraNodes);
-    }, [docs, extraNodes]);
+        preparedDocs.set(docs, true);
+    }
 }
 
 export default async function getStaticProps(
@@ -175,7 +176,7 @@ export default async function getStaticProps(
         await transformComment(obj);
         if (obj.type === 'reference' && !extraNodes[obj.id] && obj.id && byId[obj.id]) {
             extraNodes[obj.id] = byId[obj.id];
-            traverse(byId[obj.id], transformObj, visitedTracker);
+            await traverse(byId[obj.id], transformObj, visitedTracker);
         }
     }
     const docs = [];
