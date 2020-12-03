@@ -24,7 +24,8 @@
   "dependencies": {
     "qs": "^6.9.4",
     "lodash": "^4.17.15",
-    "shallowequal": "^1.1.0"
+    "shallowequal": "^1.1.0",
+    "query-string": "^6.13.1"
   },
   "devDependencies": {
     "typescript": "^3.9.2"
