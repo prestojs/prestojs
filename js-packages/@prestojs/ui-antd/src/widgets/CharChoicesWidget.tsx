@@ -12,6 +12,8 @@ import SelectChoiceWidget from './SelectChoiceWidget';
  * See [Radio](https://next.ant.design/components/radio/)   for Radio props available
  *
  * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 const CharChoicesWidget = React.forwardRef(
     (

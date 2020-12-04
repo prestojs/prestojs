@@ -4,6 +4,10 @@ import React from 'react';
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 const FloatWidget = React.forwardRef(
     (

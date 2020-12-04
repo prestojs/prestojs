@@ -1,5 +1,44 @@
 export const metadata = {
-   title: 'Antd UI'
-}
+    title: 'Antd UI',
+};
 
 # Antd UI
+
+This module provides UI components for displaying and editing data using the [antd](https://ant.design) library.
+
+See [UiProvider](doc:UiProvider) for more detail on how UI integrations work. Below is an example
+of setting up ui-antd.
+
+```jsx
+import React from 'react';
+import { UiProvider } from '@prestojs/ui';
+import {
+    FormWrapper,
+    getWidgetForField as antdGetWidgetForField,
+    FormItemWrapper,
+} from '@prestojs/ui-antd';
+
+function getWidgetForField(field) {
+    const widget = antdGetWidgetForField(field);
+    // If ui-antd doesn't provide a widget fall back to a default
+    // You can add your own customisations here too (eg. override widgets
+    // for specific fields or add support for new fields)
+    if (!widget) {
+        // Alternatively you could return a default widget here
+        throw new Error(`No widget set for ${field}`);
+    }
+    return widget;
+}
+
+export default function Root() {
+    return (
+        <UiProvider
+            getWidgetForField={getWidgetForField}
+            formItemComponent={FormItemWrapper}
+            formComponent={FormWrapper}
+        >
+            <YourApp />
+        </UiProvider>
+    );
+}
+```

@@ -3,7 +3,11 @@ import React from 'react';
 import FileWidget, { UploadWidgetProps } from './FileWidget';
 
 /**
- * See [Upload](https://next.ant.design/components/upload/) for props available
+ * See [FileWidget](doc:FileWidget) for props available
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 // might need additional features eg rescale/EXIF correction
 const ImageWidget = React.forwardRef(

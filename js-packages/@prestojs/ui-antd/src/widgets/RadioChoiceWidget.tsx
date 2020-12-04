@@ -4,6 +4,10 @@ import React from 'react';
 
 /**
  * See [Radio](https://next.ant.design/components/radio/) for props available
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 function RadioChoiceWidget({
     input,

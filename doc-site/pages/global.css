@@ -74,6 +74,9 @@ html {
 .mdx li {
     @apply my-1 list-disc;
 }
+.mdx h3 {
+    @apply mt-5;
+}
 
 .code-editor-compiler input[type="text"] {
     @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight;

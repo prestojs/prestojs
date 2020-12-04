@@ -119,6 +119,7 @@ function urlToUploadFile(uid: string, url: string): Promise<UploadFile> {
  * @param previewImage If true the `thumbUrl` property will be set for each `UploadFile`
  *
  * @extract-docs
+ * @menu-group Widget Hooks
  */
 export function useFileList(
     value: File | string | (File | string)[] | null | undefined,

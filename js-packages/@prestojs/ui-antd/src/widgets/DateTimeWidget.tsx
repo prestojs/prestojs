@@ -5,6 +5,10 @@ import React from 'react';
 
 /**
  * See [DatePicker](https://next.ant.design/components/date-picker/) for props available
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 const DateTimeWidget = React.forwardRef(
     (

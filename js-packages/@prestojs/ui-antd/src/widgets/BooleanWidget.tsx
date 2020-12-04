@@ -6,6 +6,8 @@ import React from 'react';
  * See [Checkbox](https://next.ant.design/components/checkbox/) for props available
  *
  * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 const BooleanWidget = React.forwardRef(
     (

@@ -5,6 +5,10 @@ import SelectChoiceWidget, { SelectChoiceProps } from './SelectChoiceWidget';
 
 /**
  * See [Select](https://next.ant.design/components/select/) for Select props available
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 const NullableBooleanWidget = React.forwardRef(
     (

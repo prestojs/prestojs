@@ -4,6 +4,10 @@ import React from 'react';
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 // TODO - We might want to add currency type support to this field one day.
 // TODO - do we want to limit currency decimal points to 2? there ARE countries in the world where 2's not enough eg CLF...

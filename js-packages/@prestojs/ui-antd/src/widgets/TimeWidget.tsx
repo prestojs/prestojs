@@ -5,6 +5,10 @@ import React from 'react';
 
 /**
  * See [TimePicker](https://next.ant.design/components/time-picker/) for props available
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 // FIXME - there's no way to pass value to TimePicker correctly w/o moment being involved atm - its not a standard Date object there.
 // ref as RefObject any cause TimePicker's merged as a value in antd unlike any other

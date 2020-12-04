@@ -4,6 +4,10 @@ import React from 'react';
 
 /**
  * See [Input](https://next.ant.design/components/input/) for props available
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 const IPAddressWidget = React.forwardRef(
     (

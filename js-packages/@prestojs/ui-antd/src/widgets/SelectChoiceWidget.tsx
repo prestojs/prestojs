@@ -14,6 +14,10 @@ export type SelectChoiceProps = SelectProps<any> &
 
 /**
  * See [Select](https://next.ant.design/components/select/) for Select props available
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 const SelectChoiceWidget = React.forwardRef(
     (

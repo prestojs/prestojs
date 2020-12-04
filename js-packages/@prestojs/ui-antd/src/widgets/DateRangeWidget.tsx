@@ -8,6 +8,10 @@ import RangeWidget from './RangeWidget';
  * See [DatePicker](https://next.ant.design/components/date-picker/) for props available
  *
  * As with all range widgets, ref should be shaped as { lowerRef: Ref(), upperRef: Ref() }
+ *
+ * @extract-docs
+ * @menu-group Widgets
+ * @forward-ref
  */
 const DateRangeWidget = React.forwardRef(
     (

@@ -37,11 +37,53 @@ const choicesMapping = new Map<string, FieldWidgetType<any, any>>([
     ['IntegerField', React.lazy(() => import('./widgets/IntegerChoicesWidget'))],
 ]);
 
-/*
- * Returns the default widget for any given Field.
+/**
+ * Returns the default widget to use for any given Field. This is the glue between the
+ * [ViewModel](doc:viewModelFactory) fields and the specific antd UI form components to use.
  *
- * Depending on Field, this will return either a FieldWidget component directly, or [FieldWidget, props] where props is the default props that would be applied to said widget.
+ * Depending on Field, this will return either a FieldWidget component directly, or an array like `[FieldWidget, props]` where props is the default props that would be applied to said widget.
  *
+ * This should be passed to [UiProvider](doc:UiProvider) which will provide the function
+ * to components like [FieldWidget](doc:FieldWidget).
+ *
+ * See [FieldWidget](doc:FieldWidget) for where this function typically gets called from.
+ *
+ * ### Simple usage:
+ *
+ * ```jsx
+ * import { UiProvider, getFormatterForField } from '@prestojs/ui';
+ * import {
+ *   FormWrapper,
+ *   getWidgetForField as antdGetWidgetForField,
+ *   FormItemWrapper,
+ * } from '@prestojs/ui-antd';
+ *
+ * function getWidgetForField(field) {
+ *   const widget = antdGetWidgetForField(field);
+ *   // If ui-antd doesn't provide a widget fall back to a default
+ *   // You can add your own customisations here too (eg. override widgets
+ *   // for specific fields or add support for new fields)
+ *   if (!widget) {
+ *     return DefaultWidget;
+ *   }
+ *   return widget;
+ * }
+ *
+ * export default () => (
+ *   <UiProvider
+ *     getWidgetForField={getWidgetForField}
+ *     getFormatterForField={getFormatterForField}
+ *     formItemComponent={FormItemWrapper}
+ *     formComponent={FormWrapper}
+ *   >
+ *     <YourApp />
+ *   </UiProvider>
+ * );
+ * ```
+ *
+ * @param field The field to return the widget for.
+ *
+ * @menu-group Form
  * @extract-docs
  */
 export default function getWidgetForField<
