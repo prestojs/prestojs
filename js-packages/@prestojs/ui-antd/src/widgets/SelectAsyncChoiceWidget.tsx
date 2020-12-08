@@ -150,7 +150,7 @@ export type SelectAsyncChoiceProps<T> = SelectProps<ValueType<T>> &
         retrieveOptions?: Record<string, any>;
     };
 
-type LabeledValue<T> = { key: T; label: React.ReactNode; found: boolean };
+type LabeledValue<T> = { key: T; label: React.ReactNode; found: boolean; missingLabel: boolean };
 
 /**
  * Given a value `rawValue` this functions looks up the matching item in `allItems` and returns
@@ -198,8 +198,9 @@ function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props
             })
         );
     }
-    const matchedItem = rawValue ? allItems.filter(item => item.value === rawValue).pop() : null;
+    const matchedItem = rawValue ? allItems.find(item => item.value === rawValue) : null;
     let label;
+    let missingLabel = false;
     if (
         rawValue &&
         !matchedItem &&
@@ -208,12 +209,14 @@ function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props
     ) {
         label = asyncChoices.getLabel(selected as ItemType);
     } else if (rawValue) {
+        missingLabel = !matchedItem;
         label = matchedItem ? matchedItem.label : asyncChoices.getMissingLabel(rawValue as T);
     }
     return {
         key: rawValue,
         label,
         found: !!matchedItem,
+        missingLabel,
     };
 }
 
@@ -225,23 +228,25 @@ function defaultRenderNextPageButton({ isLoading, onClick }): React.ReactNode {
     );
 }
 
-type SelectReducerState = { isOpen: boolean; keywords: string };
+type SelectReducerState = { isOpen: boolean; keywords: string; internalKeywords: string };
 type SelectReducerAction =
     | { type: 'open' }
     | { type: 'close' }
-    | { type: 'setKeywords'; keywords: string };
+    | { type: 'setKeywords'; keywords: string }
+    | { type: 'setInternalKeywords'; keywords: string };
 
 function reducer(state: SelectReducerState, action: SelectReducerAction): SelectReducerState {
     switch (action.type) {
         case 'open':
-            return { ...state, isOpen: true };
+            return { ...state, isOpen: true, keywords: '', internalKeywords: '' };
         case 'close':
             // Originally attempted to clear keywords on close... but that caused an infinite loop that
-            // I was unable to track down. Retaining the keywords across open/close transitions
-            // works.
+            // I was unable to track down. Clear them in 'open' instead.
             return { ...state, isOpen: false };
         case 'setKeywords':
             return { ...state, keywords: action.keywords };
+        case 'setInternalKeywords':
+            return { ...state, internalKeywords: action.keywords };
     }
 }
 
@@ -282,10 +287,17 @@ function SelectAsyncChoiceWidget<
         retrieveOptions,
         ...rest
     } = props;
-    // Internal input state for keywords. This differs from keywords set with reducer as
-    // reducer keywords are debounced but internal state is not.
-    const [internalKeywords, setInternalKeywords] = useState('');
-    const [{ isOpen, keywords }, dispatch] = useReducer(reducer, { isOpen: false, keywords: '' });
+    const [{ isOpen, keywords, internalKeywords }, dispatch] = useReducer(reducer, {
+        isOpen: false,
+        keywords: '',
+        internalKeywords: '',
+    });
+    // Internal input state for keywords. This differs from 'keywords' in that 'keywords' are debounced but 'internalKeywords' are not
+    const setInternalKeywords = (s): void => dispatch({ type: 'setInternalKeywords', keywords: s });
+    // Track the last value set so we can use it's labels if we need to. This is necessary for the case where
+    // values have been selected but then the list is further filtered such that the selected items are no
+    // longer in the list of choices.
+    const [lastValue, setLastValue] = useState<Choice<T>[]>([]);
     const setKeywords = (s): void => dispatch({ type: 'setKeywords', keywords: s });
     const { list, choices, selected } = useAsyncChoices<any, T>({
         asyncChoices,
@@ -332,6 +344,11 @@ function SelectAsyncChoiceWidget<
             }
             return acc;
         }, []) || [];
+    // Add previously selected values to end. Array is searched in order for a label
+    // - duplicates don't matter and first found value will be used. This is to handle
+    // case where `choices` has been filtered by a search and no longer includes the
+    // currently selected items.
+    flattenedItems.push(...lastValue);
     const rawValue = input.value;
     let value;
     // When dealing with multi-select any existing values that are selected
@@ -363,8 +380,9 @@ function SelectAsyncChoiceWidget<
     }
     const { onChange } = input;
     const wrappedOnChange = useCallback(
-        value => {
+        (value: Choice<T> | Choice<T>[]) => {
             if (Array.isArray(value)) {
+                setLastValue(value);
                 return onChange(value.map(v => v.value));
             }
             if (value.value === NEXT_PAGE_VALUE) {
@@ -375,10 +393,14 @@ function SelectAsyncChoiceWidget<
                 // from happening.
                 return;
             }
+            setLastValue([value]);
             return onChange(value.value);
         },
         [onChange]
     );
+
+    const isMissingLabel =
+        value && (Array.isArray(value) ? value.some(v => v.missingLabel) : value.missingLabel);
     return (
         <Select
             mode={asyncChoices.multiple ? 'multiple' : undefined}
@@ -398,11 +420,12 @@ function SelectAsyncChoiceWidget<
             }}
             filterOption={false}
             disabled={!isOpen && selected.isLoading}
-            {...input}
             {...rest}
             onChange={wrappedOnChange}
             labelInValue
-            value={selected.isLoading ? undefined : value}
+            // if label is missing and is currently attempting to resolve the label don't render
+            // anything - this avoids showing the missing label value (eg. the raw id) unnecessarily
+            value={isMissingLabel && selected.isLoading ? undefined : value}
             notFoundContent={isLoading ? loadingContent : rest.notFoundContent}
             searchValue={internalKeywords}
         >
