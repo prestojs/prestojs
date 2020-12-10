@@ -7,7 +7,7 @@ import {
     useViewModelCache,
     viewModelFactory,
 } from '@prestojs/viewmodel';
-import { act, fireEvent, getAllByTestId, render, waitFor } from '@testing-library/react';
+import { act, fireEvent, getAllByTestId, getByText, render, waitFor } from '@testing-library/react';
 import React, { useState } from 'react';
 import SelectAsyncChoiceWidget from '../widgets/SelectAsyncChoiceWidget';
 
@@ -122,10 +122,13 @@ const widgetProps = {
     },
 };
 
-function waitForOptions(id: any, names: string[]): Promise<any> {
-    return waitFor(() =>
+async function waitForOptions(id: any, names: string[]): Promise<any> {
+    await waitFor(() =>
         expect(getAllByTestId(id, 'select-option').map(item => item.textContent)).toEqual(names)
     );
+    // I don't understand why but adding this avoided various 'Warning: An update to PopupInner inside a test was not wrapped in act(...).'
+    // warnings.
+    await waitFor(() => getByText(id, names[0]));
 }
 
 function waitForSelectedValue(container, value: string | string[]): Promise<any> {
@@ -152,24 +155,7 @@ function openDropDown(container): void {
 }
 
 afterEach(async () => {
-    // I was getting the following error:
-    //
-    // Error: Uncaught [TypeError: Cannot read property 'clientHeight' of null]
-    // at reportException (...presto/node_modules/jsdom/lib/jsdom/living/helpers/runtime-script-errors.js:62:24)
-    // at Timeout.callback [as _onTimeout] (...presto/node_modules/jsdom/lib/jsdom/browser/Window.js:645:7)
-    // at listOnTimeout (internal/timers.js:549:17)
-    // at processTimers (internal/timers.js:492:7) TypeError: Cannot read property 'clientHeight' of null
-    // at ...presto/node_modules/rc-virtual-list/lib/List.js:232:54
-    // at Timeout.callback [as _onTimeout] (...presto/node_modules/jsdom/lib/jsdom/browser/Window.js:643:19)
-    // at listOnTimeout (internal/timers.js:549:17)
-    // at processTimers (internal/timers.js:492:7)
-    //
-    // Gave up trying to work it out. Using fake timers sometimes helped but not
-    // consistently. Setting delay to 10ms seems to reliably resolve it...
     jest.useRealTimers();
-    await delay(() => {
-        // do nothing, just need to add artificial delay
-    }, 10);
 });
 
 test('should support fetching all paginated records', async () => {
@@ -268,6 +254,7 @@ test('should support initial value', async () => {
     expect(list).toHaveBeenCalledTimes(1);
     expect(retrieve).toHaveBeenCalledTimes(2);
     await waitForSelectedValue(container, 'Item 1');
+    // await waitFor(() => getByText('Item 1'));
 });
 
 test('should support onRetrieveError', async () => {
@@ -328,6 +315,7 @@ test('should call onChange with selected value', async () => {
     });
     expect(input.onChange).toHaveBeenCalledWith(2);
     openDropDown(container);
+    await waitForOptions(baseElement, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
@@ -737,6 +725,51 @@ test('search triggered after unmount due to debounce should not error', async ()
         jest.runAllTimers();
     });
     expect(errorSpy).not.toHaveBeenCalled();
+});
+
+test('should support clearOnOpen', async () => {
+    const input = buildInput();
+    const list = jest.fn(resolveMulti);
+    const asyncChoices = buildAsyncChoices({ list });
+    const { baseElement, container, getByText, rerender } = render(
+        <SelectAsyncChoiceWidget
+            asyncChoices={asyncChoices}
+            input={input}
+            virtual={false}
+            clearOnOpen={false}
+            {...widgetProps}
+        />
+    );
+    openDropDown(container);
+    expect(getByText('Fetching results...')).toBeInTheDocument();
+    expect(list).toHaveBeenCalled();
+    await waitForOptions(baseElement, namesForRange(0, 5));
+    act(() => {
+        fireEvent.click(getByText('Fetch More'));
+    });
+    await waitForOptions(baseElement, namesForRange(0, 10));
+    act(() => {
+        fireEvent.click(getByText('Item 7'));
+    });
+    // Opening drop down again should have retained all fetched records
+    openDropDown(container);
+    await waitForOptions(baseElement, namesForRange(0, 10));
+    act(() => {
+        fireEvent.click(getByText('Item 1'));
+    });
+    // Re-render with clearOnOpen=true and it should only have the first page of results again
+    rerender(
+        <SelectAsyncChoiceWidget
+            asyncChoices={asyncChoices}
+            input={input}
+            virtual={false}
+            clearOnOpen={true}
+            {...widgetProps}
+        />
+    );
+    openDropDown(container);
+    expect(getByText('Fetching results...')).toBeInTheDocument();
+    await waitForOptions(baseElement, namesForRange(0, 5));
 });
 
 test.todo('should support tags mode');

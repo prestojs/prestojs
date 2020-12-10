@@ -1,45 +1,49 @@
 import type { WidgetProps } from '@prestojs/ui';
-import { Select } from 'antd';
 import React from 'react';
 import SelectChoiceWidget, { SelectChoiceProps } from './SelectChoiceWidget';
 
 /**
- * See [Select](https://next.ant.design/components/select/) for Select props available
+ * @expand-properties
+ * @hide-properties asyncChoices
+ */
+type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElement> & {
+    /**
+     * Label to use to represent the blank (null) value.
+     *
+     * Defaults to 'Undecided'.
+     */
+    blankLabel: string;
+} & SelectChoiceProps;
+
+/**
+ * See [Select](https://ant.design/components/select/) for Select props available
  *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
  */
-const NullableBooleanWidget = React.forwardRef(
-    (
-        {
-            choices,
-            blankLabel = 'Undecided',
-            ...rest
-        }: WidgetProps<boolean | string, HTMLElement> & {
-            blankLabel: string;
-        } & SelectChoiceProps,
-        ref: React.RefObject<Select>
-    ): React.ReactElement => {
-        const defaultChoices =
-            choices ||
-            new Map([
-                [true, 'Yes'],
-                [false, 'No'],
-                [null, blankLabel],
-            ]);
+function NullableBooleanWidget(props: NullableBooleanWidgetProps, ref): React.ReactElement {
+    const { choices, blankLabel = 'Undecided', ...rest } = props;
+    const defaultChoices =
+        choices ||
+        new Map([
+            [true, 'Yes'],
+            [false, 'No'],
+            [null, blankLabel],
+        ]);
 
-        const newChoices = new Map(
-            Array.from(defaultChoices as any, ([key, label]) =>
-                key === null ? ['null', label] : [key, label]
-            )
-        ) as Map<boolean | string, string>;
-        // rest onChange override comes before input onChange.
-        const f = rest.onChange || (rest.input as any).onChange;
-        const onChange = (v: boolean | string): void => f(v === 'null' ? null : v);
+    const newChoices = new Map(
+        Array.from(defaultChoices as any, ([key, label]) =>
+            key === null ? ['null', label] : [key, label]
+        )
+    ) as Map<boolean | string, string>;
+    // rest onChange override comes before input onChange.
+    const f = rest.onChange || (rest.input as any).onChange;
+    const onChange = (v: boolean | string): void => f(v === 'null' ? null : v);
 
-        return <SelectChoiceWidget ref={ref} choices={newChoices} {...{ onChange, ...rest }} />;
-    }
+    return <SelectChoiceWidget ref={ref} choices={newChoices} {...{ onChange, ...rest }} />;
+}
+
+export default React.forwardRef<HTMLSelectElement, NullableBooleanWidgetProps>(
+    NullableBooleanWidget
 );
-
-export default NullableBooleanWidget;

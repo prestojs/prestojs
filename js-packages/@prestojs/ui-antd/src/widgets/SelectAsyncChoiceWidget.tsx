@@ -1,10 +1,10 @@
 import { InputProps, WidgetProps } from '@prestojs/ui/FieldWidgetInterface';
-import { Paginator } from '@prestojs/util';
+import { isEqual, Paginator } from '@prestojs/util';
 import { AsyncChoicesInterface, Choice, useAsyncChoices } from '@prestojs/viewmodel';
 import { Button, Select } from 'antd';
 import { SelectProps } from 'antd/lib/select';
 import debounce from 'lodash/debounce';
-import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
 type ValueType<T> = T[] | T | null;
 
@@ -15,7 +15,7 @@ type SelectInputProps<T> = InputProps<ValueType<T>, HTMLSelectElement> & {
 };
 
 /**
- * @expand-properties Most [Select](https://next.ant.design/components/select/) props in addition to the below. Note the
+ * @expand-properties Most [Select](https://ant.design/components/select/) props in addition to the below. Note the
  * following restrictions: `mode` is set to "multiple" when `asyncChoices.multiple` is `true`, `labelInValue` can't be
  * changed, `notFoundContent` is set to `loadingContent` when choices are resolving otherwise `notFoundContent`
  * @hide-properties meta
@@ -148,6 +148,14 @@ export type SelectAsyncChoiceProps<T> = SelectProps<ValueType<T>> &
          * key
          */
         retrieveOptions?: Record<string, any>;
+        /**
+         * Whether to clear and fetch fresh results when the drop down is opened after the initial fetch. If this is set to
+         * false then the only time fresh results are fetched will be when the search filter changes or a new page of results
+         * is retrieved.
+         *
+         * This defaults to `true`.
+         */
+        clearOnOpen?: boolean;
     };
 
 type LabeledValue<T> = { key: T; label: React.ReactNode; found: boolean; missingLabel: boolean };
@@ -258,7 +266,7 @@ type SelectAsyncChoiceWidgetValue = number | string;
 const NEXT_PAGE_VALUE = '__nextpage';
 
 /**
- * A [Select](https://next.ant.design/components/select/) widget that handles [async choices](doc:AsyncChoicesInterface)
+ * A [Select](https://ant.design/components/select/) widget that handles [async choices](doc:AsyncChoicesInterface)
  *
  * @extract-docs
  * @forward-ref
@@ -267,12 +275,13 @@ const NEXT_PAGE_VALUE = '__nextpage';
 function SelectAsyncChoiceWidget<
     T extends SelectAsyncChoiceWidgetValue,
     Multiple extends boolean = T extends Array<any> ? true : false
->(props: SelectAsyncChoiceProps<T>, ref: React.RefObject<Select>): React.ReactElement {
+>(props: SelectAsyncChoiceProps<T>, ref): React.ReactElement {
     const {
         input,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         meta,
         asyncChoices,
+        clearOnOpen = true,
         debounceWait = 500,
         triggerWhenClosed = false,
         loadingContent = 'Fetching results...',
@@ -318,6 +327,27 @@ function SelectAsyncChoiceWidget<
         listOptions,
         retrieveOptions,
     });
+    const listRef = useRef(list);
+    listRef.current = list;
+    useEffect(() => {
+        // we use a ref for `list` as we only want this to do anything when `isOpen` changes to true
+        if (isOpen && !listRef.current.isLoading && listRef.current.result && clearOnOpen) {
+            listRef.current.reset();
+            if (
+                listRef.current.paginator &&
+                !isEqual(
+                    listRef.current.paginator.currentState,
+                    listRef.current.paginator.firstState()
+                )
+            ) {
+                // Reset paginator as well; this will cause a refetch
+                listRef.current.paginator.first();
+            } else {
+                // If no paginator or paginator is already on first page manually trigger a fetch
+                listRef.current.run();
+            }
+        }
+    }, [accumulatePages, clearOnOpen, isOpen]);
     const { paginator } = list;
     const isLoading = list.isLoading || selected.isLoading;
     const debouncedSetKeywords = useMemo(

@@ -9,7 +9,9 @@ test('should accept endpoint', async () => {
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [paginationMiddleware()],
     });
-    const { result } = renderHook(() => usePaginator(action1 as PaginatorClassProvider));
+    const { result } = renderHook(() =>
+        usePaginator((action1 as unknown) as PaginatorClassProvider<any>)
+    );
 
     act(() => result.current.setResponse({ total: 10, pageSize: 5 }));
 
@@ -27,7 +29,7 @@ test('should accept endpoint', async () => {
 test('should accept no value', async () => {
     let action1: null | Endpoint = null;
     const { result, rerender } = renderHook(() =>
-        usePaginator(action1 as PaginatorClassProvider<any>)
+        usePaginator((action1 as unknown) as PaginatorClassProvider<any>)
     );
 
     expect(result.current).toBe(null);

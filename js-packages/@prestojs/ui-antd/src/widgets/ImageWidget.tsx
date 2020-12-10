@@ -1,4 +1,3 @@
-import { Upload } from 'antd';
 import React from 'react';
 import FileWidget, { UploadWidgetProps } from './FileWidget';
 
@@ -9,14 +8,8 @@ import FileWidget, { UploadWidgetProps } from './FileWidget';
  * @menu-group Widgets
  * @forward-ref
  */
-// might need additional features eg rescale/EXIF correction
-const ImageWidget = React.forwardRef(
-    (
-        props: UploadWidgetProps<File, HTMLElement>,
-        ref: React.RefObject<Upload>
-    ): React.ReactElement => {
-        return <FileWidget ref={ref} listType="picture-card" accept="image/*" {...props} />;
-    }
-);
+function ImageWidget(props: UploadWidgetProps<File, HTMLElement>, ref): React.ReactElement {
+    return <FileWidget ref={ref} listType="picture-card" accept="image/*" {...props} />;
+}
 
-export default ImageWidget;
+export default React.forwardRef<HTMLElement, UploadWidgetProps<File, HTMLElement>>(ImageWidget);

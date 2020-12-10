@@ -3,20 +3,24 @@ import { Radio } from 'antd';
 import React from 'react';
 
 /**
- * See [Radio](https://next.ant.design/components/radio/) for props available
+ * @expand-properties
+ * @hide-properties asyncChoices
+ */
+type RadioChoicesWidgetProps = WidgetProps<number | string, HTMLInputElement>;
+
+/**
+ * See [Radio](https://ant.design/components/radio/) for props available
  *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
  */
-function RadioChoiceWidget({
-    input,
-    ...rest
-}: WidgetProps<number | string, HTMLInputElement>): React.ReactElement {
+function RadioChoiceWidget(props: RadioChoicesWidgetProps): React.ReactElement {
+    const { input, choices, ...rest } = props;
     return (
         <Radio.Group {...input} {...rest}>
-            {rest.choices &&
-                Array.from(rest.choices, ([key, label]) => (
+            {choices &&
+                Array.from(choices, ([key, label]) => (
                     <Radio key={key.toString()} value={key}>
                         {label}
                     </Radio>

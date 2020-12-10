@@ -1,5 +1,5 @@
 import isEqual from 'lodash/isEqual';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { PaginatorInterface } from './pagination/Paginator';
 import useAsync from './useAsync';
 
@@ -148,7 +148,7 @@ export default function useAsyncListing<T>(
     // early (eg. the UI can still show the previous results while next is loading)
     const shouldResetAccumulatedValues = useRef(false);
 
-    const { run, reset, response, isLoading, error } = useAsync(async () => {
+    const { run, reset: resetAsync, response, isLoading, error } = useAsync(async () => {
         // If paginator state has changed to anything except the next value we have to reset accumulator
         if (
             paginator &&
@@ -180,6 +180,12 @@ export default function useAsyncListing<T>(
         return result;
     });
 
+    const reset = useCallback(() => {
+        // If reset is called we need to reset accumulated values too
+        shouldResetAccumulatedValues.current = true;
+        resetAsync();
+    }, [resetAsync]);
+
     const paginationChanged =
         paginationState &&
         // First pagination being set should not register as a change - otherwise results will
@@ -210,7 +216,7 @@ export default function useAsyncListing<T>(
         if ((queryChanged || paginationChanged || executeChanged) && trigger === 'MANUAL') {
             lastPaginationStateRef.current =
                 (paginator?.responseIsSet && paginator?.currentState) || null;
-            reset();
+            resetAsync();
         }
         if (
             paginator?.responseIsSet &&
@@ -231,7 +237,7 @@ export default function useAsyncListing<T>(
         query,
         run,
         trigger,
-        reset,
+        resetAsync,
         paginationChanged,
         executeChanged,
         execute,

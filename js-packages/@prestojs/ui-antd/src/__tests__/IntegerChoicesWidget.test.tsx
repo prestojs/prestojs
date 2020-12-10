@@ -1,9 +1,9 @@
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
 
 import IntegerChoicesWidget from '../widgets/IntegerChoicesWidget';
 
-test('choices widget picks select / radio base on choice number correctly', () => {
+test('choices widget picks select / radio base on choice number correctly', async () => {
     const choices = new Map([
         [1, 'One'],
         [2, 'Two'],
@@ -31,6 +31,7 @@ test('choices widget picks select / radio base on choice number correctly', () =
     );
     expect(container.querySelectorAll('.ant-radio-group').length).toBe(0);
     expect(container.querySelectorAll('.ant-select').length).toBe(1);
+    await waitFor(() => getByText('One'));
     fireEvent.click(getByText('One'));
     expect(onChange).toHaveBeenCalledWith(1, expect.anything());
     fireEvent.click(getByText('Three'));

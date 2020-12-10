@@ -3,20 +3,24 @@ import { Checkbox } from 'antd';
 import React from 'react';
 
 /**
- * See [Checkbox](https://next.ant.design/components/checkbox/) for props available
+ * @expand-properties
+ * @hide-properties choices asyncChoices
+ */
+type BooleanWidgetProps = WidgetProps<boolean, HTMLInputElement>;
+
+/**
+ * See [Checkbox](https://ant.design/components/checkbox/) for props available
  *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
  */
-const BooleanWidget = React.forwardRef(
-    (
-        { input, ...rest }: WidgetProps<boolean, HTMLInputElement>,
-        ref: React.RefObject<Checkbox>
-    ): React.ReactElement => {
-        const { value, ...restInput } = input;
-        return <Checkbox ref={ref} checked={!!value} {...restInput} {...rest} />;
-    }
-);
+function BooleanWidget(props: BooleanWidgetProps, ref): React.ReactElement {
+    const { input, ...rest } = props;
+    const { value, ...restInput } = input;
+    return <Checkbox ref={ref} checked={!!value} {...restInput} {...rest} />;
+}
 
-export default BooleanWidget;
+export default React.forwardRef<HTMLInputElement, WidgetProps<boolean, HTMLInputElement>>(
+    BooleanWidget
+);

@@ -41,11 +41,13 @@ export function expandProperties(param, force, hideProperties = []) {
         const desc = t.comment?.tagsByName?.['expand-properties']?.mdx;
         const hideProperties = t.comment?.tagsByName?.['hide-properties'] || [];
         if (t.type?.type === 'intersection') {
-            const children = [];
+            let children = [];
             for (const type of t.type.types) {
                 const [, c] = expandProperties(type, true, hideProperties) || [];
                 if (c) {
-                    children.push(...c);
+                    // Remove any duplicates; latest entry takes precedence
+                    const names = c.map(({ name }) => name);
+                    children = [...children.filter(({ name }) => !names.includes(name)), ...c];
                 }
             }
             return [param.name, children.filter(t => !hideProperties.includes(t.name)), desc];
