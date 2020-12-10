@@ -1,11 +1,12 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SearchIcon from '../assets/search.svg';
 
 function SearchBar() {
     const inputRef = useRef();
     const router = useRouter();
+    const [searchEnabled, setSearchEnabled] = useState(false);
     useEffect(() => {
         const cb = e => {
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
@@ -27,13 +28,13 @@ function SearchBar() {
                 const a = document.createElement('a');
                 a.href = url;
                 const localUrl = url.replace(a.origin, '');
-                console.log(localUrl);
                 router.push(localUrl);
                 // NOTE: This means cmd-click etc don't work. This is actually docsearch
                 // doing it - if you provide a handleSelected it prevents default - would be
                 // better if it left that to you.
             },
         });
+        setSearchEnabled(true);
         return () => document.body.removeEventListener('keydown', cb);
     }, []);
     return (
@@ -51,6 +52,7 @@ function SearchBar() {
             <div className="w-full lg:px-6 xl:w-3/4 xl:px-12">
                 <div className="relative">
                     <input
+                        disabled={!searchEnabled}
                         ref={inputRef}
                         className="transition-colors duration-100 ease-in-out focus:outline-0 border border-transparent focus:bg-white focus:border-gray-300 placeholder-gray-600 rounded-lg bg-gray-200 py-2 pr-4 pl-10 block w-full appearance-none leading-normal ds-input"
                         id="search-input"

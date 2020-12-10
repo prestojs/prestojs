@@ -15,7 +15,6 @@ function isCurrent(router, href) {
 
 function NavItem({ href, children, as }) {
     const router = useRouter();
-    if (isCurrent) console.log(href);
     return (
         <Link href={href} as={as}>
             <a
@@ -48,7 +47,6 @@ function Links({ links }) {
 function LinksSection_({ title, links }) {
     const router = useRouter();
     const anyActive = links.filter(({ href, as }) => isCurrent(router, as || href)).length > 0;
-    console.log({ title, anyActive });
     return (
         <div className="mb-8">
             {title && (
