@@ -5,20 +5,25 @@ import { DatePickerProps } from 'antd/lib/date-picker';
 import React from 'react';
 
 /**
- * See [DatePicker](https://next.ant.design/components/date-picker/) for props available
+ * @expand-properties
+ * @hide-properties choices asyncChoices
+ */
+type DateWidgetProps = WidgetProps<Date, HTMLInputElement> & { input: DatePickerProps };
+
+/**
+ * See [DatePicker](https://ant.design/components/date-picker/) for props available
  *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
  */
-const DateWidget = React.forwardRef(
-    (
-        { input, ...rest }: WidgetProps<Date, HTMLInputElement> & { input: DatePickerProps },
-        ref: React.RefObject<React.ClassicComponent<DatePickerProps, any>>
-    ): React.ReactElement => {
-        const { format = 'MMMM Do YYYY', ...restInput } = input;
-        return <DatePicker ref={ref} format={format} {...restInput} {...rest} />;
-    }
-);
+function DateWidget(
+    props: DateWidgetProps,
+    ref: React.RefObject<React.ClassicComponent<DatePickerProps, any>>
+): React.ReactElement {
+    const { input, ...rest } = props;
+    const { format = 'MMMM Do YYYY', ...restInput } = input;
+    return <DatePicker ref={ref} format={format} {...restInput} {...rest} />;
+}
 
-export default DateWidget;
+export default React.forwardRef(DateWidget);

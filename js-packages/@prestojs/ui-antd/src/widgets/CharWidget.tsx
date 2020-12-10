@@ -3,19 +3,21 @@ import { Input } from 'antd';
 import React from 'react';
 
 /**
- * See [Input](https://next.ant.design/components/input/) for props available
+ * @expand-properties
+ * @hide-properties choices asyncChoices
+ */
+type CharWidgetProps = WidgetProps<string, HTMLInputElement>;
+
+/**
+ * See [Input](https://ant.design/components/input/) for props available
  *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
  */
-const CharWidget = React.forwardRef(
-    (
-        { input, ...rest }: WidgetProps<string, HTMLInputElement>,
-        ref: React.RefObject<Input>
-    ): React.ReactElement => {
-        return <Input ref={ref} {...input} {...rest} />;
-    }
-);
+function CharWidget(props: CharWidgetProps, ref: React.RefObject<Input>): React.ReactElement {
+    const { input, ...rest } = props;
+    return <Input ref={ref} {...input} {...rest} />;
+}
 
-export default CharWidget;
+export default React.forwardRef(CharWidget);

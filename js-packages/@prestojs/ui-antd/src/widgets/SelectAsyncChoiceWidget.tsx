@@ -15,7 +15,7 @@ type SelectInputProps<T> = InputProps<ValueType<T>, HTMLSelectElement> & {
 };
 
 /**
- * @expand-properties Most [Select](https://next.ant.design/components/select/) props in addition to the below. Note the
+ * @expand-properties Most [Select](https://ant.design/components/select/) props in addition to the below. Note the
  * following restrictions: `mode` is set to "multiple" when `asyncChoices.multiple` is `true`, `labelInValue` can't be
  * changed, `notFoundContent` is set to `loadingContent` when choices are resolving otherwise `notFoundContent`
  * @hide-properties meta
@@ -266,7 +266,7 @@ type SelectAsyncChoiceWidgetValue = number | string;
 const NEXT_PAGE_VALUE = '__nextpage';
 
 /**
- * A [Select](https://next.ant.design/components/select/) widget that handles [async choices](doc:AsyncChoicesInterface)
+ * A [Select](https://ant.design/components/select/) widget that handles [async choices](doc:AsyncChoicesInterface)
  *
  * @extract-docs
  * @forward-ref

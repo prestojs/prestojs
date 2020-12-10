@@ -13,27 +13,21 @@ import RangeWidget from './RangeWidget';
  * @menu-group Widgets
  * @forward-ref
  */
-const FloatRangeWidget = React.forwardRef(
-    (
-        {
-            lowerInput,
-            upperInput,
-            separator,
-            ...rest
-        }: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
-        ref: React.RefObject<typeof InputNumber>
-    ): React.ReactElement => {
-        return (
-            <RangeWidget
-                ref={ref}
-                lowerInput={lowerInput}
-                upperInput={upperInput}
-                separator={separator}
-                inputWidget={InputNumber}
-                {...rest}
-            />
-        );
-    }
-);
+function FloatRangeWidget(
+    props: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
+    ref: React.RefObject<typeof InputNumber>
+): React.ReactElement {
+    const { lowerInput, upperInput, separator, ...rest } = props;
+    return (
+        <RangeWidget
+            ref={ref}
+            lowerInput={lowerInput}
+            upperInput={upperInput}
+            separator={separator}
+            inputWidget={InputNumber}
+            {...rest}
+        />
+    );
+}
 
-export default FloatRangeWidget;
+export default React.forwardRef(FloatRangeWidget);

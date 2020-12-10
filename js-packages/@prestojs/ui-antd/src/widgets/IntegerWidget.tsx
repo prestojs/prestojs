@@ -3,19 +3,24 @@ import { InputNumber } from 'antd';
 import React from 'react';
 
 /**
+ * @expand-properties
+ * @hide-properties choices asyncChoices
+ */
+type IntegerWidgetProps = WidgetProps<number, HTMLInputElement>;
+
+/**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
  *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
  */
-const IntegerWidget = React.forwardRef(
-    (
-        { input, ...rest }: WidgetProps<number, HTMLInputElement>,
-        ref: React.RefObject<typeof InputNumber>
-    ): React.ReactElement => {
-        return <InputNumber ref={ref} {...rest} {...input} />;
-    }
-);
+function IntegerWidget(
+    props: IntegerWidgetProps,
+    ref: React.RefObject<typeof InputNumber>
+): React.ReactElement {
+    const { input, ...rest } = props;
+    return <InputNumber ref={ref} {...rest} {...input} />;
+}
 
-export default IntegerWidget;
+export default React.forwardRef(IntegerWidget);
