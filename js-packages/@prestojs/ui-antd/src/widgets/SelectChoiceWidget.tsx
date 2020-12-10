@@ -19,11 +19,8 @@ export type SelectChoiceProps = SelectProps<any> &
  * @menu-group Widgets
  * @forward-ref
  */
-const SelectChoiceWidget = React.forwardRef(
-    (
-        { input, meta, ...rest }: SelectChoiceProps,
-        ref: React.RefObject<Select>
-    ): React.ReactElement => {
+const SelectChoiceWidget = React.forwardRef<HTMLSelectElement, SelectChoiceProps>(
+    ({ input, meta, ...rest }: SelectChoiceProps, ref): React.ReactElement => {
         return (
             <Select ref={ref} {...input} {...rest}>
                 {rest.choices &&

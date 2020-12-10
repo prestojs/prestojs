@@ -233,10 +233,7 @@ export function useFileList(
  * @menu-group Widgets
  * @forward-ref
  */
-function FileWidget(
-    props: UploadWidgetProps<File, HTMLInputElement>,
-    ref: React.RefObject<Upload>
-): React.ReactElement {
+function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): React.ReactElement {
     let {
         input,
         children,

@@ -275,7 +275,7 @@ const NEXT_PAGE_VALUE = '__nextpage';
 function SelectAsyncChoiceWidget<
     T extends SelectAsyncChoiceWidgetValue,
     Multiple extends boolean = T extends Array<any> ? true : false
->(props: SelectAsyncChoiceProps<T>, ref: React.RefObject<Select>): React.ReactElement {
+>(props: SelectAsyncChoiceProps<T>, ref): React.ReactElement {
     const {
         input,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

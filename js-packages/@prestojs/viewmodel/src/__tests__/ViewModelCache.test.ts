@@ -797,6 +797,8 @@ function createTestModels(circular = false, many = false) {
         groupId: many
             ? new ListField({ childField: new Field<number | null>() })
             : new Field<number | null>(),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
         group: new (many ? ManyRelatedViewModelField : RelatedViewModelField)({
             to: (): Promise<typeof Group> => Promise.resolve(Group),
             sourceFieldName: 'groupId',

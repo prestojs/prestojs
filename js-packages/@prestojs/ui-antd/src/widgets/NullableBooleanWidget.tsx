@@ -1,7 +1,10 @@
 import type { WidgetProps } from '@prestojs/ui';
-import { Select } from 'antd';
 import React from 'react';
 import SelectChoiceWidget, { SelectChoiceProps } from './SelectChoiceWidget';
+
+type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElement> & {
+    blankLabel: string;
+} & SelectChoiceProps;
 
 /**
  * See [Select](https://next.ant.design/components/select/) for Select props available
@@ -10,16 +13,10 @@ import SelectChoiceWidget, { SelectChoiceProps } from './SelectChoiceWidget';
  * @menu-group Widgets
  * @forward-ref
  */
-const NullableBooleanWidget = React.forwardRef(
+const NullableBooleanWidget = React.forwardRef<HTMLSelectElement, NullableBooleanWidgetProps>(
     (
-        {
-            choices,
-            blankLabel = 'Undecided',
-            ...rest
-        }: WidgetProps<boolean | string, HTMLElement> & {
-            blankLabel: string;
-        } & SelectChoiceProps,
-        ref: React.RefObject<Select>
+        { choices, blankLabel = 'Undecided', ...rest }: NullableBooleanWidgetProps,
+        ref
     ): React.ReactElement => {
         const defaultChoices =
             choices ||
