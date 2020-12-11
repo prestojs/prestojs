@@ -19,7 +19,9 @@ function NavItem({ href, children, as }) {
         <Link href={href} as={as}>
             <a
                 className={`block px-2 -mx-2 py-1 hover:text-gray-900 font-medium text-gray-600${
-                    isCurrent(router, href || as) ? 'font-bold bg-gray-200' : ''
+                    isCurrent(router, href || as)
+                        ? 'font-bold bg-gray-200 active-top-level-menu'
+                        : ''
                 }`}
             >
                 {children}
@@ -112,6 +114,7 @@ function LinksSection_({ title, links }) {
  *  ```
  */
 function LinksSection({ title, links }) {
+    const router = useRouter();
     const defaultSection = [];
     const sections = [];
     for (const linkOrSection of links) {
@@ -125,9 +128,15 @@ function LinksSection({ title, links }) {
             defaultSection.push(linkOrSection);
         }
     }
+    const anyActiveDefault =
+        defaultSection.filter(({ href, as }) => isCurrent(router, as || href)).length > 0;
     return (
         <>
-            <h5 className="mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-md lg:text-sm">
+            <h5
+                className={`mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-md lg:text-sm${
+                    anyActiveDefault ? ' current-section' : ''
+                }`}
+            >
                 {title}
             </h5>
             {defaultSection.length > 0 && <LinksSection_ links={defaultSection} />}
