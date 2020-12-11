@@ -109,7 +109,7 @@ export type ExecuteReturnVal<T> = {
     /**
      * The value returned from the endpoint after it has passed through `decodeBody` and any middleware
      */
-    result: T | null;
+    result: T;
 };
 
 /**
