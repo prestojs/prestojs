@@ -73,6 +73,7 @@ export default function MainMenuSidebar({ children }) {
                 { href: '/docs/ui-antd', title: 'UI ANTD' },
                 { href: '/docs/util', title: 'Util' },
             ]}
+            currentLinkTag="h1"
         >
             {currentMenu && <Sidebar.LinksSection title={currentPackageName} links={currentMenu} />}
             {children}
