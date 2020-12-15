@@ -13,7 +13,7 @@ function isCurrent(router, href) {
     return asPath.startsWith(href);
 }
 
-function NavItem({ href, children, as, currentLinkTag: CurrentLinkTag }) {
+function NavItem({ href, children, as }) {
     const router = useRouter();
     return (
         <Link href={href} as={as}>
@@ -24,11 +24,7 @@ function NavItem({ href, children, as, currentLinkTag: CurrentLinkTag }) {
                         : ''
                 }`}
             >
-                {CurrentLinkTag && isCurrent(router, href || as) ? (
-                    <CurrentLinkTag className="text-sm">{children}</CurrentLinkTag>
-                ) : (
-                    children
-                )}
+                {children}
             </a>
         </Link>
     );
@@ -151,7 +147,7 @@ function LinksSection({ title, links }) {
     );
 }
 
-export default function Sidebar({ children, currentTitle, links, id, currentLinkTag }) {
+export default function Sidebar({ children, currentTitle, links, id }) {
     return (
         <div className="hidden fixed inset-0 pt-16 h-full bg-white z-90 w-full border-b -mb-16 lg:-mb-0 lg:static lg:h-auto lg:overflow-y-visible lg:border-b-0 lg:pt-0 lg:w-1/4 lg:block lg:border-0 xl:w-1/5 mr-10">
             <div className="max-h-screen h-full overflow-y-auto scrolling-touch lg:h-auto lg:block lg:relative lg:sticky lg:top-16 bg-white lg:bg-transparent">
@@ -167,12 +163,7 @@ export default function Sidebar({ children, currentTitle, links, id, currentLink
                     {links && (
                         <div className="mb-10">
                             {links.map(l => (
-                                <NavItem
-                                    key={l.href}
-                                    href={l.href}
-                                    as={l.as}
-                                    currentLinkTag={currentLinkTag}
-                                >
+                                <NavItem key={l.href} href={l.href} as={l.as}>
                                     {l.title}
                                 </NavItem>
                             ))}
