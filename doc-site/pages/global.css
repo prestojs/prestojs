@@ -77,6 +77,12 @@ html {
 .mdx h3 {
     @apply mt-5;
 }
+.mdx h1 {
+    @apply text-4xl;
+}
+.mdx h1, .mdx h2, .mdx h3, .mdx h4 {
+    font-weight: normal;
+}
 
 .code-editor-compiler input[type="text"] {
     @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight;

@@ -11,7 +11,12 @@ export default function FunctionDoc({ doc }) {
             <ApiDocHeader doc={doc} />
             {doc.mdx && <MdxWrapper mdx={doc.mdx} />}
             {doc.signatures.map((sig, i) => (
-                <SignatureDoc key={i} signature={sig} excludeParameters={excludeParameters} />
+                <SignatureDoc
+                    signatureDefinitionTag="div"
+                    key={i}
+                    signature={sig}
+                    excludeParameters={excludeParameters}
+                />
             ))}
         </Article>
     );

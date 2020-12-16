@@ -24,6 +24,7 @@ export default function ClassDoc({ doc, baseUrl }) {
             <Article>
                 <ApiDocHeader doc={doc} isType={doc.kindString === 'Interface'} />
                 {doc.mdx && <div className="mb-20" dangerouslySetInnerHTML={{ __html: doc.mdx }} />}
+                <h2 className="text-4xl my-10 text-gray-700 border-b-2">API</h2>
                 <ClassDetails {...classDetails} />
             </Article>
             <Sidebar currentTitle="On This Page" id="secondary-nav">

@@ -22,10 +22,10 @@ export default function ApiDocHeader({ doc, isType = false }) {
     }\";`;
     return (
         <>
-            <div className="flex justify-between items-center">
-                <h2 className="text-3xl flex justify-between items-center">{doc.name}</h2>
+            <header className="flex justify-between items-center">
+                <h1 className="text-3xl flex justify-between items-center">{doc.name}</h1>
                 <SourceLink doc={doc} />
-            </div>
+            </header>
             <div className="mb-3 mt-3 bg-orange-100 p-1 rounded pl-2 flex text-gray-800 justify-between">
                 <div>{importString}</div>
                 <CopyToClipboard text={importString} />

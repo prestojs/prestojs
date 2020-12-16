@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -32,18 +33,33 @@ function NavItem({ href, children, as }) {
 
 function Links({ links }) {
     const router = useRouter();
-    return links.map((m, i) => (
-        <li key={i}>
-            <Link href={m.href} as={m.as}>
-                <a
-                    className="hover:underline text-gray-800"
-                    aria-current={isCurrent(router, m.as || m.href) ? 'page' : 'false'}
-                >
-                    {m.title}
-                </a>
-            </Link>
-        </li>
-    ));
+    const sortedLinks = links.map(l => l.as || l.href);
+    sortedLinks.sort((a, b) => {
+        if (a.length > b.length) return 1;
+        if (a.length < b.length) return -1;
+        return 0;
+    });
+    let activeLink = '';
+    for (const link of sortedLinks) {
+        if (isCurrent(router, link)) {
+            activeLink = link;
+        }
+    }
+    return links.map((m, i) => {
+        const active = activeLink === (m.as || m.href);
+        return (
+            <li key={i}>
+                <Link href={m.href} as={m.as}>
+                    <a
+                        className={cx('hover:underline text-gray-800', { current: active })}
+                        {...(active ? { 'aria-current': 'page' } : {})}
+                    >
+                        {m.title}
+                    </a>
+                </Link>
+            </li>
+        );
+    });
 }
 
 function LinksSection_({ title, links }) {
@@ -162,11 +178,20 @@ export default function Sidebar({ children, currentTitle, links, id }) {
                     )}
                     {links && (
                         <div className="mb-10">
-                            {links.map(l => (
-                                <NavItem key={l.href} href={l.href} as={l.as}>
-                                    {l.title}
-                                </NavItem>
-                            ))}
+                            {links.map(l =>
+                                l.heading ? (
+                                    <div
+                                        key={l.heading}
+                                        className="py-1 my-2 text-md font-medium border-b-2"
+                                    >
+                                        {l.heading}
+                                    </div>
+                                ) : (
+                                    <NavItem key={l.href} href={l.href} as={l.as}>
+                                        {l.title}
+                                    </NavItem>
+                                )
+                            )}
                         </div>
                     )}
                     {children}

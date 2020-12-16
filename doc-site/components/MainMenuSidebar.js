@@ -65,6 +65,7 @@ export default function MainMenuSidebar({ children }) {
             links={[
                 { href: '/docs/guide', title: 'Getting Started' },
                 { href: '/docs/tutorial', title: 'Tutorial' },
+                { heading: 'Packages' },
                 { href: '/docs/viewmodel', title: 'View Model' },
                 { href: '/docs/final-form', title: 'Final Form' },
                 { href: '/docs/rest', title: 'REST' },

@@ -63,6 +63,7 @@ export default function Doc({ docs, extraNodes, slug, ...rest }) {
                     <code>viewModelFactory</code> function. The factory function is documented
                     immediately below followed by the documentation for the generated class.
                 </p>
+                <h2 className="text-5xl my-5">Factory</h2>
                 <SignatureDoc
                     signature={
                         docs.viewModelFactory.signatures[
@@ -71,8 +72,11 @@ export default function Doc({ docs, extraNodes, slug, ...rest }) {
                     }
                     anchorLink="method-viewmodel"
                 />
-                <h3 className="text-5xl my-5">The ViewModel Class</h3>
-                <h3 className="text-4xl">Static Class Methods</h3>
+                <h2 className="text-5xl my-5">ViewModel Class</h2>
+                <p>
+                    The class created from <code>viewModelFactory</code>.
+                </p>
+                <h3 className="text-4xl mt-5">Static Class Methods</h3>
                 {staticMethods.map(method => (
                     <MethodDoc key={method.name} method={method} />
                 ))}
@@ -90,6 +94,7 @@ export default function Doc({ docs, extraNodes, slug, ...rest }) {
                 ))}
             </Article>
             <Sidebar currentTitle="On This Page" id="secondary-nav">
+                <div className="font-bold text-lg text-gray-600">Factory</div>
                 <Sidebar.LinksSection
                     links={[
                         {
@@ -98,7 +103,7 @@ export default function Doc({ docs, extraNodes, slug, ...rest }) {
                         },
                     ]}
                 />
-                <h4 className="font-bold text-lg text-gray-600 mb-5">ViewModel</h4>
+                <div className="font-bold text-lg text-gray-600 mb-5">ViewModel</div>
                 <Sidebar.LinksSection
                     title="Static Methods"
                     links={staticMethods.map(prop => ({

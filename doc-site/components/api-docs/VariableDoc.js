@@ -20,7 +20,13 @@ export default function VariableDoc({ doc, anchorPrefix = 'var' }) {
                 className="text-2xl text-gray-700 mt-12"
             >
                 <span className="flex">
-                    <span className="mr-2">{doc.name}:</span> <TypeDesc doc={doc} />
+                    <span className="mr-2">
+                        {doc.name}
+                        <span className="doc-hidden">:</span>
+                    </span>{' '}
+                    <span className="doc-hidden">
+                        <TypeDesc doc={doc} />
+                    </span>
                 </span>
             </AnchorLink>
             {extra}
