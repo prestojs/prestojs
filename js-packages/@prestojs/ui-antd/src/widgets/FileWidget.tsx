@@ -13,16 +13,13 @@ type UploadWidgetInputType = Omit<
 };
 
 /**
- * @expand-properties The props from [Upload](https://ant.design/components/upload/#API). Note that any relating to uploading to server are ignored as this component doesn't upload immediately.
+ * @expand-properties The props from [Upload](https://ant.design/components/upload/#API). Note that `data`, `method`, `headers` and `withCredentials` are ignored as this component doesn't upload immediately.
  */
 export type UploadWidgetProps<FieldValue, T extends HTMLElement> = Omit<
     WidgetProps<FieldValue, T>,
     'input'
 > &
-    Omit<
-        UploadProps,
-        'data' | 'method' | 'headers' | 'onChange' | 'withCredentials' | 'progress'
-    > & {
+    Omit<UploadProps, 'data' | 'method' | 'headers' | 'onChange' | 'withCredentials'> & {
         input: UploadWidgetInputType;
         /**
          * Number of files to allow. `null` means unlimited.
