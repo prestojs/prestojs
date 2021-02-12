@@ -2,6 +2,7 @@ import { EditOutlined, InboxOutlined, PlusOutlined, UploadOutlined } from '@ant-
 import { InputProps, WidgetProps } from '@prestojs/ui';
 import { isPromise } from '@prestojs/util';
 import { Button, Upload } from 'antd';
+import { UploadFileStatus } from 'antd/es/upload/interface';
 import { RcFile, UploadFile, UploadProps } from 'antd/lib/upload/interface';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -57,8 +58,7 @@ export type UploadWidgetProps<FieldValue, T extends HTMLElement> = Omit<
         children: React.ReactNode;
     };
 
-type FileLike = Blob | File | string;
-type FileWidgetUploadFile = UploadFile & { key: FileLike };
+type FileLike = Blob | File | RcFile | string;
 
 /**
  * Given a Blob return a UploadFile object for use with FileWidget
@@ -66,7 +66,7 @@ type FileWidgetUploadFile = UploadFile & { key: FileLike };
  * @param name Name of the file
  * @param blob The Blob instance (eg. a File)
  */
-async function blobToUploadFile(uid: string, name: string, blob: Blob): Promise<UploadFile> {
+export async function blobToUploadFile(uid: string, name: string, blob: Blob): Promise<UploadFile> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.addEventListener('load', () =>
@@ -93,7 +93,7 @@ async function blobToUploadFile(uid: string, name: string, blob: Blob): Promise<
  * @param uid Unique id for this upload. Used internally by antd Upload
  * @param url The url to read (eg. a file that was previously uploaded)
  */
-function urlToUploadFile(uid: string, url: string): Promise<UploadFile> {
+export function urlToUploadFile(uid: string, url: string): Promise<UploadFile> {
     return fetch(url)
         .then(r => {
             if (r.ok) {
@@ -114,7 +114,28 @@ type UseFileListReturn = {
      * changed file. This is used to update the progress on overall status of the file. Only applicable when an
      * upload is occurring immediately (eg. when you pass `customRequest`) instead of as part of the final form submission.
      */
-    updateFileStatus: (file: UploadFile) => void;
+    updateFileStatus: (uid: string, status?: UploadFileStatus, percent?: number) => void;
+};
+
+/**
+ * @expand-properties
+ */
+type UseFileListOptions = {
+    /**
+     * If true the `thumbUrl` property will be set for each `UploadFile`
+     */
+    previewImage?: boolean;
+    /**
+     * When `previewImage` is true this function will be called to generate a URL to use
+     * as the thumbnail for an image. It can either return a Promise that resolves to
+     * a string/false or return string/false directly
+     *
+     * If not specified or `getThumbUrl` returns `false` then the underlying File will be
+     * read and a thumbnail generated automatically.
+     *
+     * @param FileLike
+     */
+    getThumbUrl?: (FileLike) => Promise<string | false> | string | false;
 };
 
 /**
@@ -123,17 +144,17 @@ type UseFileListReturn = {
  * is returned to allow updating the progress and final status of a file.
  *
  * @param value The value to convert. This would typically come from the form state.
- * @param previewImage If true the `thumbUrl` property will be set for each `UploadFile`
+ * @param options
  *
  * @extract-docs
  * @menu-group Widget Hooks
  */
 export function useFileList(
     value: FileLike | FileLike[] | null | undefined,
-    previewImage: boolean
+    options: UseFileListOptions
 ): UseFileListReturn {
-    const [fileList, setFileList] = useState<FileWidgetUploadFile[]>([]);
-    const filePreviews = useRef<Map<FileLike, FileWidgetUploadFile>>(new Map());
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const { getThumbUrl, previewImage } = options;
     const isMounted = useRef(true);
     useEffect(() => {
         return (): void => {
@@ -142,127 +163,149 @@ export function useFileList(
     }, []);
     useEffect(() => {
         const run = async (): Promise<void> => {
-            if (!value) {
-                setFileList([]);
-                return;
-            }
-            const values: FileLike[] = Array.isArray(value) ? value : [value];
-            // antd recommends using negative numbers to avoid internal conflicts
-            let uid = -1;
-            // This will be set immediately so UI reflects immediately showing uploaded
-            // files even if we haven't yet generate thumbnail
-            const fileList: FileWidgetUploadFile[] = [];
-            // This holds promises for files we need to load previews for. This will be
-            // set after it resolves.
-            const promises: (Promise<UploadFile> | null)[] = [];
-            for (const value of values) {
-                let uploadFile = filePreviews.current.get(value);
-                if (previewImage && uploadFile && uploadFile.thumbUrl) {
-                    // Preview was generated preciously with previewImage = false
-                    uploadFile = undefined;
+            setFileList(currentFileList => {
+                if (!value) {
+                    return [];
                 }
-                if (!uploadFile) {
-                    if (typeof value == 'string') {
-                        uploadFile = {
-                            key: value,
-                            uid: uid.toString(),
-                            name: value.split('/').pop() || value,
-                            size: 0,
-                            type: '',
-                        };
-                        if (previewImage) {
-                            promises.push(urlToUploadFile(uid.toString(), value));
-                        }
-                    } else {
-                        // antd seems to attach a uid to the file which we need to use if available
-                        // without this the onChange event seems to end up with multiple entries - one
-                        // with the uid from antd and one that is assigned here
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-                        // @ts-ignore
-                        const valueUid = value.uid || uid.toString();
-                        // If a Blob is passed it won't necessarily have a `name` (in some cases it appears antd
-                        // libraries attach this, eg. antd-img-crop). Log a warning if name isn't available but
-                        // set it to `uid` so things continue to work (preview may not work properly).
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-                        // @ts-ignore
-                        let name = value.name;
-                        if (!name) {
-                            console.warn(
-                                'No name set for uploaded file. Consider adding a `name` property if passing a `Blob`.'
-                            );
-                            name = `${valueUid}`;
-                        }
-                        uploadFile = {
-                            key: value,
-                            uid: valueUid,
-                            name,
-                            size: value.size,
-                            type: value.type,
-                            originFileObj: value,
-                        };
-                        promises.push(blobToUploadFile(uid.toString(), name, value));
-                    }
-                    filePreviews.current.set(value, uploadFile);
-                } else if (previewImage) {
-                    promises.push(null);
-                }
-                fileList.push(uploadFile);
-                uid -= 1;
-            }
-            [...filePreviews.current.keys()]
-                .filter(f => values.includes(f))
-                .forEach(f => filePreviews.current.delete(f));
-            // Set file list so renders immediately
-            setFileList(fileList);
+                const values: FileLike[] = Array.isArray(value) ? value : [value];
+                // antd recommends using negative numbers to avoid internal conflicts
+                let uid = -1;
+                // This will be set immediately so UI reflects immediately showing uploaded
+                // files even if we haven't yet generate thumbnail
+                const nextFileList: UploadFile[] = [];
+                // This holds promises for files we need to load previews for. This will be
+                // set after it resolves.
+                const promises: (Promise<UploadFile> | null)[] = [];
 
-            // Then if preview images are needed wait for promises to resolve before updating
-            // file list again
-            if (previewImage && !promises.every(entry => entry === null)) {
-                try {
-                    const resolved = (await Promise.all(promises)).map((entry, i) =>
-                        entry === null ? fileList[i] : { ...entry, key: values[i] }
-                    );
-                    for (let i = 0; i < resolved.length; i++) {
-                        filePreviews.current.set(values[i], resolved[i]);
+                async function generatePreview(
+                    value: FileLike,
+                    uploadFile: UploadFile
+                ): Promise<UploadFile> {
+                    const thumbUrl = getThumbUrl ? await getThumbUrl(value) : false;
+                    if (thumbUrl === false) {
+                        if (typeof value === 'string') {
+                            return urlToUploadFile(uploadFile.uid, value);
+                        } else {
+                            return blobToUploadFile(
+                                uploadFile.uid.toString(),
+                                uploadFile.name,
+                                value
+                            );
+                        }
                     }
-                    // If component unmounted do nothing. Previously we used the cleanup
-                    // for this hook to track whether this was still 'current' but was problematic
-                    // in that the hook could re-render before this finished and the generation
-                    // of preview would essentially be lost. There might be the possibility of
-                    // a race condition here so try to avoid any issues by using callback version
-                    // of setFileList and lookup entries based on UID.
-                    if (isMounted.current) {
-                        setFileList(currentFileList => {
-                            const nextFileList = [...currentFileList];
-                            for (const resolvedFile of resolved) {
-                                const index = nextFileList.findIndex(
-                                    f => f.uid === resolvedFile.uid
-                                );
-                                if (index !== -1) {
-                                    nextFileList[index] = resolvedFile;
-                                }
-                            }
-                            return nextFileList;
-                        });
-                    }
-                } catch (e) {
-                    console.error('Failed to generate preview for images', e);
+                    return { ...uploadFile, thumbUrl };
                 }
-            }
+
+                for (const value of values) {
+                    let uploadFile = currentFileList.find(el => el.originFileObj === value);
+                    if (previewImage && uploadFile && !uploadFile.thumbUrl) {
+                        // Preview was generated preciously with previewImage = false
+                        uploadFile = undefined;
+                    }
+                    if (!uploadFile) {
+                        if (typeof value == 'string') {
+                            uploadFile = {
+                                // Set uid to the string which is the current file path
+                                // Not guaranteed to be unique if the same file uploaded multiple
+                                // times but other things will break anyway (eg. removing files
+                                // won't be able to identify which file to remove).
+                                // This allows us to match up values passed into FileWidget with
+                                // the internal representation we pass to UploadFile
+                                uid: value,
+                                name: value.split('/').pop() || value,
+                                size: 0,
+                                type: '',
+                            };
+                            if (previewImage) {
+                                promises.push(generatePreview(value, uploadFile));
+                            }
+                        } else {
+                            // antd seems to attach a uid to the file which we need to use if available
+                            // without this the onChange event seems to end up with multiple entries - one
+                            // with the uid from antd and one that is assigned here
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                            // @ts-ignore
+                            const valueUid = value.uid || uid.toString();
+                            // If a Blob is passed it won't necessarily have a `name` (in some cases it appears antd
+                            // libraries attach this, eg. antd-img-crop). Log a warning if name isn't available but
+                            // set it to `uid` so things continue to work (preview may not work properly).
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                            // @ts-ignore
+                            let name = value.name;
+                            if (!name) {
+                                console.warn(
+                                    'No name set for uploaded file. Consider adding a `name` property if passing a `Blob`.'
+                                );
+                                name = `${valueUid}`;
+                            }
+                            uploadFile = {
+                                uid: valueUid,
+                                name,
+                                size: value.size,
+                                type: value.type,
+                                originFileObj: value,
+                            };
+                            if (previewImage) {
+                                promises.push(generatePreview(value, uploadFile));
+                            }
+                        }
+                    } else if (previewImage) {
+                        promises.push(null);
+                    }
+                    nextFileList.push(uploadFile);
+                    uid -= 1;
+                }
+                const handlePreviews = async (): Promise<void> => {
+                    // Then if preview images are needed wait for promises to resolve before updating
+                    // file list again
+                    if (previewImage && !promises.every(entry => entry === null)) {
+                        try {
+                            const resolved = (await Promise.all(promises)).map((entry, i) =>
+                                entry === null ? nextFileList[i] : entry
+                            );
+                            // If component unmounted do nothing. Previously we used the cleanup
+                            // for this hook to track whether this was still 'current' but was problematic
+                            // in that the hook could re-render before this finished and the generation
+                            // of preview would essentially be lost. There might be the possibility of
+                            // a race condition here so try to avoid any issues by using callback version
+                            // of setFileList and lookup entries based on UID.
+                            if (isMounted.current) {
+                                setFileList(currentFileList => {
+                                    const nextFileList = [...currentFileList];
+                                    for (const resolvedFile of resolved) {
+                                        const index = nextFileList.findIndex(
+                                            f => f.uid === resolvedFile.uid
+                                        );
+                                        if (index !== -1) {
+                                            nextFileList[index] = resolvedFile;
+                                        }
+                                    }
+                                    return nextFileList;
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Failed to generate preview for images', e);
+                        }
+                    }
+                };
+                // Call this to wait for Promises and then return immediately so state transition occurs
+                handlePreviews();
+                return nextFileList;
+            });
         };
         run();
-    }, [previewImage, value]);
+    }, [getThumbUrl, previewImage, value]);
 
-    const updateFileStatus = useCallback((file: UploadFile): void => {
+    const updateFileStatus = useCallback((uid, status, percent): void => {
         setFileList(fileList => {
-            const index = fileList.findIndex(f => f.uid === file.uid);
+            const index = fileList.findIndex(f => f.uid === uid);
             if (index !== -1) {
                 const entry = fileList[index];
                 const nextFileList = [...fileList];
                 nextFileList[index] = {
                     ...entry,
-                    percent: file.percent,
-                    status: file.status,
+                    percent: percent,
+                    status: status,
                 };
                 return nextFileList;
             }
@@ -346,20 +389,32 @@ function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): Reac
         if (multiple) {
             // We know value is either not set or an array due to the checks above
             const currentValue = (lastValue.current ?? []) as (string | File)[];
-            onChange([...currentValue, file]);
+            const nextValue = [...currentValue, file];
+            // We update this immediately otherwise uploading multiple files in one go (eg. selecting multiple
+            // in the file select box) will only capture the last file. Each file is passed to beforeUpload in
+            // order but all of them have captured `value` at the same point. The state transition from `onChange`
+            // hasn't propagated by the time the next function is called and so lastValue.current hasn't updated.
+            lastValue.current = nextValue;
+            onChange(nextValue);
         } else {
             onChange(file);
         }
         return false;
     };
-    const handleRemove = (f: FileWidgetUploadFile): void => {
+    const handleRemove = (f: UploadFile): void => {
         if (multiple) {
-            onChange((lastValue.current as (string | File)[]).filter(key => key !== f.key));
+            onChange(
+                (lastValue.current as (string | RcFile)[]).filter(
+                    val => (typeof val === 'string' ? val : val.uid) !== f.uid
+                )
+            );
         } else {
             onChange(null);
         }
     };
-    const { fileList, updateFileStatus } = useFileList(value, listType.startsWith('picture'));
+    const { fileList, updateFileStatus } = useFileList(value, {
+        previewImage: listType.startsWith('picture'),
+    });
     const shouldAllowUpload =
         limit == null || limit > fileList.length || (!multiple && limit === 1);
     if (shouldAllowUpload && !children) {
@@ -404,7 +459,7 @@ function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): Reac
             multiple={multiple}
             {...rest}
             onChange={(info): void => {
-                updateFileStatus(info.file);
+                updateFileStatus(info.file.uid, info.file.status, info.file.percent);
             }}
         >
             {children}

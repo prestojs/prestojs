@@ -9,7 +9,12 @@ export { default as DateTimeRangeWidget } from './widgets/DateTimeRangeWidget';
 export { default as DecimalWidget } from './widgets/DecimalWidget';
 export { default as DurationWidget } from './widgets/DurationWidget';
 export { default as EmailWidget } from './widgets/EmailWidget';
-export { default as FileWidget, useFileList } from './widgets/FileWidget';
+export {
+    default as FileWidget,
+    useFileList,
+    blobToUploadFile,
+    urlToUploadFile,
+} from './widgets/FileWidget';
 export { default as FloatWidget } from './widgets/FloatWidget';
 export { default as FloatRangeWidget } from './widgets/FloatRangeWidget';
 export { default as ImageWidget } from './widgets/ImageWidget';
