@@ -227,7 +227,7 @@ def has_system_site_packages(interpreter):
     system_site_packages = check_output((
         interpreter,
         '-c',
-        # stolen directly from virtualenv's site.py
+            # stolen directly from virtualenv's site.py
         """\
 import site, os.path
 print(

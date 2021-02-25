@@ -115,7 +115,6 @@ INSTALLED_APPS = (
     # 3rd party
     "allianceutils",
     "authtools",
-    "compat",  # django-hijack requires this one
     "corsheaders",
     "django_extensions",
     "django_filters",
