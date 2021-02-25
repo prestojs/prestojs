@@ -103,10 +103,10 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  * ```js
  * const middleware = [viewModelCachingMiddleware(User)];
  * // Response is a single User instance:
- * const userRetrieve = new ViewModelEndpoint(new UrlPattern('/users/:id/'), { middleware });
+ * const userRetrieve = new Endpoint(new UrlPattern('/users/:id/'), { middleware });
  * // Response is an array of User instances
  * // (declaration is the same but the response handler will treat it differently)
- * const userList = new ViewModelEndpoint(new UrlPattern('/users/'), { middleware });
+ * const userList = new Endpoint(new UrlPattern('/users/'), { middleware });
  * ```
  *
  * If the response is an object mapping different models you can specify how each
@@ -152,7 +152,7 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  * ```js
  * const middleware = [viewModelCachingMiddleware(User)];
  * // Response is empty:
- * const userDelete = new ViewModelEndpoint(new UrlPattern('/users/:id/'), {
+ * const userDelete = new Endpoint(new UrlPattern('/users/:id/'), {
  *   middleware,
  *   method: "DELETE"
  * });
@@ -166,7 +166,7 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  * ```js
  * const middleware = [viewModelCachingMiddleware({"records.bookings": Booking}, {deleteViewModel: User})];
  * // Response would include the updated related bookings, with the number of diners reduced by 1
- * const updatedBookings = new ViewModelEndpoint(new UrlPattern('/users/:id/'), {
+ * const updatedBookings = new Endpoint(new UrlPattern('/users/:id/'), {
  *   middleware,
  *   method: "DELETE"
  * });
@@ -177,7 +177,7 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  *
  * @param viewModelMapping The mapping to use for caching as described above. When the request method is `DELETE` this
  * is assumed to be the model that should be removed from the cache unless you provide `options.deleteViewModel`. If
- * deleteViewModel` is provided then this value is used to cache the response of the delete call.
+ * `deleteViewModel` is provided then this value is used to cache the response of the delete call.
  * @param options
  *
  * @extract-docs
