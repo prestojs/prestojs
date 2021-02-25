@@ -149,7 +149,9 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  * NOTE: If using with [paginationMiddleware](doc:paginationMiddleware) then this must come
  * before `paginationMiddleware`.
  *
- * @param viewModelMapping The mapping to use for caching as described above
+ * @param viewModelMapping The mapping to use for caching as described above. When the request method is `DELETE` this
+ * is assumed to be the model that should be removed from the cache unless you provide `options.deleteViewModel`. If
+ * deleteViewModel` is provided then this value is used to cache the response of the delete call.
  * @param options
  *
  * @extract-docs
