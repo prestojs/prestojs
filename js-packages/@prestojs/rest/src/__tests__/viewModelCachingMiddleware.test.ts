@@ -227,6 +227,23 @@ test('should support deletes', async () => {
     }).toThrowError(/UrlPattern includes an 'id' parameter/);
 });
 
+test('should support deleteViewModel option and delete/update with one call', async () => {
+    const { User, users, bilbo, Food, sausage } = createData();
+    User.cache.add(users);
+    Food.cache.add(sausage);
+    expect(User.cache.get(1, '*')).toEqual(bilbo);
+    const endpoint = new Endpoint(new UrlPattern('/user/:id'), {
+        middleware: [viewModelCachingMiddleware({ food: Food }, { deleteViewModel: User })],
+        method: 'DELETE',
+    });
+    mockJsonResponse({ food: { id: sausage.id, name: 'banana' } });
+    await endpoint.execute({ urlArgs: { id: 1 } });
+    expect(User.cache.get(1, '*')).toBe(null);
+    const newSausage = Food.cache.get(sausage.id, '*');
+    expect(newSausage.id).toEqual(sausage.id);
+    expect(newSausage.name).toEqual('banana');
+});
+
 test('should support custom getDeleteId', async () => {
     const { User, users, bilbo } = createData();
     User.cache.add(users);

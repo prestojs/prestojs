@@ -51,6 +51,15 @@ type ViewModelCachingOptions<T> = {
     getDeleteId?: ((context: MiddlewareContext<T>) => PrimaryKey) & {
         validateEndpoint?: (endpoint: Endpoint) => void;
     };
+    /**
+     * By default the mapping passed to `viewModelCacheMiddleware` is assumed to be the model to delete. In some
+     * cases you may want to return additional data from an endpoint and need to define a more advanced mapping - in
+     * these cases you can specify `deleteViewModel` as the model to delete and the mapping will be used to cache
+     * the result.
+     */
+    deleteViewModel?:
+        | ViewModelConstructor<any>
+        | (() => ViewModelConstructor<any> | Promise<ViewModelConstructor<any>>);
 };
 
 /**
@@ -94,10 +103,10 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  * ```js
  * const middleware = [viewModelCachingMiddleware(User)];
  * // Response is a single User instance:
- * const userRetrieve = new ViewModelEndpoint(new UrlPattern('/users/:id/'), { middleware });
+ * const userRetrieve = new Endpoint(new UrlPattern('/users/:id/'), { middleware });
  * // Response is an array of User instances
  * // (declaration is the same but the response handler will treat it differently)
- * const userList = new ViewModelEndpoint(new UrlPattern('/users/'), { middleware });
+ * const userList = new Endpoint(new UrlPattern('/users/'), { middleware });
  * ```
  *
  * If the response is an object mapping different models you can specify how each
@@ -137,10 +146,38 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  *
  * Each record instance created is also automatically added to the cache.
  *
+ * Usually when deleting a model, the endpoint doesn't return anything. So by default if the endpoint method is DELETE
+ * you should pass the model that will be deleted on a successful response.
+ *
+ * ```js
+ * const middleware = [viewModelCachingMiddleware(User)];
+ * // Response is empty:
+ * const userDelete = new Endpoint(new UrlPattern('/users/:id/'), {
+ *   middleware,
+ *   method: "DELETE"
+ * });
+ * ```
+ *
+ * Sometimes a deletion will cause a related model to change and you might want to return the modified model data.
+ * In order to do this you specify model to be deleted as the `deleteViewModel` and the model(s) to be updated as the
+ * `viewModelMapping`. Note that if you provide a `viewModelMapping` that isn't a single model without providing the
+ * deleteViewModel option, you will get an error.
+ *
+ * ```js
+ * const middleware = [viewModelCachingMiddleware({"records.bookings": Booking}, {deleteViewModel: User})];
+ * // Response would include the updated related bookings, with the number of diners reduced by 1
+ * const updatedBookings = new Endpoint(new UrlPattern('/users/:id/'), {
+ *   middleware,
+ *   method: "DELETE"
+ * });
+ * ```
+ *
  * NOTE: If using with [paginationMiddleware](doc:paginationMiddleware) then this must come
  * before `paginationMiddleware`.
  *
- * @param viewModelMapping The mapping to use for caching as described above
+ * @param viewModelMapping The mapping to use for caching as described above. When the request method is `DELETE` this
+ * is assumed to be the model that should be removed from the cache unless you provide `options.deleteViewModel`. If
+ * `deleteViewModel` is provided then this value is used to cache the response of the delete call.
  * @param options
  *
  * @extract-docs
@@ -150,13 +187,14 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
     viewModelMapping: ViewModelMappingDef,
     options: ViewModelCachingOptions<ReturnT> = {}
 ): MiddlewareObject<ReturnT> {
-    const { getDeleteId = defaultGetDeleteId } = options;
-    const resolveViewModelMapping = async (): Promise<ViewModelMapping> =>
-        !isViewModelClass(viewModelMapping) && typeof viewModelMapping === 'function'
-            ? viewModelMapping()
-            : viewModelMapping;
+    const { getDeleteId = defaultGetDeleteId, deleteViewModel } = options;
+    const resolveViewModelMapping = async (forDelete: boolean): Promise<ViewModelMapping> => {
+        const mapping = (forDelete && deleteViewModel) || viewModelMapping;
+        return !isViewModelClass(mapping) && typeof mapping === 'function' ? mapping() : mapping;
+    };
+
     const cacheAndTransform = async (data: any): Promise<any> => {
-        const _viewModelMapping = await resolveViewModelMapping();
+        const _viewModelMapping = await resolveViewModelMapping(false);
 
         if (isViewModelClass(_viewModelMapping)) {
             return cacheDataForModel(_viewModelMapping, data);
@@ -191,10 +229,10 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
         ): Promise<ReturnT> => {
             const { result } = await next(urlConfig, requestInit);
             if (context.requestInit.method?.toUpperCase() === 'DELETE') {
-                const _viewModelMapping = await resolveViewModelMapping();
+                const _viewModelMapping = await resolveViewModelMapping(true);
                 if (!isViewModelClass(_viewModelMapping)) {
                     throw new Error(
-                        'When handling DELETE the view model mapping must be a single ViewModelClass'
+                        'When handling DELETE the view model mapping must be a single ViewModelClass. Use deleteViewModel if you need to update other models.'
                     );
                 }
                 const id = getDeleteId(context);
@@ -207,6 +245,9 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
                 }
                 if (!result) {
                     return {} as ReturnT;
+                }
+                if (!deleteViewModel) {
+                    return result;
                 }
             }
             return cacheAndTransform(result);
