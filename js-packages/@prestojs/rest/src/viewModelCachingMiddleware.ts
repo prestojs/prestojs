@@ -146,6 +146,32 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  *
  * Each record instance created is also automatically added to the cache.
  *
+ * Usually when deleting a model, the endpoint doesn't return anything. So by default if the endpoint method is DELETE
+ * you should pass the model that will be deleted on a successful response.
+ *
+ * ```js
+ * const middleware = [viewModelCachingMiddleware(User)];
+ * // Response is empty:
+ * const userDelete = new ViewModelEndpoint(new UrlPattern('/users/:id/'), {
+ *   middleware,
+ *   method: "DELETE"
+ * });
+ * ```
+ *
+ * Sometimes a deletion will cause a related model to change and you might want to return the modified model data.
+ * In order to do this you specify model to be deleted as the `deleteViewModel` and the model(s) to be updated as the
+ * `viewModelMapping`. Note that if you provide a `viewModelMapping` that isn't a single model without providing the
+ * deleteViewModel option, you will get an error.
+ *
+ * ```js
+ * const middleware = [viewModelCachingMiddleware({"records.bookings": Booking}, {deleteViewModel: User})];
+ * // Response would include the updated related bookings, with the number of diners reduced by 1
+ * const updatedBookings = new ViewModelEndpoint(new UrlPattern('/users/:id/'), {
+ *   middleware,
+ *   method: "DELETE"
+ * });
+ * ```
+ *
  * NOTE: If using with [paginationMiddleware](doc:paginationMiddleware) then this must come
  * before `paginationMiddleware`.
  *
