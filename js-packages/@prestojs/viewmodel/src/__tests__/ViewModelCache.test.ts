@@ -151,6 +151,10 @@ test('should validate pk(s)', () => {
     expect(() => Test2.cache.get({ id1: null }, ['name'])).toThrowError(
         'Test2 has a compound key of id1, id2. Missing value(s) for field(s) id1, id2'
     );
+
+    expect(Test2.cache.getAll(['id1', 'id2', 'name'])[0]).toBe(record2);
+    expect(Test2.cache.getAll(['name'])[0]).toBe(record2);
+
 });
 
 test('should always use primary key in cache regardless of whether specified', () => {
