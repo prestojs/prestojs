@@ -1488,7 +1488,8 @@ export default class ViewModelCache<
         >[];
         // Tracks if records have changed from what is stored in `lastRecords`
         let isRecordsSame = true;
-        for (const pk of this.cache.keys()) {
+        for (const recordCache of this.cache.values()) {
+            const pk = recordCache.recordPk;
             const record = this.get(pk, fieldNames as FieldNames[]);
             if (record) {
                 records.push(record);
