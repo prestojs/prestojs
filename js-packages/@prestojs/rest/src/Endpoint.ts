@@ -340,8 +340,6 @@ export class ApiError extends Error {
     }
 }
 
-export class RequestError extends Error {}
-
 /**
  * Decode body and return content based on Content-Type
  *
@@ -695,7 +693,10 @@ export default class Endpoint<ReturnT = any> {
      *
      * This can be called directly or indirectly via `prepare`.
      *
-     * If the fetch call itself fails (eg. a network error) a `RequestError` will be thrown.
+     * If the fetch call itself fails due to a network error then a `TypeError` will be thrown.
+     *
+     * If the fetch call is aborted due to a call to [AbortController.abort](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort)
+     * an `AbortError` is thrown.
      *
      * If the response is a non-2XX response an `ApiError` will be thrown.
      *
@@ -728,122 +729,108 @@ export default class Endpoint<ReturnT = any> {
             query: query,
         };
 
-        try {
-            const cls = Object.getPrototypeOf(this).constructor;
-            const requestInit = mergeRequestInit(
-                cls.defaultConfig.requestInit,
-                this.requestInit,
-                init
-            ) as EndpointRequestInit;
+        const cls = Object.getPrototypeOf(this).constructor;
+        const requestInit = mergeRequestInit(
+            cls.defaultConfig.requestInit,
+            this.requestInit,
+            init
+        ) as EndpointRequestInit;
 
-            const returnVal: Record<string, any> = {
+        const returnVal: Record<string, any> = {
+            requestInit,
+            result: null,
+        };
+        const runFetch = (url: string, requestInit: RequestInit): Promise<ReturnT> =>
+            fetch(url, requestInit)
+                .then(async res => {
+                    returnVal.response = res;
+                    if (!res.ok) {
+                        returnVal.decodedBody = await this.decodeBody(res);
+                        throw new ApiError(res.status, res.statusText, returnVal.decodedBody);
+                    }
+                    return res;
+                })
+                .then(async res => (returnVal.decodedBody = await this.decodeBody(res)));
+        const executeWithMiddleware = async (): Promise<ReturnT> => {
+            const middleware = [...this.middleware];
+            let lastMiddleware;
+            const middlewareContext: MiddlewareContext<ReturnT> = {
+                execute: executeWithMiddleware,
+                executeOptions: options,
                 requestInit,
-                result: null,
+                endpoint: this,
             };
-            const runFetch = (url: string, requestInit: RequestInit): Promise<ReturnT> =>
-                fetch(url, requestInit)
-                    .then(async res => {
-                        returnVal.response = res;
-                        if (!res.ok) {
-                            returnVal.decodedBody = await this.decodeBody(res);
-                            throw new ApiError(res.status, res.statusText, returnVal.decodedBody);
-                        }
-                        return res;
-                    })
-                    .then(async res => (returnVal.decodedBody = await this.decodeBody(res)));
-            const executeWithMiddleware = async (): Promise<ReturnT> => {
-                const middleware = [...this.middleware];
-                let lastMiddleware;
-                const middlewareContext: MiddlewareContext<ReturnT> = {
-                    execute: executeWithMiddleware,
-                    executeOptions: options,
-                    requestInit,
-                    endpoint: this,
-                };
-                let lastMiddlewareReturn: MiddlewareNextReturn<ReturnT>;
-                const next = async (
-                    urlConfig: MiddlewareUrlConfig,
-                    requestInit: EndpointRequestInit
-                ): Promise<MiddlewareNextReturn<ReturnT>> => {
-                    let errors: string[] = [];
-                    if (typeof urlConfig !== 'object') {
-                        errors.push(
-                            `'urlConfig' arg from middleware was not an object, received: ${urlConfig}`
-                        );
-                    }
-                    if (!requestInit || typeof requestInit != 'object') {
-                        errors.push(
-                            `'requestInit' arg from middleware was not an object, received: ${requestInit}`
-                        );
-                    }
-                    if (errors.length > 0) {
-                        const err = errors.join('\n');
-                        throw new Error(
-                            `Bad middleware implementation; invalid arguments\n\n${err}\n\nOccurred in middleware:\n\n${lastMiddleware}`
-                        );
-                    }
-                    const nextMiddleware = middleware.shift();
-                    if (!nextMiddleware) {
-                        const url = this.resolveUrl(
-                            urlConfig.pattern,
-                            urlConfig.args,
-                            urlConfig.query
-                        );
-                        returnVal.url = url;
-                        returnVal.urlArgs = urlConfig.args;
-                        returnVal.query = urlConfig.query;
-                        const result = await runFetch(url, requestInit);
-                        lastMiddlewareReturn = {
-                            result,
-                            url,
-                            response: returnVal.response,
-                            decodedBody: returnVal.decodedBody,
-                        };
-                        return lastMiddlewareReturn;
-                    }
-                    lastMiddleware = nextMiddleware;
-                    const process =
-                        typeof nextMiddleware === 'function'
-                            ? nextMiddleware
-                            : nextMiddleware.process?.bind(nextMiddleware);
-                    let result: MiddlewareNextReturn<ReturnT> | ReturnT;
-                    if (!process) {
-                        // For MiddlewareObject `process` is optional - if not set just proceed to next middleware in chain
-                        result = await next(urlConfig, requestInit);
-                    } else {
-                        result = await process(next, urlConfig, requestInit, middlewareContext);
-                        if (result === undefined) {
-                            throw new Error(
-                                `Bad middleware implementation; function did not return anything\n\nOccurred in middleware:\n\n${lastMiddleware}`
-                            );
-                        }
-                    }
-                    if (result === lastMiddlewareReturn) {
-                        return result;
-                    }
+            let lastMiddlewareReturn: MiddlewareNextReturn<ReturnT>;
+            const next = async (
+                urlConfig: MiddlewareUrlConfig,
+                requestInit: EndpointRequestInit
+            ): Promise<MiddlewareNextReturn<ReturnT>> => {
+                let errors: string[] = [];
+                if (typeof urlConfig !== 'object') {
+                    errors.push(
+                        `'urlConfig' arg from middleware was not an object, received: ${urlConfig}`
+                    );
+                }
+                if (!requestInit || typeof requestInit != 'object') {
+                    errors.push(
+                        `'requestInit' arg from middleware was not an object, received: ${requestInit}`
+                    );
+                }
+                if (errors.length > 0) {
+                    const err = errors.join('\n');
+                    throw new Error(
+                        `Bad middleware implementation; invalid arguments\n\n${err}\n\nOccurred in middleware:\n\n${lastMiddleware}`
+                    );
+                }
+                const nextMiddleware = middleware.shift();
+                if (!nextMiddleware) {
+                    const url = this.resolveUrl(urlConfig.pattern, urlConfig.args, urlConfig.query);
+                    returnVal.url = url;
+                    returnVal.urlArgs = urlConfig.args;
+                    returnVal.query = urlConfig.query;
+                    const result = await runFetch(url, requestInit);
                     lastMiddlewareReturn = {
-                        result: result as ReturnT,
-                        url: returnVal.url,
+                        result,
+                        url,
                         response: returnVal.response,
                         decodedBody: returnVal.decodedBody,
                     };
                     return lastMiddlewareReturn;
+                }
+                lastMiddleware = nextMiddleware;
+                const process =
+                    typeof nextMiddleware === 'function'
+                        ? nextMiddleware
+                        : nextMiddleware.process?.bind(nextMiddleware);
+                let result: MiddlewareNextReturn<ReturnT> | ReturnT;
+                if (!process) {
+                    // For MiddlewareObject `process` is optional - if not set just proceed to next middleware in chain
+                    result = await next(urlConfig, requestInit);
+                } else {
+                    result = await process(next, urlConfig, requestInit, middlewareContext);
+                    if (result === undefined) {
+                        throw new Error(
+                            `Bad middleware implementation; function did not return anything\n\nOccurred in middleware:\n\n${lastMiddleware}`
+                        );
+                    }
+                }
+                if (result === lastMiddlewareReturn) {
+                    return result;
+                }
+                lastMiddlewareReturn = {
+                    result: result as ReturnT,
+                    url: returnVal.url,
+                    response: returnVal.response,
+                    decodedBody: returnVal.decodedBody,
                 };
-                // mergeRequestInit here is just used to clone requestInit
-                return (await next(urlConfig, mergeRequestInit(requestInit) as EndpointRequestInit))
-                    .result;
+                return lastMiddlewareReturn;
             };
-            returnVal.result = await executeWithMiddleware();
-            return returnVal as ExecuteReturnVal<ReturnT>;
-        } catch (err) {
-            if (err instanceof ApiError) {
-                throw err;
-            }
-            // Fetch itself threw an error. This can happen on network error.
-            // All other errors (eg. 40X responses) are handled above on res.ok
-            // check
-            throw new RequestError(err.message);
-        }
+            // mergeRequestInit here is just used to clone requestInit
+            return (await next(urlConfig, mergeRequestInit(requestInit) as EndpointRequestInit))
+                .result;
+        };
+        returnVal.result = await executeWithMiddleware();
+        return returnVal as ExecuteReturnVal<ReturnT>;
     }
 }
 
