@@ -21,7 +21,7 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
-    "@prestojs/viewmodel": "^0.0.1"
+    "@prestojs/viewmodel": "~0.0.11"
   },
   "dependencies": {
     "lodash": "^4.17.15"
