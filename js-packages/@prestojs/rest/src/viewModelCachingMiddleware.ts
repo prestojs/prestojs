@@ -2,7 +2,6 @@ import { isViewModelClass, PrimaryKey, ViewModelConstructor } from '@prestojs/vi
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import set from 'lodash/set';
-
 import Endpoint, {
     EndpointRequestInit,
     MiddlewareContext,
@@ -10,6 +9,8 @@ import Endpoint, {
     MiddlewareObject,
     MiddlewareUrlConfig,
 } from './Endpoint';
+
+import { PaginationMiddleware } from './paginationMiddleware';
 
 /**
  * Transform data into either a single instance of a ViewModel or an array of instances and cache them.
@@ -135,7 +136,7 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  * that isn't yet defined.
  *
  * ```js
- * const middleware = paginationMiddleware(() => {
+ * const middleware = viewModelCachingMiddleware(() => {
  *   const Booking = (await import('./Booking')).default;
  *   return {
  *     "records.users": User,
@@ -216,6 +217,15 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
             // throw an error. For custom implementations we have to wait until the method is called to do the check.
             if (endpoint.requestInit.method === 'DELETE') {
                 getDeleteId.validateEndpoint?.(endpoint);
+            }
+            const index = endpoint.middleware.indexOf(this);
+            const paginationIndex = endpoint.middleware.findIndex(
+                middleware => middleware instanceof PaginationMiddleware
+            );
+            if (paginationIndex !== -1 && paginationIndex < index) {
+                throw new Error(
+                    `'paginationMiddleware' must come after 'viewModelCachingMiddleware', see endpoint ${endpoint.urlPattern.pattern}`
+                );
             }
         },
         process: async (

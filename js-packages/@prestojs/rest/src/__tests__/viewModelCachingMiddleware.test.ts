@@ -5,6 +5,7 @@ import { FetchMock } from 'jest-fetch-mock';
 // @ts-ignore
 import { recordEqualTo } from '../../../../../js-testing/matchers';
 import Endpoint from '../Endpoint';
+import paginationMiddleware from '../paginationMiddleware';
 import viewModelCachingMiddleware from '../viewModelCachingMiddleware';
 
 const fetchMock = fetch as FetchMock;
@@ -240,8 +241,8 @@ test('should support deleteViewModel option and delete/update with one call', as
     await endpoint.execute({ urlArgs: { id: 1 } });
     expect(User.cache.get(1, '*')).toBe(null);
     const newSausage = Food.cache.get(sausage.id, '*');
-    expect(newSausage.id).toEqual(sausage.id);
-    expect(newSausage.name).toEqual('banana');
+    expect(newSausage?.id).toEqual(sausage.id);
+    expect(newSausage?.name).toEqual('banana');
 });
 
 test('should support custom getDeleteId', async () => {
@@ -280,4 +281,19 @@ test('should support custom getDeleteId', async () => {
             method: 'DELETE',
         });
     }).toThrowError(new Error('Endpoint pattern wrong'));
+});
+
+test('should error if included in wrong order with paginationMiddleware', async () => {
+    const { User } = createData();
+    expect(
+        () =>
+            new Endpoint(new UrlPattern('/user/'), {
+                middleware: [paginationMiddleware(), viewModelCachingMiddleware(User)],
+            })
+    ).toThrowError("'paginationMiddleware' must come after 'viewModelCachingMiddleware'");
+
+    // This should work
+    new Endpoint(new UrlPattern('/user/'), {
+        middleware: [viewModelCachingMiddleware(User), paginationMiddleware()],
+    });
 });

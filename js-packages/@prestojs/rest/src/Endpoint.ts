@@ -626,7 +626,7 @@ export default class Endpoint<ReturnT = any> {
         urlArgs?: Record<string, any>,
         query?: Query
     ) => string;
-    private middleware: Middleware<ReturnT>[];
+    public middleware: Middleware<ReturnT>[];
 
     /**
      * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint
@@ -805,7 +805,7 @@ export default class Endpoint<ReturnT = any> {
                     const process =
                         typeof nextMiddleware === 'function'
                             ? nextMiddleware
-                            : nextMiddleware.process;
+                            : nextMiddleware.process?.bind(nextMiddleware);
                     let result: MiddlewareNextReturn<ReturnT> | ReturnT;
                     if (!process) {
                         // For MiddlewareObject `process` is optional - if not set just proceed to next middleware in chain
