@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "lint": "eslint js-packages --ext .js,.ts",
-    "check-types": "tsc -b tsconfig.lint.json",
+    "check-types": "tsc -b tsconfig.lint.json && tsd tsd_checks",
     "clean": "rm -rf /tmp/tsc-output/@prestojs && wsrun -x doc-site -x django-testbed -m clean",
     "docs": "yarn workspace doc-site run develop",
     "extract-docs": "yarn node doc-site/extract-docs",
@@ -60,6 +60,7 @@
     "prettier": "2.0.5",
     "react-test-renderer": "^16.12.0",
     "ts-jest": "^26.5.3",
+    "tsd": "^0.14.0",
     "typedoc": "^0.15.2",
     "typedoc-neo-theme": "^1.0.4",
     "typescript": "^4.4.4",
