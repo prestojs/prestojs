@@ -16,7 +16,10 @@ export type NumberFieldProps<T> = FieldProps<T> & {
  * @extract-docs
  * @menu-group Fields
  */
-export default class NumberField<T = string | number> extends Field<T> {
+export default class NumberField<T = string | number, ParsableValueT = T> extends Field<
+    T,
+    ParsableValueT
+> {
     static fieldClassName = 'NumberField';
     public minValue?: number;
     public maxValue?: number;

@@ -2,7 +2,7 @@ import intersectionBy from 'lodash/intersectionBy';
 import isEqual from 'lodash/isEqual';
 import startCase from 'lodash/startCase';
 import Field, { RecordBoundField } from './fields/Field';
-import NumberField from './fields/NumberField';
+import IntegerField from './fields/IntegerField';
 
 import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
 import { freezeObject, isDev } from './util';
@@ -10,7 +10,14 @@ import ViewModelCache from './ViewModelCache';
 
 // Fields are defined as an object mapping field name to a field instance
 export type FieldsMapping = { [fieldName: string]: Field<any> };
-export type FieldsMappingOrNull = { [fieldName: string]: Field<any> | null };
+export type FieldsMappingOrNull<T extends FieldsMapping> =
+    | Record<string, Field<any>>
+    | {
+          [K in keyof T]?: null | undefined | Field<any>;
+      };
+
+// Extract field names from specified ViewModel. Guarantees keys are of type string which `keyof T['fields']` doesn't (includes symbol etc)
+type ExtractFieldNames<T extends ViewModelConstructor<any>> = Extract<keyof T['fields'], string>;
 
 // Extract mapping of field name to it's underlying data type
 export type FieldDataMapping<T extends FieldsMapping> = {
@@ -27,6 +34,16 @@ export type FieldDataMappingRaw<T extends FieldsMapping> = {
 export type SinglePrimaryKey = string | number;
 export type CompoundPrimaryKey = { [fieldName: string]: SinglePrimaryKey };
 export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
+
+type KeysOfType<O, T> = {
+    [K in keyof O]: O[K] extends T ? K : never;
+}[keyof O];
+
+type AugmentFields<
+    OriginalFields extends FieldsMapping,
+    AugmentedFields extends FieldsMappingOrNull<OriginalFields>
+> = Omit<OriginalFields, keyof AugmentedFields> &
+    Omit<AugmentedFields, KeysOfType<AugmentedFields, undefined | null>>;
 
 /**
  * Creates a ViewModel class with the specified fields.
@@ -148,16 +165,17 @@ export type ViewModelInterface<
  */
 export interface ViewModelConstructor<
     FieldMappingType extends FieldsMapping,
-    PkFieldType extends string | string[] = string | string[],
+    PkFieldType extends
+        | Extract<keyof FieldMappingType, string>
+        | Extract<keyof FieldMappingType, string>[]
+        | string
+        | string[] = Extract<keyof FieldMappingType, string>,
     PkType extends PrimaryKey = PrimaryKey
 > {
     /** @private */
     __pkFieldType: PkFieldType;
     /** @private */
     __pkType: PkType;
-    new <FieldNames extends keyof FieldMappingType>(
-        data: { [K in FieldNames]: FieldMappingType[K]['__parsableValueType'] }
-    ): ViewModelInterface<FieldMappingType, FieldNames, PkFieldType, PkType>;
 
     // This is necessary for when the base class is extended so that it still conforms to
     // ViewModelConstructor - without this there will be no matching type (for some reason?)
@@ -185,12 +203,15 @@ export interface ViewModelConstructor<
     // const a3 = new C({ name: 'test' });
     // Error: Property 'age' does not exist on type ...
     // a3.age
-    new (data: FieldDataMappingRaw<FieldMappingType>): ViewModelInterface<
-        FieldMappingType,
-        keyof FieldMappingType,
-        PkFieldType,
-        PkType
-    >;
+    new (
+        // When we know primary key is 'id' then we can require it be provided in types (pk is always required)
+        // When pk customised we can't provide this check
+        data: PkFieldType extends 'id'
+            ? FieldDataMappingRaw<FieldMappingType> & {
+                  id: FieldMappingType['id']['__parsableValueType'];
+              }
+            : FieldDataMappingRaw<FieldMappingType>
+    ): ViewModelInterface<FieldMappingType, keyof FieldMappingType, PkFieldType, PkType>;
 
     /**
      * The bound fields for this ViewModel. These will match the `fields` passed in to `ViewModel` with the
@@ -239,7 +260,7 @@ export interface ViewModelConstructor<
     /**
      * Shortcut to get pkFieldName as an array always, even for non-compound keys
      */
-    readonly pkFieldNames: string[];
+    readonly pkFieldNames: Extract<keyof FieldMappingType, string>[];
 
     /**
      * Shortcut to get the names of all fields excluding primary keys.
@@ -250,7 +271,7 @@ export interface ViewModelConstructor<
      * model.fieldNames.concat(model.pkFieldNames);
      * ```
      */
-    readonly fieldNames: string[];
+    readonly fieldNames: Extract<keyof FieldMappingType, string>[];
 
     /**
      * Get a field from this model or a related model
@@ -335,19 +356,20 @@ export interface ViewModelConstructor<
      * @param newOptions Provide optional overrides for the options that the original class was created with
      * @return A new ViewModel class with fields modified according to `newFields`.
      */
-    augment<P extends FieldsMappingOrNull>(
-        newFields: P,
-        newOptions?: ViewModelOptions<FieldMappingType & P>
-    ): ViewModelConstructor<FieldMappingType & P, PkFieldType, PkType>;
+    augment<T extends FieldsMappingOrNull<FieldMappingType>>(
+        newFields: T,
+        newOptions?: ViewModelOptions<AugmentFields<FieldMappingType, T>>
+    ): ViewModelConstructor<AugmentFields<FieldMappingType, T>, PkFieldType, PkType>;
 }
 
 type GetImplicitPkFieldCompound<T extends FieldsMapping> = (
-    model: ViewModelConstructor<T>,
+    // Type is any instead of T as fields on model vs fields may no be finalised and may differ (eg. from implicit keys)
+    model: ViewModelConstructor<any>,
     fields: T
 ) => [string[], Field<any>[]];
 
 type GetImplicitPkFieldSingle<T extends FieldsMapping> = (
-    model: ViewModelConstructor<T>,
+    model: ViewModelConstructor<any>,
     fields: T
 ) => [string, Field<any>];
 
@@ -374,7 +396,7 @@ interface ViewModelOptions<T extends FieldsMapping> {
      *
      * @type-name string|string[]
      */
-    pkFieldName?: null | undefined | string | string[];
+    pkFieldName?: null | undefined | keyof T | (keyof T)[];
     /**
      * A function to generate field(s) to use for the primary key. It is passed the model class and
      * the fields on the model. It should return an array of size 2 - first element should be the
@@ -386,10 +408,10 @@ interface ViewModelOptions<T extends FieldsMapping> {
 }
 
 interface ViewModelOptionsPkFieldNameSingle<T extends FieldsMapping> extends ViewModelOptions<T> {
-    pkFieldName: string;
+    pkFieldName: Extract<keyof T, string>;
 }
 interface ViewModelOptionsPkFieldNameCompound<T extends FieldsMapping> extends ViewModelOptions<T> {
-    pkFieldName: string[];
+    pkFieldName: Extract<keyof T, string>[];
 }
 
 interface ViewModelOptionsGetImplicitPkFieldSingle<T extends FieldsMapping>
@@ -402,12 +424,18 @@ interface ViewModelOptionsGetImplicitPkFieldCompound<T extends FieldsMapping>
     getImplicitPkField: GetImplicitPkFieldCompound<T>;
 }
 
+interface ViewModelOptionsDefault<T extends FieldsMapping> extends ViewModelOptions<T> {
+    pkFieldName: 'id';
+    getImplicitPkField: undefined;
+}
+
 /**
  * Defines a getter on `base` for `name` that throws `errorMessage`. If this property isn't
  * overridden then when it's accessed the error will be thrown (eg. for static properties
  * like `label` & `labelPlural`.
  */
-function defineRequiredGetter(base: {}, name: string, errorMessage: string): void {
+// eslint-disable-next-line @typescript-eslint/ban-types
+function defineRequiredGetter(base: Function, name: string, errorMessage: string): void {
     Object.defineProperty(base, name, {
         configurable: true,
         get(): string {
@@ -488,8 +516,8 @@ function bindFields<T extends FieldsMapping>(fields: T, bindTo: ViewModelConstru
 function defaultGetImplicitPkField<T extends FieldsMapping>(
     model: ViewModelConstructor<T>,
     fields: T
-): ['id', NumberField] {
-    return ['id', fields.id || new NumberField()];
+): ['id', IntegerField] {
+    return ['id', fields.id || new IntegerField()];
 }
 
 const IS_VIEW_MODEL = Symbol.for('@prestojs/IS_VIEW_MODEL');
@@ -767,23 +795,46 @@ export class MissingFieldsError extends Error {
 export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options: ViewModelOptionsPkFieldNameSingle<T>
-): ViewModelConstructor<T, string, SinglePrimaryKey>;
+): ViewModelConstructor<
+    T,
+    typeof options['pkFieldName'],
+    typeof options['pkFieldName'] extends keyof T
+        ? T[typeof options['pkFieldName']] extends Field<infer X>
+            ? X extends string | number
+                ? X
+                : never
+            : SinglePrimaryKey
+        : SinglePrimaryKey
+>;
 export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options: ViewModelOptionsPkFieldNameCompound<T>
-): ViewModelConstructor<T, string[], CompoundPrimaryKey>;
+): ViewModelConstructor<T, typeof options['pkFieldName'], CompoundPrimaryKey>;
 export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options: ViewModelOptionsGetImplicitPkFieldSingle<T>
-): ViewModelConstructor<T, string, SinglePrimaryKey>;
+): ViewModelConstructor<
+    T,
+    string,
+    ReturnType<typeof options['getImplicitPkField']>[1] extends Field<infer X> ? X : PrimaryKey
+>;
 export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
     options: ViewModelOptionsGetImplicitPkFieldCompound<T>
 ): ViewModelConstructor<T, string[], CompoundPrimaryKey>;
 export default function viewModelFactory<T extends FieldsMapping>(
     fields: T,
-    options?: ViewModelOptions<T>
-): ViewModelConstructor<{ id: NumberField } & T, 'id', string | number>;
+    options?: ViewModelOptionsDefault<{ id: IntegerField } & T>
+): ViewModelConstructor<
+    { id: IntegerField } & T,
+    'id',
+    // If field is provided it must be either a number or string
+    T['id'] extends Field<number>
+        ? number
+        : T['id'] extends Field<string>
+        ? string // This is the default; IntegerField
+        : number
+>;
 /**
  * Creates a ViewModel class with the specified fields.
  *
@@ -840,10 +891,10 @@ export default function viewModelFactory<T extends FieldsMapping>(
     // getImplicitPkField will create a new field if specified but we can't type it so we ignore it
     // (nested ternary is unavoidable to use the typescripts `extends` behaviour)
     type FinalFields = typeof options.pkFieldName extends string | string[]
-        ? T
+        ? T // eslint-disable-next-line @typescript-eslint/ban-types
         : typeof options.getImplicitPkField extends Function
         ? T
-        : { id: NumberField } & T;
+        : { id: IntegerField } & T;
     type PkFieldType = typeof options.pkFieldName extends string
         ? string
         : typeof options.pkFieldName extends string[]
@@ -862,15 +913,23 @@ export default function viewModelFactory<T extends FieldsMapping>(
         ? CompoundPrimaryKey
         : typeof options.getImplicitPkField extends GetImplicitPkFieldSingle<T>
         ? SinglePrimaryKey
+        : T['id'] extends Field<number>
+        ? number
+        : T['id'] extends Field<string>
+        ? string
         : SinglePrimaryKey;
 
     // This is the constructor function for the created class. We aren't using an ES6 class
     // here as I couldn't get types to work nicely (possibly ignorance on my behalf - can look
     // to refactor down the track)
-    function _Base<IncomingData extends FieldDataMappingRaw<FinalFields>>(
-        data: IncomingData
+    function _Base(
+        data: PkFieldType extends 'id'
+            ? FieldDataMappingRaw<FinalFields> & {
+                  id: FinalFields['id']['__parsableValueType'];
+              }
+            : FieldDataMappingRaw<FinalFields>
     ): {
-        [k in Extract<keyof IncomingData, keyof FinalFields>]: FinalFields[k]['__fieldValueType'];
+        [k in Extract<keyof typeof data, keyof FinalFields>]: FinalFields[k]['__fieldValueType'];
     } {
         if (!data) {
             throw new Error('data must be specified');
@@ -1168,8 +1227,10 @@ export default function viewModelFactory<T extends FieldsMapping>(
      *
      * The return value is a 2-tuple of the field mapping object and the primary key name(s).
      */
-    function _bindFields(modelClass: ViewModelConstructor<T>): [FinalFields, string | string[]] {
-        let f = boundFields.get(modelClass as ViewModelConstructor<FinalFields>);
+    function _bindFields(
+        modelClass: ViewModelConstructor<FinalFields>
+    ): [FinalFields, string | string[]] {
+        let f = boundFields.get(modelClass);
         if (!f) {
             const toBind = { ...fields };
             let { getImplicitPkField } = options;
@@ -1268,7 +1329,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
             /**
              * Shortcut to get pkFieldName as an array always, even for non-compound keys
              */
-            get(): string[] {
+            get(): Extract<keyof FinalFields, string>[] {
                 const pkFieldNames = this.pkFieldName;
                 if (!Array.isArray(pkFieldNames)) {
                     return [pkFieldNames];
@@ -1373,13 +1434,10 @@ export default function viewModelFactory<T extends FieldsMapping>(
         },
     });
 
-    // I can't work out proper explicit type, wasn't what I expected (ViewModelConstructor<O & P>) but it
-    // infers it fine.
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    function augment<P extends FieldsMappingOrNull>(
-        newFields: P,
-        newOptions: ViewModelOptions<T & P> = {}
-    ) {
+    function augment<T extends FieldsMappingOrNull<FinalFields>>(
+        newFields: T,
+        newOptions?: ViewModelOptions<AugmentFields<FinalFields, T>>
+    ): ViewModelConstructor<AugmentFields<FinalFields, T>, PkFieldType, PkValueType> {
         const f: FieldsMapping = {
             ...fields,
         };
@@ -1390,15 +1448,19 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 delete f[fieldName];
             }
         }
-        return viewModelFactory(f as T & P, {
-            ...(options as ViewModelOptions<T & P>),
+        const finalOptions = {
+            ...options,
             ...newOptions,
             baseClass: this,
-        });
+        };
+        // Can't work this out, not a big deal as internal function anyway (main definition is on ViewModelConstructor)
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return viewModelFactory(f, finalOptions);
     }
 
     _Base.augment = augment;
-    return (_Base as Function) as ViewModelConstructor<FinalFields, PkFieldType, PkValueType>;
+    return (_Base as unknown) as ViewModelConstructor<FinalFields, PkFieldType, PkValueType>;
 }
 
 /**
