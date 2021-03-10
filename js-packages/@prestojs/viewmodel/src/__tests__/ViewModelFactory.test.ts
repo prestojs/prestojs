@@ -193,6 +193,8 @@ test('should error if pkFieldName and getImplicitPkField provided', () => {
             {},
             {
                 pkFieldName: 'id',
+                // Typescript knows this is not valid
+                // @ts-ignore
                 getImplicitPkField(): [string, Field<any>] {
                     return ['EntityId', new CharField()];
                 },
@@ -213,6 +215,8 @@ test('ViewModel should validate primary key fields exist when binding fields', (
     class B extends ViewModelFactory(
         {},
         {
+            // Not valid types; no such fields id1, id2
+            // @ts-ignore
             pkFieldName: ['id1', 'id2'],
         }
     ) {}
@@ -226,6 +230,8 @@ test('ViewModel should validate primary key fields exist when binding fields', (
             id1: new Field({ label: 'Id' }),
         },
         {
+            // Not valid types; no such field id2
+            // @ts-ignore
             pkFieldName: ['id1', 'id2'],
         }
     ) {}
@@ -264,6 +270,8 @@ test('should validate primary key is provided', () => {
         id: new Field({ label: 'Id' }),
     }) {}
 
+    // Type fails because `id` is required, ignore
+    // @ts-ignore
     expect(() => new A({})).toThrowError(/Missing value\(s\) for primary key\(s\) 'id'/);
     expect(() => new A({ id: null })).toThrowError(
         "Primary key(s) 'id' was provided but was null or undefined"
