@@ -142,7 +142,7 @@ export default function useAsyncChoices<ItemT, ValueT>(
         getId: asyncChoices.getValue.bind(asyncChoices),
         existingValues: existingValues,
         // Haven't been able to workout typing on this yet
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         ids: Array.isArray(value) ? value : undefined,
         id: !Array.isArray(value) ? value : undefined,
@@ -153,7 +153,7 @@ export default function useAsyncChoices<ItemT, ValueT>(
     const listResult = asyncChoices.useResolveItems(list.result);
     const selectedValue = asyncChoices.useResolveItems(selected.value);
     return {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         list: {
             ...list,

@@ -10,6 +10,19 @@ module.exports = {
         '@typescript-eslint/no-explicit-any': 0,
         // disable the rule for all files
         '@typescript-eslint/explicit-function-return-type': 'off',
+        '@typescript-eslint/no-use-before-define': ['error', { ignoreTypeReferences: true }],
+        '@typescript-eslint/ban-types': [
+            'error',
+            {
+                extendDefaults: true,
+                types: {
+                    Function: false,
+                    '{}': false,
+                },
+            },
+        ],
+        '@typescript-eslint/no-unused-vars': ['warn', { args: 'none' }],
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
         'react/jsx-uses-react': 'error',
         'react/jsx-uses-vars': 'error',
         'react-hooks/rules-of-hooks': 'error',

@@ -25,7 +25,7 @@ test('choices widget picks select / radio base on choice number correctly', asyn
         // open is a valid prop for SelectChoices but IntegerChoicesWidget doesn't specify...
         // complicated because it is only valid when type is Select not when Radio. I'm ignoring
         // this for now
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         <IntegerChoicesWidget choices={choicesLong} input={input} open />
     );

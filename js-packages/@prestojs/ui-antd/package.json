@@ -40,6 +40,6 @@
     "antd": "^4.9.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "typescript": "^3.9.2"
+    "typescript": "^4.2.3"
   }
 }

@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import viewModelFactory, { ViewModelConstructor } from '../../ViewModelFactory';
 import Field from '../Field';
@@ -8,7 +8,7 @@ import { ManyRelatedViewModelField, RelatedViewModelField } from '../RelatedView
 declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace jest {
-        interface Matchers<R, T> {
+        interface Matchers<R> {
             toBeEqualToRecord(received: any, msg?: string): R;
         }
     }
@@ -85,7 +85,7 @@ describe('RelatedViewModelField', () => {
         });
         // Can we fix this? Return type is inferred from values passed in... groupId
         // is added because 'group' exists but can't be inferred
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         expect(user.groupId).toBe(1);
         expect(user._assignedFields).toEqual(['group', 'groupId', 'id', 'name']);

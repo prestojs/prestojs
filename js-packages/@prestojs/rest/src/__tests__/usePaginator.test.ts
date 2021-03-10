@@ -39,7 +39,7 @@ test('should accept no value', async () => {
     });
     rerender();
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     act(() => result.current.setResponse({ total: 10, pageSize: 5 }));
 

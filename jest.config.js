@@ -26,7 +26,6 @@ module.exports = {
             diagnostics: {
                 warnOnly: true,
             },
-            packageJson: 'package.json',
         },
     },
     moduleFileExtensions: ['ts', 'tsx', 'js'],

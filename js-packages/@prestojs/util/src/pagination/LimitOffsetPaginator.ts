@@ -65,12 +65,15 @@ export default class LimitOffsetPaginator extends Paginator<
             const offset = Math.floor(this.offset / limit) * limit;
             return { ...this.currentState, limit, offset };
         }
-        const nextState = { ...this.currentState, limit };
+        const nextState: LimitOffsetPaginationState = {
+            ...this.currentState,
+            limit: limit ?? undefined,
+        };
         if (limit == null) {
             delete nextState.offset;
             delete nextState.limit;
         }
-        return nextState as LimitOffsetPaginationState;
+        return nextState;
     }
 
     /**
@@ -90,11 +93,14 @@ export default class LimitOffsetPaginator extends Paginator<
             throw new Error(`Invalid offset ${offset} - should be >= 0`);
         }
 
-        const nextState = { ...this.currentState, offset };
+        const nextState: LimitOffsetPaginationState = {
+            ...this.currentState,
+            offset: offset ?? undefined,
+        };
         if (offset === 0 || offset == null) {
             delete nextState.offset;
         }
-        return nextState as LimitOffsetPaginationState;
+        return nextState;
     }
 
     setOffset(offset: number | null): void {

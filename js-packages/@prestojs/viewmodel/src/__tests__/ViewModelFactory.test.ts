@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { getId, isIdentifiable } from '@prestojs/util';
 import CharField from '../fields/CharField';
 import Field from '../fields/Field';
@@ -17,7 +17,7 @@ import ViewModelFactory, {
 declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace jest {
-        interface Matchers<R, T> {
+        interface Matchers<R> {
             toBeEqualToRecord(received: any, msg?: string): R;
         }
     }
@@ -88,7 +88,6 @@ test('field name and label should be set automatically', () => {
         id: new Field(),
         firstName: new Field(),
         LastName: new Field(),
-        // eslint-disable-next-line @typescript-eslint/camelcase
         email_address: new Field(),
         CONTACT_NUMBER: new Field(),
         age: new Field({ label: 'User Age' }),

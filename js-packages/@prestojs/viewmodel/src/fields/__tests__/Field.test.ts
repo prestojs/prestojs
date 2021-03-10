@@ -3,31 +3,31 @@ import Field from '../Field';
 
 test('Field options validation', () => {
     expect(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         () => new Field({ label: 'phone number', blank: 3 })
     ).toThrowError('"blank" should be a boolean, received: 3');
 
     expect(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         () => new Field({ label: 'phone number', readOnly: {} })
     ).toThrowError('"readOnly" should be a boolean, received: [object Object]');
 
     expect(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         () => new Field({ label: 'phone number', writeOnly: 'no' })
     ).toThrowError('"writeOnly" should be a boolean, received: no');
 
     expect(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         () => new Field({ label: 'phone number', choices: 3 })
     ).toThrowError('"choices" should be Iterable, received: 3');
 
     expect(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         () => new Field({ label: 'phone number', snake: 'oil' })
     ).toThrowError('Received unknown option(s): snake');

@@ -151,7 +151,7 @@ export default function useViewModelCache<
         function checkForUpdates(): void {
             try {
                 // lastSelector.current is always set... ignore typescript
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 const nextValue = lastSelector.current(viewModel.cache, ...lastArgs.current);
                 if (isEquals(nextValue, lastValue.current)) {

@@ -223,13 +223,13 @@ export function useFileList(
                             // antd seems to attach a uid to the file which we need to use if available
                             // without this the onChange event seems to end up with multiple entries - one
                             // with the uid from antd and one that is assigned here
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
                             const valueUid = value.uid || uid.toString();
                             // If a Blob is passed it won't necessarily have a `name` (in some cases it appears antd
                             // libraries attach this, eg. antd-img-crop). Log a warning if name isn't available but
                             // set it to `uid` so things continue to work (preview may not work properly).
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
                             let name = value.name;
                             if (!name) {

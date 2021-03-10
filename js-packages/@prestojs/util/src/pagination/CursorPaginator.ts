@@ -66,7 +66,10 @@ export default class CursorPaginator extends Paginator<
         if (this.currentState.pageSize !== pageSize) {
             this.setInternalState({ nextCursor: null, previousCursor: null });
         }
-        const nextState = { ...this.currentState, pageSize };
+        const nextState: CursorPaginationState = {
+            ...this.currentState,
+            pageSize: pageSize ?? undefined,
+        };
         if (pageSize == null) {
             delete nextState.pageSize;
         }

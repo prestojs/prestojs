@@ -7,11 +7,11 @@ test('NumberFormatter format numbers correctly', () => {
 
     expect(NumberFormatter({ value: 0.69 })).toBe('0.69');
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expect(NumberFormatter({ value: '42' })).toBe('42');
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expect(NumberFormatter({ value: 'ulururu' })).toBeNull();
 

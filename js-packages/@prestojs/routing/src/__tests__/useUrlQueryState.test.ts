@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { act, renderHook, RenderHookResult } from '@testing-library/react-hooks';
 import diff from 'jest-diff';
 import qs from 'query-string';
@@ -8,7 +7,7 @@ import useUrlQueryState from '../useUrlQueryState';
 declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace jest {
-        interface Matchers<R, T> {
+        interface Matchers<R> {
             queryStateEquals(hookStatus: any, msg?: string): R;
         }
     }

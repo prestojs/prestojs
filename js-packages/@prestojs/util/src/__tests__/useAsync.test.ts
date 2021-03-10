@@ -755,7 +755,7 @@ test('useAsync return a reset function that clears response / error', async () =
 
 test('useAsync should throw an error if invalid option specified', async () => {
     const asyncFn = jest.fn(() => Promise.resolve());
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const { result } = renderHook(() => useAsync(asyncFn, { unknownKey: 1 }));
     expect(result.error).toEqual(

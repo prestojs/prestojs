@@ -268,7 +268,7 @@ test('should support onRetrieveError', async () => {
     const asyncChoices = buildAsyncChoices({ list, retrieve });
     function Wrapper(): React.ReactElement {
         const [value, setValue] = useState(input.value);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         input.onChange = setValue;
         input.value = value;

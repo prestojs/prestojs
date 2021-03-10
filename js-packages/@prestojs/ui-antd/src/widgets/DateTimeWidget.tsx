@@ -24,7 +24,7 @@ function DateTimeWidget(
     const { format = 'MMMM Do YYYY, h:mm a', ...restInput } = input;
     // antd 4.0.0-rc5 has a bug in DatePickerProps in that it does not have showTime taking boolean as type atm (object only)
     // revisit to see if we still need this ignore once its released
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return <DatePicker ref={ref} showTime format={format} {...restInput} {...rest} />;
 }

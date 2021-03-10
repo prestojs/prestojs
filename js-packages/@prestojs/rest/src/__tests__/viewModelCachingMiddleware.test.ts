@@ -1,7 +1,7 @@
 import { UrlPattern } from '@prestojs/routing';
 import { CharField, viewModelFactory } from '@prestojs/viewmodel';
 import { FetchMock } from 'jest-fetch-mock';
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { recordEqualTo } from '../../../../../js-testing/matchers';
 import Endpoint from '../Endpoint';

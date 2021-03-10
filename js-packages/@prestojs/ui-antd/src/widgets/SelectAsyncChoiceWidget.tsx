@@ -199,7 +199,7 @@ function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props
             getLabeledValue<T, ItemType>({
                 rawValue: v,
                 allItems,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 selected: selectedById[v],
                 asyncChoices,

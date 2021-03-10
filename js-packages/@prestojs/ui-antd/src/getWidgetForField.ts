@@ -93,7 +93,10 @@ export default function getWidgetForField<
     T extends HTMLElement
 >(
     field: Field<FieldValue, ParsableValueT, SingleValueT>
-): FieldWidgetType<FieldValue, T> | [FieldWidgetType<FieldValue, T>, object] | null {
+):
+    | FieldWidgetType<FieldValue, T>
+    | [FieldWidgetType<FieldValue, T>, Record<string, unknown>]
+    | null {
     const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     // Couldn't work out what to type this as so field.constructor was accepted
     const widget: FieldWidgetType<any, any> | null | undefined =
@@ -104,7 +107,9 @@ export default function getWidgetForField<
     const getReturnWithChoices = (
         w,
         f
-    ): FieldWidgetType<FieldValue, T> | [FieldWidgetType<FieldValue, T>, object] => {
+    ):
+        | FieldWidgetType<FieldValue, T>
+        | [FieldWidgetType<FieldValue, T>, Record<string, unknown>] => {
         if (f.choices || f.asyncChoices) {
             if (Array.isArray(w)) {
                 return [w[0], { ...w[1], choices: f.choices, asyncChoices: f.asyncChoices }];

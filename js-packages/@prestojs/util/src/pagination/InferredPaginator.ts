@@ -533,7 +533,7 @@ export default class InferredPaginator
             }
             this.paginator = new paginatorClass(...args);
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this.paginator.setResponse(response);
     }

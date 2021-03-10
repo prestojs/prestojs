@@ -54,7 +54,7 @@ export type UseAsyncListingProps<T> = {
     }) => Promise<T>;
 };
 
-type UseAsyncListingReturnCommon<T> = {
+type UseAsyncListingReturnCommon = {
     /**
      * True while `execute` call is in progress.
      */
@@ -80,14 +80,14 @@ type UseAsyncListingReturnCommon<T> = {
     reset: () => void;
 };
 export type UseAsyncListingReturn<T> =
-    | (UseAsyncListingReturnCommon<T> & {
+    | (UseAsyncListingReturnCommon & {
           /**
            * Until first call has resolved neither error nor result will be set
            */
           error: null;
           result: null;
       })
-    | (UseAsyncListingReturnCommon<T> & {
+    | (UseAsyncListingReturnCommon & {
           /**
            * Set to the rejected value of the promise. Only one of `error` and `response` can be set. If
            * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
@@ -99,7 +99,7 @@ export type UseAsyncListingReturn<T> =
            */
           result: null;
       })
-    | (UseAsyncListingReturnCommon<T> & {
+    | (UseAsyncListingReturnCommon & {
           /**
            * Error will not be set when result is set
            */

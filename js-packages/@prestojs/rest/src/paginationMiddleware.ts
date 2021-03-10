@@ -54,7 +54,7 @@ export default function paginationMiddleware<T>(
 ): MiddlewareObject<T> {
     return {
         init(endpoint: Endpoint): void {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (endpoint.getPaginatorClass) {
                 throw new Error(
@@ -63,7 +63,7 @@ export default function paginationMiddleware<T>(
             }
             // Add getPaginatorClass to Endpoint so that it conforms to
             // PaginatorClassProvider and will work with usePaginator
-            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             endpoint.getPaginatorClass = (): typeof paginatorClass => paginatorClass;
         },

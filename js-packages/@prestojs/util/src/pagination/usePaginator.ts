@@ -29,7 +29,7 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
     paginatorClassOrProvider: PaginatorInterfaceClass<T> | PaginatorClassProvider<T>,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): T;
-export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
+export default function usePaginator<PaginatorState>(
     paginatorClassOrProvider: null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): null;

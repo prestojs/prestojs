@@ -97,12 +97,15 @@ export default class PageNumberPaginator extends Paginator<
             const page = Math.max(1, Math.ceil(((this.page - 1) * this.pageSize) / pageSize));
             return { ...this.currentState, pageSize, page };
         }
-        const nextState = { ...this.currentState, pageSize };
+        const nextState: PageNumberPaginationState = {
+            ...this.currentState,
+            pageSize: pageSize ?? undefined,
+        };
         if (pageSize == null) {
             delete nextState.page;
             delete nextState.pageSize;
         }
-        return nextState as PageNumberPaginationState;
+        return nextState;
     }
 
     /**

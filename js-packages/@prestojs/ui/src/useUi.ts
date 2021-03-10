@@ -21,7 +21,7 @@ export default function useUi(): TopLevelUiContextValue {
     // which says getWidgetForField doesn't return null but that's not compatible with the
     // type of UiContext. As such we have to ignore the type error here.
     // Also see comments on type UiContextValue
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return context;
 }

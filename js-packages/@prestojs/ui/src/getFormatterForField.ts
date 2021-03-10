@@ -8,25 +8,25 @@ const ImageFormatter = React.lazy(() => import('./formatters/ImageFormatter'));
 // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/33006
 // TLDR: currently @types/react disallows bare children (eg, string) to be returned from a functional component
 // also see: issue 32832
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const BooleanFormatter = React.lazy(() => import('./formatters/BooleanFormatter'));
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const CharFormatter = React.lazy(() => import('./formatters/CharFormatter'));
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const ChoiceFormatter = React.lazy(() => import('./formatters/ChoiceFormatter'));
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const DateFormatter = React.lazy(() => import('./formatters/DateFormatter'));
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const DateTimeFormatter = React.lazy(() => import('./formatters/DateTimeFormatter'));
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const NumberFormatter = React.lazy(() => import('./formatters/NumberFormatter'));
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const TimeFormatter = React.lazy(() => import('./formatters/TimeFormatter'));
 
@@ -78,7 +78,7 @@ export default function getFormatterForField<
     T extends HTMLElement
 >(
     field: Field<FieldValue, ParsableValueT, SingleValueT>
-): React.ComponentType<T> | [React.ComponentType<T>, object] | string | null {
+): React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>] | string | null {
     const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     const formatter: React.FunctionComponent | string | null | undefined = field.choices
         ? choicesMapping.get(fieldClassName) || mapping.get(fieldClassName)
@@ -87,7 +87,7 @@ export default function getFormatterForField<
     const getReturnWithChoices = (
         w,
         f
-    ): React.ComponentType<T> | [React.ComponentType<T>, object] | string => {
+    ): React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>] | string => {
         if (f.choices) {
             if (Array.isArray(w)) {
                 return [w[0], { ...w[1], choices: f.choices }];

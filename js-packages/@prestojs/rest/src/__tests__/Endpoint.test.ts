@@ -55,13 +55,13 @@ test('prepare should maintain equality based on inputs', () => {
     const noop = (): void => undefined;
     const gArgs = {
         urlArgs: { id: 1 },
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         paginator: new PageNumberPaginator([{}, noop], [{}, noop]),
     };
     const g = action.prepare(gArgs);
     expect(g).toBe(action.prepare(gArgs));
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     gArgs.paginator = new PageNumberPaginator([{}, noop], [{}, noop]);
     expect(g).not.toBe(action.prepare(gArgs));
@@ -154,13 +154,13 @@ test('should support merging global headers with action specific headers', async
     fetchMock.mockResponse('');
     const expectHeadersEqual = (headers2): void => {
         const headers1 = new Headers(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             fetchMock.mock.calls[fetchMock.mock.calls.length - 1][1].headers
         );
         headers2 = new Headers(headers2);
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         expect([...headers1.entries()]).toEqual([...headers2.entries()]);
     };
@@ -275,7 +275,7 @@ test('should update paginator state on response', async () => {
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [paginationMiddleware()],
     });
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     let { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
@@ -297,7 +297,7 @@ test('should update paginator state on response', async () => {
     });
 
     // Should also work by passing paginator to prepare
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     hookResult = renderHook(() => useTestHook(action1.getPaginatorClass())).result;
     fetchMock.mockResponseOnce(
@@ -339,7 +339,7 @@ test('should support changing paginatorClass & getPaginationState', async () => 
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [paginationMiddleware(PageNumberPaginator, getPaginationState)],
     });
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const { result: hookResult } = renderHook(() => useTestHook(action1.getPaginatorClass()));
 
@@ -551,7 +551,7 @@ test('middleware should detect bad implementations', async () => {
     function badMiddleware2(next, urlConfig, requestInit) {
         next(urlConfig, requestInit);
     }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const action2 = new Endpoint(new UrlPattern('/whatever/'), { middleware: [badMiddleware2] });
     expect(action2.execute()).rejects.toThrowError(

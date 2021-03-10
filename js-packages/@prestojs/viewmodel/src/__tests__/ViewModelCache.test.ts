@@ -146,7 +146,7 @@ test('should validate pk(s)', () => {
     expect(() => Test2.cache.get(1, ['name'])).toThrowError(
         'Test2 has a compound key of id1, id2. You must provide an object mapping these fields to their values.'
     );
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expect(() => Test2.cache.get({ id1: null }, ['name'])).toThrowError(
         'Test2 has a compound key of id1, id2. Missing value(s) for field(s) id1, id2'
@@ -154,7 +154,6 @@ test('should validate pk(s)', () => {
 
     expect(Test2.cache.getAll(['id1', 'id2', 'name'])[0]).toBe(record2);
     expect(Test2.cache.getAll(['name'])[0]).toBe(record2);
-
 });
 
 test('should always use primary key in cache regardless of whether specified', () => {
@@ -207,7 +206,7 @@ test('should always use primary key in cache regardless of whether specified', (
 test('should support custom cache', () => {
     class MyInvalidCache {}
     expect(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         class TestBad extends viewModelFactory({}) {
@@ -236,7 +235,7 @@ test('should support custom cache', () => {
     expect(Test1.cache).not.toBe(Test3.cache);
 
     class Test4 extends Test1 {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         static cache = new MyCache2<Test4>(Test4);
     }
@@ -801,7 +800,7 @@ function createTestModels(circular = false, many = false) {
         groupId: many
             ? new ListField({ childField: new Field<number | null>() })
             : new Field<number | null>(),
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         group: new (many ? ManyRelatedViewModelField : RelatedViewModelField)({
             to: (): Promise<typeof Group> => Promise.resolve(Group),
@@ -1143,7 +1142,7 @@ test('should handle nullable values', async () => {
         new User({
             id: 2,
             name: 'Sam',
-            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             group: null,
             groupId: null,
@@ -1732,7 +1731,7 @@ test('listeners should handle missing nested', async () => {
             user: {
                 id: 1,
                 groupId: null,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 group: null,
             },
@@ -2573,7 +2572,7 @@ test('getList should work across caches', async () => {
             new User({
                 id: 2,
                 name: 'Sam',
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 group: null,
                 groupId: null,
@@ -2630,7 +2629,7 @@ test('getList should work across caches', async () => {
             new User({
                 id: 2,
                 name: 'Sam',
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 group: null,
                 groupId: null,
@@ -2687,7 +2686,7 @@ test('getAll should work across caches', async () => {
             new User({
                 id: 2,
                 name: 'Sam',
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 group: null,
                 groupId: null,
@@ -2744,7 +2743,7 @@ test('getAll should work across caches', async () => {
             new User({
                 id: 2,
                 name: 'Sam',
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 group: null,
                 groupId: null,
