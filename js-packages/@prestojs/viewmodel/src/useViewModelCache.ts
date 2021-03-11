@@ -34,6 +34,10 @@ function defaultEquality<T>(currentValue: T, previousValue?: T): boolean {
  * Select some data out of the cache for use in a component. Whenever the cache data
  * changes the component will re-render with latest value.
  *
+ * See [ViewModelCache](doc:ViewModelCache) for more details on how to read data from the
+ * cache. The [Field notation](doc:ViewModelCache#Field_notation) documentation goes over
+ * the possible formats for the fields argument.
+ *
  * Example usage:
  *
  * ```jsx
