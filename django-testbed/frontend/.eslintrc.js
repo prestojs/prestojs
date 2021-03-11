@@ -1,6 +1,7 @@
 const assert = require('assert');
 const path = require('path');
 const react = require('./webpack.project.config.js').commonSettings.react;
+
 assert(
     react !== undefined,
     'react can no longer be blank in webpack.project.config; please set it to true or false'
@@ -14,7 +15,9 @@ const globals = react
 module.exports = {
     parser: require.resolve('babel-eslint'),
     extends: [
-        react ? require.resolve('@alliance-software/eslint-config-react') : require.resolve('@alliance-software/eslint-config'),
+        react
+            ? require.resolve('@alliance-software/eslint-config-react')
+            : require.resolve('@alliance-software/eslint-config'),
     ],
     rules: {
         'import/no-unresolved': [
@@ -42,10 +45,12 @@ module.exports = {
                 ],
             },
         ],
+        'arrow-parens': ['error', 'as-needed'],
     },
     globals,
     env: {
         browser: true,
+        node: true,
         jquery: !react,
     },
 };

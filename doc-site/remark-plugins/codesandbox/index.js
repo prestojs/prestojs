@@ -80,11 +80,9 @@ ReactDOM.render(
         mode: 'cors',
     })
         .then(response => response.json())
-        // eslint-disable-next-line @typescript-eslint/camelcase
         .then(({ errors, sandbox_id }) => {
             if (errors) throw errors;
             const result = {
-                // eslint-disable-next-line @typescript-eslint/camelcase
                 sandboxId: sandbox_id,
                 sandboxUrl: getSandboxUrl(sandbox_id, type, fileName),
             };

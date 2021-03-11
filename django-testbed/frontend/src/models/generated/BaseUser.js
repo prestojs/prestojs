@@ -4,11 +4,9 @@ export default class Base extends viewModelFactory({
     id: new NumberField({
         label: 'Id',
     }),
-    // eslint-disable-next-line @typescript-eslint/camelcase
     firstName: new CharField({
         label: 'First Name',
     }),
-    // eslint-disable-next-line @typescript-eslint/camelcase
     lastName: new CharField({
         label: 'Last Name',
     }),

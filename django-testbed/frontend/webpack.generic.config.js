@@ -140,6 +140,7 @@ module.exports = ({
     const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
     const WriteJsonFilePlugin = require('./plugins/WriteJsonFilePlugin');
     const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+    const ESLintPlugin = require('eslint-webpack-plugin');
 
     const assert = require('assert');
     const autoprefixer = require('autoprefixer');
@@ -277,7 +278,7 @@ module.exports = ({
                 options: {
                     // Autoprefixing is done with postcss - postcss-loader
                     // included in getCssLoader
-                    postcss: function() {
+                    postcss: function () {
                         return [autoprefixer()];
                     },
                 },
@@ -288,6 +289,15 @@ module.exports = ({
                     OUTPUT_DIR_RELATIVE +
                     (isDev ? 'webpack-stats-dev.json' : 'webpack-stats.json'),
                 indent: 2,
+            }),
+            new ESLintPlugin({
+                // formatter: eslintFormatter,
+                eslintPath: require.resolve('eslint'),
+                emitWarning: isDev,
+                // Prevent production builds if linting fails
+                failOnWarning: !isDev,
+                failOnError: !isDev,
+                exclude: [...NODE_MODULES_PATHS, path.resolve('../../js-packages/')],
             }),
         ].filter(Boolean),
         optimization: {
@@ -539,24 +549,6 @@ module.exports = ({
 
     // ------------------------------------------------------------------
     // JS
-    conf.module.rules.push({
-        test: /\.(js|jsx|mjs)$/,
-        enforce: 'pre',
-        use: [
-            {
-                options: {
-                    formatter: eslintFormatter,
-                    eslintPath: require.resolve('eslint'),
-                    emitWarning: isDev,
-                    // Prevent production builds if linting fails
-                    failOnWarning: !isDev,
-                    failOnError: !isDev,
-                },
-                loader: require.resolve('eslint-loader'),
-            },
-        ],
-        exclude: [...NODE_MODULES_PATHS, path.resolve('../../js-packages/')],
-    });
     conf.module.rules.push({
         test: /\.(js|jsx)$/,
         exclude: NODE_MODULES_PATHS,
