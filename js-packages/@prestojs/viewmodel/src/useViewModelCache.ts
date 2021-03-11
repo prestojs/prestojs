@@ -148,6 +148,7 @@ export default function useViewModelCache<
     });
 
     useLayoutEffect(() => {
+        let current = true;
         function checkForUpdates(): void {
             try {
                 // lastSelector.current is always set... ignore typescript
@@ -162,7 +163,9 @@ export default function useViewModelCache<
             } catch (err) {
                 latestSubscriptionCallbackError.current = err;
             }
-            forceRender({});
+            if (current) {
+                forceRender({});
+            }
         }
 
         // This catches any changes to cache that occur between initial render
@@ -170,7 +173,11 @@ export default function useViewModelCache<
         // See "should handle updates between first render and subscription" test case
         checkForUpdates();
 
-        return viewModel.cache.addListener(checkForUpdates);
+        const unsub = viewModel.cache.addListener(checkForUpdates);
+        return (): void => {
+            current = false;
+            unsub();
+        };
     }, [isEquals, viewModel.cache]);
 
     useDebugValue(value);

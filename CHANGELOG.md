@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+* Fix issue with `useViewModelCache` that could cause a render after unmount
+
 ## [0.0.11] - 2021-03-01
 
 ### Added
