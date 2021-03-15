@@ -12,6 +12,15 @@
 * (breaking) Removed `RequestError` from `Endpoint`. Instead `Endpoint` will now throw the error raised by `fetch` directly - either `TypeError` or `AbortError`.
 * Fix bugs with `RelatedViewModelField` and `ManyRelatedViewModelField` where things could break if value was `null` or `[]`
 * Fix bug with `ViewModelCache` when passing a record with nested related fields to `get` or `getList` that meant it only traversed 1 level deep which meant the returned record could be different to the passed record.
+* Fix issues with paginator where if multiple state transitions were called before the previous committed then only the last would be retained. This is fixed, eg. the following now works:
+    ```js
+    function onChange(page, pageSize) {
+        paginator.setPage(page);
+        if (pageSize) {
+            paginator.setPageSize(pageSize);
+        }
+    }
+    ``` 
 
 ## [0.0.11] - 2021-03-01
 
