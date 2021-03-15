@@ -170,7 +170,24 @@ function getFieldNameCacheKey(
             // don't need to check it here
             const relatedField = viewModel.getField(
                 // If the related field is empty (eg. ManyRelatedViewModelField with value []) then
-                // the path will only have 1 element which is the related field itself
+                // the path will only have 1 element which is the related field itself.
+                // For instance if we receive data like
+                // {
+                //     title: 'Main Record',
+                //     foreignKeys: [{
+                //         id: 1,
+                //         name: 'Record Name',
+                //     }]
+                // }
+                // Then `fieldNames` will be ['title', ['foreignKeys', 'name']] and so we need
+                // to get rid of `name` to get the final related field. If we instead receive
+                // {
+                //     title: 'Main Record',
+                //     foreignKeys: []
+                // }
+                // the value is set (it's just empty) and the `fieldNames` will be ['title', ['foreignKeys']]
+                // and so the path is to the related field itself (because there's no subfields set because
+                // it's null)
                 path.length === 1 ? path : path.slice(0, -1)
             ) as BaseRelatedViewModelField<any, any, any>;
             if (!relatedField.to.pkFieldNames.includes(path[path.length - 1])) {
@@ -1215,7 +1232,7 @@ export default class ViewModelCache<
                     }`
                 );
             }
-            fieldNames = pk._assignedFields as FieldNames[];
+            fieldNames = getAssignedFieldsDeep(pk) as FieldNames[];
             pk = pk._key;
         }
         if (!fieldNames) {

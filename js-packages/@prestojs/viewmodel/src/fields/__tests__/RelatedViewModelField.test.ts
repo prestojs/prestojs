@@ -571,6 +571,40 @@ test('should cache records with empty ManyRelatedViewModelFields', () => {
     expect(Test2.cache.get(6, '*')?.toJS()).toEqual({ id: 6, records: [], recordIds: [] });
 });
 
+test('should use correct cache key for nested related records', () => {
+    class Test1 extends viewModelFactory({
+        name: new CharField(),
+    }) {}
+
+    class Test2 extends viewModelFactory({
+        name: new CharField(),
+        record: new RelatedViewModelField({
+            to: Test1,
+            sourceFieldName: 'recordId',
+        }),
+        recordId: new IntegerField(),
+    }) {}
+
+    class Test3 extends viewModelFactory({
+        records: new ManyRelatedViewModelField({
+            to: Test2,
+            sourceFieldName: 'recordIds',
+        }),
+        recordIds: new ListField({
+            childField: new IntegerField(),
+        }),
+    }) {}
+
+    const record1 = new Test3({
+        id: 3,
+        records: [{ id: 2, name: 'Test2', record: { id: 1, name: 'Test 1' } }],
+    });
+    expect(new Set(record1._assignedFields)).toEqual(new Set(['id', 'records', 'recordIds']));
+    Test3.cache.add(record1);
+    expect(Test3.cache.get(record1)?.records[0].record.name).toBe('Test 1');
+    expect(Test3.cache.getList([record1])[0]?.records[0].record.name).toBe('Test 1');
+});
+
 test('should cache records with empty RelatedViewModelFields', () => {
     class Test1 extends viewModelFactory({
         name: new CharField(),
