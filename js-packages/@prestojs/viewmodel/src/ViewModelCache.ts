@@ -168,11 +168,11 @@ function getFieldNameCacheKey(
         } else {
             // getField guarantees that the field will be a RelatedViewModelField so we
             // don't need to check it here
-            const relatedField = viewModel.getField(path.slice(0, -1)) as BaseRelatedViewModelField<
-                any,
-                any,
-                any
-            >;
+            const relatedField = viewModel.getField(
+                // If the related field is empty (eg. ManyRelatedViewModelField with value []) then
+                // the path will only have 1 element which is the related field itself
+                path.length === 1 ? path : path.slice(0, -1)
+            ) as BaseRelatedViewModelField<any, any, any>;
             if (!relatedField.to.pkFieldNames.includes(path[path.length - 1])) {
                 flatFieldNames.add(path.join('.'));
             }
