@@ -10,7 +10,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
 import { useState } from 'react';
 import { act } from 'react-test-renderer';
-import Endpoint, { ApiError, MiddlewareNextReturn, RequestError } from '../Endpoint';
+import Endpoint, { ApiError, MiddlewareNextReturn } from '../Endpoint';
 import paginationMiddleware from '../paginationMiddleware';
 
 const fetchMock = fetch as FetchMock;
@@ -228,7 +228,7 @@ test('should support merging global headers with action specific headers', async
     expectHeadersEqual({ a: 'one', c: 'three', token: 'abc123' });
 });
 
-test('should raise RequestError on bad request', async () => {
+test('should raise TypeError on bad request', async () => {
     fetchMock.mockResponseOnce(() => {
         throw new TypeError('Unknown error');
     });
@@ -240,7 +240,7 @@ test('should raise RequestError on bad request', async () => {
         error = err;
     }
     expect(error).not.toBeFalsy();
-    expect(error).toBeInstanceOf(RequestError);
+    expect(error).toBeInstanceOf(TypeError);
     expect(error.message).toEqual('Unknown error');
 });
 
