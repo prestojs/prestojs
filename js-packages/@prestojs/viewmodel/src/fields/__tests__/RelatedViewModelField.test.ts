@@ -1,7 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import viewModelFactory, { ViewModelConstructor } from '../../ViewModelFactory';
+import CharField from '../CharField';
 import Field from '../Field';
+import IntegerField from '../IntegerField';
 import ListField from '../ListField';
 import { ManyRelatedViewModelField, RelatedViewModelField } from '../RelatedViewModelField';
 
@@ -538,6 +540,98 @@ describe('ManyRelatedViewModelField', () => {
         User.fields.groups.resolveViewModel();
         User.fields.groups.to.fields;
     });
+});
+
+test('should cache records with empty ManyRelatedViewModelFields', () => {
+    class Test1 extends viewModelFactory({
+        name: new CharField(),
+    }) {}
+    class Test2 extends viewModelFactory({
+        records: new ManyRelatedViewModelField({
+            to: Test1,
+            sourceFieldName: 'recordIds',
+        }),
+        recordIds: new ListField({
+            childField: new IntegerField(),
+        }),
+    }) {}
+
+    const record1 = new Test2({ id: 5, records: [{ id: 1, name: 'Test1' }] });
+    expect(new Set(record1._assignedFields)).toEqual(new Set(['id', 'records', 'recordIds']));
+    Test2.cache.add(record1);
+    expect(Test2.cache.get(5, '*')?.toJS()).toEqual({
+        id: 5,
+        records: [{ id: 1, name: 'Test1' }],
+        recordIds: [1],
+    });
+
+    const record2 = new Test2({ id: 6, records: [] });
+    expect(new Set(record1._assignedFields)).toEqual(new Set(['id', 'records', 'recordIds']));
+    Test2.cache.add(record2);
+    expect(Test2.cache.get(6, '*')?.toJS()).toEqual({ id: 6, records: [], recordIds: [] });
+});
+
+test('should use correct cache key for nested related records', () => {
+    class Test1 extends viewModelFactory({
+        name: new CharField(),
+    }) {}
+
+    class Test2 extends viewModelFactory({
+        name: new CharField(),
+        record: new RelatedViewModelField({
+            to: Test1,
+            sourceFieldName: 'recordId',
+        }),
+        recordId: new IntegerField(),
+    }) {}
+
+    class Test3 extends viewModelFactory({
+        records: new ManyRelatedViewModelField({
+            to: Test2,
+            sourceFieldName: 'recordIds',
+        }),
+        recordIds: new ListField({
+            childField: new IntegerField(),
+        }),
+    }) {}
+
+    const record1 = new Test3({
+        id: 3,
+        records: [{ id: 2, name: 'Test2', record: { id: 1, name: 'Test 1' } }],
+    });
+    expect(new Set(record1._assignedFields)).toEqual(new Set(['id', 'records', 'recordIds']));
+    Test3.cache.add(record1);
+    expect(Test3.cache.get(record1)?.records[0].record.name).toBe('Test 1');
+    expect(Test3.cache.getList([record1])[0]?.records[0].record.name).toBe('Test 1');
+});
+
+test('should cache records with empty RelatedViewModelFields', () => {
+    class Test1 extends viewModelFactory({
+        name: new CharField(),
+    }) {}
+    class Test2 extends viewModelFactory({
+        record: new RelatedViewModelField({
+            to: Test1,
+            sourceFieldName: 'recordId',
+        }),
+        recordId: new IntegerField(),
+    }) {}
+
+    const record1 = new Test2({ id: 5, record: { id: 1, name: 'Test1' } });
+    expect(new Set(record1._assignedFields)).toEqual(new Set(['id', 'record', 'recordId']));
+    Test2.cache.add(record1);
+    expect(Test2.cache.get(5, '*')?.toJS()).toEqual({
+        id: 5,
+        record: { id: 1, name: 'Test1' },
+        recordId: 1,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore TODO: Currently type doesn't allow `null`...
+    const record2 = new Test2({ id: 6, record: null });
+    expect(new Set(record2._assignedFields)).toEqual(new Set(['id', 'record', 'recordId']));
+    Test2.cache.add(record2);
+    expect(Test2.cache.get(6, '*')?.toJS()).toEqual({ id: 6, record: null, recordId: null });
 });
 
 // TODO: Is there a need to support compound fields? Would that mean sourceFieldName would have to be an array?

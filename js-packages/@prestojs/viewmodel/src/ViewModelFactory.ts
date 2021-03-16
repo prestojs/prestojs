@@ -918,8 +918,10 @@ export default function viewModelFactory<T extends FieldsMapping>(
                             `Related field ${name} was created from nested object that had a different id to the source field name ${sourceFieldName}: ${data[sourceFieldName]} !== ${pk}. ${pk} has been used for both.`
                         );
                     }
-                    if (assignedData[key]) {
-                        assignedData[field.sourceFieldName] = pkOrPks;
+                    // Key could be set but the value is null. In that case we want the sourceFieldName to be set to
+                    // null as well.
+                    if (key in assignedData) {
+                        assignedData[field.sourceFieldName] = pkOrPks ?? null;
                         if (!data[field.sourceFieldName]) {
                             assignedFields.push(field.sourceFieldName);
                         }
