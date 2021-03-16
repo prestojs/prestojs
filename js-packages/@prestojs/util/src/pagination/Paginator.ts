@@ -102,9 +102,20 @@ export default abstract class Paginator<State extends {}, InternalState extends 
         const [currentState, setCurrentState] = currentStatePair;
         const [internalState, setInternalState] = internalStatePair;
         this.currentState = currentState || {};
-        this.setCurrentState = setCurrentState;
+        this.setCurrentState = (nextState: State): void => {
+            // If multiple setCurrentState occur before the first is committed then
+            // any reads of `this.currentState` will return the previous value (the
+            // last time `replaceStateControllers` was called). Update the `currentState`
+            // immediately when `setCurrentState` is called. This ensures any reads
+            // use the latest value until it's replaced by the next call to
+            // `replaceStateControllers`.
+            this.currentState = nextState;
+            setCurrentState(nextState);
+        };
         this.internalState = internalState || {};
         this.setInternalState = (nextState): void => {
+            // See explanation above `this.currentState = nextState`
+            this.internalState = nextState;
             setInternalState({
                 ...nextState,
                 responseIsSet: true,

@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useState } from 'react';
+import CursorPaginator from '../pagination/CursorPaginator';
 import PageNumberPaginator from '../pagination/PageNumberPaginator';
 import { PaginatorInterfaceClass } from '../pagination/Paginator';
 import usePaginator, { PaginatorClassProvider } from '../pagination/usePaginator';
@@ -105,4 +106,37 @@ test('should not set state after unmount', async () => {
     act(() => paginator.setResponse({ total: 5, pageSize: 2 }));
     expect(mockError).not.toHaveBeenCalled();
     mockError.mockRestore();
+});
+
+test('should handle multiple state transitions before commit', async () => {
+    const { result } = renderHook(() => usePaginator(PageNumberPaginator));
+
+    expect(result.current).toBeInstanceOf(PageNumberPaginator);
+    act(() => {
+        result.current.setPageSize(10);
+        result.current.setPage(2);
+    });
+
+    expect(result.current.page).toBe(2);
+    expect(result.current.pageSize).toBe(10);
+});
+
+test('should handle multiple internal state transitions before commit', async () => {
+    const { result } = renderHook(() => usePaginator(CursorPaginator));
+
+    expect(result.current).toBeInstanceOf(CursorPaginator);
+
+    act(() => {
+        // This one is less of a concern than `setCurrentState` as it's all internal to the paginators
+        // but test it here in case third party paginators do multiple calls to internalState with reads
+        // in between
+        result.current.setInternalState({ nextCursor: 'a' });
+        result.current.setInternalState({ ...result.current.internalState, previousCursor: 'b' });
+    });
+
+    expect(result.current.internalState).toEqual({
+        nextCursor: 'a',
+        previousCursor: 'b',
+        responseIsSet: true,
+    });
 });
