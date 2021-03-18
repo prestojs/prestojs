@@ -497,9 +497,9 @@ export default class InferredPaginator
                 [this.internalState, this.setInternalState],
             ];
             let paginatorClass;
-            if (response.nextCursor || response.previousCursor) {
+            if ('nextCursor' in response || 'previousCursor' in response) {
                 paginatorClass = CursorPaginator;
-            } else if (response.limit) {
+            } else if ('limit' in response) {
                 paginatorClass = LimitOffsetPaginator;
             } else if (response.total != null) {
                 paginatorClass = PageNumberPaginator;

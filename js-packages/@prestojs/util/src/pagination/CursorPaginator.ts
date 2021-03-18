@@ -201,6 +201,15 @@ export default class CursorPaginator extends Paginator<
         return !!this.internalState.nextCursor;
     }
 
+    /**
+     * Expected pagination state in the shape:
+     * {
+     *     next: null|'http://example.com/?cursor=abc123',
+     *     previous: null|'http://example.com/?cursor=abc123',
+     *     results: Array
+     * }
+     * @param requestDetails
+     */
     static getPaginationState(
         requestDetails: PaginationRequestDetails
     ): Record<string, any> | false {
@@ -213,9 +222,12 @@ export default class CursorPaginator extends Paginator<
         // Cursor pagination responses should contain a next and previous link that includes
         // a query parameter with name 'cursor' containing the next/previous cursor value. Results
         // should be an array under the `results` key.
-        const isCursorLink = (link: any): boolean =>
-            typeof link == 'string' && 'cursor' in qs.parse(qs.extract(link));
-        if (isCursorLink(decodedBody.next) || isCursorLink(decodedBody.previous)) {
+        if (
+            ('next' in decodedBody || 'previous' in decodedBody) &&
+            // If there's a count then it can't be a cursor pagination - probably it's LimitOffset instead
+            !('count' in decodedBody) &&
+            !('total' in decodedBody)
+        ) {
             const state: Record<string, any> = {
                 results: decodedBody.results,
                 nextCursor: decodedBody.next ? qs.parse(qs.extract(decodedBody.next)).cursor : null,

@@ -241,7 +241,7 @@ export default class LimitOffsetPaginator extends Paginator<
     static getPaginationState(
         requestDetails: PaginationRequestDetails
     ): Record<string, any> | false {
-        const { decodedBody } = requestDetails;
+        const { query, decodedBody } = requestDetails;
         // If it's an array then it's assumed to be unpaginated data
         if (Array.isArray(decodedBody) || !decodedBody) {
             return false;
@@ -252,15 +252,34 @@ export default class LimitOffsetPaginator extends Paginator<
         // expected these would also include an 'offset' parameter but we ignore this as this is
         // calculated internally based on current pagination state. Results should be an array under
         // the `results` key.
-        const isLimitOffsetLink = (link: any): boolean =>
-            typeof link == 'string' && 'limit' in qs.parse(qs.extract(link));
-        if (isLimitOffsetLink(decodedBody.next) || isLimitOffsetLink(decodedBody.previous)) {
-            const { limit } = qs.parse(qs.extract(decodedBody.previous || decodedBody.next));
-            return {
-                total: decodedBody.count || decodedBody.total,
+        if (
+            ('next' in decodedBody || 'previous' in decodedBody) &&
+            // There should be a count or total as well - otherwise it's probably CursorPaginator
+            ('count' in decodedBody || 'total' in decodedBody)
+        ) {
+            const { limit } = qs.parse(qs.extract(decodedBody.previous || decodedBody.next || ''));
+            const r: Record<string, any> = {
+                total: decodedBody.count ?? decodedBody.total,
                 results: decodedBody.results,
-                limit: Number(limit),
+                limit: null,
             };
+
+            if (!limit) {
+                const { offset } = query || {};
+                // Infer limit if we are on first page and there's now next/previous link
+                if (
+                    r.total >= decodedBody.results.length &&
+                    !offset &&
+                    !decodedBody.previous &&
+                    !decodedBody.next
+                ) {
+                    r.limit = decodedBody.results.length;
+                }
+            } else {
+                r.limit = Number(limit);
+            }
+
+            return r;
         }
 
         // Not paginated - could be a single record result

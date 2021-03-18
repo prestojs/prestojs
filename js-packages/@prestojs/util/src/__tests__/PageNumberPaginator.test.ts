@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useState } from 'react';
+import InferredPaginator from '../pagination/InferredPaginator';
 import PageNumberPaginator from '../pagination/PageNumberPaginator';
 
 function useTestHook(initialState = {}): PageNumberPaginator {
@@ -165,4 +166,58 @@ test('should support hasNextPage', () => {
     expect(result.current.hasNextPage()).toBe(false);
     act(() => result.current.first());
     expect(result.current.hasNextPage()).toBe(true);
+});
+
+test.each`
+    paginatorClass
+    ${PageNumberPaginator}
+    ${InferredPaginator}
+`(' identifies page number pagination ($paginatorClass)', ({ paginatorClass }) => {
+    const defaultOptions = {
+        url: 'a',
+        requestInit: {},
+        result: null,
+        query: {},
+    };
+
+    let state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            count: 10,
+            results: new Array(5),
+        },
+    });
+    expect(state).toEqual({ total: 10, results: new Array(5), pageSize: 5 });
+
+    // If pageSize is in response should use that
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            count: 5,
+            results: [],
+            pageSize: 5,
+        },
+    });
+    expect(state).toEqual({ total: 5, results: [], pageSize: 5 });
+
+    // Accept `total` directly instead of `count`
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            total: 10,
+            results: new Array(5),
+        },
+    });
+    expect(state).toEqual({ total: 10, results: new Array(5), pageSize: 5 });
+
+    // If pageSize is in response should use that
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            total: 0,
+            results: [],
+            pageSize: 5,
+        },
+    });
+    expect(state).toEqual({ total: 0, results: [], pageSize: 5 });
 });
