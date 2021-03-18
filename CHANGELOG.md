@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+* Add [detectBadPaginationMiddleware](https://prestojs.com/docs/rest/detectbadpaginationmiddleware/) to highlight when either `paginator` hasn't been supplied or `paginationMiddelware` is not specified. Without this `viewModelCachingMiddleware` will give cryptic errors (eg. primary key value not supplied) as it will attempt to convert the paginated response to a record rather than each result in the paginated response.
+
+### Changed
+
+* Removed `getPaginationState` and references to a non-existant `Endpoint.defaultConfig.getPaginationState`
+* Add `getPaginationState` to the Paginator class instead
+* Default `PageNumberPagination` `page` to `1` rather than `null` when used without an explicit `page` being specified.
+
 ## [0.0.12] - 2021-03-17
 
 ### Added
