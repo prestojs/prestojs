@@ -123,7 +123,7 @@ test('should handle changing page size', () => {
     act(() => result.current.setResponse({ total: 20 }));
     expect(result.current.currentState).toEqual({ pageSize: 10 });
     act(() => result.current.setPageSize(5));
-    expect(result.current.currentState).toEqual({ pageSize: 5 });
+    expect(result.current.currentState).toEqual({ page: 1, pageSize: 5 });
     act(() => result.current.setPage(2));
     expect(result.current.currentState).toEqual({ pageSize: 5, page: 2 });
     // Page size same shouldn't change anything

@@ -53,6 +53,12 @@ export default class PageNumberPaginator extends Paginator<
         if (typeof page === 'string') {
             return Number(page);
         }
+        if (page == null) {
+            // If not set page is assumed to be 1. We do this on access rather
+            // than calling setPage() initially to avoid unnecessary re-renders
+            // & data fetches from the state transitions
+            return 1;
+        }
         return page;
     }
 
