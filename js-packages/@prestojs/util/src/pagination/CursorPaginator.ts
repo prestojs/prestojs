@@ -1,4 +1,5 @@
-import Paginator, { PaginatorRequestOptions } from './Paginator';
+import qs from 'query-string';
+import Paginator, { PaginationRequestDetails, PaginatorRequestOptions } from './Paginator';
 
 export type CursorPaginationState = {
     pageSize?: number;
@@ -198,5 +199,37 @@ export default class CursorPaginator extends Paginator<
      */
     hasNextPage(): boolean {
         return !!this.internalState.nextCursor;
+    }
+
+    static getPaginationState(
+        requestDetails: PaginationRequestDetails
+    ): Record<string, any> | false {
+        const { decodedBody } = requestDetails;
+        // If it's an array then it's assumed to be unpaginated data
+        if (Array.isArray(decodedBody) || !decodedBody) {
+            return false;
+        }
+
+        // Cursor pagination responses should contain a next and previous link that includes
+        // a query parameter with name 'cursor' containing the next/previous cursor value. Results
+        // should be an array under the `results` key.
+        const isCursorLink = (link: any): boolean =>
+            typeof link == 'string' && 'cursor' in qs.parse(qs.extract(link));
+        if (isCursorLink(decodedBody.next) || isCursorLink(decodedBody.previous)) {
+            const state: Record<string, any> = {
+                results: decodedBody.results,
+                nextCursor: decodedBody.next ? qs.parse(qs.extract(decodedBody.next)).cursor : null,
+                previousCursor: decodedBody.previous
+                    ? qs.parse(qs.extract(decodedBody.previous)).cursor
+                    : null,
+            };
+            if (decodedBody.pageSize) {
+                state.pageSize = decodedBody.pageSize;
+            }
+            return state;
+        }
+
+        // Not paginated - could be a single record result
+        return false;
     }
 }

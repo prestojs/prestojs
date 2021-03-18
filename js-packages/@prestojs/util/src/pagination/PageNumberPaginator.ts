@@ -1,4 +1,4 @@
-import Paginator, { PaginatorRequestOptions } from './Paginator';
+import Paginator, { PaginationRequestDetails, PaginatorRequestOptions } from './Paginator';
 
 export type PageNumberPaginationState = {
     page?: string | number;
@@ -11,9 +11,12 @@ export type InternalPageNumberPaginationState = {
 /**
  * Page number based paginator
  *
- * Expects a `total` and optional `pageSize` key in the response. `total` should be the total number of records
- * available. See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation
- * differs.
+ * Expects a `total` or `count` key and optional `pageSize` key in the response. `total` or `count` should be the total
+ * number of records available.
+ *
+ * If your backend differs from this (for example by storing the values in different named keys or in headers instead of
+ * the response body) you can handle that by extending this class and implementing `getPaginationState` or
+ * by passing `getPaginationState` to [usePaginator](doc:usePaginator).
  *
  * @menu-group Pagination
  * @extract-docs
@@ -230,5 +233,44 @@ export default class PageNumberPaginator extends Paginator<
             return false;
         }
         return Number(page) * Number(pageSize) < this.internalState.total;
+    }
+
+    /**
+     * Expects `decodedBody` to include a key `results` which should be an array of return records and a variable
+     * `count` or `total` that contains the total number of records available.
+     *
+     * @param requestDetails
+     */
+    static getPaginationState(
+        requestDetails: PaginationRequestDetails
+    ): Record<string, any> | false {
+        const { query, decodedBody } = requestDetails;
+        // If it's an array then it's assumed to be unpaginated data
+        if (Array.isArray(decodedBody) || !decodedBody) {
+            return false;
+        }
+
+        // Page number pagination expects a response containing the total number of records (`count`) and
+        // an array of results under the `results` key. pageSize is inferred from response where possible.
+        const total = 'count' in decodedBody ? decodedBody.count : decodedBody.total;
+        if (Array.isArray(decodedBody.results) && typeof total == 'number') {
+            let { pageSize } = decodedBody;
+            if (!pageSize) {
+                const { page } = query || {};
+                // Infer page size if we are on first page and total results are greater
+                // than returned results
+                if (total > decodedBody.results.length && (page === 1 || page == null)) {
+                    pageSize = decodedBody.results.length;
+                }
+            }
+            return {
+                total,
+                results: decodedBody.results,
+                pageSize,
+            };
+        }
+
+        // Not paginated - could be a single record result
+        return false;
     }
 }

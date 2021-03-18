@@ -1,4 +1,5 @@
-import Paginator, { PaginatorRequestOptions } from './Paginator';
+import qs from 'query-string';
+import Paginator, { PaginationRequestDetails, PaginatorRequestOptions } from './Paginator';
 
 export type LimitOffsetPaginationState = {
     limit?: number | string;
@@ -236,5 +237,33 @@ export default class LimitOffsetPaginator extends Paginator<
             return false;
         }
         return nextState.offset < this.internalState.total;
+    }
+    static getPaginationState(
+        requestDetails: PaginationRequestDetails
+    ): Record<string, any> | false {
+        const { decodedBody } = requestDetails;
+        // If it's an array then it's assumed to be unpaginated data
+        if (Array.isArray(decodedBody) || !decodedBody) {
+            return false;
+        }
+
+        // Limit/offset pagination responses should contain a next and previous link that includes
+        // a query parameter with name 'limit' containing the next/previous limit value to use. It's
+        // expected these would also include an 'offset' parameter but we ignore this as this is
+        // calculated internally based on current pagination state. Results should be an array under
+        // the `results` key.
+        const isLimitOffsetLink = (link: any): boolean =>
+            typeof link == 'string' && 'limit' in qs.parse(qs.extract(link));
+        if (isLimitOffsetLink(decodedBody.next) || isLimitOffsetLink(decodedBody.previous)) {
+            const { limit } = qs.parse(qs.extract(decodedBody.previous || decodedBody.next));
+            return {
+                total: decodedBody.count || decodedBody.total,
+                results: decodedBody.results,
+                limit: Number(limit),
+            };
+        }
+
+        // Not paginated - could be a single record result
+        return false;
     }
 }

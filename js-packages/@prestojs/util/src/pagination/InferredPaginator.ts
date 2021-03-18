@@ -1,7 +1,7 @@
 import CursorPaginator, { CursorPaginationState } from './CursorPaginator';
 import LimitOffsetPaginator, { LimitOffsetPaginationState } from './LimitOffsetPaginator';
 import PageNumberPaginator, { PageNumberPaginationState } from './PageNumberPaginator';
-import { PaginatorInterface, PaginatorRequestOptions } from './Paginator';
+import { PaginationRequestDetails, PaginatorInterface, PaginatorRequestOptions } from './Paginator';
 
 export type PaginatorState =
     | PageNumberPaginationState
@@ -18,29 +18,6 @@ export type PaginatorState =
  * * If response contains `limit` then paginator is set to  [LimitOffsetPaginator](LimitOffsetPaginator)
  * * If response contains `total` then paginator is set to [PageNumberPaginator](doc:PageNumberPaginator)
  *
- * If your backend differs from this implementation then you can transform the shape of your response to conform with
- * the above by providing your own `getPaginationState`
- *
- * ```js
- * import { Endpoint } from '@prestojs/rest';
- *
- * function getPaginationState(paginator, { query, decodedBody }) {
- *    ....
- * }
- *
- * Endpoint.defaultConfig.getPaginationState = getPaginationState;
- * ```
- *
- * See [getPaginationState](doc:getPaginationState) for default implementation used.
- *
- * Alternatively if you only use one type of paginator everywhere in a project you can change the default from
- * `InferredPaginator` in your project entry point (ie. it should happen before any `Endpoint` is used):
- *
- * ```js
- * import { Endpoint } from '@prestojs/rest';
- *
- * Endpoint.defaultConfig.paginatorClass = PageNumberPaginator;
- * ```
  * @menu-group Pagination
  * @extract-docs
  */
@@ -536,5 +513,15 @@ export default class InferredPaginator
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this.paginator.setResponse(response);
+    }
+
+    static getPaginationState(
+        requestDetails: PaginationRequestDetails
+    ): Record<string, any> | false {
+        return (
+            CursorPaginator.getPaginationState(requestDetails) ||
+            LimitOffsetPaginator.getPaginationState(requestDetails) ||
+            PageNumberPaginator.getPaginationState(requestDetails)
+        );
     }
 }

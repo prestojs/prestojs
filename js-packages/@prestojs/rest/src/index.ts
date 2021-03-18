@@ -3,6 +3,7 @@ export { default as viewModelCachingMiddleware } from './viewModelCachingMiddlew
 export { default as dedupeInFlightRequestsMiddleware } from './dedupeInFlightRequestsMiddleware';
 export { default as paginationMiddleware } from './paginationMiddleware';
 export { default as requestDefaultsMiddleware } from './requestDefaultsMiddleware';
+export { default as detectBadPaginationMiddleware } from './detectBadPaginationMiddleware';
 
 import type {
     EndpointExecuteOptions,

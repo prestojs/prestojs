@@ -136,6 +136,12 @@ export type MiddlewareContext<T> = {
      * The options used to execute the endpoint with
      */
     requestInit: EndpointRequestInit;
+    /**
+     * The state as of when the last middleware in the chain was processed.
+     *
+     * This contains the `url`, `response`, `decodedBody` and `result`.
+     */
+    lastState: null | MiddlewareNextReturn<T>;
 };
 
 export type MiddlewareNextReturn<ReturnT> = {
@@ -152,7 +158,7 @@ export type MiddlewareNextReturn<ReturnT> = {
      */
     response: Response;
     /**
-     * The value returned by `decodedBody`
+     * The value returned by `decodeBody`
      *
      * Only available in the response part of the middleware.
      */
@@ -510,6 +516,11 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  *
  * See [usePaginator](doc:usePaginator) for more details about how to use a paginator in React.
  *
+ * If your backend returns data in a different shape or uses headers instead of putting details in the response body
+ * you can handle this by a) implementing your own paginator that extends one of the base classes and customising
+ * the `getPaginationState` function or b) passing the `getPaginationState` method to [usePaginator](doc:usePaginator).
+ * This function can return the data in the shape expected by the paginator.
+ *
  * ## Middleware
  *
  * Middleware functions can be provided to alter the `url` or fetch options and transform the
@@ -759,6 +770,7 @@ export default class Endpoint<ReturnT = any> {
                 executeOptions: options,
                 requestInit,
                 endpoint: this,
+                lastState: null,
             };
             let lastMiddlewareReturn: MiddlewareNextReturn<ReturnT>;
             const next = async (
@@ -795,6 +807,7 @@ export default class Endpoint<ReturnT = any> {
                         response: returnVal.response,
                         decodedBody: returnVal.decodedBody,
                     };
+                    middlewareContext.lastState = lastMiddlewareReturn;
                     return lastMiddlewareReturn;
                 }
                 lastMiddleware = nextMiddleware;
@@ -823,6 +836,7 @@ export default class Endpoint<ReturnT = any> {
                     response: returnVal.response,
                     decodedBody: returnVal.decodedBody,
                 };
+                middlewareContext.lastState = lastMiddlewareReturn;
                 return lastMiddlewareReturn;
             };
             // mergeRequestInit here is just used to clone requestInit

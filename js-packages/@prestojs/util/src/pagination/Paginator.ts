@@ -14,6 +14,32 @@ export type PaginatorRequestOptions = Omit<RequestInit, 'headers'> & {
     query?: Record<string, boolean | string | null | number>;
 };
 
+/**
+ * @expand-properties eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)
+ */
+export type PaginationRequestDetails = {
+    /**
+     * Any query string parameters
+     */
+    query?: Record<string, boolean | string | null | number>;
+    /**
+     * Any arguments used to resolve URL
+     */
+    urlArgs?: Record<string, any>;
+    /**
+     * Resolved URL
+     */
+    url: string;
+    /**
+     * The `Response` object, if available
+     */
+    response?: Response;
+    /**
+     * The value returned by `decodedBody`. See [Endpoint.execute](doc:Endpoint#method-execute).
+     */
+    decodedBody?: any;
+};
+
 export interface PaginatorInterface<State = {}, InternalState = {}> {
     currentState: State;
     internalState: InternalState;
@@ -37,6 +63,8 @@ export interface PaginatorInterface<State = {}, InternalState = {}> {
 export interface PaginatorInterfaceClass<T extends PaginatorInterface = PaginatorInterface>
     extends Function {
     new (...args: any[]): T;
+
+    getPaginationState(requestDetails: PaginationRequestDetails): Record<string, any> | false;
 }
 
 /**
