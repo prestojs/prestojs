@@ -68,7 +68,7 @@ export default function UserCreateUpdateView({ userId, onSuccess }) {
                 <FieldErrors name="email" />
                 <Form.Item field={User.fields.region} />
                 <FieldErrors name="region" />
-                <Form.Item field={User.fields.referredBy} />
+                <Form.Item field={User.fields.referredBy} fieldProps={{ allowClear: true }} />
                 <FieldErrors name="referredBy" />
                 <Form.Item field={User.fields.referredByGrouped} />
                 <FieldErrors name="referredByGrouped" />

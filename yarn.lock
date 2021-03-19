@@ -1908,16 +1908,6 @@
     "@nodelib/fs.scandir" "2.1.3"
     fastq "^1.6.0"
 
-"@prestojs/util@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@prestojs/util/-/util-0.0.9.tgz#92e7edc5d3abe4e4db8dd78adc226a3c8f2308b8"
-  integrity sha512-d5Owi96wSGiTT1YjQBlR7luai/1pcuPMvpDKJ5/FCqKM/hOPqU06vU86FQ9mY1mpr34WPynxVQGGFH6kQFknNA==
-  dependencies:
-    lodash "^4.17.15"
-    qs "^6.9.4"
-    query-string "^6.13.1"
-    shallowequal "^1.1.0"
-
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.0.tgz#ecdf48d532c58ea477acfcab80348424f8d0662f"
