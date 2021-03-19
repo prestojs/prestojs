@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useState } from 'react';
+import InferredPaginator from '../pagination/InferredPaginator';
 import LimitOffsetPaginator from '../pagination/LimitOffsetPaginator';
 
 function useTestHook(initialState = {}): LimitOffsetPaginator {
@@ -146,4 +147,50 @@ test('should support hasNextPage', () => {
     expect(result.current.hasNextPage()).toBe(false);
     act(() => result.current.first());
     expect(result.current.hasNextPage()).toBe(true);
+});
+
+test.each`
+    paginatorClass
+    ${LimitOffsetPaginator}
+    ${InferredPaginator}
+`(' identifies limit/offset pagination($paginatorClass)', ({ paginatorClass }) => {
+    const defaultOptions = {
+        url: 'a',
+        requestInit: {},
+        result: null,
+        query: {},
+    };
+
+    let state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            count: 5,
+            results: [],
+            previous: null,
+            next: 'http://localhost/?limit=5',
+        },
+    });
+    expect(state).toEqual({ limit: 5, total: 5, results: [] });
+
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            count: 5,
+            results: [],
+            next: null,
+            previous: 'http://localhost/?limit=10',
+        },
+    });
+    expect(state).toEqual({ limit: 10, total: 5, results: [] });
+
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            count: 5,
+            results: [1, 2, 3, 4, 5],
+            next: null,
+            previous: null,
+        },
+    });
+    expect(state).toEqual({ limit: 5, total: 5, results: [1, 2, 3, 4, 5] });
 });

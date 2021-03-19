@@ -14,17 +14,19 @@ export { default as PageNumberPaginator } from './pagination/PageNumberPaginator
 export { default as LimitOffsetPaginator } from './pagination/LimitOffsetPaginator';
 export { default as CursorPaginator } from './pagination/CursorPaginator';
 export { default as Paginator } from './pagination/Paginator';
-export { default as getPaginationState } from './pagination/getPaginationState';
 export { getNodeLabel, isTextLabeled, isLabeled } from './Labeled';
 
 import type { Id, Identifiable } from './identifiable';
 import type { NodeLabeled, TextLabeled } from './Labeled';
 import type { CursorPaginationState } from './pagination/CursorPaginator';
-import type { PaginationRequestDetails } from './pagination/getPaginationState';
 import type { PaginatorState } from './pagination/InferredPaginator';
 import type { LimitOffsetPaginationState } from './pagination/LimitOffsetPaginator';
 import type { PageNumberPaginationState } from './pagination/PageNumberPaginator';
-import type { PaginatorInterface, PaginatorInterfaceClass } from './pagination/Paginator';
+import type {
+    PaginationRequestDetails,
+    PaginatorInterface,
+    PaginatorInterfaceClass,
+} from './pagination/Paginator';
 import type { UseAsyncListingProps, UseAsyncListingReturn } from './useAsyncListing';
 import type {
     UseAsyncValuePropsMulti,

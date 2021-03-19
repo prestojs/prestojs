@@ -1,5 +1,4 @@
 import {
-    getPaginationState as defaultGetPaginationState,
     InferredPaginator,
     PaginationRequestDetails,
     PaginatorInterface,
@@ -23,9 +22,9 @@ type GetPaginationState = (
 
 export class PaginationMiddleware<T> {
     paginatorClass: PaginatorInterfaceClass;
-    getPaginationState: GetPaginationState;
+    getPaginationState?: GetPaginationState;
 
-    constructor(paginatorClass: PaginatorInterfaceClass, getPaginationState: GetPaginationState) {
+    constructor(paginatorClass: PaginatorInterfaceClass, getPaginationState?: GetPaginationState) {
         this.paginatorClass = paginatorClass;
         this.getPaginationState = getPaginationState;
     }
@@ -84,16 +83,31 @@ export class PaginationMiddleware<T> {
                 // And the `count` goes into the paginator internal state
                 throw new Error('paginatorMiddleware must be the first to handle the response');
             }
+            if (
+                !(paginator instanceof this.paginatorClass) &&
+                this.paginatorClass !== InferredPaginator
+            ) {
+                throw new Error(
+                    `paginationMiddleware specified '${
+                        this.paginatorClass
+                    }' as the expected paginator but received '${
+                        (paginator as PaginatorInterface).constructor
+                    }'`
+                );
+            }
             // If we have a paginator update its state based on response
             // This runs for all requests but should return false if response
             // is not paginated.
-            const paginationState = this.getPaginationState(paginator, {
+            const requestDetails = {
                 query: urlConfig.query,
                 decodedBody,
                 url,
                 urlArgs: urlConfig.args,
                 response,
-            });
+            };
+            const paginationState = this.getPaginationState
+                ? this.getPaginationState(paginator, requestDetails)
+                : this.paginatorClass.getPaginationState(requestDetails);
             if (paginationState) {
                 paginator.setResponse(paginationState);
                 return paginationState.results;
@@ -133,15 +147,17 @@ export class PaginationMiddleware<T> {
  * ```
  *
  * @param paginatorClass The pagination class to use. Defaults to [InferredPaginator](doc:InferredPaginator).
- * @param getPaginationState Function that returns the state for a paginator based on the response.
- * See [getPaginationState](doc:getPaginationState] for the default implementation
+ * @param getPaginationState Function that returns the state for a paginator based on the response. If not provided
+ * uses the static `getPaginationState` method on the `paginatorClass`. You can use this method if your backend needs
+ * to transform the response before being handled by `paginatorClass`. This can be useful to use a built in paginator
+ * (eg. PageNumberPaginator) where a data structure from the backend differs from that expected.
  *
  * @extract-docs
  * @menu-group Middleware
  */
 export default function paginationMiddleware<T>(
     paginatorClass: PaginatorInterfaceClass = InferredPaginator,
-    getPaginationState: GetPaginationState = defaultGetPaginationState
+    getPaginationState?: GetPaginationState
 ): MiddlewareObject<T> {
     return new PaginationMiddleware(paginatorClass, getPaginationState);
 }

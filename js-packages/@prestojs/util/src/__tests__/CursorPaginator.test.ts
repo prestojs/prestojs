@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useState } from 'react';
 import CursorPaginator from '../pagination/CursorPaginator';
+import InferredPaginator from '../pagination/InferredPaginator';
 
 function useTestHook(initialState = {}): CursorPaginator {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -142,4 +143,79 @@ test('should support hasNextPage', () => {
     act(() => result.current.next());
     act(() => result.current.setResponse({ pageSize: 10 }));
     expect(result.current.hasNextPage()).toBe(false);
+});
+
+test.each`
+    paginatorClass
+    ${CursorPaginator}
+    ${InferredPaginator}
+`(' identifies cursorpagination($paginatorClass)', ({ paginatorClass }) => {
+    const defaultOptions = {
+        url: 'a',
+        requestInit: {},
+        result: null,
+        query: {},
+    };
+    let state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            results: [],
+            next: 'http://localhost/?cursor=a',
+            previous: null,
+        },
+    });
+    expect(state).toEqual({ nextCursor: 'a', results: [], previousCursor: null });
+
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            results: [],
+            next: null,
+            previous: 'http://localhost/?cursor=b',
+        },
+    });
+    expect(state).toEqual({ previousCursor: 'b', results: [], nextCursor: null });
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            results: [],
+            previous: 'http://localhost/?cursor=b',
+            next: 'http://localhost/?cursor=a',
+        },
+    });
+    expect(state).toEqual({ previousCursor: 'b', results: [], nextCursor: 'a' });
+
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            results: [],
+            pageSize: 5,
+            previous: 'http://localhost/?cursor=b',
+            next: 'http://localhost/?cursor=a',
+        },
+    });
+    expect(state).toEqual({ previousCursor: 'b', results: [], nextCursor: 'a', pageSize: 5 });
+
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            results: [],
+            previous: null,
+            next: null,
+        },
+    });
+    expect(state).toEqual({ previousCursor: null, results: [], nextCursor: null });
+
+    state = paginatorClass.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            count: 0,
+            results: [],
+            previous: null,
+            next: null,
+        },
+    });
+    expect(state).toEqual(
+        CursorPaginator === paginatorClass ? false : { limit: 0, results: [], total: 0 }
+    );
 });

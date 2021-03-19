@@ -61,6 +61,8 @@ test('should infer underlying paginator based on response', () => {
     act(() => result.current.setLimit(10));
     expect(result.current.currentState).toEqual({ limit: 10 });
 
+    expect(result.current.paginator).toBeInstanceOf(LimitOffsetPaginator);
+
     result = renderHook(() => useTestHook()).result;
     act(() =>
         result.current.setResponse({
@@ -85,6 +87,8 @@ test('should infer underlying paginator based on response', () => {
     expect(result.current.previousState()).toEqual({ cursor: 'def456' });
     act(() => result.current.previous());
     expect(result.current.currentState).toEqual({ cursor: 'def456' });
+
+    expect(result.current.paginator).toBeInstanceOf(CursorPaginator);
 });
 
 test('should set responseIsSet', () => {
@@ -111,4 +115,48 @@ test('should support hasNextPage', () => {
     expect(result.current.hasNextPage()).toBe(false);
     act(() => result.current.first());
     expect(result.current.hasNextPage()).toBe(true);
+});
+
+test('should infer correct paginator based on getPaginationState', () => {
+    const defaultOptions = {
+        url: 'a',
+        requestInit: {},
+        result: null,
+        query: {},
+    };
+    let state = InferredPaginator.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            count: 5,
+            results: [1, 2, 3, 4, 5],
+            next: null,
+            previous: null,
+        },
+    });
+    let { result } = renderHook(() => useTestHook());
+    act(() => result.current.setResponse(state as Record<string, any>));
+    expect(result.current.paginator).toBeInstanceOf(LimitOffsetPaginator);
+
+    state = InferredPaginator.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            results: [1, 2, 3, 4, 5],
+            next: null,
+            previous: null,
+        },
+    });
+    result = renderHook(() => useTestHook()).result;
+    act(() => result.current.setResponse(state as Record<string, any>));
+    expect(result.current.paginator).toBeInstanceOf(CursorPaginator);
+
+    state = InferredPaginator.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
+            count: 5,
+            results: [1, 2, 3, 4, 5],
+        },
+    });
+    result = renderHook(() => useTestHook()).result;
+    act(() => result.current.setResponse(state as Record<string, any>));
+    expect(result.current.paginator).toBeInstanceOf(PageNumberPaginator);
 });
