@@ -410,7 +410,11 @@ function SelectAsyncChoiceWidget<
     }
     const { onChange } = input;
     const wrappedOnChange = useCallback(
-        (value: Choice<T> | Choice<T>[]) => {
+        (value?: null | Choice<T> | Choice<T>[]) => {
+            if (value == null) {
+                setLastValue([]);
+                return onChange(asyncChoices.multiple ? [] : null);
+            }
             if (Array.isArray(value)) {
                 setLastValue(value);
                 return onChange(value.map(v => v.value));

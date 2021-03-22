@@ -772,4 +772,50 @@ test('should support clearOnOpen', async () => {
     await waitForOptions(baseElement, namesForRange(0, 5));
 });
 
+test('should support onClear', async () => {
+    const input = buildInput(2);
+    const list = jest.fn(resolveMulti);
+    const retrieve = jest.fn(resolveSingle);
+    let asyncChoices = buildAsyncChoices({ list, retrieve });
+    const { container, getByTestId, rerender } = render(
+        <SelectAsyncChoiceWidget
+            asyncChoices={asyncChoices}
+            input={input}
+            {...widgetProps}
+            allowClear
+            clearIcon={<div data-testid="close">X</div>}
+        />
+    );
+    expect(list).not.toHaveBeenCalled();
+    expect(retrieve).toHaveBeenCalledTimes(1);
+    await waitForSelectedValue(container, 'Item 2');
+    act(() => {
+        fireEvent.mouseDown(getByTestId('close'));
+    });
+    expect(input.onChange).toHaveBeenCalledWith(null);
+});
+
+test('should support onClear (multiple)', async () => {
+    const input = buildInput([1, 2]);
+    const list = jest.fn(resolveMulti);
+    const retrieve = jest.fn(resolveSingle);
+    let asyncChoices = buildAsyncChoices({ list, retrieve, multiple: true });
+    const { container, getByTestId, rerender } = render(
+        <SelectAsyncChoiceWidget
+            asyncChoices={asyncChoices}
+            input={input}
+            {...widgetProps}
+            allowClear
+            clearIcon={<div data-testid="close">X</div>}
+        />
+    );
+    expect(list).not.toHaveBeenCalled();
+    expect(retrieve).toHaveBeenCalledTimes(1);
+    await waitForSelectedValue(container, ['Item 1', 'Item 2']);
+    act(() => {
+        fireEvent.mouseDown(getByTestId('close'));
+    });
+    expect(input.onChange).toHaveBeenCalledWith([]);
+});
+
 test.todo('should support tags mode');

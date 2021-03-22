@@ -11,6 +11,7 @@
 * Removed `getPaginationState` and references to a non-existant `Endpoint.defaultConfig.getPaginationState`
 * Add `getPaginationState` to the Paginator class instead
 * Default `PageNumberPagination` `page` to `1` rather than `null` when used without an explicit `page` being specified.
+* Fix `SelectAsyncChoiceWidget` to work when `allowClear` is passed
 
 ## [0.0.12] - 2021-03-17
 
