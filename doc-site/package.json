@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 4000",
-    "build": "node extract-docs.js && next build && next export",
+    "build": "node extract-docs.js && next build",
     "postbuild": "next-sitemap",
     "start": "next start"
   },

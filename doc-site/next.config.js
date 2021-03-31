@@ -37,4 +37,6 @@ module.exports = withMDX({
     // working in dev also failed (worked in dev but doing a build would complain
     // about moving a file with a .html.html extension...)
     trailingSlash: true,
+    distDir: '../.next',
+    target: 'serverless',
 });

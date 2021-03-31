@@ -99,8 +99,7 @@ function extractChildren(node) {
     const slug = [...importPath.split('/').slice(0, -1), rest.name].join('/');
     const permaLink = slug.split('/').slice(1).join('/');
     const [, packageName, ...names] = slug.split('/');
-    // netlify serves everything on lowercase as the canonical version
-    rest.slug = permaLink.toLowerCase();
+    rest.slug = permaLink;
     rest.packageName = packageName;
     if (children) {
         rest.childIds = children.map(child => child.id);

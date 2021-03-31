@@ -13,6 +13,8 @@ node_modules
 # dev files
 venv/
 build/
+.next/
+.now/
 
 # Media files
 media/
@@ -38,4 +40,3 @@ django-root/temp/*
 .yarn/unplugged
 .yarn/build-state.yml
 .pnp.*
-.now
