@@ -403,21 +403,16 @@ export default function useUrlQueryState(
     }, [location]);
     const { search, pathname } = location;
 
-    // This effect is used to update URL to include any missing keys that are
-    // specified in initialState. It only runs once - any subsequent changes to
-    // initialState have no effect.
-    useEffect(() => {
-        const query = qs.parse(search);
-        const invalidKeys: string[] = [];
-        const missingKeys = Object.keys(initialState).filter(key => {
-            if (
+    const isFirstRender = useRef(true);
+    const initialStateRef = useRef<Record<string, any>>({});
+    const previousStateRef = useRef<Record<string, any>>();
+
+    if (isFirstRender.current) {
+        const invalidKeys = Object.keys(initialState).filter(key => {
+            return (
                 controlledKeys &&
                 !(Array.isArray(controlledKeys) ? controlledKeys.includes(key) : key in params)
-            ) {
-                invalidKeys.push(key);
-                return false;
-            }
-            return !(prefix + key in query);
+            );
         });
         if (invalidKeys.length) {
             // eslint-disable-next-line no-console
@@ -427,6 +422,30 @@ export default function useUrlQueryState(
                 )}\nEither remove these keys from initialState or add them to 'controlledKeys'`
             );
         }
+        initialStateRef.current = Object.keys(initialState).reduce((acc, key) => {
+            if (invalidKeys.includes(key)) {
+                return acc;
+            }
+            acc[key] = initialState[key];
+            return acc;
+        }, {});
+    }
+
+    // This effect is used to update URL to include any missing keys that are
+    // specified in initialState. It only runs once - any subsequent changes to
+    // initialState have no effect.
+    useEffect(() => {
+        const query = qs.parse(search);
+        const missingKeys = Object.keys(initialState).filter(key => {
+            // Exclude invalid keys
+            if (
+                controlledKeys &&
+                !(Array.isArray(controlledKeys) ? controlledKeys.includes(key) : key in params)
+            ) {
+                return false;
+            }
+            return !(prefix + key in query);
+        });
         if (missingKeys.length > 0) {
             replaceUrl(
                 `${pathname}?${qs.stringify({
@@ -463,10 +482,19 @@ export default function useUrlQueryState(
     });
 
     // Return the current query params without the prefix
-    const unPrefixedQueryObject = useMemo(
-        () => buildQueryForState(qs.parse(search), prefix, params, controlledKeys),
-        [controlledKeys, search, params, prefix]
-    );
+    const unPrefixedQueryObject = useMemo(() => {
+        const state = buildQueryForState(qs.parse(search), prefix, params, controlledKeys);
+        if (isFirstRender.current) {
+            Object.assign(state, initialStateRef.current);
+        }
+        // If state hasn't changed return the same object
+        if (previousStateRef.current && isEqual(previousStateRef.current, state)) {
+            return previousStateRef.current;
+        }
+        return state;
+    }, [controlledKeys, search, params, prefix]);
+
+    previousStateRef.current = unPrefixedQueryObject;
 
     // Build the state transition callback. This will make sure the URL matches
     // the state specified including removing any values no included in the next
@@ -509,6 +537,8 @@ export default function useUrlQueryState(
         },
         [search, controlledKeys, prefix, params, unPrefixedQueryObject, replaceUrl, pathname]
     );
+
+    isFirstRender.current = false;
 
     return [unPrefixedQueryObject, setUrlState];
 }

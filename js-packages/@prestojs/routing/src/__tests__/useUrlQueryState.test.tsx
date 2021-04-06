@@ -1,7 +1,8 @@
+import { render } from '@testing-library/react';
 import { act, renderHook, RenderHookResult } from '@testing-library/react-hooks';
 import diff from 'jest-diff';
 import qs from 'query-string';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useUrlQueryState from '../useUrlQueryState';
 
 declare global {
@@ -130,6 +131,10 @@ test('useUrlQueryState should sync state with URL query params', () => {
     // Re-rendering with different initial values shouldn't have any effect
     rerender({ test: 'one' });
     expect(hookStatus).queryStateEquals({ p: 'a' });
+
+    // Clearing state should work and not reset to initialValue
+    act(() => setQueryState({}));
+    expect(hookStatus).queryStateEquals({});
 });
 
 test('useUrlQueryState should support multiple hooks on same page', () => {
@@ -186,7 +191,7 @@ test('useUrlQueryState should support controlledKeys option', () => {
 });
 
 test('useUrlQueryState should support controlledKeys=true', () => {
-    const identity = <T>(value: T): T => value;
+    const identity = <T,>(value: T): T => value;
     const hook1 = renderUrlQueryStateHook(
         { a: 'one' },
         { params: { a: identity }, controlledKeys: true }
@@ -217,7 +222,7 @@ test('useUrlQueryState should support controlledKeys=true', () => {
 });
 
 test('useUrlQueryState should error if controlledKeys=true and wildcard specified', () => {
-    const identity = <T>(value: T): T => value;
+    const identity = <T,>(value: T): T => value;
     expect(() =>
         useUrlQueryState({ a: 'one' }, { params: { '*': identity }, controlledKeys: true })
     ).toThrow(/controlledKeys=true cannot be used with a wildcard/);
@@ -452,4 +457,30 @@ test('useUrlQueryState default implementation with window.location', async () =>
     });
     await hook.waitForNextUpdate();
     expect(hook).queryStateEquals({ q: '1', p: '2' });
+});
+
+test('useUrlQueryState initial render should return initialValues', () => {
+    const cb = jest.fn();
+    const distinctStates = new Map<Record<string, any>, number>();
+    navigation.search = '?test_a=1';
+    function Wrapper({ initialState }): React.ReactElement {
+        const navigationProps = useDummyNavigation();
+        const [state] = useUrlQueryState(initialState, { ...navigationProps, prefix: 'test_' });
+        cb(state);
+        const count = distinctStates.get(state) || 0;
+        distinctStates.set(state, count + 1);
+        return <div data-testid="wrapper">{state.value || ''}</div>;
+    }
+    const { getByTestId } = render(<Wrapper initialState={{ value: 'Test' }} />);
+    // Currently we accept the additional render at start. This is hard to avoid - it's
+    // dependent on the router implementation. We could support it for the default HTML5
+    // integration but would complicate things so ignoring it for now.
+    // expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenCalledTimes(2);
+    expect(cb).toHaveBeenNthCalledWith(1, { value: 'Test', a: '1' });
+    expect(cb).toHaveBeenNthCalledWith(2, { value: 'Test', a: '1' });
+    expect(getByTestId('wrapper')).toContainHTML('Test');
+    // Should only be a single entry with count of '2'
+    expect([...distinctStates.values()]).toEqual([2]);
+    expect(navigation.search).toBe('test_a=1&test_value=Test');
 });
