@@ -404,10 +404,31 @@ export default function useUrlQueryState(
     const { search, pathname } = location;
 
     const isFirstRender = useRef(true);
+    // Starts as `true`
+    // - If no `initialState` or there's no keys in `initialState` that aren't in URL it gets set to false
+    // - Otherwise it gets set to the initial `query` parameters based on current query string and `initialState`
+    //      - This triggers a `replaceUrl` which we want to wait for before setting it to false
+    // - Once the location `search` matches the stored value here we set it to false
+    // This is used to track whether or not we need to return the `initialValues` explicitly or whether
+    // we know it's included in the URL. This is to avoid the issue where the returned query parameters don't
+    // include `initialState` until after the `replaceUrl` is called to add them to the URL. We specifically
+    // track the query rather than assuming the second render is due to the `replaceUrl` because we don't control
+    // the implementation of `replaceUrl` - if something happens that causes another render to occur before
+    // `replaceUrl` propagates then the second render may not include the `initialState`.
+    const pendingInitialState = useRef<boolean | Record<string, any>>(true);
     const initialStateRef = useRef<Record<string, any>>({});
     const previousStateRef = useRef<Record<string, any>>();
 
+    if (pendingInitialState.current && typeof pendingInitialState.current === 'object') {
+        if (isEqual(qs.parse(search), pendingInitialState.current)) {
+            pendingInitialState.current = false;
+        }
+    }
+
     if (isFirstRender.current) {
+        // Only in first render do we validate keys in initialState. Any subsequent
+        // changes to initialState are ignored.
+        isFirstRender.current = false;
         const invalidKeys = Object.keys(initialState).filter(key => {
             return (
                 controlledKeys &&
@@ -447,12 +468,14 @@ export default function useUrlQueryState(
             return !(prefix + key in query);
         });
         if (missingKeys.length > 0) {
-            replaceUrl(
-                `${pathname}?${qs.stringify({
-                    ...buildQueryForUrl(initialState, prefix, params, missingKeys),
-                    ...query,
-                })}`
-            );
+            const nextQuery = {
+                ...buildQueryForUrl(initialState, prefix, params, missingKeys),
+                ...query,
+            };
+            replaceUrl(`${pathname}?${qs.stringify(nextQuery)}`);
+            pendingInitialState.current = nextQuery;
+        } else {
+            pendingInitialState.current = false;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -484,7 +507,7 @@ export default function useUrlQueryState(
     // Return the current query params without the prefix
     const unPrefixedQueryObject = useMemo(() => {
         const state = buildQueryForState(qs.parse(search), prefix, params, controlledKeys);
-        if (isFirstRender.current) {
+        if (pendingInitialState.current) {
             Object.assign(state, initialStateRef.current);
         }
         // If state hasn't changed return the same object
@@ -537,8 +560,6 @@ export default function useUrlQueryState(
         },
         [search, controlledKeys, prefix, params, unPrefixedQueryObject, replaceUrl, pathname]
     );
-
-    isFirstRender.current = false;
 
     return [unPrefixedQueryObject, setUrlState];
 }
