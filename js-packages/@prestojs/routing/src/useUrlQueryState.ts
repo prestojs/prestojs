@@ -121,9 +121,10 @@ const buildQueryForState = (
     obj: Record<string, any>,
     prefix: string,
     params: ParamsEncodeDecode,
-    controlledKeys?: string[] | true
+    controlledKeys?: string[] | true,
+    initialState?: Record<string, any>
 ): Record<string, any> => {
-    return Object.entries(obj).reduce((acc, [key, value]) => {
+    const queryObj = Object.entries(obj).reduce((acc, [key, value]) => {
         if (key.startsWith(prefix)) {
             const unprefixedKey = key.substr(prefix.length);
             if (
@@ -137,6 +138,10 @@ const buildQueryForState = (
         }
         return acc;
     }, {});
+    if (Object.keys(queryObj).length === 0) {
+        return initialState || {};
+    }
+    return queryObj;
 };
 
 // TODO: Should the default parse actually do something special here? eg. if it's
@@ -451,7 +456,13 @@ export default function useUrlQueryState(
             return;
         }
         const query = qs.parse(search);
-        const existingQuery = buildQueryForState(query, prefixCache.current, params);
+        const existingQuery = buildQueryForState(
+            query,
+            prefixCache.current,
+            params,
+            undefined,
+            initialState
+        );
         const keys = Object.keys(query).filter(key => key.startsWith(prefixCache.current));
         replaceUrl(
             `${pathname}?${qs.stringify({
@@ -464,8 +475,8 @@ export default function useUrlQueryState(
 
     // Return the current query params without the prefix
     const unPrefixedQueryObject = useMemo(
-        () => buildQueryForState(qs.parse(search), prefix, params, controlledKeys),
-        [controlledKeys, search, params, prefix]
+        () => buildQueryForState(qs.parse(search), prefix, params, controlledKeys, initialState),
+        [controlledKeys, search, params, prefix, initialState]
     );
 
     // Build the state transition callback. This will make sure the URL matches
