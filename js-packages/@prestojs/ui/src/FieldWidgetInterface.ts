@@ -58,6 +58,8 @@ export interface WidgetProps<FieldValue, T extends HTMLElement> {
 export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {
     lowerInput: P;
     upperInput: P;
+    // the "input" from default form
+    input: InputProps<FieldValue, T> & { value?: Record<string, FieldValue> };
     separator: string;
     /**
      * Any extra details such as field errors, touched status etc. The values here depend on the form

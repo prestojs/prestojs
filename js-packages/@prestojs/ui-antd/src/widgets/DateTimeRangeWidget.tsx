@@ -9,6 +9,8 @@ import RangeWidget from './RangeWidget';
  *
  * As with all range widgets, ref should be shaped as { lowerRef: Ref(), upperRef: Ref() }
  *
+ * You may pass in props to be used for the individual input as lowerInput / upperInput
+ *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
@@ -22,8 +24,8 @@ function DateTimeRangeWidget(
     }: RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>,
     ref: React.RefObject<DatePickerProps>
 ): React.ReactElement {
-    const { format: formatLower = 'MMMM Do YYYY, h:mm a', ...restLower } = lowerInput;
-    const { format: formatUpper = 'MMMM Do YYYY, h:mm a', ...restUpper } = upperInput;
+    const { format: formatLower = 'MMMM Do YYYY, h:mm a', ...restLower } = lowerInput || {};
+    const { format: formatUpper = 'MMMM Do YYYY, h:mm a', ...restUpper } = upperInput || {};
 
     const lower = { ...{ format: formatLower, ...restLower } };
     const upper = { ...{ format: formatUpper, ...restUpper } };

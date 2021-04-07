@@ -9,6 +9,8 @@ import RangeWidget from './RangeWidget';
  *
  * As with all range widgets, ref should be shaped as { lowerRef: Ref(), upperRef: Ref() }
  *
+ * You may pass in props to be used for the individual input as lowerInput / upperInput
+ *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref

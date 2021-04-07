@@ -16,14 +16,33 @@ function RangeWidget<FieldValue, T extends HTMLElement, P>(
     props: RangeWidgetProps<FieldValue, T, P>,
     ref: any
 ): React.ReactElement {
-    const { lowerInput, upperInput, separator = '-', inputWidget: InputWidget, ...rest } = props;
-    const { lowerRef, upperRef } = ref;
+    const {
+        lowerInput,
+        upperInput,
+        separator = '-',
+        inputWidget: InputWidget,
+        input: { value = {} as Record<string, FieldValue>, onChange },
+        ...rest
+    } = props;
+    const { lowerRef, upperRef } = ref || {};
     return (
         <>
             <Input.Group compact>
-                <InputWidget ref={lowerRef} {...lowerInput} {...rest} />
-                <Input placeholder={separator} disabled />
-                <InputWidget ref={upperRef} {...upperInput} {...rest} />
+                <InputWidget
+                    ref={lowerRef}
+                    defaultValue={value.lower}
+                    onChange={(v: any): void => onChange({ ...value, lower: v })}
+                    {...lowerInput}
+                    {...rest}
+                />
+                {separator}
+                <InputWidget
+                    ref={upperRef}
+                    defaultValue={value.upper}
+                    onChange={(v: any): void => onChange({ ...value, upper: v })}
+                    {...upperInput}
+                    {...rest}
+                />
             </Input.Group>
         </>
     );
