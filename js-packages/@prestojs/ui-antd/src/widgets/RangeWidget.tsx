@@ -1,6 +1,7 @@
 import { RangedWidgetProps } from '@prestojs/ui';
 import { Input } from 'antd';
 import React from 'react';
+import cx from 'classnames';
 
 /**
  * @expand-properties
@@ -22,26 +23,26 @@ function RangeWidget<FieldValue, T extends HTMLElement, P>(
         separator = '-',
         inputWidget: InputWidget,
         input: { value = {} as Record<string, FieldValue>, onChange },
-        ...rest
+        className,
     } = props;
     const { lowerRef, upperRef } = ref || {};
     return (
         <>
-            <Input.Group compact>
+            <Input.Group compact className={cx('presto-range-widget-wrapper', className)}>
                 <InputWidget
                     ref={lowerRef}
-                    defaultValue={value.lower}
+                    value={value.lower}
                     onChange={(v: any): void => onChange({ ...value, lower: v })}
                     {...lowerInput}
-                    {...rest}
+                    className={cx('presto-range-widget-lower', lowerInput.className)}
                 />
-                {separator}
+                <Input className="presto-range-widget-separator" placeholder={separator} disabled />
                 <InputWidget
                     ref={upperRef}
-                    defaultValue={value.upper}
+                    value={value.upper}
                     onChange={(v: any): void => onChange({ ...value, upper: v })}
                     {...upperInput}
-                    {...rest}
+                    className={cx('presto-range-widget-upper', upperInput.className)}
                 />
             </Input.Group>
         </>

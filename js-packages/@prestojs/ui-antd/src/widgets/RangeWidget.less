@@ -1,0 +1,32 @@
+@import (reference) '~antd/lib/style/index.less';
+
+.presto-range-widget-wrapper.@{ant-prefix}-input-group {
+  .presto-range-widget-upper {
+    border-left-width: 0;
+
+    &:hover,
+    &:focus {
+      border-left-width: 1px;
+    }
+  }
+  .presto-range-widget-separator {
+    width: 30px;
+    border-left: 0;
+    border-right: 0;
+    pointer-events: none;
+    margin-left: 1px;
+  }
+
+  .presto-range-widget-lower {
+    border-right-width: 0;
+
+    &:hover,
+    &:focus {
+      border-right-width: 1px;
+    }
+  }
+
+  .presto-range-widget-separator {
+    background-color: @input-bg;
+  }
+}

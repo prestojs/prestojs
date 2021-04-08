@@ -16,7 +16,7 @@ export default class RangeField<T> extends Field<T> {
     static fieldClassName = 'RangeField';
     public separator: string;
 
-    constructor(values: RangeFieldProps<T>) {
+    constructor(values: RangeFieldProps<T> = {}) {
         const { separator = '-', ...rest } = values;
         super(rest);
         this.separator = separator;

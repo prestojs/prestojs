@@ -20,8 +20,8 @@ function DateRangeWidget(
     ref: React.RefObject<DatePickerProps>
 ): React.ReactElement {
     const { lowerInput, upperInput, separator, ...rest } = props;
-    const { format: formatLower = 'MMMM Do YYYY', ...restLower } = lowerInput || {};
-    const { format: formatUpper = 'MMMM Do YYYY', ...restUpper } = upperInput || {};
+    const { format: formatLower = 'YYYY-MM-DD', ...restLower } = lowerInput || {};
+    const { format: formatUpper = 'YYYY-MM-DD', ...restUpper } = upperInput || {};
 
     const lower = { ...{ format: formatLower, ...restLower } };
     const upper = { ...{ format: formatUpper, ...restUpper } };
