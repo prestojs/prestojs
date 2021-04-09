@@ -2,7 +2,6 @@ import { Endpoint } from '@prestojs/rest';
 import React from 'react';
 import { render } from 'react-dom';
 import 'stop-runaway-react-effects/hijack';
-
 import App from './App';
 
 /**

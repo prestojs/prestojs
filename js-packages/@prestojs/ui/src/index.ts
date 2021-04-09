@@ -25,6 +25,7 @@ import type {
     FormProps,
     TopLevelUiContextValue,
     UiContextValue,
+    UiProviderProps,
 } from './UiProvider';
 
 export type {
@@ -35,5 +36,6 @@ export type {
     FormItemProps,
     FormProps,
     UiContextValue,
+    UiProviderProps,
     TopLevelUiContextValue,
 };

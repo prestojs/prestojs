@@ -1,7 +1,8 @@
 import { WidgetProps } from '@prestojs/ui';
-import { TimePicker } from 'antd';
 import { TimePickerProps } from 'antd/lib/time-picker';
 import React from 'react';
+
+import { useAntdUiConfig } from '../AntdUiProvider';
 
 /**
  * @expand-properties
@@ -18,7 +19,9 @@ type TimeWidgetProps = WidgetProps<string, HTMLInputElement> & { input: TimePick
 // FIXME - there's no way to pass value to TimePicker correctly w/o moment being involved atm - its not a standard Date object there.
 // ref as RefObject any cause TimePicker's merged as a value in antd unlike any other
 function TimeWidget(props: TimeWidgetProps, ref: React.RefObject<any>): React.ReactElement {
+    const TimePicker = useAntdUiConfig().getTimePicker();
     const { input, ...rest } = props;
+
     return <TimePicker ref={ref} {...input} {...rest} />;
 }
 

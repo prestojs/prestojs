@@ -39,4 +39,11 @@ export { default as getWidgetForField } from './getWidgetForField';
 export { default as FormItemWrapper } from './FormItemWrapper';
 export { default as FormWrapper } from './FormWrapper';
 
+export {
+    default as AntdUiProvider,
+    useAntdUiConfig,
+    AntdUiContext,
+    AntdUiConfig,
+} from './AntdUiProvider';
+
 export type { SelectChoiceProps } from './widgets/SelectChoiceWidget';
