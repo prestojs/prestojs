@@ -10,6 +10,8 @@
 ### Changed
 
 * Fix `useUrlQueryState` to return `initialState` on first render
+* Add React 17 as valid peerDep version
+* Update to support antd 4.15+
 
 ## [0.0.13] - 2021-03-22
 

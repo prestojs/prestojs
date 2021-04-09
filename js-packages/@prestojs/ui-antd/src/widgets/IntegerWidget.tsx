@@ -17,7 +17,7 @@ type IntegerWidgetProps = WidgetProps<number, HTMLInputElement>;
  */
 function IntegerWidget(
     props: IntegerWidgetProps,
-    ref: React.RefObject<typeof InputNumber>
+    ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
     const { input, ...rest } = props;
     return <InputNumber ref={ref} {...rest} {...input} />;

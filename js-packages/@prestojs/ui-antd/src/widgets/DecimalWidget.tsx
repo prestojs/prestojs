@@ -17,7 +17,7 @@ type DecimalWidgetProps = WidgetProps<string, HTMLInputElement>;
  */
 function DecimalWidget(
     props: DecimalWidgetProps,
-    ref: React.RefObject<typeof InputNumber>
+    ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
     const { input, ...rest } = props;
     const { value, ...restInput } = input;
