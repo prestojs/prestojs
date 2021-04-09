@@ -22,8 +22,8 @@
   },
   "peerDependencies": {
     "@prestojs/viewmodel": "~0.0.11",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react": ">= 16.12.0 < 18",
+    "react-dom": ">= 16.12.0 < 18"
   },
   "dependencies": {
     "lodash": "^4.17.15"
