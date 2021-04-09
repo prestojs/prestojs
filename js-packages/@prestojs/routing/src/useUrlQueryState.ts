@@ -403,21 +403,37 @@ export default function useUrlQueryState(
     }, [location]);
     const { search, pathname } = location;
 
-    // This effect is used to update URL to include any missing keys that are
-    // specified in initialState. It only runs once - any subsequent changes to
-    // initialState have no effect.
-    useEffect(() => {
-        const query = qs.parse(search);
-        const invalidKeys: string[] = [];
-        const missingKeys = Object.keys(initialState).filter(key => {
-            if (
+    const isFirstRender = useRef(true);
+    // Starts as `true`
+    // - If no `initialState` or there's no keys in `initialState` that aren't in URL it gets set to false
+    // - Otherwise it gets set to the initial `query` parameters based on current query string and `initialState`
+    //      - This triggers a `replaceUrl` which we want to wait for before setting it to false
+    // - Once the location `search` matches the stored value here we set it to false
+    // This is used to track whether or not we need to return the `initialValues` explicitly or whether
+    // we know it's included in the URL. This is to avoid the issue where the returned query parameters don't
+    // include `initialState` until after the `replaceUrl` is called to add them to the URL. We specifically
+    // track the query rather than assuming the second render is due to the `replaceUrl` because we don't control
+    // the implementation of `replaceUrl` - if something happens that causes another render to occur before
+    // `replaceUrl` propagates then the second render may not include the `initialState`.
+    const pendingInitialState = useRef<boolean | Record<string, any>>(true);
+    const initialStateRef = useRef<Record<string, any>>({});
+    const previousStateRef = useRef<Record<string, any>>();
+
+    if (pendingInitialState.current && typeof pendingInitialState.current === 'object') {
+        if (isEqual(qs.parse(search), pendingInitialState.current)) {
+            pendingInitialState.current = false;
+        }
+    }
+
+    if (isFirstRender.current) {
+        // Only in first render do we validate keys in initialState. Any subsequent
+        // changes to initialState are ignored.
+        isFirstRender.current = false;
+        const invalidKeys = Object.keys(initialState).filter(key => {
+            return (
                 controlledKeys &&
                 !(Array.isArray(controlledKeys) ? controlledKeys.includes(key) : key in params)
-            ) {
-                invalidKeys.push(key);
-                return false;
-            }
-            return !(prefix + key in query);
+            );
         });
         if (invalidKeys.length) {
             // eslint-disable-next-line no-console
@@ -427,13 +443,39 @@ export default function useUrlQueryState(
                 )}\nEither remove these keys from initialState or add them to 'controlledKeys'`
             );
         }
+        initialStateRef.current = Object.keys(initialState).reduce((acc, key) => {
+            if (invalidKeys.includes(key)) {
+                return acc;
+            }
+            acc[key] = initialState[key];
+            return acc;
+        }, {});
+    }
+
+    // This effect is used to update URL to include any missing keys that are
+    // specified in initialState. It only runs once - any subsequent changes to
+    // initialState have no effect.
+    useEffect(() => {
+        const query = qs.parse(search);
+        const missingKeys = Object.keys(initialState).filter(key => {
+            // Exclude invalid keys
+            if (
+                controlledKeys &&
+                !(Array.isArray(controlledKeys) ? controlledKeys.includes(key) : key in params)
+            ) {
+                return false;
+            }
+            return !(prefix + key in query);
+        });
         if (missingKeys.length > 0) {
-            replaceUrl(
-                `${pathname}?${qs.stringify({
-                    ...buildQueryForUrl(initialState, prefix, params, missingKeys),
-                    ...query,
-                })}`
-            );
+            const nextQuery = {
+                ...buildQueryForUrl(initialState, prefix, params, missingKeys),
+                ...query,
+            };
+            replaceUrl(`${pathname}?${qs.stringify(nextQuery)}`);
+            pendingInitialState.current = nextQuery;
+        } else {
+            pendingInitialState.current = false;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -463,10 +505,19 @@ export default function useUrlQueryState(
     });
 
     // Return the current query params without the prefix
-    const unPrefixedQueryObject = useMemo(
-        () => buildQueryForState(qs.parse(search), prefix, params, controlledKeys),
-        [controlledKeys, search, params, prefix]
-    );
+    const unPrefixedQueryObject = useMemo(() => {
+        const state = buildQueryForState(qs.parse(search), prefix, params, controlledKeys);
+        if (pendingInitialState.current) {
+            Object.assign(state, initialStateRef.current);
+        }
+        // If state hasn't changed return the same object
+        if (previousStateRef.current && isEqual(previousStateRef.current, state)) {
+            return previousStateRef.current;
+        }
+        return state;
+    }, [controlledKeys, search, params, prefix]);
+
+    previousStateRef.current = unPrefixedQueryObject;
 
     // Build the state transition callback. This will make sure the URL matches
     // the state specified including removing any values no included in the next
