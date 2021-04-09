@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+### Changed
+
+* Fix `useUrlQueryState` to return `initialState` on first render
+
 ## [0.0.13] - 2021-03-22
 
 ### Added
