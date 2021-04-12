@@ -19,7 +19,7 @@ function FloatRangeWidget(
     props: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
     ref: React.RefObject<typeof InputNumber>
 ): React.ReactElement {
-    const { lowerInput, upperInput, separator, ...rest } = props;
+    const { lowerInput={}, upperInput={}, separator, ...rest } = props;
     return (
         <RangeWidget
             ref={ref}

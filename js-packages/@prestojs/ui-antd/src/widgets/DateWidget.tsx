@@ -23,7 +23,7 @@ function DateWidget(
 ): React.ReactElement {
     const DatePicker = useAntdUiConfig().getDatePicker();
     const { input, ...rest } = props;
-    const { format = 'YYYY-MM-DD', ...restInput } = input;
+    const { format = 'MMMM Do YYYY', ...restInput } = input;
     return <DatePicker ref={ref} format={format} {...restInput} {...rest} />;
 }
 
