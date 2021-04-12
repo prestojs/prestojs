@@ -17,7 +17,7 @@ type NumberWidgetProps = WidgetProps<number, HTMLInputElement>;
  */
 function NumberWidget(
     props: NumberWidgetProps,
-    ref: React.RefObject<typeof InputNumber>
+    ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
     const { input, ...rest } = props;
     return <InputNumber ref={ref} {...input} {...rest} />;

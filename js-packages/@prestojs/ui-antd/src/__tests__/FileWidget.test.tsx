@@ -86,6 +86,10 @@ test('useFileList should convert string urls to antd representation', async () =
     expect(result.current.fileList).toEqual([
         {
             uid: 'test1.png',
+            originFileObj: expect.objectContaining({
+                uid: 'test1.png',
+                url: 'test1.png',
+            }),
             name: 'test1.png',
             size: 0,
             type: '',

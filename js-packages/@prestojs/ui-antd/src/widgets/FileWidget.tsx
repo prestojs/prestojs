@@ -76,7 +76,7 @@ export async function blobToUploadFile(uid: string, name: string, blob: Blob): P
                 size: blob.size,
                 type: blob.type,
                 thumbUrl: reader.result as string,
-                originFileObj: blob,
+                originFileObj: blob as RcFile,
             })
         );
         reader.addEventListener('error', error => reject(error));
@@ -204,6 +204,13 @@ export function useFileList(
                     }
                     if (!uploadFile) {
                         if (typeof value == 'string') {
+                            const uid = value;
+                            const name = value.split('/').pop() || value;
+                            const fakeFile = Object.assign(new File([], name), {
+                                url: value,
+                                uid: uid,
+                                lastModifiedDate: new Date(),
+                            });
                             uploadFile = {
                                 // Set uid to the string which is the current file path
                                 // Not guaranteed to be unique if the same file uploaded multiple
@@ -211,10 +218,11 @@ export function useFileList(
                                 // won't be able to identify which file to remove).
                                 // This allows us to match up values passed into FileWidget with
                                 // the internal representation we pass to UploadFile
-                                uid: value,
-                                name: value.split('/').pop() || value,
+                                uid,
+                                name,
                                 size: 0,
                                 type: '',
+                                originFileObj: fakeFile,
                             };
                             if (previewImage) {
                                 promises.push(generatePreview(value, uploadFile));
@@ -243,7 +251,7 @@ export function useFileList(
                                 name,
                                 size: value.size,
                                 type: value.type,
-                                originFileObj: value,
+                                originFileObj: value as RcFile,
                             };
                             if (previewImage) {
                                 promises.push(generatePreview(value, uploadFile));

@@ -21,23 +21,23 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
-    "@ant-design/icons": "^4.0.0-rc.0",
+    "@ant-design/icons": ">=4.0.6",
     "@prestojs/ui": "*",
     "@prestojs/viewmodel": "*",
-    "antd": "^4.4.3",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "antd": ">=4.4.3",
+    "react": ">= 16.12.0 < 18",
+    "react-dom": ">= 16.12.0 < 18"
   },
   "dependencies": {
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "@ant-design/icons": "^4.0.0-rc.0",
+    "@ant-design/icons": "^4.6.1",
     "@prestojs/ui": "*",
     "@prestojs/viewmodel": "*",
     "@testing-library/jest-dom": "^5.1.1",
     "@testing-library/react": "^10.0.4",
-    "antd": "^4.9.2",
+    "antd": "^4.15.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "typescript": "^4.2.3"

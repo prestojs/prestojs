@@ -17,7 +17,7 @@ type FloatWidgetProps = WidgetProps<number, HTMLInputElement>;
  */
 function FloatWidget(
     props: FloatWidgetProps,
-    ref: React.RefObject<typeof InputNumber>
+    ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
     const { input, ...rest } = props;
     return <InputNumber ref={ref} {...input} {...rest} />;

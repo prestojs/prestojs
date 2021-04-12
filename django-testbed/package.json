@@ -75,7 +75,7 @@
   },
   "dependencies": {
     "@alliance-software/webpack-dev-utils": "^0.4.0",
-    "@ant-design/icons": "^4.0.0-alpha.11",
+    "@ant-design/icons": "^4.6.2",
     "@prestojs/final-form": "*",
     "@prestojs/rest": "*",
     "@prestojs/routing": "*",
@@ -83,7 +83,7 @@
     "@prestojs/ui-antd": "*",
     "@prestojs/util": "*",
     "@prestojs/viewmodel": "*",
-    "antd": "^4.9.2",
+    "antd": "^4.15.0",
     "classnames": "^2.2.6",
     "core-js": "^3.6.4",
     "dayjs": "^1.10.4",

@@ -17,7 +17,7 @@ type CurrencyWidgetProps = WidgetProps<string, HTMLInputElement>;
  */
 function CurrencyWidget(
     props: CurrencyWidgetProps,
-    ref: React.RefObject<typeof InputNumber>
+    ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
     const { input, ...rest } = props;
     const { value, ...restInput } = input;

@@ -21,7 +21,7 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
-    "react": "^16.12.0"
+    "react": ">= 16.12.0 < 18"
   },
   "devDependencies": {
     "@testing-library/react": "^10.0.4",
