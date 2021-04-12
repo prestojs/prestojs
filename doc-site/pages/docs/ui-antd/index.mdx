@@ -23,11 +23,11 @@ of props you can pass through.
 ```jsx
 import React from 'react';
 import { DatePicker, TimePicker } from 'antd';
-import { AntUiProvider, getWidgetForField as antdGetWidgetForField } from '@prestojs/ui-antd';
+import { AntdUiProvider, getWidgetForField as antdGetWidgetForField } from '@prestojs/ui-antd';
 
 /**
  * This is optional but recommended. You can provide any customisations to widgets
- * here. If you choose not to provide this `AntUiProvider` will call `antdGetWidgetForField`
+ * here. If you choose not to provide this `AntdUiProvider` will call `antdGetWidgetForField`
  * directly.
  */
 function getWidgetForField(field) {

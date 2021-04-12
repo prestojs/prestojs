@@ -130,7 +130,7 @@ export function useAntdUiConfig(): AntdUiConfig {
     const context = useContext(AntdUiContext);
     if (!context) {
         throw new Error(
-            'useAntdUiConfig can only be used within a AntdUiProvider. Ensure your app is wrapped in AntUiProvider.'
+            'useAntdUiConfig can only be used within a AntdUiProvider. Ensure your app is wrapped in AntdUiProvider.'
         );
     }
     return context;
