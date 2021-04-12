@@ -1,13 +1,15 @@
 import { RangedWidgetProps } from '@prestojs/ui';
-import { DatePicker } from 'antd';
 import { DatePickerProps } from 'antd/lib/date-picker';
 import React from 'react';
 import RangeWidget from './RangeWidget';
+import { useAntdUiConfig } from '../AntdUiProvider';
 
 /**
  * See [DatePicker](https://ant.design/components/date-picker/) for props available
  *
  * As with all range widgets, ref should be shaped as { lowerRef: Ref(), upperRef: Ref() }
+ *
+ * You may pass in props to be used for the individual input as lowerInput / upperInput
  *
  * @extract-docs
  * @menu-group Widgets
@@ -18,9 +20,9 @@ function DateRangeWidget(
     ref: React.RefObject<DatePickerProps>
 ): React.ReactElement {
     const { lowerInput, upperInput, separator, ...rest } = props;
-    const { format: formatLower = 'MMMM Do YYYY', ...restLower } = lowerInput;
-    const { format: formatUpper = 'MMMM Do YYYY', ...restUpper } = upperInput;
-
+    const { format: formatLower = 'MMMM Do YYYY', ...restLower } = lowerInput || {};
+    const { format: formatUpper = 'MMMM Do YYYY', ...restUpper } = upperInput || {};
+    const DatePicker = useAntdUiConfig().getDatePicker();
     const lower = { ...{ format: formatLower, ...restLower } };
     const upper = { ...{ format: formatUpper, ...restUpper } };
 

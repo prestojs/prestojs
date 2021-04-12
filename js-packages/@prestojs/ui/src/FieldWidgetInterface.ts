@@ -55,9 +55,25 @@ export interface WidgetProps<FieldValue, T extends HTMLElement> {
     asyncChoices?: AsyncChoicesInterface<any, any>;
 }
 
+/**
+ * @expand-properties
+ */
 export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {
-    lowerInput: P;
-    upperInput: P;
+    /**
+     * Any props you want to pass to the first ("lower") Input of a range. Props available depends on type of range widget being used.
+     */
+    lowerInput: P & { className?: string };
+    /**
+     * Any props you want to pass to the second ("upper") Input of a range. Props available depends on type of range widget being used.
+     */
+    upperInput: P & { className?: string };
+    /**
+     * the input coming from form; `value` and `onChange` of it is used by the RangedWidget.
+     */
+    input: InputProps<FieldValue, T> & { value?: Record<string, FieldValue> };
+    /**
+     * Separator between two Input elements; defaults to `-`.
+     */
     separator: string;
     /**
      * Any extra details such as field errors, touched status etc. The values here depend on the form
@@ -65,6 +81,10 @@ export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {
      * for what this will be.
      */
     meta?: Record<string, any>;
+    /**
+     * className for the wrapper class.
+     */
+    className?: string;
 }
 
 export type FieldWidgetType<FieldValue, T extends HTMLElement> =

@@ -12,6 +12,10 @@
 * Fix `useUrlQueryState` to return `initialState` on first render
 * Add React 17 as valid peerDep version
 * Update to support antd 4.15+
+* `DurationWidget` no longer uses TimePicker - it accepts input instead
+* All range widgets fixed to properly accept constructor arguments
+* `RangeWidget` now has classes for styling
+* `DateRangeWidget` and `DateTimeRangeWidget` now using `datePickerComponent` from [AntdUiProvider](https://prestojs.com/docs/ui-antd/AntdUiProvider/)
 
 ## [0.0.13] - 2021-03-22
 

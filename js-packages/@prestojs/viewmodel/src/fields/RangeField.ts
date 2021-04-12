@@ -1,16 +1,11 @@
 import Field, { FieldProps } from './Field';
 
-interface Boundary<T> extends FieldProps<T> {
-    lowerBound: T | null | undefined;
-    upperBound: T | null | undefined;
-    separator: string | undefined;
-    [propName: string]: any;
-}
+type RangeFieldProps<T> = FieldProps<T> & {
+    separator?: string;
+};
 
 /**
- * Base class for range fields (fields with a boundary).
- *
- * supply lowerBound and upperBound to the constructor to define boundaries. they're optional (can be undefined / null).
+ * Base class for range fields (see: https://www.postgresql.org/docs/9.6/rangetypes.html).
  *
  * Other range based fields (DateTimeRangeField, IntegerRangeField, ...) will extend this.
  *
@@ -19,15 +14,11 @@ interface Boundary<T> extends FieldProps<T> {
  */
 export default class RangeField<T> extends Field<T> {
     static fieldClassName = 'RangeField';
-    public lowerBound: T | null | undefined;
-    public upperBound: T | null | undefined;
     public separator: string;
 
-    constructor(values: Boundary<T>) {
-        super(values);
-        const { lowerBound, upperBound, separator = '~' } = values;
-        this.lowerBound = lowerBound;
-        this.upperBound = upperBound;
+    constructor(values: RangeFieldProps<T> = {}) {
+        const { separator = '-', ...rest } = values;
+        super(rest);
         this.separator = separator;
     }
 }

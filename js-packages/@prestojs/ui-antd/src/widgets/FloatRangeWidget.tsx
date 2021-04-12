@@ -9,6 +9,8 @@ import RangeWidget from './RangeWidget';
  *
  * As with all range widgets, ref should be shaped as { lowerRef: Ref(), upperRef: Ref() }
  *
+ * You may pass in props to be used for the individual input as lowerInput / upperInput
+ *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
@@ -17,7 +19,7 @@ function FloatRangeWidget(
     props: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
     ref: React.RefObject<typeof InputNumber>
 ): React.ReactElement {
-    const { lowerInput, upperInput, separator, ...rest } = props;
+    const { lowerInput={}, upperInput={}, separator, ...rest } = props;
     return (
         <RangeWidget
             ref={ref}
