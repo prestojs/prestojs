@@ -1,4 +1,5 @@
 export const metadata = {
+    className: 'docs',
     title: 'Antd UI',
 };
 
@@ -6,18 +7,29 @@ export const metadata = {
 
 This module provides UI components for displaying and editing data using the [antd](https://ant.design) library.
 
-See [UiProvider](doc:UiProvider) for more detail on how UI integrations work. Below is an example
-of setting up ui-antd.
+## Installation
+
+```bash
+yarn add @prestojs/ui @prestojs/ui-antd antd
+```
+
+## Setup
+
+Below is an example of setting up ui-antd using [AntdUiProvider](doc:AntdUiProvider) - see there for the full list
+of props you can pass through.
+
+> See [UiProvider](doc:UiProvider) for more detail on how UI integrations work at a high level.
 
 ```jsx
 import React from 'react';
-import { UiProvider } from '@prestojs/ui';
-import {
-    FormWrapper,
-    getWidgetForField as antdGetWidgetForField,
-    FormItemWrapper,
-} from '@prestojs/ui-antd';
+import { DatePicker, TimePicker } from 'antd';
+import { AntUiProvider, getWidgetForField as antdGetWidgetForField } from '@prestojs/ui-antd';
 
+/**
+ * This is optional but recommended. You can provide any customisations to widgets
+ * here. If you choose not to provide this `AntUiProvider` will call `antdGetWidgetForField`
+ * directly.
+ */
 function getWidgetForField(field) {
     const widget = antdGetWidgetForField(field);
     // If ui-antd doesn't provide a widget fall back to a default
@@ -32,19 +44,22 @@ function getWidgetForField(field) {
 
 export default function Root() {
     return (
-        <UiProvider
+        <AntdUiProvider
+            // This is optional but the recommended pattern for providing your own widgets with a fallback
             getWidgetForField={getWidgetForField}
-            formItemComponent={FormItemWrapper}
-            formComponent={FormWrapper}
+            // This is optional; if you use no date based widgets you can exclude this
+            datePickerComponent={DatePicker}
+            // This is optional; if you use no time based widgets you can exclude this
+            timePickerComponent={TimePicker}
         >
             <YourApp />
-        </UiProvider>
+        </AntdUiProvider>
     );
 }
 ```
 
-## Installation
-
-```bash
-yarn add @prestojs/ui @prestojs/ui-antd antd
-```
+The above example shows how to configure an app that is going to use date or time based widgets (eg. [DateWidget](doc:DateWidget)
+or [TimeWidget](doc:TimeWidget)). You must explicitly pass `datePickerComponent` and `timePickerComponent` to define
+what widget to use. This is to allow customisation of the underlying date library to use for the component. The default
+provided by antd is to use moment but often this is undesirable. The recommended approach from antd is to outlined
+in their [replace moment](https://ant.design/docs/react/replace-moment#DatePicker) documentation.

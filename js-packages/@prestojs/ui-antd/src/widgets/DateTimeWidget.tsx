@@ -1,7 +1,8 @@
 import { WidgetProps } from '@prestojs/ui';
-import { DatePicker } from 'antd';
-import { DatePickerProps } from 'antd/lib/date-picker';
+import type { DatePickerProps } from 'antd/lib/date-picker';
 import React from 'react';
+
+import { useAntdUiConfig } from '../AntdUiProvider';
 
 /**
  * @expand-properties
@@ -20,6 +21,7 @@ function DateTimeWidget(
     props: DateTimeWidgetProps,
     ref: React.RefObject<React.ClassicComponent<DatePickerProps, any>>
 ): React.ReactElement {
+    const DatePicker = useAntdUiConfig().getDatePicker();
     const { input, ...rest } = props;
     const { format = 'MMMM Do YYYY, h:mm a', ...restInput } = input;
     // antd 4.0.0-rc5 has a bug in DatePickerProps in that it does not have showTime taking boolean as type atm (object only)

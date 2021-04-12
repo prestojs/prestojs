@@ -4,6 +4,9 @@
 
 ### Added
 
+* Add [AntdUiProvider](https://prestojs.com/docs/ui-antd/AntdUiProvider/) with support for `datePickerComponent` and `timePickerComponent`
+  * This makes it easy to switch out the concrete implementation of date/time picker using preferred date library of choice
+
 ### Changed
 
 * Fix `useUrlQueryState` to return `initialState` on first render

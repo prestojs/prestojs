@@ -86,6 +86,7 @@
     "antd": "^4.9.2",
     "classnames": "^2.2.6",
     "core-js": "^3.6.4",
+    "dayjs": "^1.10.4",
     "file-loader": "^3.0.1",
     "history": "^4.7.2",
     "invariant": "^2.2.4",
@@ -100,6 +101,7 @@
     "react-navi": "^0.14.2",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
+    "rc-picker": "^2.5.10",
     "stop-runaway-react-effects": "^2.0.0",
     "swr": "^0.1.12",
     "whatwg-fetch": "^3.0.0"
