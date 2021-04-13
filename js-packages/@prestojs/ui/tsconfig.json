@@ -3,7 +3,7 @@
 
   "compilerOptions": {
     "composite": true,
-    "outDir": "./build/module",
+    "outDir": "./build",
     "rootDir": "./src",
     "jsx": "react"
   },
