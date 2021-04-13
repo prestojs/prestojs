@@ -1,3 +1,5 @@
-# Generator
+# Antd Presto Integration
 
-Code generator for frontend. Accepts JSON definitions generated from other sources (eg. django).
+UI integration for Presto and [antd](https://ant.design)
+
+
