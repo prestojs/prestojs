@@ -147,7 +147,7 @@ export function useAntdUiConfig(): AntdUiConfig {
  *   return (
  *     <AntdUiProvider>
  *        <YourApp />
- *     </UiProvider>
+ *     </AntdUiProvider>
  *   );
  * }
  * ```
@@ -174,7 +174,7 @@ export function useAntdUiConfig(): AntdUiConfig {
  *   return (
  *     <AntdUiProvider datePickerComponent={datePickerComponent} timePickerComponent={timePickerComponent} >
  *        <YourApp />
- *     </UiProvider>
+ *     </AntdUiProvider>
  *   );
  * }
  * ```
