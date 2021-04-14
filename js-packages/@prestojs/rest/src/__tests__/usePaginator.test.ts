@@ -1,6 +1,7 @@
 import { UrlPattern } from '@prestojs/routing';
 import { InferredPaginator, PageNumberPaginator, usePaginator } from '@prestojs/util';
-import { PaginatorClassProvider } from '@prestojs/util/build/module/pagination/usePaginator';
+import { PaginatorClassProvider } from '@prestojs/util/pagination/usePaginator';
+
 import { act, renderHook } from '@testing-library/react-hooks';
 import Endpoint from '../Endpoint';
 import paginationMiddleware from '../paginationMiddleware';

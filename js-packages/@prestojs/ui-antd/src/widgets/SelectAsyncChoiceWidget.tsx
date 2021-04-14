@@ -8,10 +8,13 @@ import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } 
 
 type ValueType<T> = T[] | T | null;
 
-type SelectInputProps<T> = InputProps<ValueType<T>, HTMLSelectElement> & {
+type SelectInputProps<T> = Omit<
+    InputProps<ValueType<T>, HTMLSelectElement>,
+    'onBlur' | 'onFocus'
+> & {
     // Types in antd require event. Our types don't because final-form doesn't.
-    onBlur: (event: React.FocusEvent<HTMLSelectElement>) => void;
-    onFocus: (event: React.FocusEvent<HTMLSelectElement>) => void;
+    onBlur?: (event: React.FocusEvent<HTMLSelectElement>) => void;
+    onFocus?: (event: React.FocusEvent<HTMLSelectElement>) => void;
 };
 
 /**
@@ -21,7 +24,7 @@ type SelectInputProps<T> = InputProps<ValueType<T>, HTMLSelectElement> & {
  * @hide-properties meta
  */
 export type SelectAsyncChoiceProps<T> = SelectProps<ValueType<T>> &
-    Omit<WidgetProps<ValueType<T>, HTMLSelectElement>, 'choices' | 'asyncChoices'> & {
+    Omit<WidgetProps<ValueType<T>, HTMLSelectElement>, 'input' | 'choices' | 'asyncChoices'> & {
         /**
          * The [AsyncChoices](doc:AsyncChoicesInterface) instance to use.
          */
