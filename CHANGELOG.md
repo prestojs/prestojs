@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.0.15] - 2021-04-14
+
+### Changed
+
+The structure of the published packages has changed with this release. Previously it looked like:
+
+* `build/module` - ESM build
+* `build/cjs` - commonjs build
+
+Now the ESM build appears in the root and commonjs in immediate `cjs` sub directory.
+
+If you only ever imported directly from the package root (eg. `import { UiProvider } from '@prestojs/ui'`) then no changes are required.
+
+Otherwise change any imports of the form:
+
+* `'@prestojs/<package>/build/module/<module>'` to `'@prestojs/<package>/<module>'`
+* `'@prestojs/<package>/build/cjs/<module>'` to `'@prestojs/<package>/cjs/<module>'`
+
 ## [0.0.14] - 2021-04-12
 
 ### Added
