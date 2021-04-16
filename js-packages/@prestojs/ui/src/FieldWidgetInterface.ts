@@ -70,7 +70,9 @@ export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {
     /**
      * the input coming from form; `value` and `onChange` of it is used by the RangedWidget.
      */
-    input: InputProps<FieldValue, T> & { value?: Record<string, FieldValue> };
+    input: InputProps<FieldValue, T> & {
+        value?: { lower?: FieldValue; upper?: FieldValue; bound?: string };
+    };
     /**
      * Separator between two Input elements; defaults to `-`.
      */
