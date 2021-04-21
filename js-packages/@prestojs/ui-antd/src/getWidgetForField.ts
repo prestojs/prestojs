@@ -106,8 +106,12 @@ export default function getWidgetForField<
         if (clsName === 'ListField') {
             if (field.choices) {
                 return React.lazy(() => import('./widgets/SelectChoiceWidget'));
-            } else {
+            } else if (field.asyncChoices) {
                 return React.lazy(() => import('./widgets/SelectAsyncChoiceWidget'));
+            } else {
+                throw new Error(
+                    `${field} is a ListField without either choices or asyncChoices. This is not yet supported.`
+                );
             }
         } else if (field.choices || field.asyncChoices) {
             return choicesMapping.get(clsName) || mapping.get(clsName);
