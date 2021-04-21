@@ -20,6 +20,7 @@ function DateTimeRangeWidget(
         lowerInput,
         upperInput,
         separator,
+        meta,
         ...rest
     }: RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>,
     ref: React.RefObject<DatePickerProps>

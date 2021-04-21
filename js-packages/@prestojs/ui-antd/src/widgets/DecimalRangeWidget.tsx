@@ -19,7 +19,7 @@ function DecimalRangeWidget(
     props: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
     ref: React.RefObject<typeof InputNumber>
 ): React.ReactElement {
-    const { lowerInput = {}, upperInput = {}, separator, input, ...rest } = props;
+    const { lowerInput = {}, upperInput = {}, separator, input, meta, ...rest } = props;
     const { value } = input;
 
     const valueNumLower: number | null | undefined =

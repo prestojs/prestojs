@@ -27,7 +27,7 @@ type CharChoicesWidgetProps = WidgetProps<string, HTMLElement> & {
  * @forward-ref
  */
 function CharChoicesWidget(props: CharChoicesWidgetProps, ref: any): React.ReactElement {
-    const { widgetType, asyncChoices, ...rest } = props;
+    const { widgetType, asyncChoices, meta, ...rest } = props;
     if (asyncChoices) {
         return <SelectAsyncChoiceWidget ref={ref} asyncChoices={asyncChoices} {...rest} />;
     }

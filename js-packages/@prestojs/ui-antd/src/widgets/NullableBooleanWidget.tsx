@@ -23,7 +23,7 @@ type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElemen
  * @forward-ref
  */
 function NullableBooleanWidget(props: NullableBooleanWidgetProps, ref): React.ReactElement {
-    const { choices, blankLabel = 'Undecided', ...rest } = props;
+    const { choices, blankLabel = 'Undecided', meta, ...rest } = props;
     const defaultChoices =
         choices ||
         new Map([

@@ -352,6 +352,7 @@ function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): Reac
         listType = 'text',
         limit = 1,
         multiple = limit !== 1,
+        meta,
         ...rest
     } = props;
     const { value, onChange } = input;

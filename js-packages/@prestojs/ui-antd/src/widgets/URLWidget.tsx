@@ -16,7 +16,7 @@ type URLWidgetProps = WidgetProps<string, HTMLInputElement>;
  * @forward-ref
  */
 function URLWidget(props: URLWidgetProps, ref: React.RefObject<Input>): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;
 }
 

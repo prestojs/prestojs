@@ -19,7 +19,7 @@ function DateRangeWidget(
     props: RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>,
     ref: React.RefObject<DatePickerProps>
 ): React.ReactElement {
-    const { lowerInput, upperInput, separator, ...rest } = props;
+    const { lowerInput, upperInput, separator, meta, ...rest } = props;
     const { format: formatLower = 'MMMM Do YYYY', ...restLower } = lowerInput || {};
     const { format: formatUpper = 'MMMM Do YYYY', ...restUpper } = upperInput || {};
     const DatePicker = useAntdUiConfig().getDatePicker();

@@ -18,7 +18,7 @@ function IPAddressWidget(
     props: IPAddressWidgetProps,
     ref: React.RefObject<Input>
 ): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;
 }
 
