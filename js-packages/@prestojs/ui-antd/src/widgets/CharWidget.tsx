@@ -6,11 +6,9 @@ import React from 'react';
  * @expand-properties
  * @hide-properties choices asyncChoices
  */
-type CharWidgetProps = WidgetProps<string, HTMLInputElement> & { type?: string };
+type CharWidgetProps = WidgetProps<string, HTMLInputElement>;
 
 /**
- *
- * To use Input.Password, pass a type="password" to your widget
  *
  * See [Input](https://ant.design/components/input/) for props available
  *
@@ -19,11 +17,8 @@ type CharWidgetProps = WidgetProps<string, HTMLInputElement> & { type?: string }
  * @forward-ref
  */
 function CharWidget(props: CharWidgetProps, ref: React.RefObject<Input>): React.ReactElement {
-    const { input, meta, type, ...rest } = props;
-    if (type === 'password') {
-        return <Input.Password ref={ref} {...input} {...rest} />;
-    }
-    return <Input ref={ref} {...type?{type}:{}} {...input} {...rest} />;
+    const { input, meta, ...rest } = props;
+    return <Input ref={ref} {...input} {...rest} />;
 }
 
 export default React.forwardRef(CharWidget);

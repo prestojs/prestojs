@@ -25,6 +25,7 @@ export { default as IPAddressWidget } from './widgets/IPAddressWidget';
 export { default as JsonWidget } from './widgets/JsonWidget';
 export { default as NullableBooleanWidget } from './widgets/NullableBooleanWidget';
 export { default as NumberWidget } from './widgets/NumberWidget';
+export { default as PasswordWidget } from './widgets/PasswordWidget';
 export { default as RadioChoiceWidget } from './widgets/RadioChoiceWidget';
 export { default as RangeWidget } from './widgets/RangeWidget';
 export { default as SelectChoiceWidget } from './widgets/SelectChoiceWidget';

@@ -25,6 +25,7 @@ const mapping = new Map<string, FieldWidgetType<any, any>>([
     ['JsonField', React.lazy(() => import('./widgets/JsonWidget'))],
     ['NumberField', React.lazy(() => import('./widgets/NumberWidget'))],
     ['NullableBooleanField', React.lazy(() => import('./widgets/NullableBooleanWidget'))],
+    ['PasswordField', React.lazy(() => import('./widgets/PasswordWidget'))],
     ['SlugField', React.lazy(() => import('./widgets/SlugWidget'))],
     ['TextField', React.lazy(() => import('./widgets/TextWidget'))],
     ['TimeField', React.lazy(() => import('./widgets/TimeWidget'))],

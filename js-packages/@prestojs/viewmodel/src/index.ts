@@ -22,6 +22,7 @@ export { default as IPAddressField } from './fields/IPAddressField';
 export { default as NullableBooleanField } from './fields/NullableBooleanField';
 export { default as JsonField } from './fields/JsonField';
 export { default as NumberField } from './fields/NumberField';
+export { default as PasswordField } from './fields/PasswordField';
 export { default as SlugField } from './fields/SlugField';
 export { default as TextField } from './fields/TextField';
 export { default as TimeField } from './fields/TimeField';
