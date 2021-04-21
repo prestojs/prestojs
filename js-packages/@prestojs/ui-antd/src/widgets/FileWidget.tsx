@@ -2,8 +2,8 @@ import { EditOutlined, InboxOutlined, PlusOutlined, UploadOutlined } from '@ant-
 import { InputProps, WidgetProps } from '@prestojs/ui';
 import { isPromise } from '@prestojs/util';
 import { Button, Upload } from 'antd';
-import { UploadFileStatus } from 'antd/es/upload/interface';
-import { RcFile, UploadFile, UploadProps } from 'antd/lib/upload/interface';
+import type { RcFile, UploadFile, UploadFileStatus, UploadProps } from 'antd/es/upload/interface';
+import { file2Obj } from 'antd/lib/upload/utils';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 type UploadWidgetInputType = Omit<
@@ -69,16 +69,15 @@ type FileLike = Blob | File | RcFile | string;
 export async function blobToUploadFile(uid: string, name: string, blob: Blob): Promise<UploadFile> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.addEventListener('load', () =>
-            resolve({
+        reader.addEventListener('load', () => {
+            const rcFile = Object.assign(blob as RcFile, {
                 uid,
-                name,
-                size: blob.size,
-                type: blob.type,
-                thumbUrl: reader.result as string,
-                originFileObj: blob as RcFile,
-            })
-        );
+            });
+            const uploadFile = file2Obj(rcFile);
+            uploadFile.thumbUrl = reader.result as string;
+            uploadFile.name = name;
+            resolve(uploadFile);
+        });
         reader.addEventListener('error', error => reject(error));
         try {
             reader.readAsDataURL(blob);
@@ -207,23 +206,9 @@ export function useFileList(
                             const uid = value;
                             const name = value.split('/').pop() || value;
                             const fakeFile = Object.assign(new File([], name), {
-                                url: value,
                                 uid: uid,
-                                lastModifiedDate: new Date(),
-                            });
-                            uploadFile = {
-                                // Set uid to the string which is the current file path
-                                // Not guaranteed to be unique if the same file uploaded multiple
-                                // times but other things will break anyway (eg. removing files
-                                // won't be able to identify which file to remove).
-                                // This allows us to match up values passed into FileWidget with
-                                // the internal representation we pass to UploadFile
-                                uid,
-                                name,
-                                size: 0,
-                                type: '',
-                                originFileObj: fakeFile,
-                            };
+                            }) as RcFile;
+                            uploadFile = file2Obj(fakeFile);
                             if (previewImage) {
                                 promises.push(generatePreview(value, uploadFile));
                             }
@@ -239,20 +224,15 @@ export function useFileList(
                             // set it to `uid` so things continue to work (preview may not work properly).
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
-                            let name = value.name;
-                            if (!name) {
+                            uploadFile = file2Obj(
+                                Object.assign(value as RcFile, { uid: valueUid })
+                            );
+                            if (!(value as RcFile).name) {
                                 console.warn(
                                     'No name set for uploaded file. Consider adding a `name` property if passing a `Blob`.'
                                 );
-                                name = `${valueUid}`;
+                                uploadFile.name = `${valueUid}`;
                             }
-                            uploadFile = {
-                                uid: valueUid,
-                                name,
-                                size: value.size,
-                                type: value.type,
-                                originFileObj: value as RcFile,
-                            };
                             if (previewImage) {
                                 promises.push(generatePreview(value, uploadFile));
                             }
