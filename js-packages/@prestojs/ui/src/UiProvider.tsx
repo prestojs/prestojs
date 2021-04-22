@@ -103,37 +103,52 @@ export type UiProviderProps = {
  * UiProvider is used to supply the UI library specific widgets, formatters, form components etc that are used
  * throughout the system.
  *
- * For example to use with ui-antd (install `@prestojs/ui-antd` and `antd`):
+ * To use with `@prestojs/ui-antd` see [AntdUiProvider](doc:AntdUiProvider).
  *
  * ```jsx
  * import React from 'react';
- * import { UiProvider } from '@prestojs/ui';
+ * import { UiProvider, getFormatterForField } from '@prestojs/ui';
  * import { Input } from 'antd';
- * import {
- *   FormWrapper,
- *   getWidgetForField as antdGetWidgetForField,
- *   FormItemWrapper,
- * } from '@prestojs/ui-antd';
  *
- * const DefaultWidget = ({ input }) => <Input {...input} />;
+ * const DefaultWidget = ({ input }) => <input {...input} />;
+ * const DefaultFormatter = ({ value }) => value;
  *
  * function getWidgetForField(field) {
- *   const widget = antdGetWidgetForField(field);
- *   // If ui-antd doesn't provide a widget fall back to a default
- *   // You can add your own customisations here too (eg. override widgets
- *   // for specific fields or add support for new fields)
- *   if (!widget) {
- *     return DefaultWidget;
- *   }
- *   return widget;
+ *    // Add any app specific customisations here, eg
+ *    // if (field instanceof BooleanField) {
+ *    //    return CustomBooleanWidget;
+ *    // }
+ *    // Otherwise return default widget. If you would prefer an error if no explicit widget defined for
+ *    // a field then don't return anything.
+ *    return DefaultWidget;
+ * }
+ *
+ * function getFormatterForField(field) {
+ *     // Add any app specific customisations here, eg
+ *     // if (field instanceof BooleanField) {
+ *     //    return CustomBooleanFormatter;
+ *     // }
+ *     return DefaultFormatter;
+ * }
+ *
+ * function FormItemWrapper({ children, label, help, required }) {
+ *     return (
+ *         <div>
+ *             <label>
+ *                 {label} {children}
+ *             </label>
+ *             {required ? '(required)' : '(optional)'}
+ *             {help && <span className="help">{help}</span>}
+ *         </div>
+ *     );
  * }
  *
  * export default function Root() {
  *   return (
  *     <UiProvider
+ *       getFormatterForField={getFormatterForField}
  *       getWidgetForField={getWidgetForField}
  *       formItemComponent={FormItemWrapper}
- *       formComponent={FormWrapper}
  *     >
  *        <YourApp />
  *     </UiProvider>

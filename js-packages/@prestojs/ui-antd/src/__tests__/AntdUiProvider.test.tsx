@@ -3,7 +3,6 @@ import { FieldWidgetType, useUi, WidgetProps } from '@prestojs/ui';
 import { Field } from '@prestojs/viewmodel';
 import { render } from '@testing-library/react';
 import React from 'react';
-
 import AntdUiProvider, { useAntdUiConfig } from '../AntdUiProvider';
 
 function TestDatePicker(): React.ReactElement {

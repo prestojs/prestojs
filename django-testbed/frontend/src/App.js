@@ -1,15 +1,17 @@
-import { AntdUiProvider } from '@prestojs/ui-antd';
+import { getFormatterForField } from '@prestojs/ui';
+import { AntdUiProvider, FormItemWrapper, FormWrapper, getWidgetForField } from '@prestojs/ui-antd';
 import { mount, redirect, route } from 'navi';
 import React from 'react';
 import { Router, View } from 'react-navi';
 import { SWRConfig } from 'swr';
 
-import DatePicker from './DatePicker';
-
 // eslint-disable-next-line import/extensions
 import './styles/global.less?no-css-modules';
-import TimePicker from './TimePicker';
+
 import UserListView from './views/UserListView';
+
+const DatePicker = React.lazy(() => import('./DatePicker'));
+const TimePicker = React.lazy(() => import('./TimePicker'));
 
 const routes = mount({
     '/': redirect('/users/'),
@@ -22,7 +24,14 @@ const routes = mount({
 export default function App() {
     return (
         <React.Suspense fallback={<div>Loading...</div>}>
-            <AntdUiProvider datePickerComponent={DatePicker} timePickerComponent={TimePicker}>
+            <AntdUiProvider
+                datePickerComponent={DatePicker}
+                timePickerComponent={TimePicker}
+                getFormatterForField={getFormatterForField}
+                getWidgetForField={getWidgetForField}
+                formItemComponent={FormItemWrapper}
+                formComponent={FormWrapper}
+            >
                 <SWRConfig>
                     <Router routes={routes}>
                         <View />
