@@ -7,15 +7,15 @@
 .docs hr {
     @apply my-10;
 }
-.docs blockquote {
+.docs blockquote, .mdx blockquote  {
     background-color: #fffbe6;
     border-left: 4px solid #ffe58f;
     @apply py-4 pl-6 pr-3 -mx-5 my-5;
 }
-.docs blockquote:first-child {
+.docs blockquote:first-child, .mdx blockquote:first-child  {
     @apply m-0;
 }
-.docs blockquote p {
+.docs blockquote p, .mdx blockquote p {
     @apply mt-1;
 }
 .docs ul {

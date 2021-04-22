@@ -39,25 +39,34 @@ export default function ReturnType({ signature }) {
             <AnchorLink id="return-type" Component="div" className="text-xl">
                 Returns
             </AnchorLink>
-            {returnTypes.length > 1 && <p className="my-5">One of the following:</p>}
-            {returnTypes.map(([type, c], i) => {
-                let isConstructor = classTypeNames.includes(type.name);
-                if (c) {
-                    // Don't expand properties for these... kind of weird when this happens when
-                    // the returned value is a class
-                    isConstructor =
-                        isConstructor || c.filter(({ name }) => name === 'constructor').length > 0;
-                }
-                return (
-                    <React.Fragment key={i}>
-                        <TypeDesc type={type} />
-                        {!isConstructor && c && (
-                            <ParameterTable parameters={c} nameHeader="Key" isReturnType />
-                        )}
-                        {i !== returnTypes.length - 1 && <p className="my-10 text-center">OR</p>}
-                    </React.Fragment>
-                );
-            })}
+            {signature.comment?.tagsByName?.['return-type-name'] ? (
+                <p className="text-blue-400">{signature.comment.tagsByName['return-type-name']}</p>
+            ) : (
+                <>
+                    {returnTypes.length > 1 && <p className="my-5">One of the following:</p>}
+                    {returnTypes.map(([type, c], i) => {
+                        let isConstructor = classTypeNames.includes(type.name);
+                        if (c) {
+                            // Don't expand properties for these... kind of weird when this happens when
+                            // the returned value is a class
+                            isConstructor =
+                                isConstructor ||
+                                c.filter(({ name }) => name === 'constructor').length > 0;
+                        }
+                        return (
+                            <React.Fragment key={i}>
+                                <TypeDesc type={type} />
+                                {!isConstructor && c && (
+                                    <ParameterTable parameters={c} nameHeader="Key" isReturnType />
+                                )}
+                                {i !== returnTypes.length - 1 && (
+                                    <p className="my-10 text-center">OR</p>
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
+                </>
+            )}
             {signature.mdxReturns && <MdxWrapper mdx={signature.mdxReturns} />}
         </div>
     );
