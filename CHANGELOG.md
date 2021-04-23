@@ -12,6 +12,7 @@
 * [getWidgetForField](https://prestojs.com/docs/ui-antd/getWidgetForField/#main-content) handles [ListField](https://prestojs.com/docs/viewmodel/fields/ListField/#main-content) with `asyncChoices` or `choices`. Will currently throw for other types of `ListField`.
 * Avoid passing through `meta` to widgets in `@prestojs/ui-antd`. This avoids having invalid `meta` prop set on DOM elements.
 * [FileWidget](https://prestojs.com/docs/ui-antd/widgets/FileWidget) had a bug that would break in some browsers when loading an initial value. This has been resolved.
+* Removed defaults for `getFormatterForField`, `getWidgetForField`, `formItemComponent` and `formComponent` from [AntdUiProvider](https://prestojs.com/docs/ui-antd/AntdUiProvider/). You must explicitly pass these now.
 
 ## [0.0.15] - 2021-04-14
 
