@@ -1,8 +1,9 @@
 import { RangedWidgetProps } from '@prestojs/ui';
 import { DatePickerProps } from 'antd/lib/date-picker';
 import React from 'react';
-import RangeWidget from './RangeWidget';
+
 import { useAntdUiConfig } from '../AntdUiProvider';
+import RangeWidget from './RangeWidget';
 
 /**
  * See [DatePicker](https://ant.design/components/date-picker/) for props available

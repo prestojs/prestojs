@@ -23,6 +23,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     -   `@menu-group` - This nests this item under this menu name. If not specified appears ungrouped under the package name.
     -   `@doc-class` - Specify what documentation component class to use. If not specified defaults based on type.
     -   `@forward-ref` - Indicate this function is used as a React.forwardRef. This allows doc site renderer to not document second `ref` parameter to the function as you don't pass it in yourself.
+    -   `@return-type-name` - Override the inferred returned type and display this text instead. Useful when the inferred type is more confusing than helpful.
     
 ### Codesandbox
 
