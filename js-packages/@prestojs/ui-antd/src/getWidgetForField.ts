@@ -107,6 +107,8 @@ export default function getWidgetForField<
             if (field.choices) {
                 return React.lazy(() => import('./widgets/SelectChoiceWidget'));
             } else if (field.asyncChoices) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 return React.lazy(() => import('./widgets/SelectAsyncChoiceWidget'));
             } else {
                 throw new Error(

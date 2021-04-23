@@ -10,6 +10,7 @@ export { default as DateRangeField } from './fields/DateRangeField';
 export { default as DateTimeField } from './fields/DateTimeField';
 export { default as DateTimeRangeField } from './fields/DateTimeRangeField';
 export { default as DecimalField } from './fields/DecimalField';
+export { default as DecimalRangeField } from './fields/DecimalRangeField';
 export { default as DurationField } from './fields/DurationField';
 export { default as EmailField } from './fields/EmailField';
 export { default as FileField } from './fields/FileField';

@@ -7,6 +7,7 @@ export { default as DateRangeWidget } from './widgets/DateRangeWidget';
 export { default as DateTimeWidget } from './widgets/DateTimeWidget';
 export { default as DateTimeRangeWidget } from './widgets/DateTimeRangeWidget';
 export { default as DecimalWidget } from './widgets/DecimalWidget';
+export { default as DecimalRangeWidget } from './widgets/DecimalRangeWidget';
 export { default as DurationWidget } from './widgets/DurationWidget';
 export { default as EmailWidget } from './widgets/EmailWidget';
 export {
