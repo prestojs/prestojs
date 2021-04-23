@@ -16,7 +16,7 @@ type BooleanWidgetProps = WidgetProps<boolean, HTMLInputElement>;
  * @forward-ref
  */
 function BooleanWidget(props: BooleanWidgetProps, ref): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     const { value, ...restInput } = input;
     return <Checkbox ref={ref} checked={!!value} {...restInput} {...rest} />;
 }

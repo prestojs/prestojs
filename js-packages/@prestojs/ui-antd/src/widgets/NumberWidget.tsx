@@ -19,7 +19,7 @@ function NumberWidget(
     props: NumberWidgetProps,
     ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <InputNumber ref={ref} {...input} {...rest} />;
 }
 

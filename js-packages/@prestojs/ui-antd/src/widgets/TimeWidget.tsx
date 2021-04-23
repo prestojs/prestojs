@@ -20,7 +20,7 @@ type TimeWidgetProps = WidgetProps<string, HTMLInputElement> & { input: TimePick
 // ref as RefObject any cause TimePicker's merged as a value in antd unlike any other
 function TimeWidget(props: TimeWidgetProps, ref: React.RefObject<any>): React.ReactElement {
     const TimePicker = useAntdUiConfig().getTimePicker();
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
 
     return <TimePicker ref={ref} {...input} {...rest} />;
 }

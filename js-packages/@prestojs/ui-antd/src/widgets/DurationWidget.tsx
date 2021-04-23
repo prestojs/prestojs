@@ -16,7 +16,7 @@ type DurationWidgetProps = WidgetProps<string, HTMLInputElement>;
  * @forward-ref
  */
 function DurationWidget(props: DurationWidgetProps, ref: React.RefObject<any>): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;
 }
 

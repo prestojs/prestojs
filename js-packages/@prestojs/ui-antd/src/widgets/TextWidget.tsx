@@ -16,7 +16,7 @@ type TextWidgetProps = WidgetProps<string, HTMLTextAreaElement>;
  * @forward-ref
  */
 function TextWidget(props: TextWidgetProps, ref): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <Input.TextArea ref={ref} {...input} {...rest} />;
 }
 

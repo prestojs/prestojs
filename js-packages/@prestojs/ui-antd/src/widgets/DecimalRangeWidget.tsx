@@ -15,11 +15,27 @@ import RangeWidget from './RangeWidget';
  * @menu-group Widgets
  * @forward-ref
  */
-function FloatRangeWidget(
+function DecimalRangeWidget(
     props: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
     ref: React.RefObject<typeof InputNumber>
 ): React.ReactElement {
-    const { lowerInput={}, upperInput={}, separator, meta, ...rest } = props;
+    const { lowerInput = {}, upperInput = {}, separator, input, meta, ...rest } = props;
+    const { value } = input;
+
+    const valueNumLower: number | null | undefined =
+        value?.lower === undefined || value?.lower === null
+            ? input.value?.lower
+            : Number(value.lower);
+    const valueNumUpper: number | null | undefined =
+        value?.upper === undefined || value?.upper === null
+            ? input.value?.upper
+            : Number(value.upper);
+
+    const refinedInput = {
+        ...input,
+        value: { lower: valueNumLower, upper: valueNumUpper, bound: value?.bound },
+    };
+
     return (
         <RangeWidget
             ref={ref}
@@ -27,9 +43,10 @@ function FloatRangeWidget(
             upperInput={upperInput}
             separator={separator}
             inputWidget={InputNumber}
+            input={refinedInput}
             {...rest}
         />
     );
 }
 
-export default React.forwardRef(FloatRangeWidget);
+export default React.forwardRef(DecimalRangeWidget);

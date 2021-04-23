@@ -16,7 +16,7 @@ type SlugWidgetProps = WidgetProps<string, HTMLInputElement>;
  * @forward-ref
  */
 function SlugWidget(props: SlugWidgetProps, ref: React.RefObject<Input>): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;
 }
 

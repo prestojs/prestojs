@@ -19,7 +19,7 @@ function FloatWidget(
     props: FloatWidgetProps,
     ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <InputNumber ref={ref} {...input} {...rest} />;
 }
 

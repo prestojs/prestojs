@@ -19,7 +19,7 @@ function IntegerWidget(
     props: IntegerWidgetProps,
     ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <InputNumber ref={ref} {...rest} {...input} />;
 }
 

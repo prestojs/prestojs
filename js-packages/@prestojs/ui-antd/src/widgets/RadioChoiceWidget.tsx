@@ -16,7 +16,7 @@ type RadioChoicesWidgetProps = WidgetProps<number | string, HTMLInputElement>;
  * @forward-ref
  */
 function RadioChoiceWidget(props: RadioChoicesWidgetProps): React.ReactElement {
-    const { input, choices, ...rest } = props;
+    const { input, choices, meta, ...rest } = props;
     return (
         <Radio.Group {...input} {...rest}>
             {choices &&

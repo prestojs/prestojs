@@ -16,7 +16,7 @@ type EmailWidgetProps = WidgetProps<string, HTMLInputElement>;
  * @forward-ref
  */
 function EmailWidget(props: EmailWidgetProps, ref: React.RefObject<Input>): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;
 }
 

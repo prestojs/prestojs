@@ -18,7 +18,7 @@ type JsonWidgetProps = WidgetProps<string, HTMLTextAreaElement>;
  * @forward-ref
  */
 function JsonWidget(props: JsonWidgetProps, ref): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <Input.TextArea ref={ref} {...input} {...rest} />;
 }
 

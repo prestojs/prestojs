@@ -15,7 +15,7 @@ type UUIDWidgetProps = WidgetProps<string, HTMLInputElement>;
  * @forward-ref
  */
 function UUIDWidget(props: UUIDWidgetProps, ref: React.RefObject<Input>): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;
 }
 

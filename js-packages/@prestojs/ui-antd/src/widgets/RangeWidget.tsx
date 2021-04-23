@@ -24,6 +24,7 @@ function RangeWidget<FieldValue, T extends HTMLElement, P>(
         inputWidget: InputWidget,
         input: { value = {} as Record<string, FieldValue>, onChange },
         className,
+        meta,
     } = props;
     const { lowerRef, upperRef } = ref || {};
     return (

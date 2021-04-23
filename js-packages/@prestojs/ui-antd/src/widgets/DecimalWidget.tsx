@@ -19,7 +19,7 @@ function DecimalWidget(
     props: DecimalWidgetProps,
     ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     const { value, ...restInput } = input;
     const valueNum: number | null | undefined =
         value === undefined || value === null ? value : Number(value);

@@ -9,6 +9,7 @@ import React from 'react';
 type CharWidgetProps = WidgetProps<string, HTMLInputElement>;
 
 /**
+ *
  * See [Input](https://ant.design/components/input/) for props available
  *
  * @extract-docs
@@ -16,7 +17,7 @@ type CharWidgetProps = WidgetProps<string, HTMLInputElement>;
  * @forward-ref
  */
 function CharWidget(props: CharWidgetProps, ref: React.RefObject<Input>): React.ReactElement {
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;
 }
 

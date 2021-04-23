@@ -12,6 +12,7 @@ const mapping = new Map<string, FieldWidgetType<any, any>>([
     ['DateTimeField', React.lazy(() => import('./widgets/DateTimeWidget'))],
     ['DateTimeRangeField', React.lazy(() => import('./widgets/DateTimeRangeWidget'))],
     ['DecimalField', React.lazy(() => import('./widgets/DecimalWidget'))],
+    ['DecimalRangeField', React.lazy(() => import('./widgets/DecimalRangeWidget'))],
     ['DurationField', React.lazy(() => import('./widgets/DurationWidget'))],
     ['EmailField', React.lazy(() => import('./widgets/EmailWidget'))],
     ['FileField', React.lazy(() => import('./widgets/FileWidget'))],
@@ -24,6 +25,7 @@ const mapping = new Map<string, FieldWidgetType<any, any>>([
     ['JsonField', React.lazy(() => import('./widgets/JsonWidget'))],
     ['NumberField', React.lazy(() => import('./widgets/NumberWidget'))],
     ['NullableBooleanField', React.lazy(() => import('./widgets/NullableBooleanWidget'))],
+    ['PasswordField', React.lazy(() => import('./widgets/PasswordWidget'))],
     ['SlugField', React.lazy(() => import('./widgets/SlugWidget'))],
     ['TextField', React.lazy(() => import('./widgets/TextWidget'))],
     ['TimeField', React.lazy(() => import('./widgets/TimeWidget'))],
@@ -35,6 +37,7 @@ const mapping = new Map<string, FieldWidgetType<any, any>>([
 const choicesMapping = new Map<string, FieldWidgetType<any, any>>([
     ['CharField', React.lazy(() => import('./widgets/CharChoicesWidget'))],
     ['IntegerField', React.lazy(() => import('./widgets/IntegerChoicesWidget'))],
+    ['ListField', React.lazy(() => import('./widgets/SelectChoiceWidget'))],
 ]);
 
 /**
@@ -99,10 +102,25 @@ export default function getWidgetForField<
     | null {
     const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     // Couldn't work out what to type this as so field.constructor was accepted
-    const widget: FieldWidgetType<any, any> | null | undefined =
-        field.choices || field.asyncChoices
-            ? choicesMapping.get(fieldClassName) || mapping.get(fieldClassName)
-            : mapping.get(fieldClassName);
+    const getWidget = (clsName: string): FieldWidgetType<any, any> | null | undefined => {
+        if (clsName === 'ListField') {
+            if (field.choices) {
+                return React.lazy(() => import('./widgets/SelectChoiceWidget'));
+            } else if (field.asyncChoices) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                return React.lazy(() => import('./widgets/SelectAsyncChoiceWidget'));
+            } else {
+                throw new Error(
+                    `${field} is a ListField without either choices or asyncChoices. This is not yet supported.`
+                );
+            }
+        } else if (field.choices || field.asyncChoices) {
+            return choicesMapping.get(clsName) || mapping.get(clsName);
+        }
+        return mapping.get(clsName);
+    };
+    const widget = getWidget(fieldClassName);
 
     const getReturnWithChoices = (
         w,
@@ -128,10 +146,7 @@ export default function getWidgetForField<
     // if no match can be found check prototypes
     let f = Object.getPrototypeOf(field.constructor);
     do {
-        const widgetF: FieldWidgetType<any, any> | null | undefined =
-            field.choices || field.asyncChoices
-                ? choicesMapping.get(f.fieldClassName) || mapping.get(f.fieldClassName)
-                : mapping.get(f.fieldClassName);
+        const widgetF = getWidget(f.fieldClassName);
         if (widgetF) {
             return getReturnWithChoices(widgetF, field);
         }

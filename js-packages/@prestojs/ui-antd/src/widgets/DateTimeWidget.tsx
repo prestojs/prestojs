@@ -22,7 +22,7 @@ function DateTimeWidget(
     ref: React.RefObject<React.ClassicComponent<DatePickerProps, any>>
 ): React.ReactElement {
     const DatePicker = useAntdUiConfig().getDatePicker();
-    const { input, ...rest } = props;
+    const { input, meta, ...rest } = props;
     const { format = 'MMMM Do YYYY, h:mm a', ...restInput } = input;
     // antd 4.0.0-rc5 has a bug in DatePickerProps in that it does not have showTime taking boolean as type atm (object only)
     // revisit to see if we still need this ignore once its released
