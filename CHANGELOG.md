@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+* Add [PasswordField](https://prestojs.com/docs/viewmodel/fields/PasswordField/) and [PasswordWidget](https://prestojs.com/docs/ui-antd/widgets/PasswordWidget/)
+* Add [DecimalRangeField](https://prestojs.com/docs/viewmodel/fields/DecimalRangeField/) [DecimalRangeWidget](https://prestojs.com/docs/ui-antd/widgets/DecimalRangeWidget/) 
+
+### Changed
+
+* [getWidgetForField](https://prestojs.com/docs/ui-antd/getWidgetForField/#main-content) handles [ListField](https://prestojs.com/docs/viewmodel/fields/ListField/#main-content) with `asyncChoices` or `choices`. Will currently throw for other types of `ListField`.
+* Avoid passing through `meta` to widgets in `@prestojs/ui-antd`. This avoids having invalid `meta` prop set on DOM elements.
+
 ## [0.0.15] - 2021-04-14
 
 ### Changed
