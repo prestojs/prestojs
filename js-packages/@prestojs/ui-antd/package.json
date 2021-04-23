@@ -8,10 +8,11 @@
   "sideEffects": false,
   "scripts": {
     "build:declaration": "tsc --project tsconfig.json --outDir build && tsc --project tsconfig.json --outDir build/cjs",
+    "build:css": "yarn lessc --js ./src/styles.less ./build/styles.css && cp build/styles.css build/cjs/styles.css",
     "publish:build": "cd build && npm publish",
     "prepublishOnly": "echo \"Publish should be run in build directory\" && exit 1",
     "build:packagejson": "node ../../../bin/generate-packagejson.js ./ ./build",
-    "build": "yarn build:esmodule && yarn build:commonjs && yarn build:declaration && yarn build:packagejson",
+    "build": "yarn build:esmodule && yarn build:commonjs && yarn build:declaration && yarn build:packagejson && yarn build:css",
     "build:esmodule": "BABEL_MODULES=esmodule BABEL_ENV=build babel src --root-mode upward --out-dir build --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-copy-ignored --copy-files",
     "build:commonjs": "BABEL_MODULES=commonjs BABEL_ENV=build babel src --root-mode upward --out-dir build/cjs --source-maps --extensions .ts,.tsx --delete-dir-on-start --no-copy-ignored --copy-files",
     "build:watch": "yarn build:esmodule --watch",
