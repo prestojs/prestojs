@@ -6,7 +6,7 @@ type PasswordWidgetProps = WidgetProps<string, HTMLInputElement>;
 
 /**
  *
- * See [Input](https://ant.design/components/input/) for props available
+ * See [Input.Password](https://ant.design/components/input/) for props available
  *
  * @extract-docs
  * @menu-group Widgets
