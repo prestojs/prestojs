@@ -1,6 +1,6 @@
 {
   "name": "@prestojs/final-form",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "license": "MIT",
   "typings": "build/index.d.ts",
   "main": "build/cjs/index.js",
