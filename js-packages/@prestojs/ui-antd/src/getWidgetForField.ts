@@ -1,4 +1,5 @@
 import { FieldWidgetType } from '@prestojs/ui';
+import type { ListField } from '@prestojs/viewmodel';
 import { Field } from '@prestojs/viewmodel';
 import React from 'react';
 
@@ -37,8 +38,23 @@ const mapping = new Map<string, FieldWidgetType<any, any>>([
 const choicesMapping = new Map<string, FieldWidgetType<any, any>>([
     ['CharField', React.lazy(() => import('./widgets/CharChoicesWidget'))],
     ['IntegerField', React.lazy(() => import('./widgets/IntegerChoicesWidget'))],
-    ['ListField', React.lazy(() => import('./widgets/SelectChoiceWidget'))],
 ]);
+
+function splitWidgetAndProps(
+    maybeWidgetAndProps:
+        | null
+        | undefined
+        | FieldWidgetType<any, any>
+        | [FieldWidgetType<any, any>, Record<string, unknown>]
+): [FieldWidgetType<any, any> | null, Record<string, unknown>] {
+    if (!maybeWidgetAndProps) {
+        return [null, {}];
+    }
+    if (Array.isArray(maybeWidgetAndProps)) {
+        return maybeWidgetAndProps;
+    }
+    return [maybeWidgetAndProps, {}];
+}
 
 /**
  * Returns the default widget to use for any given Field. This is the glue between the
@@ -107,55 +123,79 @@ export default function getWidgetForField<
     | FieldWidgetType<FieldValue, T>
     | [FieldWidgetType<FieldValue, T>, Record<string, unknown>]
     | null {
-    const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     // Couldn't work out what to type this as so field.constructor was accepted
-    const getWidget = (clsName: string): FieldWidgetType<any, any> | null | undefined => {
-        if (clsName === 'ListField') {
-            if (field.choices) {
-                return React.lazy(() => import('./widgets/SelectChoiceWidget'));
-            } else if (field.asyncChoices) {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                return React.lazy(() => import('./widgets/SelectAsyncChoiceWidget'));
-            } else {
-                throw new Error(
-                    `${field} is a ListField without either choices or asyncChoices. This is not yet supported.`
-                );
-            }
-        } else if (field.choices || field.asyncChoices) {
-            return choicesMapping.get(clsName) || mapping.get(clsName);
+    const getWidget = (
+        _field: Field<FieldValue, ParsableValueT, SingleValueT>
+    ):
+        | FieldWidgetType<any, any>
+        | null
+        | undefined
+        | [FieldWidgetType<any, any>, Record<string, unknown>] => {
+        const { fieldClassName } = Object.getPrototypeOf(_field).constructor;
+        let widget:
+            | undefined
+            | FieldWidgetType<any, any>
+            | [FieldWidgetType<any, any>, Record<string, unknown>];
+        if (fieldClassName === 'ListField' && !(_field.choices || _field.asyncChoices)) {
+            throw new Error(
+                `${_field} is a ListField without either choices or asyncChoices. This is not yet supported.`
+            );
         }
-        return mapping.get(clsName);
+        if (_field.choices || _field.asyncChoices) {
+            widget = choicesMapping.get(fieldClassName) || mapping.get(fieldClassName);
+        } else {
+            widget = mapping.get(fieldClassName);
+        }
+        if (fieldClassName === 'ListField' && !widget) {
+            const [_widget, props] = splitWidgetAndProps(
+                getWidget(((field as unknown) as ListField<any, any>).childField)
+            );
+            if (_widget) {
+                return [_widget, { ...props, multiple: true }];
+            }
+        }
+        return widget;
     };
-    const widget = getWidget(fieldClassName);
+    const [widget, extraProps] = splitWidgetAndProps(getWidget(field));
 
     const getReturnWithChoices = (
-        w,
-        f
+        _widget: FieldWidgetType<FieldValue, T>,
+        _field: Field<FieldValue, ParsableValueT, SingleValueT>,
+        extraProps: Record<string, unknown>
     ):
         | FieldWidgetType<FieldValue, T>
         | [FieldWidgetType<FieldValue, T>, Record<string, unknown>] => {
-        if (f.choices || f.asyncChoices) {
-            if (Array.isArray(w)) {
-                return [w[0], { ...w[1], choices: f.choices, asyncChoices: f.asyncChoices }];
-            } else {
-                return [w, { choices: f.choices, asyncChoices: f.asyncChoices }];
+        if (field.choices || field.asyncChoices) {
+            const finalWidget = Array.isArray(_widget) ? _widget[0] : _widget;
+            const props = Array.isArray(_widget) ? _widget[1] : {};
+            const finalProps = {
+                ...props,
+                ...extraProps,
+            };
+            // Only set this when necessary to avoid passing props through
+            // with undefined value that may make it's way through to the DOM
+            if (field.choices) {
+                finalProps.choices = field.choices;
             }
+            if (field.asyncChoices) {
+                finalProps.asyncChoices = field.asyncChoices;
+            }
+            return [finalWidget, finalProps];
         } else {
-            return w;
+            return _widget;
         }
     };
 
     if (widget) {
-        return getReturnWithChoices(widget, field);
+        return getReturnWithChoices(widget, field, extraProps);
     }
 
     // if no match can be found check prototypes
     let f = Object.getPrototypeOf(field.constructor);
     do {
-        const widgetF = getWidget(f.fieldClassName);
+        const [widgetF, props] = splitWidgetAndProps(getWidget(f));
         if (widgetF) {
-            return getReturnWithChoices(widgetF, field);
+            return getReturnWithChoices(widgetF, field, props);
         }
         f = Object.getPrototypeOf(f);
     } while (f.name);
