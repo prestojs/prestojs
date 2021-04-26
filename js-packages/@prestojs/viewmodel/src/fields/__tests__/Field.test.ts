@@ -1,5 +1,20 @@
+import fs from 'fs';
+import path from 'path';
 import CharField from '../CharField';
 import Field from '../Field';
+import { ManyRelatedViewModelField, RelatedViewModelField } from '../RelatedViewModelField';
+
+// We want all provided fields to specify `fieldClassName` so can reliably be used in eg. getWidgetForField
+test.each([
+    ...fs
+        .readdirSync(path.resolve(__dirname, '../'))
+        .filter(f => f.endsWith('Field.ts') && f !== 'Field.ts' && f !== 'RelatedViewModelField.ts')
+        .map(f => [f.split('.')[0], require('../' + f).default]),
+    ['RelatedViewModelField', RelatedViewModelField],
+    ['ManyRelatedViewModelField', ManyRelatedViewModelField],
+])('%s should specify fieldClassName that matches the classes name', (fieldClassName, field) => {
+    expect(field.fieldClassName).toBe(fieldClassName);
+});
 
 test('Field options validation', () => {
     expect(

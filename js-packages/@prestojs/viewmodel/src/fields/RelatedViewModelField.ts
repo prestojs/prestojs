@@ -308,6 +308,7 @@ export class RelatedViewModelField<
     RelatedViewModelValueType<TargetViewModelT>,
     FieldDataMappingRaw<TargetViewModelT['fields']>
 > {
+    static fieldClassName = 'RelatedViewModelField';
     /**
      * Converts a value into the relations [ViewModel](doc:viewModelFactory) instance.
      */
@@ -351,6 +352,7 @@ export class ManyRelatedViewModelField<
     RelatedViewModelValueType<TargetViewModelT>[],
     FieldDataMappingRaw<TargetViewModelT['fields']>[]
 > {
+    static fieldClassName = 'ManyRelatedViewModelField';
     /**
      * Converts a value into the relations [ViewModel](doc:viewModelFactory) instance.
      */

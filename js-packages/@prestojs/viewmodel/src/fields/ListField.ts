@@ -20,6 +20,8 @@ import Field, { FieldProps } from './Field';
  * @menu-group Fields
  */
 export default class ListField<T, ParsableType = T> extends Field<T[], ParsableType[], T> {
+    static fieldClassName = 'ListField';
+
     public childField: Field<T, ParsableType>;
 
     constructor({
