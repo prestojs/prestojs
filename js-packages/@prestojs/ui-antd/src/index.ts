@@ -28,6 +28,8 @@ export { default as NullableBooleanWidget } from './widgets/NullableBooleanWidge
 export { default as NumberWidget } from './widgets/NumberWidget';
 export { default as PasswordWidget } from './widgets/PasswordWidget';
 export { default as RadioChoiceWidget } from './widgets/RadioChoiceWidget';
+export { default as CheckboxChoiceWidget } from './widgets/CheckboxChoiceWidget';
+export { default as ChoicesWidget } from './widgets/ChoicesWidget';
 export { default as RangeWidget } from './widgets/RangeWidget';
 export { default as SelectChoiceWidget } from './widgets/SelectChoiceWidget';
 export { default as SlugWidget } from './widgets/SlugWidget';
