@@ -11,8 +11,8 @@ export type SelectChoiceProps = SelectProps<any> &
     WidgetProps<number | string | boolean, HTMLSelectElement> & {
         input: InputProps<number | string | boolean, HTMLSelectElement> & {
             // Types in antd require event. Our types don't because final-form doesn't.
-            onBlur: (event: React.FocusEvent<HTMLSelectElement>) => void;
-            onFocus: (event: React.FocusEvent<HTMLSelectElement>) => void;
+            onBlur?: (event: React.FocusEvent<HTMLSelectElement>) => void;
+            onFocus?: (event: React.FocusEvent<HTMLSelectElement>) => void;
         };
     };
 

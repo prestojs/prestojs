@@ -10,9 +10,9 @@ export interface InputProps<FieldValue, T extends HTMLElement> {
      * Name of the field
      */
     name: string;
-    onBlur: (event?: React.FocusEvent<T>) => void;
     onChange: (event: React.ChangeEvent<T> | any) => void;
-    onFocus: (event?: React.FocusEvent<T>) => void;
+    onBlur?: (event?: React.FocusEvent<T>) => void;
+    onFocus?: (event?: React.FocusEvent<T>) => void;
     type?: string;
     value?: FieldValue;
     checked?: boolean;
@@ -22,7 +22,7 @@ export interface InputProps<FieldValue, T extends HTMLElement> {
 /**
  * @expand-properties
  */
-export interface WidgetProps<FieldValue, T extends HTMLElement> {
+export interface WidgetProps<FieldValue, T extends HTMLElement, SingleValue = FieldValue> {
     /**
      * The input props for the widget. This should include, at minimum:
      *
@@ -47,8 +47,10 @@ export interface WidgetProps<FieldValue, T extends HTMLElement> {
     meta?: Record<string, any>;
     /**
      * Any choices, if applicable. This typically comes from [Field.choices](doc:Field#var-choices).
+     *
+     * This can be a `Map` of value to label or an array of 2-element arrays `[value, label]`.
      */
-    choices?: Map<FieldValue, string>;
+    choices?: Map<SingleValue, string> | [SingleValue, string][];
     /**
      * Any [AsyncChoices](doc:AsyncChoices), if applicable. This typically comes from [Field.asyncChoices](doc:Field#var-asyncChoices).
      */
