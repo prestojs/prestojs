@@ -1,6 +1,6 @@
 import type { WidgetProps } from '@prestojs/ui';
 import React from 'react';
-import SelectChoiceWidget, { SelectChoiceProps } from './SelectChoiceWidget';
+import SelectChoicesWidget, { SelectChoicesProps } from './SelectChoicesWidget';
 
 /**
  * @expand-properties
@@ -13,7 +13,7 @@ type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElemen
      * Defaults to 'Undecided'.
      */
     blankLabel: string;
-} & SelectChoiceProps;
+} & SelectChoicesProps;
 
 /**
  * See [Select](https://ant.design/components/select/) for Select props available
@@ -41,7 +41,7 @@ function NullableBooleanWidget(props: NullableBooleanWidgetProps, ref): React.Re
     const f = rest.onChange || (rest.input as any).onChange;
     const onChange = (v: boolean | string): void => f(v === 'null' ? null : v);
 
-    return <SelectChoiceWidget ref={ref} choices={newChoices} {...{ onChange, ...rest }} />;
+    return <SelectChoicesWidget ref={ref} choices={newChoices} {...{ onChange, ...rest }} />;
 }
 
 export default React.forwardRef<HTMLSelectElement, NullableBooleanWidgetProps>(

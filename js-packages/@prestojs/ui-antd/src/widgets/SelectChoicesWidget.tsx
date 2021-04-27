@@ -7,12 +7,12 @@ import React from 'react';
  * @expand-properties
  * @hide-properties asyncChoices
  */
-export type SelectChoiceProps = SelectProps<any> &
+export type SelectChoicesProps = SelectProps<any> &
     WidgetProps<number | string | boolean, HTMLSelectElement> & {
         input: InputProps<number | string | boolean, HTMLSelectElement> & {
             // Types in antd require event. Our types don't because final-form doesn't.
-            onBlur: (event: React.FocusEvent<HTMLSelectElement>) => void;
-            onFocus: (event: React.FocusEvent<HTMLSelectElement>) => void;
+            onBlur?: (event: React.FocusEvent<HTMLSelectElement>) => void;
+            onFocus?: (event: React.FocusEvent<HTMLSelectElement>) => void;
         };
     };
 
@@ -23,7 +23,7 @@ export type SelectChoiceProps = SelectProps<any> &
  * @menu-group Widgets
  * @forward-ref
  */
-function SelectChoiceWidget(props: SelectChoiceProps, ref): React.ReactElement {
+function SelectChoicesWidget(props: SelectChoicesProps, ref): React.ReactElement {
     const { input, meta, choices, ...rest } = props;
     return (
         <Select ref={ref} {...input} {...rest}>
@@ -37,4 +37,4 @@ function SelectChoiceWidget(props: SelectChoiceProps, ref): React.ReactElement {
     );
 }
 
-export default React.forwardRef<HTMLSelectElement, SelectChoiceProps>(SelectChoiceWidget);
+export default React.forwardRef<HTMLSelectElement, SelectChoicesProps>(SelectChoicesWidget);

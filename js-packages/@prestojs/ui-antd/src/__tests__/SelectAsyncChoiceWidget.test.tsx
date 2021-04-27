@@ -9,7 +9,7 @@ import {
 } from '@prestojs/viewmodel';
 import { act, fireEvent, getAllByTestId, getByText, render, waitFor } from '@testing-library/react';
 import React, { useState } from 'react';
-import SelectAsyncChoiceWidget from '../widgets/SelectAsyncChoiceWidget';
+import SelectAsyncChoicesWidget from '../widgets/SelectAsyncChoicesWidget';
 
 function delay<T>(fn, timeout = 0): Promise<T> {
     return new Promise((resolve, reject) => setTimeout(() => resolve(fn(reject)), timeout));
@@ -163,7 +163,7 @@ test('should support fetching all paginated records', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container, getByText, queryByText } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -192,7 +192,7 @@ test('should reset pagination on keyword changes', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container, getByText, getByRole } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -227,14 +227,14 @@ test('should support initial value', async () => {
     const retrieve = jest.fn(resolveSingle);
     const asyncChoices = buildAsyncChoices({ list, retrieve });
     const { container, baseElement, getByText, rerender } = render(
-        <SelectAsyncChoiceWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
+        <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
     expect(retrieve).toHaveBeenCalledTimes(1);
     await waitForSelectedValue(container, 'Item 2');
     input.value = 4;
     rerender(
-        <SelectAsyncChoiceWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
+        <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
     expect(retrieve).toHaveBeenCalledTimes(2);
@@ -249,7 +249,7 @@ test('should support initial value', async () => {
     // have it from the list call
     input.value = 1;
     rerender(
-        <SelectAsyncChoiceWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
+        <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).toHaveBeenCalledTimes(1);
     expect(retrieve).toHaveBeenCalledTimes(2);
@@ -273,7 +273,7 @@ test('should support onRetrieveError', async () => {
         input.onChange = setValue;
         input.value = value;
         return (
-            <SelectAsyncChoiceWidget
+            <SelectAsyncChoicesWidget
                 asyncChoices={asyncChoices}
                 input={input}
                 onRetrieveError={onRetrieveError}
@@ -299,7 +299,7 @@ test('should call onChange with selected value', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container, getByText } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -359,7 +359,7 @@ test('should be able to integrate with viewmodel cache', async () => {
     });
     const input = buildInput();
     const { baseElement, container, getByText, rerender } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -372,7 +372,7 @@ test('should be able to integrate with viewmodel cache', async () => {
     await waitForOptions(baseElement, namesForRange(0, 5));
     input.value = 4;
     rerender(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -392,7 +392,7 @@ test('should be able to integrate with viewmodel cache', async () => {
     });
     input.value = 66;
     rerender(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -439,7 +439,7 @@ test('should handle grouped choices', async () => {
         },
     });
     const { baseElement, container, getByText, queryByText } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -472,7 +472,7 @@ test('should support loadingContent', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container, getByTestId, getByRole } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -501,7 +501,7 @@ test('should support custom fetch more button', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container, getByTestId, getByText, queryByText } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -536,7 +536,7 @@ test('should support disabling fetch more button', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container, getByText, queryByText } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -556,7 +556,7 @@ test('should support triggerWhenClosed', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -577,7 +577,7 @@ test('should work if asyncChoices instance changes', async () => {
     const asyncChoices1 = buildAsyncChoices({ list: list1 });
     const asyncChoices2 = buildAsyncChoices({ list: list2 });
     const { baseElement, container, getByText, rerender } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices1}
             input={input}
             virtual={false}
@@ -593,7 +593,7 @@ test('should work if asyncChoices instance changes', async () => {
     expect(list1).toHaveBeenCalledTimes(2);
     await waitForOptions(baseElement, namesForRange(0, 10));
     rerender(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices2}
             input={input}
             virtual={false}
@@ -617,14 +617,14 @@ test('should support multi select', async () => {
     const retrieve = jest.fn(resolveSingle);
     const asyncChoices = buildAsyncChoices<true>({ list, retrieve, multiple: true });
     const { container, baseElement, rerender } = render(
-        <SelectAsyncChoiceWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
+        <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
     expect(retrieve).toHaveBeenCalledTimes(1);
     await waitForSelectedValue(container, ['Item 2', 'Item 3']);
     input.value = [4];
     rerender(
-        <SelectAsyncChoiceWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
+        <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
     expect(retrieve).toHaveBeenCalledTimes(2);
@@ -638,7 +638,7 @@ test('should support multi select', async () => {
     // have it from the list call
     input.value = [1];
     rerender(
-        <SelectAsyncChoiceWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
+        <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).toHaveBeenCalledTimes(1);
     expect(retrieve).toHaveBeenCalledTimes(2);
@@ -650,7 +650,7 @@ test('support filtering results', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container, getByText, getByRole } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -677,7 +677,7 @@ test('should support custom query parameter name', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container, getByText, getByRole } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -704,7 +704,7 @@ test('search triggered after unmount due to debounce should not error', async ()
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { unmount, container, baseElement, getByText, getByRole } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -732,7 +732,7 @@ test('should support clearOnOpen', async () => {
     const list = jest.fn(resolveMulti);
     const asyncChoices = buildAsyncChoices({ list });
     const { baseElement, container, getByText, rerender } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -759,7 +759,7 @@ test('should support clearOnOpen', async () => {
     });
     // Re-render with clearOnOpen=true and it should only have the first page of results again
     rerender(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
@@ -778,7 +778,7 @@ test('should support onClear', async () => {
     const retrieve = jest.fn(resolveSingle);
     let asyncChoices = buildAsyncChoices({ list, retrieve });
     const { container, getByTestId, rerender } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             {...widgetProps}
@@ -801,7 +801,7 @@ test('should support onClear (multiple)', async () => {
     const retrieve = jest.fn(resolveSingle);
     let asyncChoices = buildAsyncChoices({ list, retrieve, multiple: true });
     const { container, getByTestId, rerender } = render(
-        <SelectAsyncChoiceWidget
+        <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
             {...widgetProps}

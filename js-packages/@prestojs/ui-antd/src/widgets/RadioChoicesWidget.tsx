@@ -6,7 +6,7 @@ import React from 'react';
  * @expand-properties
  * @hide-properties asyncChoices
  */
-type RadioChoicesWidgetProps = WidgetProps<number | string, HTMLInputElement>;
+type RadioChoicesWidgetProps<ValueT> = WidgetProps<ValueT, HTMLInputElement>;
 
 /**
  * See [Radio](https://ant.design/components/radio/) for props available
@@ -15,7 +15,9 @@ type RadioChoicesWidgetProps = WidgetProps<number | string, HTMLInputElement>;
  * @menu-group Widgets
  * @forward-ref
  */
-function RadioChoiceWidget(props: RadioChoicesWidgetProps): React.ReactElement {
+function RadioChoicesWidget<ValueT extends number | string>(
+    props: RadioChoicesWidgetProps<ValueT>
+): React.ReactElement {
     const { input, choices, meta, ...rest } = props;
     return (
         <Radio.Group {...input} {...rest}>
@@ -30,4 +32,4 @@ function RadioChoiceWidget(props: RadioChoicesWidgetProps): React.ReactElement {
 }
 
 // Note that Radio.Group doesn't support ref so we don't use forwardRef here
-export default RadioChoiceWidget;
+export default RadioChoicesWidget;

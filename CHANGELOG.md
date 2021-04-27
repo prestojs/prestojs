@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+* Add [CheckboxChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/CheckboxChoicesWidget/)
+* Add [ChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/ChoicesWidget/)
+
+### Changed
+
+* [getWidgetForField](https://prestojs.com/docs/ui-antd/getWidgetForField/#main-content) better handling for [ListField](https://prestojs.com/docs/viewmodel/fields/ListField/#main-content) and `choice` fields in general
+* `IntegerChoicesWidget` and `CharChoicesWidget` now use [ChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/ChoicesWidget/)
+* Renamed `RadioChoiceWidget` to `RadioChoicesWidget`
+* Renamed `SelectChoiceWidget` to `SelectChoicesWidget`
+* Renamed `SelectAsyncChoiceWidget` to `SelectAsyncChoicesWidget`
+* Add missing static `fieldClassName` property to some fields  
+* [FieldWidget](https://prestojs.com/docs/ui/FieldWidget/#main-content) now memo's the selected widget. This solves a bug that could result in the selected component being unmounted and remounted every render.
+* Type changes
+  * `onBlur` and `onFocus` are no longer required on `input` specified by `FieldWidgetInterface`
+  * `WidgetProps` now supports `SingleValue` generic type to support fields with an array of values but type `choices` correctly
+
 ## [0.0.16] - 2021-04-26
 
 ### Added
