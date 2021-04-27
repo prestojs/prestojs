@@ -24,7 +24,7 @@ type CheckboxChoicesWidgetProps<ValueT extends number | string> = CheckboxGroupP
  * @menu-group Widgets
  * @forward-ref
  */
-function CheckboxChoiceWidget<ValueT extends (number | string)[]>(
+function CheckboxChoicesWidget<ValueT extends (number | string)[]>(
     props: CheckboxChoicesWidgetProps<ValueT extends Array<infer T> ? T : unknown>
 ): React.ReactElement {
     const { input, choices, meta, ...rest } = props;
@@ -41,4 +41,4 @@ function CheckboxChoiceWidget<ValueT extends (number | string)[]>(
 }
 
 // Note that Checkbox.Group doesn't support ref so we don't use forwardRef here
-export default CheckboxChoiceWidget;
+export default CheckboxChoicesWidget;

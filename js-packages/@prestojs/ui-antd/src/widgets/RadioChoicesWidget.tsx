@@ -15,7 +15,7 @@ type RadioChoicesWidgetProps<ValueT> = WidgetProps<ValueT, HTMLInputElement>;
  * @menu-group Widgets
  * @forward-ref
  */
-function RadioChoiceWidget<ValueT extends number | string>(
+function RadioChoicesWidget<ValueT extends number | string>(
     props: RadioChoicesWidgetProps<ValueT>
 ): React.ReactElement {
     const { input, choices, meta, ...rest } = props;
@@ -32,4 +32,4 @@ function RadioChoiceWidget<ValueT extends number | string>(
 }
 
 // Note that Radio.Group doesn't support ref so we don't use forwardRef here
-export default RadioChoiceWidget;
+export default RadioChoicesWidget;

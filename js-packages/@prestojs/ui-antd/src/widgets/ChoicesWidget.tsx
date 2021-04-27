@@ -1,9 +1,9 @@
 import { WidgetProps } from '@prestojs/ui';
 import React from 'react';
-import CheckboxChoiceWidget from './CheckboxChoiceWidget';
-import RadioChoiceWidget from './RadioChoiceWidget';
-import SelectAsyncChoiceWidget from './SelectAsyncChoiceWidget';
-import SelectChoiceWidget from './SelectChoiceWidget';
+import CheckboxChoicesWidget from './CheckboxChoicesWidget';
+import RadioChoicesWidget from './RadioChoicesWidget';
+import SelectAsyncChoicesWidget from './SelectAsyncChoicesWidget';
+import SelectChoicesWidget from './SelectChoicesWidget';
 
 /**
  * @expand-properties
@@ -13,7 +13,7 @@ type ChoicesWidgetSingleProps<ValueType extends string | number> = WidgetProps<
     HTMLElement
 > & {
     /**
-     * Choices are rendered as either [SelectChoiceWidget](doc:SelectChoiceWidget) or [RadioChoiceWidget](doc:RadioChoiceWidget).
+     * Choices are rendered as either [SelectChoicesWidget](doc:SelectChoicesWidget) or [RadioChoicesWidget](doc:RadioChoicesWidget).
      * Specify `select` or `radio` to choose one of these or leave blank to select based on number of choices (if > 3 defaults to
      * 'select' otherwise 'radio').
      */
@@ -33,7 +33,7 @@ type ChoicesWidgetMultipleProps<ValueType extends (string | number)[]> = WidgetP
     number | string
 > & {
     /**
-     * Choices are rendered as either [SelectChoiceWidget](doc:SelectChoiceWidget) or [CheckboxChoiceWidget](doc:CheckboxChoiceWidget).
+     * Choices are rendered as either [SelectChoicesWidget](doc:SelectChoicesWidget) or [CheckboxChoicesWidget](doc:CheckboxChoicesWidget).
      * Specify `select` or `checkbox` to choose one of these or leave blank to select based on number of choices (if > 3 defaults to
      * 'select' otherwise 'checkbox').
      */
@@ -49,10 +49,10 @@ type ChoicesWidgetMultipleProps<ValueType extends (string | number)[]> = WidgetP
  *
  * The specific widget chosen is one of
  *
- * * [SelectAsyncChoiceWidget](SelectAsyncChoiceWidget) - when `asyncChoices` is provided. `widgetType` is ignored in this case.
- * * [SelectChoiceWidget](doc:SelectChoiceWidget) - when `widgetType="select"` or `widgetType` is not specified and there is more than 3 choices.
- * * [RadioChoiceWidget](doc:RadioChoiceWidget) - when `widgetType="radio"` or `multiple={false}` and `widgetType` is not specified and there is 3 or fewer choices.
- * * [CheckboxChoiceWidget](doc:CheckboxChoiceWidget) - when `widgetType="checkbox"` or `multiple={true}` and `widgetType` is not specified and there is 3 or fewer choices.
+ * * [SelectAsyncChoicesWidget](SelectAsyncChoicesWidget) - when `asyncChoices` is provided. `widgetType` is ignored in this case.
+ * * [SelectChoicesWidget](doc:SelectChoicesWidget) - when `widgetType="select"` or `widgetType` is not specified and there is more than 3 choices.
+ * * [RadioChoicesWidget](doc:RadioChoicesWidget) - when `widgetType="radio"` or `multiple={false}` and `widgetType` is not specified and there is 3 or fewer choices.
+ * * [CheckboxChoicesWidget](doc:CheckboxChoicesWidget) - when `widgetType="checkbox"` or `multiple={true}` and `widgetType` is not specified and there is 3 or fewer choices.
  *
  * @extract-docs
  * @menu-group Widgets
@@ -91,16 +91,16 @@ function ChoicesWidget(
                 `When 'asyncChoices' is specified 'multiple' does not need be specified. Got mismatch - 'asyncChoices.multiple' = ${asyncChoices.multiple.toString()} but 'multiple' = ${multiple.toString()}`
             );
         }
-        return <SelectAsyncChoiceWidget ref={ref} asyncChoices={asyncChoices} {...rest} />;
+        return <SelectAsyncChoicesWidget ref={ref} asyncChoices={asyncChoices} {...rest} />;
     }
     if (widgetType === 'select') {
         return (
-            <SelectChoiceWidget ref={ref} {...rest} {...(multiple ? { mode: 'multiple' } : {})} />
+            <SelectChoicesWidget ref={ref} {...rest} {...(multiple ? { mode: 'multiple' } : {})} />
         );
     } else if (widgetType === 'radio') {
-        return <RadioChoiceWidget {...rest} />;
+        return <RadioChoicesWidget {...rest} />;
     } else if (widgetType === 'checkbox') {
-        return <CheckboxChoiceWidget {...rest} />;
+        return <CheckboxChoicesWidget {...rest} />;
     }
     throw new Error(`Invalid widgetType="${widgetType}"`);
 }

@@ -27,17 +27,17 @@ export { default as JsonWidget } from './widgets/JsonWidget';
 export { default as NullableBooleanWidget } from './widgets/NullableBooleanWidget';
 export { default as NumberWidget } from './widgets/NumberWidget';
 export { default as PasswordWidget } from './widgets/PasswordWidget';
-export { default as RadioChoiceWidget } from './widgets/RadioChoiceWidget';
-export { default as CheckboxChoiceWidget } from './widgets/CheckboxChoiceWidget';
+export { default as RadioChoicesWidget } from './widgets/RadioChoicesWidget';
+export { default as CheckboxChoicesWidget } from './widgets/CheckboxChoicesWidget';
 export { default as ChoicesWidget } from './widgets/ChoicesWidget';
 export { default as RangeWidget } from './widgets/RangeWidget';
-export { default as SelectChoiceWidget } from './widgets/SelectChoiceWidget';
+export { default as SelectChoicesWidget } from './widgets/SelectChoicesWidget';
 export { default as SlugWidget } from './widgets/SlugWidget';
 export { default as TextWidget } from './widgets/TextWidget';
 export { default as TimeWidget } from './widgets/TimeWidget';
 export { default as URLWidget } from './widgets/URLWidget';
 export { default as UUIDWidget } from './widgets/UUIDWidget';
-export { default as SelectAsyncChoiceWidget } from './widgets/SelectAsyncChoiceWidget';
+export { default as SelectAsyncChoicesWidget } from './widgets/SelectAsyncChoicesWidget';
 
 export { default as getWidgetForField } from './getWidgetForField';
 export { default as FormItemWrapper } from './FormItemWrapper';
@@ -50,4 +50,4 @@ export {
     AntdUiConfig,
 } from './AntdUiProvider';
 
-export type { SelectChoiceProps } from './widgets/SelectChoiceWidget';
+export type { SelectChoicesProps } from './widgets/SelectChoicesWidget';

@@ -23,7 +23,7 @@ type SelectInputProps<T> = Omit<
  * changed, `notFoundContent` is set to `loadingContent` when choices are resolving otherwise `notFoundContent`
  * @hide-properties meta
  */
-export type SelectAsyncChoiceProps<T> = SelectProps<ValueType<T>> &
+export type SelectAsyncChoicesProps<T> = SelectProps<ValueType<T>> &
     Omit<WidgetProps<ValueType<T>, HTMLSelectElement>, 'input' | 'choices' | 'asyncChoices'> & {
         /**
          * The [AsyncChoices](doc:AsyncChoicesInterface) instance to use.
@@ -171,19 +171,19 @@ type LabeledValue<T> = { key: T; label: React.ReactNode; found: boolean; missing
  *
  * If `rawValue` is an array an array of labeled values will be returned.
  */
-function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props: {
+function getLabeledValue<T extends SelectAsyncChoicesWidgetValue, ItemType>(props: {
     rawValue: T;
     allItems: Choice<T>[];
     selected?: ItemType | null;
     asyncChoices: AsyncChoicesInterface<ItemType, T>;
 }): LabeledValue<T>;
-function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props: {
+function getLabeledValue<T extends SelectAsyncChoicesWidgetValue, ItemType>(props: {
     rawValue: T[];
     allItems: Choice<T>[];
     selected?: ItemType[] | null;
     asyncChoices: AsyncChoicesInterface<ItemType, T>;
 }): LabeledValue<T>[];
-function getLabeledValue<T extends SelectAsyncChoiceWidgetValue, ItemType>(props: {
+function getLabeledValue<T extends SelectAsyncChoicesWidgetValue, ItemType>(props: {
     rawValue: T | T[];
     allItems: Choice<T>[];
     selected?: ItemType | ItemType[] | null;
@@ -261,7 +261,7 @@ function reducer(state: SelectReducerState, action: SelectReducerAction): Select
     }
 }
 
-type SelectAsyncChoiceWidgetValue = number | string;
+type SelectAsyncChoicesWidgetValue = number | string;
 
 // Pagination is handled by rendering a button within a Select.Option that triggers a fetch. This
 // is the value used for that option. We can can prevent clicks on the option in case the button
@@ -275,10 +275,10 @@ const NEXT_PAGE_VALUE = '__nextpage';
  * @forward-ref
  * @menu-group Widgets
  */
-function SelectAsyncChoiceWidget<
-    T extends SelectAsyncChoiceWidgetValue,
+function SelectAsyncChoicesWidget<
+    T extends SelectAsyncChoicesWidgetValue,
     Multiple extends boolean = T extends Array<any> ? true : false
->(props: SelectAsyncChoiceProps<T>, ref): React.ReactElement {
+>(props: SelectAsyncChoicesProps<T>, ref): React.ReactElement {
     const {
         input,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -525,4 +525,4 @@ function SelectAsyncChoiceWidget<
     );
 }
 
-export default React.forwardRef(SelectAsyncChoiceWidget);
+export default React.forwardRef(SelectAsyncChoicesWidget);
