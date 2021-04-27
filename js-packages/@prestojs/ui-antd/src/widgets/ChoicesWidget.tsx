@@ -86,6 +86,11 @@ function ChoicesWidget(
         );
     }
     if (asyncChoices) {
+        if (multiple != null) {
+            console.warn(
+                `When 'asyncChoices' is specified 'multiple' does not need be specified - 'asyncChoices.multiple' is used instead.`
+            );
+        }
         if (multiple != null && asyncChoices.multiple !== multiple) {
             throw new Error(
                 `When 'asyncChoices' is specified 'multiple' does not need be specified. Got mismatch - 'asyncChoices.multiple' = ${asyncChoices.multiple.toString()} but 'multiple' = ${multiple.toString()}`
