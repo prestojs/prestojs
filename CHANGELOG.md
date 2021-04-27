@@ -19,6 +19,7 @@
 * Type changes
   * `onBlur` and `onFocus` are no longer required on `input` specified by `FieldWidgetInterface`
   * `WidgetProps` now supports `SingleValue` generic type to support fields with an array of values but type `choices` correctly
+* Fix bug that prevented [TimeFormatter](https://prestojs.com/docs/ui/formatters/TimeFormatter/) from working in Safari
 
 ## [0.0.16] - 2021-04-26
 
