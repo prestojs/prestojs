@@ -40,30 +40,17 @@ export default function MultipleSelectionExample() {
                 checked={choices === longChoices}
                 onChange={() => setChoices(c => (c === shortChoices ? longChoices : shortChoices))}
             />
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    height: 240,
-                    marginTop: 20,
-                }}
-            >
-                <div>
-                    <strong>widgetType:</strong> (default - based on number of choices)
-                </div>
+            <div className="grid grid-cols-1 gap-4 w-full mt-5">
+                <strong>widgetType: (default - based on number of choices)</strong>
                 <ChoicesWidget choices={choices} multiple input={input} />
-                <div>
-                    <strong>widgetType:</strong> checkbox
-                </div>
+                <hr />
+                <strong>widgetType: checkbox</strong>
                 <ChoicesWidget choices={choices} multiple widgetType="checkbox" input={input} />
-                <div>
-                    <strong>widgetType:</strong> select
-                </div>
+                <hr />
+                <strong>widgetType: select</strong>
                 <ChoicesWidget choices={choices} multiple widgetType="select" input={input} />
-                <div>
-                    <strong>widgetType:</strong> select + search
-                </div>
+                <hr />
+                <strong>widgetType: select + search</strong>
                 <ChoicesWidget
                     multiple
                     choices={choices}

@@ -10,14 +10,14 @@ type RawValue = string | number | boolean;
  * @hide-properties asyncChoices
  */
 export type SelectChoicesProps<ValueT> = SelectProps<ValueT> &
-    WidgetProps<ValueT, HTMLSelectElement> & {
+    Omit<WidgetProps<ValueT, HTMLSelectElement>, 'input'> & {
         /**
          * The choices to render. This can be a `Map` of value to label or an array of 2-element arrays `[value, label]`.
          */
         choices: ValueT extends Array<infer T>
             ? Map<T, string> | [T, string][]
             : Map<ValueT, string> | [ValueT, string][];
-        input: InputProps<ValueT, HTMLSelectElement> & {
+        input: InputProps<ValueT | null, HTMLSelectElement> & {
             // Types in antd require event. Our types don't because final-form doesn't.
             onBlur?: (event: React.FocusEvent<HTMLSelectElement>) => void;
             onFocus?: (event: React.FocusEvent<HTMLSelectElement>) => void;

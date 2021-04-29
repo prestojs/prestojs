@@ -4,7 +4,6 @@ import React from 'react';
 
 /**
  * @expand-properties
- * @hide-properties choices asyncChoices
  */
 type EmailWidgetProps = WidgetProps<string, HTMLInputElement>;
 

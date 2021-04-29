@@ -38,18 +38,27 @@ export default function BasicExample() {
     return (
         <div className="grid grid-cols-1 gap-4 w-full">
             <RadioChoicesWidget choices={choices} input={input} />
+            <hr />
+            <strong>Render as buttons</strong>
             <RadioChoicesWidget
                 choices={choices}
                 input={input}
                 buttonStyle="solid"
                 radioComponent={RadioChoicesWidget.Button}
             />
+            <hr />
+            <strong>Pass props to specific choices</strong>
             <RadioChoicesWidget
                 choices={choices}
                 input={input}
                 buttonStyle="solid"
                 radioComponent={RadioChoicesWidget.Button}
-                choiceProps={new Map([['3', { disabled: true }]])}
+                choiceProps={
+                    new Map([
+                        ['3', { disabled: true }],
+                        ['5', { style: { color: 'red' } }],
+                    ])
+                }
             />
         </div>
     );

@@ -38,22 +38,18 @@ export default function BasicExample() {
                 checked={choices === longChoices}
                 onChange={() => setChoices(c => (c === shortChoices ? longChoices : shortChoices))}
             />
-            <div className="grid grid-cols-1 gap-4 w-full mt-5 justify-between">
-                <div>
-                    <strong>widgetType:</strong> (default - based on number of choices)
-                </div>
+            <div className="grid grid-cols-1 gap-4 w-full mt-5">
+                <strong>widgetType: (default - based on number of choices)</strong>
                 <ChoicesWidget choices={choices} input={input} />
-                <div>
-                    <strong>widgetType:</strong> radio
-                </div>
+                <hr />
+                <strong>widgetType: radio</strong>
                 <ChoicesWidget choices={choices} widgetType="radio" input={input} />
-                <div>
-                    <strong>widgetType:</strong> select
-                </div>
+                <hr />
+                <strong>widgetType: select</strong>
+                <hr />
                 <ChoicesWidget choices={choices} widgetType="select" input={input} />
-                <div>
-                    <strong>widgetType:</strong> select + search
-                </div>
+                <hr />
+                <strong>widgetType: select + search</strong>
                 <ChoicesWidget
                     choices={choices}
                     widgetType="select"
