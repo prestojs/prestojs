@@ -9,7 +9,7 @@ export interface InputProps<FieldValue, T extends HTMLElement> {
     /**
      * Name of the field
      */
-    name: string;
+    name?: string;
     onChange: (event: React.ChangeEvent<T> | any) => void;
     onBlur?: (event?: React.FocusEvent<T>) => void;
     onFocus?: (event?: React.FocusEvent<T>) => void;
@@ -21,17 +21,18 @@ export interface InputProps<FieldValue, T extends HTMLElement> {
 
 /**
  * @expand-properties
+ * @hide-properties meta choices asyncChoices
  */
 export interface WidgetProps<FieldValue, T extends HTMLElement, SingleValue = FieldValue> {
     /**
      * The input props for the widget. This should include, at minimum:
      *
-     * - name
      * - onChange
      * - value
      *
      * Can also include
      *
+     * - name
      * - onBlur
      * - onFocus
      * - type

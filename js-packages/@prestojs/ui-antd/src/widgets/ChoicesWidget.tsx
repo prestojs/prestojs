@@ -5,43 +5,33 @@ import RadioChoicesWidget from './RadioChoicesWidget';
 import SelectAsyncChoicesWidget from './SelectAsyncChoicesWidget';
 import SelectChoicesWidget from './SelectChoicesWidget';
 
-/**
- * @expand-properties
- */
-type ChoicesWidgetSingleProps<ValueType extends string | number> = WidgetProps<
-    ValueType,
-    HTMLElement
-> & {
-    /**
-     * Choices are rendered as either [SelectChoicesWidget](doc:SelectChoicesWidget) or [RadioChoicesWidget](doc:RadioChoicesWidget).
-     * Specify `select` or `radio` to choose one of these or leave blank to select based on number of choices (if > 3 defaults to
-     * 'select' otherwise 'radio').
-     */
-    widgetType?: 'select' | 'radio';
-    /**
-     * Multiple values are accepted. `widgetType` must be `select`, `radio` or unspecified.
-     */
-    multiple?: false;
-};
+type RawValue = string | number;
 
 /**
- * @expand-properties
+ * @expand-properties Any additional props are passed through to the specify widget
  */
-type ChoicesWidgetMultipleProps<ValueType extends (string | number)[]> = WidgetProps<
+type ChoicesWidgetProps<ValueType extends RawValue | RawValue[]> = WidgetProps<
     ValueType,
     HTMLElement,
-    number | string
+    RawValue
 > & {
     /**
-     * Choices are rendered as either [SelectChoicesWidget](doc:SelectChoicesWidget) or [CheckboxChoicesWidget](doc:CheckboxChoicesWidget).
-     * Specify `select` or `checkbox` to choose one of these or leave blank to select based on number of choices (if > 3 defaults to
-     * 'select' otherwise 'checkbox').
+     * The choices to render. This can be a `Map` of value to label or an array of 2-element arrays `[value, label]`.
      */
-    widgetType?: 'select' | 'checkbox';
+    choices: Map<ValueType, string> | [ValueType, string][];
     /**
-     * Multiple values are accepted. `widgetType` must be `select`, `checkbox` or unspecified.
+     * Choices are rendered as either [SelectChoicesWidget](doc:SelectChoicesWidget),
+     * [RadioChoicesWidget](doc:RadioChoicesWidget) (only if `multiple=false`) or
+     * [CheckboxChoicesWidget](doc:CheckboxChoicesWidget) (only if `multiple=true)
+     * Specify `select`, 'radio', or `checkbox` to choose one of these or leave blank to select based on number of choices (if > 3 defaults to
+     * 'select' otherwise 'checkbox' or 'radio' depending on value of `multiple`).
      */
-    multiple: true;
+    widgetType?: 'select' | 'checkbox' | 'radio';
+    /**
+     * Whether multiple values are accepted
+     */
+    multiple?: boolean;
+    [x: string]: any;
 };
 
 /**
@@ -58,16 +48,8 @@ type ChoicesWidgetMultipleProps<ValueType extends (string | number)[]> = WidgetP
  * @menu-group Widgets
  * @forward-ref
  */
-function ChoicesWidget<ValueType extends number | string>(
-    props: ChoicesWidgetSingleProps<ValueType>,
-    ref: any
-): React.ReactElement;
-function ChoicesWidget<ValueType extends (number | string)[]>(
-    props: ChoicesWidgetMultipleProps<ValueType>,
-    ref: any
-): React.ReactElement;
-function ChoicesWidget(
-    props: ChoicesWidgetMultipleProps<any> | ChoicesWidgetSingleProps<any>,
+function ChoicesWidget<ValueType extends RawValue | RawValue[]>(
+    props: ChoicesWidgetProps<ValueType>,
     ref: any
 ): React.ReactElement {
     let { widgetType, asyncChoices, multiple, meta, ...rest } = props;
@@ -103,9 +85,9 @@ function ChoicesWidget(
             <SelectChoicesWidget ref={ref} {...rest} {...(multiple ? { mode: 'multiple' } : {})} />
         );
     } else if (widgetType === 'radio') {
-        return <RadioChoicesWidget {...rest} />;
+        return <RadioChoicesWidget {...(rest as ChoicesWidgetProps<RawValue>)} />;
     } else if (widgetType === 'checkbox') {
-        return <CheckboxChoicesWidget {...rest} />;
+        return <CheckboxChoicesWidget {...(rest as ChoicesWidgetProps<RawValue[]>)} />;
     }
     throw new Error(`Invalid widgetType="${widgetType}"`);
 }

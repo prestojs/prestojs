@@ -6,7 +6,12 @@ import React from 'react';
  * @expand-properties
  * @hide-properties asyncChoices
  */
-type RadioChoicesWidgetProps<ValueT> = WidgetProps<ValueT, HTMLInputElement>;
+type RadioChoicesWidgetProps<ValueT> = WidgetProps<ValueT, HTMLInputElement> & {
+    /**
+     * The choices to render. This can be a `Map` of value to label or an array of 2-element arrays `[value, label]`.
+     */
+    choices: Map<ValueT, string> | [ValueT, string][];
+};
 
 /**
  * See [Radio](https://ant.design/components/radio/) for props available
