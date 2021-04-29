@@ -5,7 +5,7 @@ import CodeBlock from '../CodeBlock';
 
 const OPEN_CODE_HEIGHT = 40;
 
-function CodeExample({ example, container, language }) {
+function CodeExample({ example, container, language, showExpand }) {
     const codeRef = useRef();
     const [open, setOpen] = useState(false);
     const [height, setHeight] = useState();
@@ -37,6 +37,7 @@ function CodeExample({ example, container, language }) {
                 className="z-20 mb-5"
                 style={{
                     flex: 1,
+                    minHeight: 100,
                 }}
                 onLoad={e =>
                     setHeight(e.target.contentDocument.body.getBoundingClientRect().height)
@@ -69,26 +70,28 @@ function CodeExample({ example, container, language }) {
                 </button>{' '}
                 {open && (
                     <div className="relative" ref={codeRef}>
-                        <button
-                            onClick={() => setExpanded(x => !x)}
-                            title={expanded ? 'Collapse' : 'Expand'}
-                            className="absolute right-0 mr-2 mt-2 text-white opacity-75 hover:opacity-100"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                        {showExpand && (
+                            <button
+                                onClick={() => setExpanded(x => !x)}
+                                title={expanded ? 'Collapse' : 'Expand'}
+                                className="absolute right-0 mr-2 mt-2 text-white opacity-75 hover:opacity-100"
                             >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                                />
-                            </svg>
-                        </button>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                                    />
+                                </svg>
+                            </button>
+                        )}
                         <CodeBlock
                             children={example.code[language === 'tsx' ? 'ts' : 'js']}
                             className={`language-${language}`}
@@ -128,13 +131,19 @@ export default function CodeExamples({ examples }) {
                     <option value="tsx">Typescript</option>
                 </select>
             </h3>
-            <div className="grid grid-cols-2 gap-4 w-full">
+            <div
+                className={cx('grid gap-4 w-full', {
+                    'grip-cols-1': examples.length === 1,
+                    'grid-cols-2': examples.length !== 1,
+                })}
+            >
                 {examples.map(example => (
                     <CodeExample
                         key={example.name}
                         example={example}
                         container={containerRef}
                         language={language}
+                        showExpand={examples.length > 1}
                     />
                 ))}
             </div>
