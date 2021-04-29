@@ -1,8 +1,8 @@
 import { PageNumberPaginator, useAsyncListing, usePaginator } from '@prestojs/util';
 import React from 'react';
-import * as githubApi from '../../../../codesandbox-examples/github-data-fetching/src/github-api';
-import UserList from '../../../../codesandbox-examples/github-data-fetching/src/UserList';
-import UserSearch from '../../../../codesandbox-examples/github-data-fetching/src/UserSearch';
+import * as githubApi from './github-api';
+import UserList from './UserList';
+import UserSearch from './UserSearch';
 
 export default function FollowerList() {
     const [user, setUser] = React.useState();
