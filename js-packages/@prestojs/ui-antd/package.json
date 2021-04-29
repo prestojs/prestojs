@@ -3,8 +3,7 @@
   "version": "0.0.16",
   "license": "MIT",
   "typings": "build/index.d.ts",
-  "main": "build/cjs/index.js",
-  "module": "build/index.js",
+  "module": "src/index.ts",
   "sideEffects": false,
   "scripts": {
     "build:declaration": "tsc --project tsconfig.json --outDir build && tsc --project tsconfig.json --outDir build/cjs",

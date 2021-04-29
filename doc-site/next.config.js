@@ -9,9 +9,12 @@ const withMDX = require('@next/mdx')({
         ],
     },
 });
-module.exports = withMDX({
-    pageExtensions: ['js', 'jsx', 'mdx'],
-    webpack: config => {
+const withAntdLess = require('next-plugin-antd-less');
+const withTM = require('next-transpile-modules')(['@prestojs/ui-antd'], { debug: false });
+const withPlugins = require('next-compose-plugins');
+module.exports = withPlugins([withAntdLess, withMDX, withTM], {
+    pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
+    webpack: (config, options) => {
         config.module.rules.push({
             test: /\.svg$/,
             issuer: {

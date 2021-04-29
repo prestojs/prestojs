@@ -1,6 +1,7 @@
 import React from 'react';
 import ApiDocHeader from '../ApiDocHeader';
 import Article from '../Article';
+import CodeExamples from './CodeExamples';
 import MdxWrapper from './MdxWrapper';
 import SignatureDoc from './SignatureDoc';
 
@@ -18,6 +19,7 @@ export default function FunctionDoc({ doc }) {
                     excludeParameters={excludeParameters}
                 />
             ))}
+            {doc.examples && <CodeExamples examples={doc.examples} />}
         </Article>
     );
 }
