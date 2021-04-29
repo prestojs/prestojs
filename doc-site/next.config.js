@@ -46,5 +46,4 @@ module.exports = withPlugins([withAntdLess, withMDX], {
     // about moving a file with a .html.html extension...)
     trailingSlash: true,
     distDir: '../.next',
-    target: 'serverless',
 });
