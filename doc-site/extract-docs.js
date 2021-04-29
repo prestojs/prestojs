@@ -4,7 +4,6 @@ const prettier = require('prettier');
 const typedoc = require('typedoc');
 const fs = require('fs');
 const path = require('path');
-var remark = require('remark');
 
 function readDirRecursive(dir) {
     const files = [];
