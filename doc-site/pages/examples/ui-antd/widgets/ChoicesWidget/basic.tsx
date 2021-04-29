@@ -38,15 +38,7 @@ export default function BasicExample() {
                 checked={choices === longChoices}
                 onChange={() => setChoices(c => (c === shortChoices ? longChoices : shortChoices))}
             />
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    height: 240,
-                    marginTop: 20,
-                }}
-            >
+            <div className="grid grid-cols-1 gap-4 w-full mt-5 justify-between">
                 <div>
                     <strong>widgetType:</strong> (default - based on number of choices)
                 </div>

@@ -37,7 +37,6 @@
   },
   "devDependencies": {
     "postcss-prefixwrap": "^1.22.1",
-    "next-transpile-modules": "^6.4.1",
     "next-compose-plugins": "^2.2.1",
     "@babel/node": "^7.13.13",
     "next-plugin-antd-less": "^1.1.2",

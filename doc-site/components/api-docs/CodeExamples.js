@@ -6,11 +6,28 @@ import CodeBlock from '../CodeBlock';
 const OPEN_CODE_HEIGHT = 40;
 
 function CodeExample({ example, container, language, showExpand }) {
+    const iframeRef = useRef();
     const codeRef = useRef();
     const [open, setOpen] = useState(false);
     const [height, setHeight] = useState();
     const [expanded, setExpanded] = useState(false);
     const lastExpanded = useRef(expanded);
+    useEffect(() => {
+        const listener = e => {
+            // This message comes from _app.js
+            try {
+                const data = JSON.parse(e.data);
+                if (
+                    e.source.document === iframeRef.current.contentDocument &&
+                    data.type === 'height-change'
+                ) {
+                    setHeight(data.height);
+                }
+            } catch (e) {}
+        };
+        window.addEventListener('message', listener);
+        return () => window.removeEventListener('message', listener);
+    }, []);
     useEffect(() => {
         if (lastExpanded.current !== expanded && typeof window !== 'undefined') {
             lastExpanded.current = expanded;
@@ -31,6 +48,7 @@ function CodeExample({ example, container, language, showExpand }) {
             })}
         >
             <iframe
+                ref={iframeRef}
                 src={example.url}
                 width="100%"
                 height={height}
