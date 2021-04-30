@@ -170,6 +170,25 @@ export default async function getStaticProps(
                 </div>
             );
         }
+        if (obj.examples) {
+            for (const example of obj.examples) {
+                if (example.header.description) {
+                    example.header.description = ReactDOMServer.renderToStaticMarkup(
+                        <div className="mdx">
+                            {
+                                await transformMdx(
+                                    example.header.description.trim(),
+                                    remarkPlugins,
+                                    {
+                                        components: mdxComponents,
+                                    }
+                                )
+                            }
+                        </div>
+                    );
+                }
+            }
+        }
     }
     const visitedTracker = new Map();
     async function transformObj(obj) {

@@ -3,13 +3,21 @@ import { Select } from 'antd';
 import { SelectProps } from 'antd/lib/select';
 import React from 'react';
 
+type RawValue = string | number | boolean;
+
 /**
  * @expand-properties
  * @hide-properties asyncChoices
  */
-export type SelectChoicesProps = SelectProps<any> &
-    WidgetProps<number | string | boolean, HTMLSelectElement> & {
-        input: InputProps<number | string | boolean, HTMLSelectElement> & {
+export type SelectChoicesProps<ValueT> = SelectProps<ValueT> &
+    Omit<WidgetProps<ValueT, HTMLSelectElement>, 'input'> & {
+        /**
+         * The choices to render. This can be a `Map` of value to label or an array of 2-element arrays `[value, label]`.
+         */
+        choices: ValueT extends Array<infer T>
+            ? Map<T, string> | [T, string][]
+            : Map<ValueT, string> | [ValueT, string][];
+        input: InputProps<ValueT | null, HTMLSelectElement> & {
             // Types in antd require event. Our types don't because final-form doesn't.
             onBlur?: (event: React.FocusEvent<HTMLSelectElement>) => void;
             onFocus?: (event: React.FocusEvent<HTMLSelectElement>) => void;
@@ -23,18 +31,20 @@ export type SelectChoicesProps = SelectProps<any> &
  * @menu-group Widgets
  * @forward-ref
  */
-function SelectChoicesWidget(props: SelectChoicesProps, ref): React.ReactElement {
+function SelectChoicesWidget<ValueT extends RawValue | RawValue[]>(
+    props: SelectChoicesProps<ValueT>,
+    ref
+): React.ReactElement {
     const { input, meta, choices, ...rest } = props;
     return (
-        <Select ref={ref} {...input} {...rest}>
-            {choices &&
-                Array.from(choices, ([key, label]) => (
-                    <Select.Option key={key.toString()} value={key as any}>
-                        {label}
-                    </Select.Option>
-                ))}
+        <Select ref={ref} {...rest} {...input}>
+            {Array.from(choices, ([key, label]) => (
+                <Select.Option key={key.toString()} value={key as any}>
+                    {label}
+                </Select.Option>
+            ))}
         </Select>
     );
 }
 
-export default React.forwardRef<HTMLSelectElement, SelectChoicesProps>(SelectChoicesWidget);
+export default React.forwardRef(SelectChoicesWidget);

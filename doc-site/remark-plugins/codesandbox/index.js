@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+
 const qs = require('qs');
 const visit = require('unist-util-visit');
 const util = require('util');
@@ -6,10 +7,9 @@ const fs = require('fs');
 const path = require('path');
 const exec = util.promisify(require('child_process').exec);
 const { getParameters } = require('codesandbox/lib/api/define');
-const { assembleFiles } = require('codesandboxer-fs');
 require('isomorphic-unfetch');
 const FormData = require('form-data');
-const { version } = require('../../../package.json');
+const parseSandbox = require('codesandbox/lib/utils/parse-sandbox').default;
 
 const cache = new Map();
 
@@ -23,8 +23,8 @@ function getSandboxUrl(id, type, fileName) {
  * Reads from 'style.css' and builds with tailwind
  */
 async function getStyles(cwd) {
-    const inPath = path.resolve(cwd + '/remark-plugins/codesandbox/styles.css');
-    const outPath = path.resolve(cwd + '/remark-plugins/codesandbox/output.css');
+    const inPath = path.resolve(__dirname, 'styles.css');
+    const outPath = path.resolve(__dirname, 'output.css');
     if (fs.existsSync(outPath)) {
         const a = fs.statSync(outPath);
         const b = fs.statSync(inPath);
@@ -37,49 +37,31 @@ async function getStyles(cwd) {
     return outPath;
 }
 
-async function generateSandbox(fn, cwd) {
-    const f = await assembleFiles(fn);
-    delete f.parameters;
-    const packageJson = JSON.parse(f.files['package.json'].content);
-    packageJson.dependencies['react-scripts'] = '^3.0.1';
-    // Temporary until prestojs/util new version published
-    packageJson.dependencies['qs'] = '^6.9.4';
-    for (const name of ['viewmodel', 'ui', 'ui-antd', 'util', 'final-form', 'routing']) {
-        packageJson.dependencies[`@prestojs/${name}`] = version;
-    }
-    packageJson.scripts = {
-        start: 'react-scripts start',
-        build: 'react-scripts build',
-        test: 'react-scripts test --env=jsdom',
-        eject: 'react-scripts eject',
+async function generateSandbox(dir) {
+    const result = await parseSandbox(path.resolve(dir));
+    result.files['src/tailwind.css'] = {
+        content: fs.readFileSync(await getStyles(), 'utf8'),
     };
-    f.files['styles.css'] = { content: fs.readFileSync(await getStyles(cwd), 'utf8') };
-    f.files['index.js'].content = `import React from 'react';
-import ReactDOM from 'react-dom';
-import Example from './example';
-import './styles.css';
-
-ReactDOM.render(
-    <div className="p-10">
-        <Example />
-    </div>,
-    document.getElementById('root')
-);`;
-    f.files['package.json'].content = JSON.stringify(packageJson, null, 2);
-    const parameters = getParameters(f);
+    const parameters = getParameters(result);
     if (cache.has(parameters)) {
         return cache.get(parameters);
     }
     let formData = new FormData();
     formData.append('parameters', parameters);
     const type = 's';
-    const fileName = 'example.js';
+    const fileName = 'src/index.js';
     return await fetch('https://codesandbox.io/api/v1/sandboxes/define?json=1', {
         method: 'post',
         body: formData,
         mode: 'cors',
     })
-        .then(response => response.json())
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            console.error(response);
+            throw new Error('Invalid response from codesandbox');
+        })
         .then(({ errors, sandbox_id }) => {
             if (errors) throw errors;
             const result = {
@@ -107,12 +89,10 @@ module.exports = function codesandbox() {
             if (!filePath) {
                 return;
             }
-            const fileAbsPath = file.dirname
-                ? path.resolve(file.dirname, filePath)
-                : path.resolve(filePath);
+            const fileAbsPath = path.resolve(__dirname, '../../codesandbox-examples', filePath);
 
             if (!fs.existsSync(fileAbsPath)) {
-                const msg = `Codesandbox link for ${filePath} does not exist. Occurred in:\n\n${file}`;
+                const msg = `Codesandbox link for ${filePath} does not exist. Path should be relative to doc-site/codesandbox-examples/.`;
                 console.error(msg);
                 node.value = msg;
                 return;
@@ -126,7 +106,7 @@ module.exports = function codesandbox() {
             } = meta;
             const query = {
                 codemirror: 1,
-                module: 'example.js',
+                module: 'src/index.js',
                 view,
                 hidenavigation,
                 editorsize,
@@ -176,7 +156,9 @@ module.exports = function codesandbox() {
                     delete node.position;
                 })
                 .catch(e => {
-                    console.error(`Failed to generate sandbox for ${filePath} in ${file}:`, e);
+                    const msg = `Failed to generate sandbox for ${filePath}:`;
+                    console.error(msg, e);
+                    node.value = `${msg} ${e}`;
                 });
             promises.push(promise);
         });

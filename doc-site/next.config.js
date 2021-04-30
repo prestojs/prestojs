@@ -9,9 +9,11 @@ const withMDX = require('@next/mdx')({
         ],
     },
 });
-module.exports = withMDX({
-    pageExtensions: ['js', 'jsx', 'mdx'],
-    webpack: config => {
+const withAntdLess = require('next-plugin-antd-less');
+const withPlugins = require('next-compose-plugins');
+module.exports = withPlugins([withAntdLess, withMDX], {
+    pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
+    webpack: (config, options) => {
         config.module.rules.push({
             test: /\.svg$/,
             issuer: {
@@ -24,6 +26,12 @@ module.exports = withMDX({
         config.node = {
             fs: 'empty',
         };
+        // Process ui-antd with babel so that babel-plugin-import runs on it and imports necessary styles
+        config.module.rules.push({
+            test: /\.+(js|jsx|mjs|ts|tsx)$/,
+            loader: options.defaultLoaders.babel,
+            include: /@prestojs\//,
+        });
         return config;
     },
     webpackDevMiddleware: config => {
@@ -38,5 +46,4 @@ module.exports = withMDX({
     // about moving a file with a .html.html extension...)
     trailingSlash: true,
     distDir: '../.next',
-    target: 'serverless',
 });

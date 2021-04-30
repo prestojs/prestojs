@@ -13,7 +13,7 @@ type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElemen
      * Defaults to 'Undecided'.
      */
     blankLabel: string;
-} & SelectChoicesProps;
+} & SelectChoicesProps<boolean | string>;
 
 /**
  * See [Select](https://ant.design/components/select/) for Select props available
@@ -23,7 +23,7 @@ type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElemen
  * @forward-ref
  */
 function NullableBooleanWidget(props: NullableBooleanWidgetProps, ref): React.ReactElement {
-    const { choices, blankLabel = 'Undecided', meta, ...rest } = props;
+    const { choices, blankLabel = 'Undecided', meta, input, ...rest } = props;
     const defaultChoices =
         choices ||
         new Map([
@@ -37,11 +37,16 @@ function NullableBooleanWidget(props: NullableBooleanWidgetProps, ref): React.Re
             key === null ? ['null', label] : [key, label]
         )
     ) as Map<boolean | string, string>;
-    // rest onChange override comes before input onChange.
-    const f = rest.onChange || (rest.input as any).onChange;
-    const onChange = (v: boolean | string): void => f(v === 'null' ? null : v);
+    const onChange = (v: boolean | string): void => input.onChange(v === 'null' ? null : v);
 
-    return <SelectChoicesWidget ref={ref} choices={newChoices} {...{ onChange, ...rest }} />;
+    return (
+        <SelectChoicesWidget
+            ref={ref}
+            choices={newChoices}
+            input={{ ...input, onChange }}
+            {...rest}
+        />
+    );
 }
 
 export default React.forwardRef<HTMLSelectElement, NullableBooleanWidgetProps>(

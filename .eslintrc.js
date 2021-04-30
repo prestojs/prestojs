@@ -38,5 +38,12 @@ module.exports = {
                 '@typescript-eslint/explicit-function-return-type': ['error'],
             },
         },
+        {
+            // enable the rule specifically for TypeScript files
+            files: ['doc-site/**/*.ts', 'doc-site/**/*.tsx'],
+            rules: {
+                '@typescript-eslint/explicit-function-return-type': 'off',
+            },
+        },
     ],
 };
