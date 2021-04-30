@@ -12,6 +12,7 @@ export default function SignatureDoc({
     method,
     anchorLink,
     isConstructor,
+    showReturn = !isConstructor,
     signatureDefinitionTag = 'h4',
     bordered = true,
     hideName = false,
@@ -80,7 +81,7 @@ export default function SignatureDoc({
             {!hideName && header}
             <MdxWrapper mdx={signature.mdx} />
             {parameters.length > 0 && <ParameterTable parameters={parameters} />}
-            {!isConstructor && <ReturnType signature={signature} />}
+            {showReturn && <ReturnType signature={signature} />}
         </div>
     );
 }

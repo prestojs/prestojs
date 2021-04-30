@@ -19,15 +19,15 @@ export default function MyApp({ Component, pageProps, router }) {
                 );
             });
             resizeObserver.observe(document.body);
+            // .doc-antd matches selector in prefix-antd-styles.js postcss plugin
+            // all antd styles are prefixed with this so it doesn't pollute styles throughout
+            // rest of doc site
             document.body.classList.add('doc-antd');
         }
     }, [isExample]);
     if (isExample) {
         return (
-            // .doc-antd matches selector in prefix-antd-styles.js postcss plugin
-            // all antd styles are prefixed with this so it doesn't pollute styles throughout
-            // rest of doc site
-            <div className="p-10">
+            <div className="p-10 code-examples">
                 <Component {...pageProps} />
             </div>
         );
