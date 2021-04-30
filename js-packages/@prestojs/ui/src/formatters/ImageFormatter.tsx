@@ -1,12 +1,43 @@
-import React from 'react';
+import React, { ReactNode, useMemo } from 'react';
 
-export default function ImageFormatter({
-    value,
-    ...rest
-}: {
-    value?: string;
-}): React.ReactElement | null {
-    if (!value) return null;
+/**
+ * @expand-properties Any additional props are passed through to the `img` tag
+ */
+type ImageFormatterProps = {
+    /**
+     * The value to render. Should be a valid URL or a File/Blob.
+     */
+    value?: null | string | Blob;
+    /**
+     * What to render when `value` is `null`, `undefined` or an empty string
+     *
+     * Defaults to `null`
+     */
+    blankLabel?: ReactNode;
+} & JSX.IntrinsicElements['img'];
 
-    return <img src={value} {...rest} />;
+/**
+ * Render an image from a URL
+ *
+ * This is the [default formatter](doc:getFormatterForField) used for [ImageField](doc:ImageField)
+ *
+ * @extract-docs
+ * @menu-group Formatters
+ */
+export default function ImageFormatter(props: ImageFormatterProps): React.ReactElement | null {
+    const { value, blankLabel, ...rest } = props;
+    const blobUrl = useMemo(() => {
+        if (typeof Blob !== 'undefined' && value instanceof Blob) {
+            return URL.createObjectURL(value);
+        }
+    }, [value]);
+    if (!value) {
+        return <>{blankLabel}</>;
+    }
+    // Check `Blob` exists so works with SSR (eg. nextjs)
+    if (typeof Blob !== 'undefined' && value instanceof Blob) {
+        return <img src={blobUrl} {...rest} />;
+    }
+
+    return <img src={value as string} {...rest} />;
 }
