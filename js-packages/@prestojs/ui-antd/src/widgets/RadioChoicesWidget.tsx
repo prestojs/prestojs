@@ -35,13 +35,13 @@ type RadioChoicesWidgetProps<ValueT> = Omit<
  * @menu-group Widgets
  * @forward-ref
  */
-function RadioChoicesWidget<ValueT extends number | string>(
+function RadioChoicesWidget<ValueT extends number | string | boolean>(
     props: RadioChoicesWidgetProps<ValueT>
 ): React.ReactElement {
     const { input, choices, meta, radioComponent, choiceProps, ...rest } = props;
     const RadioComponent = radioComponent || Radio;
     return (
-        <Radio.Group {...input} {...rest}>
+        <Radio.Group {...rest} {...input}>
             {choices &&
                 Array.from(choices, ([key, label]) => (
                     <RadioComponent

@@ -58,8 +58,10 @@ function ChoicesWidget<ValueType extends RawValue | RawValue[]>(
     }
     if (!widgetType) {
         widgetType =
-            (rest.choices && Array.from(rest.choices).length > 3) || multiple || asyncChoices
+            (rest.choices && Array.from(rest.choices).length > 3) || asyncChoices
                 ? 'select'
+                : multiple
+                ? 'checkbox'
                 : 'radio';
     }
     if (widgetType !== 'select' && asyncChoices) {

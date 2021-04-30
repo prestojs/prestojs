@@ -61,14 +61,14 @@ function CodeExample({ example, container, language, showExpand }) {
                     setHeight(e.target.contentDocument.body.getBoundingClientRect().height)
                 }
             />
-            <div className="px-5 relative border-t mb-5">
-                <h3 className="relative bg-white inline-block px-1" style={{ top: -15 }}>
-                    {title}
-                </h3>
-                {description && (
+            {description && (
+                <div className="px-5 relative border-t mb-5">
+                    <h3 className="relative bg-white inline-block px-1" style={{ top: -15 }}>
+                        {title}
+                    </h3>
                     <div className="" dangerouslySetInnerHTML={{ __html: description }} />
-                )}
-            </div>
+                </div>
+            )}
             <div
                 className={cx('relative', {
                     'z-10': open && expanded,

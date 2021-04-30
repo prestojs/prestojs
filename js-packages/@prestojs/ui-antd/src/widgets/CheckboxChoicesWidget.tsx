@@ -3,12 +3,14 @@ import { Checkbox } from 'antd';
 import type { CheckboxGroupProps } from 'antd/es/checkbox';
 import React from 'react';
 
+type RawValue = string | number | boolean;
+
 /**
  * @expand-properties
  * @hide-properties asyncChoices
  */
-type CheckboxChoicesWidgetProps<ValueT extends number | string> = CheckboxGroupProps &
-    WidgetProps<ValueT[], HTMLInputElement, ValueT> & {
+type CheckboxChoicesWidgetProps<ValueT> = CheckboxGroupProps &
+    Omit<WidgetProps<ValueT[], HTMLInputElement, ValueT>, 'choices'> & {
         /**
          * The choices to render.
          *
@@ -35,17 +37,17 @@ type CheckboxChoicesWidgetProps<ValueT extends number | string> = CheckboxGroupP
  * @menu-group Widgets
  * @forward-ref
  */
-function CheckboxChoicesWidget<ValueT extends (number | string)[]>(
-    props: CheckboxChoicesWidgetProps<ValueT extends Array<infer T> ? T : unknown>
+function CheckboxChoicesWidget<ValueT extends RawValue>(
+    props: CheckboxChoicesWidgetProps<ValueT>
 ): React.ReactElement {
     const { input, choices, meta, choiceProps, ...rest } = props;
     if (!choices) {
         throw new Error('choices must be provided');
     }
     return (
-        <Checkbox.Group {...input} {...rest}>
+        <Checkbox.Group {...rest} {...input}>
             {Array.from(choices, ([value, label]) => (
-                <Checkbox key={value} value={value} {...(choiceProps?.get(value) || {})}>
+                <Checkbox key={value.toString()} value={value} {...(choiceProps?.get(value) || {})}>
                     {label}
                 </Checkbox>
             ))}
