@@ -1,26 +1,31 @@
+import { render } from '@testing-library/react';
+import React from 'react';
 import NumberFormatter from '../formatters/NumberFormatter';
 
 test('NumberFormatter format numbers correctly', () => {
-    expect(NumberFormatter({ value: null })).toBeNull();
+    expect(render(<NumberFormatter value={null} />).container.innerHTML).toBe('');
+    expect(render(<NumberFormatter value={1} />).container.innerHTML).toBe('1');
+    expect(render(<NumberFormatter value={0.69} />).container.innerHTML).toBe('0.69');
 
-    expect(NumberFormatter({ value: 1 })).toBe('1');
-
-    expect(NumberFormatter({ value: 0.69 })).toBe('0.69');
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    expect(NumberFormatter({ value: '42' })).toBe('42');
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    expect(NumberFormatter({ value: 'ulururu' })).toBeNull();
-
-    expect(NumberFormatter({ value: 5000 })).toBe('5,000');
+    expect(render(<NumberFormatter value="42" />).container.innerHTML).toBe('42');
+    expect(render(<NumberFormatter value="ulururu" />).container.innerHTML).toBe('');
+    expect(render(<NumberFormatter value={5000} />).container.innerHTML).toBe('5,000');
 
     expect(
-        NumberFormatter({
-            value: 5000,
-            localeOptions: { style: 'currency', currency: 'USD', currencyDisplay: 'code' },
-        })
-    ).toBe('USD 5,000.00');
+        render(
+            <NumberFormatter
+                value={5000}
+                localeOptions={{ style: 'currency', currency: 'USD', currencyDisplay: 'code' }}
+            />
+        ).container.innerHTML
+    ).toBe('USD&nbsp;5,000.00');
+});
+
+test('NumberFormatter should support blankLabel & invalidValueLabel', () => {
+    expect(render(<NumberFormatter />).container.innerHTML).toBe('');
+    expect(render(<NumberFormatter value="" blankLabel="-" />).container.innerHTML).toBe('-');
+    expect(render(<NumberFormatter value="bad" />).container.innerHTML).toBe('');
+    expect(
+        render(<NumberFormatter value="bad" invalidValueLabel="Bad Number" />).container.innerHTML
+    ).toBe('Bad Number');
 });
