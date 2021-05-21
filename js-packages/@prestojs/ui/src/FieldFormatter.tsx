@@ -19,9 +19,14 @@ type FieldFormatterProps<FieldValueT, ParsableValueT, SingleValueT> = {
 };
 
 /**
- * Wraps around getFormatterForField to always return ReactElement; Applies default props from getFormatterForField if any.
- * Formats a value based on the specified field. See `getFormatterForField` on [UiProvider](doc:UiProvider) for how the
- * formatter is determined.
+ * For the given `Field` and `value` render the relevant Formatter for it.
+ *
+ * Usage of this component requires [UiProvider](doc:UiProvider) to appear somewhere above it in the component hierarchy. You
+ * must pass the `getFormatterForField` prop through which is what determines which component to use for a specific field.
+ *
+ * `getFormatterForField` can return either a component directly or a 2-element array of the component and some props to pass
+ * through to it. `FieldFormatter` handles rendering the returned component and passing through any extra props returned from
+ * `getFormatterForField` or passed through to `Formatter`.
  *
  * @extract-docs
  */
