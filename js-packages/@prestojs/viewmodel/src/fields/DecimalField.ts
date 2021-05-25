@@ -1,4 +1,11 @@
-import NumberField from './NumberField';
+import NumberField, { NumberFieldProps } from './NumberField';
+
+/**
+ * @expand-properties
+ */
+type DecimalFieldProps = NumberFieldProps<string> & {
+    decimalPlaces?: number;
+};
 
 /**
  * Decimal Field. Stores decimal value as a string.
@@ -16,12 +23,12 @@ export default class DecimalField extends NumberField<string> {
     static fieldClassName = 'DecimalField';
     public decimalPlaces?: number;
 
-    constructor(values) {
+    constructor(values: DecimalFieldProps = {}) {
         const { decimalPlaces, ...rest } = values;
 
         if (decimalPlaces !== undefined && typeof decimalPlaces !== 'number')
             throw new Error(`"decimalPlaces" should be a number, received: ${decimalPlaces}`);
-        if (decimalPlaces <= 0)
+        if (decimalPlaces !== undefined && decimalPlaces <= 0)
             throw new Error(
                 `"decimalPlaces" should be a positive number, received: ${decimalPlaces}`
             );
