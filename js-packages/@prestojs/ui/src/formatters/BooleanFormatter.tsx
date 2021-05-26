@@ -5,7 +5,7 @@ import React, { ReactElement, ReactNode } from 'react';
  */
 type BooleanFormatterProps = {
     /**
-     * The value to format. When null or undefined renders `blankLabel`, when truthy renders `trueLabel`, when falsy renders 'falseLabel`
+     * The value to format. When `null`, `undefined` or empty string it renders `blankLabel`, when truthy renders `trueLabel`, when falsy renders `falseLabel`
      */
     value?: boolean | null;
     /**
@@ -21,7 +21,7 @@ type BooleanFormatterProps = {
      */
     trueLabel?: ReactNode;
     /**
-     * Rendered when `value` is falsy
+     * Rendered when `value` is falsy but not `null`, `undefined` or the empty string
      *
      * Defaults to `No`
      */
@@ -31,8 +31,7 @@ type BooleanFormatterProps = {
 /**
  * Format a boolean for display
  *
- * Displays truthy value as `Yes`, `false` as `No` and null/undefined
- * as `blankLabel` (defaults to empty string).
+ * Displays truthy value as `Yes`, falsy as `No` and null/undefined/empty string as `blankLabel` (defaults to empty string).
  *
  * This is the [default formatter](doc:getFormatterForField) used for [BooleanField](doc:BooleanField) and [NullableBooleanField](doc:NullableBooleanField).
  *

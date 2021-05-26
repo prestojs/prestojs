@@ -36,7 +36,7 @@ type RangeFormatterProps<T, BoundsFormatter extends React.ComponentType<{ value:
     /**
      * The formatter to use to render the `lower` and `upper` values in `value`.
      *
-     * If not specified then defaults to returned the `value` directly.
+     * If not specified then defaults to returning the `value` directly.
      */
     boundsFormatter?: BoundsFormatter;
     /**
