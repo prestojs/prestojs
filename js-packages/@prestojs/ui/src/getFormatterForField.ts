@@ -65,7 +65,9 @@ const choicesMapping = new Map<string, any>([
 ]);
 
 /**
- * Returns the default formatter for any given Field.
+ * Returns the default formatter for a given [Field](doc:Field).
+ *
+ * This can be called directly but is more commonly used via [UiProvider](doc:UiProvider) and [FieldFormatter](doc:FieldFormatter).
  *
  * Depending on Field, this will return either a Formatter component directly, or [Formatter, props] where props is the default props that would be applied to said formatter.
  *

@@ -6,6 +6,7 @@
 
 * Add [CheckboxChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/CheckboxChoicesWidget/)
 * Add [ChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/ChoicesWidget/)
+* Add [parseTime](https://prestojs.com/docs/util/parseTime/) and [formatTime](https://prestojs.com/docs/util/formatTime/)
 
 ### Changed
 
@@ -21,6 +22,17 @@
   * `WidgetProps` now supports `SingleValue` generic type to support fields with an array of values but type `choices` correctly
 * Fix bug that prevented [TimeFormatter](https://prestojs.com/docs/ui/formatters/TimeFormatter/) from working in Safari
 * [RadioChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/RadioChoicesWidget/) now supports `radioComponent` & `choicesProps` props
+* Types for all provided Formatter components in `@prestojs/ui` have been updated to have correct return types for typescript
+* [BooleanFormatter](https://prestojs.com/docs/ui/formatters/BooleanFormatter/) now accepts `trueLabel` and `falseLabel`
+* [CharFormatter](https://prestojs.com/docs/ui/formatters/CharFormatter/) now accepts `blankLabel`
+* [ChoiceFormatter](https://prestojs.com/docs/ui/formatters/ChoiceFormatter/) now accepts `blankLabel`, `invalidChoiceLabel` and `warnOnInvalidChoice`
+* [DateFormatter](https://prestojs.com/docs/ui/formatters/DateFormatter/) and [DateTimeFormatter](https://prestojs.com/docs/ui/formatters/DateTimeFormatter/) now accept `blankLabel` and `invalidDateLabel`
+* [ImageFormatter](https://prestojs.com/docs/ui/formatters/ImageFormatter/) now accepts `blankLabel` and types updated to accept valid `img` props. It also accepts a `Blob` or `File` as a value.
+* [LinkFormatter](https://prestojs.com/docs/ui/formatters/LinkFormatter/) now accepts `blankLabel` and `linkComponent` 
+* [NumberFormatter](https://prestojs.com/docs/ui/formatters/NumberFormatter/) now accepts `blanklabel` and `invalidValueLabel`
+* [RangeFormatter](https://prestojs.com/docs/ui/formatters/RangeFormatter/) now accepts `blanklabel`, `boundsFormatterProps`, `lowerFormatterProps`, `upperFormatterProps`. `baseFormatter` was renamed `boundsFormatter`.
+* [TimeFormatter](https://prestojs.com/docs/ui/formatters/TimeFormatter/) now accepts `blanklabel` and `invalidValueLabel` and can parse times in more formats.
+* [DecimalField](https://prestojs.com/docs/viewmodel/fields/DecimalField/) previously required you to pass `props` even if it was empty. This is now optional.
 
 ## [0.0.16] - 2021-04-26
 

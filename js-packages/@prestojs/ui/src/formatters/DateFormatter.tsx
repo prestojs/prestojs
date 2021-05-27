@@ -1,26 +1,69 @@
-/*
- * Formats a date input based on user browser's locale. Returns null when value is either null or Not-a-Date, toLocaleDateString otherwise.
- *
- * Both `locales` and `options` used are customizeable. For values available, see: [MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString)
+import React, { ReactElement, ReactNode } from 'react';
+
+/**
+ * @expand-properties
  */
-export default function DateFormatter({
-    value,
-    locales = [],
-    localeOptions,
-}: {
+type DateFormatterProps = {
+    /**
+     * The value to format
+     */
     value: Date | string | null;
+    /**
+     * The [locales](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#using_locales) option passed to
+     * [Date.toLocaleDateString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString).
+     */
     locales?: string | Array<string>;
-    localeOptions?: Intl.DateTimeFormatOptions;
-}): string | null {
+    /**
+     * The [localeOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#using_options) passed to
+     * [Date.toLocaleDateString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString).
+     */
+    localeOptions?: Intl.DateTimeFormatOptions & {
+        // https://github.com/microsoft/TypeScript/issues/38266
+        dateStyle?: 'full' | 'long' | 'medium' | 'short';
+    };
+    /**
+     * What to render when `value` is `null`, `undefined` or an empty string
+     *
+     * Defaults to `null`
+     */
+    blankLabel?: ReactNode;
+    /**
+     * What to render when passed date is invalid
+     *
+     * Defaults to `null`
+     */
+    invalidDateLabel?: ReactNode;
+};
+
+/**
+ * Formats a date without time based on user browser's locale.
+ *
+ * If no value is provided `blankLabel` is returned.
+ *
+ * If an invalid date is provided `invalidDateLabel` is returned.
+ *
+ * This is the [default formatter](doc:getFormatterForField) used for [DateField](doc:DateField)
+ *
+ * @extract-docs
+ * @menu-group Formatters
+ */
+export default function DateFormatter(props: DateFormatterProps): ReactElement | null {
+    const {
+        value,
+        locales = [],
+        blankLabel = null,
+        invalidDateLabel = null,
+        localeOptions,
+    } = props;
     let finalValue;
 
     if (!value) {
-        return null;
+        return <>{blankLabel}</>;
     }
 
     if (!(value instanceof Date)) {
         if (Number.isNaN(Date.parse(value))) {
-            return null;
+            return <>{invalidDateLabel}</>;
         }
         finalValue = new Date(value);
     } else {

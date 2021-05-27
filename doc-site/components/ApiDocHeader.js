@@ -1,6 +1,8 @@
 import React from 'react';
 import EditCopy from '../assets/edit-copy.svg';
+import ReactIcon from './ReactIcon';
 import SourceLink from './SourceLink';
+import Tooltip from './Tooltip';
 
 function CopyToClipboard({ text }) {
     return (
@@ -16,14 +18,21 @@ function CopyToClipboard({ text }) {
     );
 }
 
-export default function ApiDocHeader({ doc, isType = false }) {
+export default function ApiDocHeader({ doc, isComponent, isType = false }) {
     const importString = `import ${isType ? 'type ' : ' '}{ ${doc.name} } from \"@prestojs/${
         doc.packageName
     }\";`;
     return (
         <>
             <header className="flex justify-between items-center">
-                <h1 className="text-3xl flex justify-between items-center">{doc.name}</h1>
+                <h1 className="text-3xl flex justify-between items-center relative">
+                    {doc.name}
+                    {isComponent && (
+                        <Tooltip content="This is a React component">
+                            <ReactIcon className="text-blue-400 ml-5" />
+                        </Tooltip>
+                    )}
+                </h1>
                 <SourceLink doc={doc} />
             </header>
             <div className="mb-3 mt-3 bg-orange-100 p-1 rounded pl-2 flex text-gray-800 justify-between">

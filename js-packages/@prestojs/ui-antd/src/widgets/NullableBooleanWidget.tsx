@@ -13,7 +13,7 @@ type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElemen
      * Defaults to 'Undecided'.
      */
     blankLabel: string;
-} & SelectChoicesProps<boolean | string>;
+} & Omit<SelectChoicesProps<boolean | string>, 'choices'>;
 
 /**
  * See [Select](https://ant.design/components/select/) for Select props available

@@ -7,12 +7,16 @@ import SignatureDoc from './SignatureDoc';
 
 export default function FunctionDoc({ doc }) {
     const excludeParameters = doc.isForwardRef ? ['ref'] : [];
+    const isComponent = doc.name[0].toUpperCase() === doc.name[0];
     return (
         <Article>
-            <ApiDocHeader doc={doc} />
+            <ApiDocHeader doc={doc} isComponent={isComponent} />
             {doc.mdx && <MdxWrapper mdx={doc.mdx} />}
             {doc.signatures.map((sig, i) => (
                 <SignatureDoc
+                    // For components don't show return value - doesn't convey any useful
+                    // information and can be confusing
+                    showReturn={!isComponent}
                     signatureDefinitionTag="div"
                     key={i}
                     signature={sig}

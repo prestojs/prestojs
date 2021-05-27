@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import Link from 'next/link';
 import React from 'react';
 import { expandProperties } from '../../util';
@@ -47,6 +48,7 @@ export default function TypeDesc({ doc, type, isArray, isReturnType, isTypeParam
     if (!type) {
         return '';
     }
+
     if (doc?.comment?.tagsByName?.['type-name']) {
         return <span className="text-blue-400">{doc.comment.tagsByName['type-name']}</span>;
     }
@@ -73,6 +75,21 @@ export default function TypeDesc({ doc, type, isArray, isReturnType, isTypeParam
                 <TypeDesc type={sig.type} />
                 {'}'}
             </span>
+        );
+    }
+
+    // See if it's a type that supports expanded properties
+    const expandedProperties = expandProperties(type);
+    if (expandedProperties) {
+        return (
+            <Popover
+                content={<ParameterTable parameters={expandedProperties[1]} />}
+                title={expandedProperties[0]}
+            >
+                <span className="text-orange-400 underline cursor-pointer">
+                    {expandedProperties[0]}
+                </span>
+            </Popover>
         );
     }
     const referencedType = type.constraint?.referencedType || type.referencedType;

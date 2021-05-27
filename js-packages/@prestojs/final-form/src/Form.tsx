@@ -8,7 +8,7 @@ import FormItem from './FormItem';
 /**
  * @expand-properties Any of the final-form [FormProps](https://final-form.org/docs/react-final-form/types/FormProps) and the options shown below
  */
-type FormProps<FormValues = AnyObject> = FinalFormProps<FormValues> & {
+export type FormProps<FormValues = AnyObject> = FinalFormProps<FormValues> & {
     /**
      * Initial values for the form. Either an object or a `ViewModel` record.
      */

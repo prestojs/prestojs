@@ -3,7 +3,7 @@ import Field, { FieldProps } from './Field';
 /**
  * @expand-properties
  */
-type NumberFieldProps<T> = FieldProps<T> & {
+export type NumberFieldProps<T> = FieldProps<T> & {
     minValue?: number;
     maxValue?: number;
 };
