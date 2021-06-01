@@ -46,13 +46,27 @@ export type EndpointOptions<ReturnT> = ExecuteInitOptions & {
      * A function to resolve the URL. It is passed the URL pattern object, any
      * arguments for the URL and any query string parameters.
      *
+     * `this` is bound to the `Endpoint`.
+     *
      * If not provided defaults to:
      *
      * ```js
-     * urlPattern.resolve(urlArgs, { query });
+     * function defaultResolveUrl(urlPattern, urlArgs, query, baseUrl) {
+     *      if (baseUrl[baseUrl.length - 1] === '/') {
+     *          baseUrl = baseUrl.slice(0, -1);
+     *      }
+     *      return baseUrl + this.urlPattern.resolve(urlArgs, { query });
+     *  }
      * ```
      */
     resolveUrl?: (urlPattern: UrlPattern, urlArgs?: Record<string, any>, query?: Query) => string;
+    /**
+     * Base URL to use. This is prepended to the return value of `urlPattern.resolve(...)` and can be used
+     * to change the call to occur to a different domain.
+     *
+     * If not specified defaults to [Endpoint.defaultConfig.baseUrl](doc:Endpoint#static-var-defaultConfig)
+     */
+    baseUrl?: string;
     /**
      * Middleware to apply for this endpoint. By default `getMiddleware` concatenates this with the global
      * [Endpoint.defaultConfig.middleware](doc:Endpoint#static-var-defaultConfig)
@@ -176,6 +190,7 @@ export type MiddlewareUrlConfig = {
     pattern: UrlPattern;
     args: Record<string, any>;
     query: Query;
+    baseUrl: string;
 };
 
 /**
@@ -234,6 +249,13 @@ type DefaultConfig<ReturnT = any> = {
      * by the endpoint specific middleware.
      */
     getMiddleware: (middleware: Middleware<ReturnT>[], endpoint: Endpoint) => Middleware<ReturnT>[];
+    /**
+     * Base to use for all urls. This can be used to change all URL's to be on a different origin.
+     *
+     * This can also be customised by middleware by changing `urlConfig.baseUrl` (defaults to this setting) or
+     * in each `Endpoint` by passing `baseUrl` in options.
+     */
+    baseUrl: string;
 };
 
 /**
@@ -379,10 +401,14 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
 
 function defaultResolveUrl(
     urlPattern: UrlPattern,
-    urlArgs?: Record<string, any>,
-    query?: Query
+    urlArgs: Record<string, any>,
+    query: Query | undefined,
+    baseUrl: string
 ): string {
-    return this.urlPattern.resolve(urlArgs, { query });
+    if (baseUrl[baseUrl.length - 1] === '/') {
+        baseUrl = baseUrl.slice(0, -1);
+    }
+    return baseUrl + this.urlPattern.resolve(urlArgs, { query });
 }
 
 /**
@@ -632,10 +658,29 @@ export default class Endpoint<ReturnT = any> {
     private decodeBody: (res: Response) => any;
     private resolveUrl: (
         urlPattern: UrlPattern,
-        urlArgs?: Record<string, any>,
-        query?: Query
+        urlArgs: Record<string, any>,
+        query: Query | undefined,
+        baseUrl: string
     ) => string;
     public middleware: Middleware<ReturnT>[];
+
+    private _baseUrl?: string;
+
+    /**
+     * The base URL to use for this endpoint. This is prepended to the URL returned from `urlPattern.resolve`.
+     *
+     * If not specified then it defaults to [Endpoint.defaultConfig.baseUrl](doc:Endpoint#static-var-defaultConfig).
+     *
+     * Note that middleware can override this as well.
+     */
+    get baseUrl(): string {
+        // This is a getter so that we can read `defaultConfig` when it's executing rather than when Endpoint
+        // is instantiated (ie. you can change `baseUrl` after endpoints have been created.
+        if (this._baseUrl == null) {
+            return Endpoint.defaultConfig.baseUrl;
+        }
+        return this._baseUrl;
+    }
 
     /**
      * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint
@@ -644,11 +689,13 @@ export default class Endpoint<ReturnT = any> {
         const {
             decodeBody = defaultDecodeBody,
             resolveUrl = defaultResolveUrl,
+            baseUrl,
             middleware = [],
             getMiddleware = Endpoint.defaultConfig.getMiddleware,
             ...requestInit
         } = options;
 
+        this._baseUrl = baseUrl;
         this.urlPattern = urlPattern;
         this.urlCache = new Map();
         this.decodeBody = decodeBody;
@@ -683,7 +730,7 @@ export default class Endpoint<ReturnT = any> {
             }
         }
         const { urlArgs = {}, query, ...init } = options;
-        const url = this.resolveUrl(this.urlPattern, urlArgs, query);
+        const url = this.resolveUrl(this.urlPattern, urlArgs, query, this.baseUrl);
         let cache = this.urlCache.get(url);
         if (!cache) {
             cache = new Map();
@@ -738,6 +785,7 @@ export default class Endpoint<ReturnT = any> {
             pattern: this.urlPattern,
             args: urlArgs,
             query: query,
+            baseUrl: this.baseUrl,
         };
 
         const cls = Object.getPrototypeOf(this).constructor;
@@ -796,7 +844,12 @@ export default class Endpoint<ReturnT = any> {
                 }
                 const nextMiddleware = middleware.shift();
                 if (!nextMiddleware) {
-                    const url = this.resolveUrl(urlConfig.pattern, urlConfig.args, urlConfig.query);
+                    const url = this.resolveUrl(
+                        urlConfig.pattern,
+                        urlConfig.args,
+                        urlConfig.query,
+                        urlConfig.baseUrl
+                    );
                     returnVal.url = url;
                     returnVal.urlArgs = urlConfig.args;
                     returnVal.query = urlConfig.query;
@@ -850,6 +903,7 @@ export default class Endpoint<ReturnT = any> {
 
 // Initialisation is not done inline in class as doc extractor doesn't handle object literals well
 Endpoint.defaultConfig = {
+    baseUrl: '',
     requestInit: {},
     middleware: [requestDefaultsMiddleware],
     getMiddleware: <T>(middleware: Middleware<T>[]): Middleware<T>[] => [
