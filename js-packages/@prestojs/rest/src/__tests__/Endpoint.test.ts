@@ -337,7 +337,7 @@ test('should support changing paginatorClass & getPaginationState', async () => 
         };
     };
     const action1 = new Endpoint(new UrlPattern('/whatever/'), {
-        middleware: [paginationMiddleware(PageNumberPaginator, getPaginationState)],
+        middleware: [paginationMiddleware(PageNumberPaginator, { getPaginationState })],
     });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

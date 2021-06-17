@@ -36,6 +36,28 @@ export type PaginationRequestDetails = {
     response?: Response;
     /**
      * The value returned by `decodedBody`. See [Endpoint.execute](doc:Endpoint#method-execute).
+     *
+     * This may be a sub-key of the data returned by `Endpoint.execute`, eg. if the `path` option is used in
+     * [paginationMiddleware](doc:paginationMiddleware). eg. If `decodedBody` from the `Endpoint` was
+     *
+     * ```json
+     * {
+     *     users: {
+     *         count: 10,
+     *         results: [...],
+     *     }
+     *     extraDetails: {...}
+     * }
+     * ```
+     *
+     * and `paginationMiddleware` was used with `path: 'users'` then `decodedBody` would be:
+     *
+     * ```json
+     * {
+     *     count: 10,
+     *     results: [...]
+     * }
+     * ```
      */
     decodedBody?: any;
 };

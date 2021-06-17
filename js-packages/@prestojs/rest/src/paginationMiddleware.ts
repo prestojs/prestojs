@@ -4,6 +4,10 @@ import {
     PaginatorInterface,
     PaginatorInterfaceClass,
 } from '@prestojs/util';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
+
+import set from 'lodash/set';
 import Endpoint, {
     EndpointExecuteOptions,
     EndpointRequestInit,
@@ -20,13 +24,62 @@ type GetPaginationState = (
     requestDetails: PaginationRequestDetails
 ) => Record<string, any> | false;
 
+/**
+ * @expand-properties
+ */
+type PaginationMiddlewareOptions = {
+    /**
+     * Function that returns the state for a paginator based on the response. If not provided
+     * uses the static `getPaginationState` method on the `paginatorClass`. You can use this method if your backend needs
+     * to transform the response before being handled by `paginatorClass`. This can be useful to use a built in paginator
+     * (eg. PageNumberPaginator) where a data structure from the backend differs from that expected.
+     */
+    getPaginationState?: GetPaginationState;
+    /**
+     * Optional path to where in data the pagination state exists. Dotted notation is accepted (see below example).
+     *
+     * If this is provided only this section of the data object will be updated. For example if the return data looked like:
+     *
+     * ```json
+     * {
+     *   records: {
+     *       users: {
+     *           count: 10,
+     *           results: [...]
+     *       },
+     *       products: [...]
+     *   }
+     *   extra: { ... }
+     * }
+     * ```
+     *
+     * And `resultPath` was set to `records.users` then the returned data would be
+     *
+     * ```json
+     * {
+     *   records: {
+     *       users: [...],    // pagination state extracted, `results` set
+     *       products: [...], // unchanged
+     *   }
+     *   extra: { ... }       // unchanged
+     * }
+     * ```
+     *
+     */
+    resultPath?: string;
+};
 export class PaginationMiddleware<T> {
     paginatorClass: PaginatorInterfaceClass;
     getPaginationState?: GetPaginationState;
+    resultPath?: string;
 
-    constructor(paginatorClass: PaginatorInterfaceClass, getPaginationState?: GetPaginationState) {
+    constructor(
+        paginatorClass: PaginatorInterfaceClass,
+        { getPaginationState, resultPath }: PaginationMiddlewareOptions = {}
+    ) {
         this.paginatorClass = paginatorClass;
         this.getPaginationState = getPaginationState;
+        this.resultPath = resultPath;
     }
     init(endpoint: Endpoint): void {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -100,7 +153,7 @@ export class PaginationMiddleware<T> {
             // is not paginated.
             const requestDetails = {
                 query: urlConfig.query,
-                decodedBody,
+                decodedBody: this.resultPath ? get(decodedBody, this.resultPath) : decodedBody,
                 url,
                 urlArgs: urlConfig.args,
                 response,
@@ -110,6 +163,11 @@ export class PaginationMiddleware<T> {
                 : this.paginatorClass.getPaginationState(requestDetails);
             if (paginationState) {
                 paginator.setResponse(paginationState);
+                if (this.resultPath) {
+                    const result = cloneDeep(decodedBody);
+                    set(result, this.resultPath, paginationState.results);
+                    return result;
+                }
                 return paginationState.results;
             } else {
                 // TODO: If you specify a paginator and the response is not paginated should
@@ -147,17 +205,13 @@ export class PaginationMiddleware<T> {
  * ```
  *
  * @param paginatorClass The pagination class to use. Defaults to [InferredPaginator](doc:InferredPaginator).
- * @param getPaginationState Function that returns the state for a paginator based on the response. If not provided
- * uses the static `getPaginationState` method on the `paginatorClass`. You can use this method if your backend needs
- * to transform the response before being handled by `paginatorClass`. This can be useful to use a built in paginator
- * (eg. PageNumberPaginator) where a data structure from the backend differs from that expected.
  *
  * @extract-docs
  * @menu-group Middleware
  */
 export default function paginationMiddleware<T>(
     paginatorClass: PaginatorInterfaceClass = InferredPaginator,
-    getPaginationState?: GetPaginationState
+    options?: PaginationMiddlewareOptions
 ): MiddlewareObject<T> {
-    return new PaginationMiddleware(paginatorClass, getPaginationState);
+    return new PaginationMiddleware(paginatorClass, options);
 }

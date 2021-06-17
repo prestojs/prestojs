@@ -1,6 +1,11 @@
 import { UrlPattern } from '@prestojs/routing';
+import { PageNumberPaginator } from '@prestojs/util';
 import { CharField, viewModelFactory } from '@prestojs/viewmodel';
+import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
+import qs from 'query-string';
+import { useState } from 'react';
+import { act } from 'react-test-renderer';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { recordEqualTo } from '../../../../../js-testing/matchers';
@@ -295,5 +300,76 @@ test('should error if included in wrong order with paginationMiddleware', async 
     // This should work
     new Endpoint(new UrlPattern('/user/'), {
         middleware: [viewModelCachingMiddleware(User), paginationMiddleware()],
+    });
+});
+
+test('object notation should work with pagination', async () => {
+    const { User, Food, users, foodItems } = createData();
+    const endpoint = new Endpoint(new UrlPattern('/combined/'), {
+        middleware: [
+            viewModelCachingMiddleware({
+                'records.user': User,
+                'records.food': Food,
+            }),
+            paginationMiddleware(undefined, { resultPath: 'records.user' }),
+        ],
+    });
+    fetchMock.mockResponse(request => {
+        const query = qs.parse(request.url.split('?')[1] || '');
+        let { page = 1, pageSize = 2 } = query;
+        page = Number(page);
+        pageSize = Number(pageSize);
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        return Promise.resolve({
+            body: JSON.stringify({
+                records: {
+                    user: {
+                        count: users.length,
+                        results: users.slice(start, end),
+                    },
+                    food: foodItems[0],
+                },
+                extraDetails: [1, 2, 3],
+            }),
+            init: {
+                status: 200,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            },
+        });
+    });
+    function useTestHook(initialState = {}): PageNumberPaginator {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return new PageNumberPaginator(useState(initialState), useState());
+    }
+    const {
+        result: { current: paginator },
+    } = renderHook(() => useTestHook());
+    await act(async () => {
+        const endpointReturn = await endpoint.execute({ paginator });
+        expect(endpointReturn.result).toEqual({
+            records: {
+                user: users.slice(0, 2).map(d => recordEqualTo(d)),
+                food: recordEqualTo(foodItems[0]),
+            },
+            extraDetails: [1, 2, 3],
+        });
+    });
+    expect(paginator.internalState.total).toBe(3);
+    expect(paginator.currentState.pageSize).toBe(2);
+
+    await act(async () => {
+        paginator.next();
+        const endpointReturn = await endpoint.execute({ paginator });
+        expect(endpointReturn.result).toEqual({
+            records: {
+                user: users.slice(2, 4).map(d => recordEqualTo(d)),
+                food: recordEqualTo(foodItems[0]),
+            },
+            extraDetails: [1, 2, 3],
+        });
     });
 });
