@@ -139,7 +139,7 @@ export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
  * if a duplicate request is detected it just needs to wait for the original request to finish and return the
  * same Response object.
  *
- * It can also be used to change how `fetch` is performed like in `batchMiddleware`.
+ * It can also be used to change how `fetch` is performed (`batchMiddleware` uses this).
  *
  * For example this just calls a completely different URL and uses the response object from that:
  *
@@ -150,6 +150,9 @@ export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
  *   ));
  * }
  * ```
+ *
+ * Note that this completely bypasses any subsequent middleware in the chain (including response handling) so any
+ * security-related middleware should come before this.
  *
  * @extract-docs
  * @menu-group Endpoint

@@ -4,6 +4,7 @@ export { default as dedupeInFlightRequestsMiddleware } from './dedupeInFlightReq
 export { default as paginationMiddleware } from './paginationMiddleware';
 export { default as requestDefaultsMiddleware } from './requestDefaultsMiddleware';
 export { default as detectBadPaginationMiddleware } from './detectBadPaginationMiddleware';
+export { default as batchMiddleware } from './batchMiddleware';
 
 import type {
     EndpointExecuteOptions,
