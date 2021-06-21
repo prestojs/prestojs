@@ -1,4 +1,4 @@
-export { default as Endpoint, ApiError } from './Endpoint';
+export { default as Endpoint, ApiError, mergeRequestInit, SkipToResponse } from './Endpoint';
 export { default as viewModelCachingMiddleware } from './viewModelCachingMiddleware';
 export { default as dedupeInFlightRequestsMiddleware } from './dedupeInFlightRequestsMiddleware';
 export { default as paginationMiddleware } from './paginationMiddleware';
