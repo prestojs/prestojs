@@ -29,6 +29,8 @@ test('should de-dupe in flight requests', async () => {
     const p2 = action1.prepare().execute();
     expect((await p1).result).toBe('hello world 0');
     expect((await p2).result).toBe('hello world 0');
+    // All aspects of the response should be equivalent
+    expect(await p1).toEqual(await p2);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect((await action1.prepare().execute()).result).toBe('hello world 1');
     expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -37,6 +39,7 @@ test('should de-dupe in flight requests', async () => {
     const p4 = action1.prepare().execute(init1);
     expect((await p3).result).toBe('hello world 2');
     expect((await p4).result).toBe('hello world 2');
+    expect(await p3).toEqual(await p4);
     expect(fetchMock).toHaveBeenCalledTimes(3);
     expect((await action1.prepare().execute(init1)).result).toBe('hello world 3');
     expect(fetchMock).toHaveBeenCalledTimes(4);
@@ -56,6 +59,7 @@ test('should de-dupe in flight requests', async () => {
         .execute({ headers: new Headers({ 'x-test2': '2', 'x-test1': '1' }) });
     expect((await p7).result).toBe('hello world 6');
     expect((await p8).result).toBe('hello world 6');
+    expect(await p7).toEqual(await p8);
     expect(fetchMock).toHaveBeenCalledTimes(7);
 });
 
