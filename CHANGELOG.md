@@ -7,6 +7,7 @@
 * Add [CheckboxChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/CheckboxChoicesWidget/)
 * Add [ChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/ChoicesWidget/)
 * Add [parseTime](https://prestojs.com/docs/util/parseTime/) and [formatTime](https://prestojs.com/docs/util/formatTime/)
+* Add [resultPath](https://prestojs.com/docs/rest/paginationMiddleware/) option to `paginationMiddleware`. This allows pagination to be handled on a sub-key of the data.
 
 ### Changed
 
@@ -33,6 +34,13 @@
 * [RangeFormatter](https://prestojs.com/docs/ui/formatters/RangeFormatter/) now accepts `blanklabel`, `boundsFormatterProps`, `lowerFormatterProps`, `upperFormatterProps`. `baseFormatter` was renamed `boundsFormatter`.
 * [TimeFormatter](https://prestojs.com/docs/ui/formatters/TimeFormatter/) now accepts `blanklabel` and `invalidValueLabel` and can parse times in more formats.
 * [DecimalField](https://prestojs.com/docs/viewmodel/fields/DecimalField/) previously required you to pass `props` even if it was empty. This is now optional.
+* Second parameter of [paginationMiddleware](https://prestojs.com/docs/rest/paginationMiddleware/) is now an options object. If you used this option previous change:
+  ```js
+  // before
+  paginationMiddleware(PageNumberPaginator, getPaginationState);
+  // after
+  paginationMiddleware(PageNumberPaginator, { getPaginationState });
+  ```
 
 ## [0.0.16] - 2021-04-26
 
