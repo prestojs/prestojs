@@ -63,7 +63,7 @@ export default function FormField<T>({
             ) {
                 throw new Error('Promise support not yet implemented');
             }
-            if (typeof fieldProps.defaultValue === 'function') {
+            if (typeof defaultValue === 'function') {
                 defaultValue = defaultValue();
             }
             fieldProps.defaultValue = defaultValue;
