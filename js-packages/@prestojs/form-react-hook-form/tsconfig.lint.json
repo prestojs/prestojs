@@ -1,0 +1,21 @@
+{
+  "extends": "../../../tsconfig.lint.json",
+
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "/tmp/tsc-output/@prestojs/final-form.tsbuildinfo",
+    "outDir": "/tmp/tsc-output/@prestojs/final-form"
+  },
+  "references": [
+    {
+      "path": "../viewmodel/tsconfig.lint.json"
+    },
+    {
+      "path": "../ui/tsconfig.lint.json"
+    }
+  ],
+
+  "include": ["src/**/*"],
+  "exclude": ["*/__tests__/**/*"]
+}
