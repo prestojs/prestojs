@@ -26,6 +26,7 @@ beforeEach(() => {
     fetchMock.resetMocks();
     Endpoint.defaultConfig.requestInit = {};
     Endpoint.defaultConfig.middleware = [];
+    Endpoint.defaultConfig.baseUrl = '';
 });
 
 test('prepare should maintain equality based on inputs', () => {
@@ -82,6 +83,30 @@ test('should resolve URLs', () => {
     action.prepare({ query: { a: 'b' } }).execute();
     expect(fetchMock.mock.calls.length).toEqual(4);
     expect(fetchMock.mock.calls[3][0]).toEqual('/whatever/?a=b');
+});
+
+test('should respect baseUrl', () => {
+    Endpoint.defaultConfig.baseUrl = 'http://example.com/';
+    fetchMock.mockResponse('');
+    const endpoint = new Endpoint(new UrlPattern('/whatever/:id?/'));
+    endpoint.execute();
+    expect(fetchMock.mock.calls.length).toEqual(1);
+    expect(fetchMock.mock.calls[0][0]).toEqual('http://example.com/whatever/');
+    endpoint.execute({ urlArgs: { id: 2 } });
+    expect(fetchMock.mock.calls.length).toEqual(2);
+    expect(fetchMock.mock.calls[1][0]).toEqual('http://example.com/whatever/2/');
+    endpoint.execute({ urlArgs: { id: 2 }, query: { a: 'b' } });
+    expect(fetchMock.mock.calls.length).toEqual(3);
+    expect(fetchMock.mock.calls[2][0]).toEqual('http://example.com/whatever/2/?a=b');
+    endpoint.execute({ query: { a: 'b' } });
+    expect(fetchMock.mock.calls.length).toEqual(4);
+    expect(fetchMock.mock.calls[3][0]).toEqual('http://example.com/whatever/?a=b');
+
+    const endpoint2 = new Endpoint(new UrlPattern('/whatever/:id?/'), {
+        baseUrl: 'http://elsewhere.com',
+    });
+    endpoint2.execute();
+    expect(fetchMock.mock.calls[4][0]).toEqual('http://elsewhere.com/whatever/');
 });
 
 test('should support calling execute without prepare', () => {
@@ -653,4 +678,37 @@ test('middleware can return either next() directly or result', async () => {
         },
     });
     expect((await endpoint.execute()).result).toBe('HELLO WORLD');
+});
+
+test('middleware can modify baseUrl', async () => {
+    let enabled = false;
+    async function middleware1(next, urlConfig, requestInit): Promise<string> {
+        if (enabled) {
+            urlConfig.baseUrl = 'http://something.com';
+        }
+        const { result } = await next(urlConfig, requestInit);
+        return result.toUpperCase();
+    }
+    const endpoint = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [middleware1],
+    });
+    Endpoint.defaultConfig.baseUrl = 'http://example.com/';
+    endpoint.execute();
+    expect(fetchMock.mock.calls[0][0]).toEqual('http://example.com/whatever/');
+
+    enabled = true;
+    endpoint.execute();
+    expect(fetchMock.mock.calls[1][0]).toEqual('http://something.com/whatever/');
+
+    enabled = false;
+    const endpoint2 = new Endpoint(new UrlPattern('/whatever/'), {
+        middleware: [middleware1],
+        baseUrl: 'http://elsewhere.com',
+    });
+    endpoint2.execute();
+    expect(fetchMock.mock.calls[2][0]).toEqual('http://elsewhere.com/whatever/');
+
+    enabled = true;
+    endpoint.execute();
+    expect(fetchMock.mock.calls[3][0]).toEqual('http://something.com/whatever/');
 });

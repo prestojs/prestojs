@@ -2,9 +2,9 @@ import { isDeepEqual } from '@prestojs/util';
 import {
     EndpointRequestInit,
     MiddlewareFunction,
-    MiddlewareNextReturn,
     MiddlewareReturn,
     MiddlewareUrlConfig,
+    SkipToResponse,
 } from './Endpoint';
 
 function defaultGetKey(
@@ -69,17 +69,18 @@ export default function dedupeInFlightRequestsMiddleware<T>(
     options: DedupeOptions = {}
 ): MiddlewareFunction<T> {
     const { test = defaultTest, getKey = defaultGetKey } = options;
-    const requestsInFlight = new Map<any, Promise<MiddlewareNextReturn<T>>>();
+    const requestsInFlight = new Map<any, Promise<Response>>();
     return async (
         next,
         urlConfig: MiddlewareUrlConfig,
-        requestInit: EndpointRequestInit
+        requestInit: EndpointRequestInit,
+        context
     ): MiddlewareReturn<T> => {
         if (!test(urlConfig, requestInit)) {
-            return (await next(urlConfig, requestInit)).result;
+            return next(urlConfig, requestInit);
         }
         const key = getKey(urlConfig, requestInit);
-        let currentRequest: Promise<MiddlewareNextReturn<T>> | null = null;
+        let currentRequest: Promise<Response> | null = null;
         for (const [k, value] of requestsInFlight.entries()) {
             if (isDeepEqual(k, key)) {
                 currentRequest = value;
@@ -87,14 +88,16 @@ export default function dedupeInFlightRequestsMiddleware<T>(
             }
         }
         if (currentRequest) {
-            return (await currentRequest).result;
+            return next(new SkipToResponse(currentRequest));
         }
-        const promise = next(urlConfig, requestInit);
-        requestsInFlight.set(key, promise);
         try {
-            const r = await promise;
-            requestsInFlight.delete(key);
-            return r.result;
+            context.addFetchStartListener(fetchPromise => {
+                requestsInFlight.set(key, fetchPromise);
+                fetchPromise.then(() => {
+                    requestsInFlight.delete(key);
+                });
+            });
+            return await next(urlConfig, requestInit);
         } catch (err) {
             requestsInFlight.delete(key);
             throw err;

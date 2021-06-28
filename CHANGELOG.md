@@ -8,6 +8,9 @@
 * Add [ChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/ChoicesWidget/)
 * Add [parseTime](https://prestojs.com/docs/util/parseTime/) and [formatTime](https://prestojs.com/docs/util/formatTime/)
 * Add [resultPath](https://prestojs.com/docs/rest/paginationMiddleware/) option to `paginationMiddleware`. This allows pagination to be handled on a sub-key of the data.
+* Add [SkipToResponse](https://prestojs.com/docs/rest/SkipToResponse/) for use in middleware to bypass the rest of the middleware chain
+* Add [addFetchStartListener](https://prestojs.com/docs/rest/MiddlewareContext/#method-addFetchStartListener)
+* Add [batchMiddleware](https://prestojs.com/docs/rest/batchMiddleware)
 
 ### Changed
 
@@ -41,6 +44,7 @@
   // after
   paginationMiddleware(PageNumberPaginator, { getPaginationState });
   ```
+* Fix bug in [dedupeInFlightRequestsMiddleware](https://prestojs.com/docs/rest/dedupeInFlightRequestsMiddleware/) that meant deduped calls didn't have all the expected keys in the returned object (eg. `response`).
 
 ## [0.0.16] - 2021-04-26
 

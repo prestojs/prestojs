@@ -46,13 +46,27 @@ export type EndpointOptions<ReturnT> = ExecuteInitOptions & {
      * A function to resolve the URL. It is passed the URL pattern object, any
      * arguments for the URL and any query string parameters.
      *
+     * `this` is bound to the `Endpoint`.
+     *
      * If not provided defaults to:
      *
      * ```js
-     * urlPattern.resolve(urlArgs, { query });
+     * function defaultResolveUrl(urlPattern, urlArgs, query, baseUrl) {
+     *      if (baseUrl[baseUrl.length - 1] === '/') {
+     *          baseUrl = baseUrl.slice(0, -1);
+     *      }
+     *      return baseUrl + this.urlPattern.resolve(urlArgs, { query });
+     *  }
      * ```
      */
     resolveUrl?: (urlPattern: UrlPattern, urlArgs?: Record<string, any>, query?: Query) => string;
+    /**
+     * Base URL to use. This is prepended to the return value of `urlPattern.resolve(...)` and can be used
+     * to change the call to occur to a different domain.
+     *
+     * If not specified defaults to [Endpoint.defaultConfig.baseUrl](doc:Endpoint#static-var-defaultConfig)
+     */
+    baseUrl?: string;
     /**
      * Middleware to apply for this endpoint. By default `getMiddleware` concatenates this with the global
      * [Endpoint.defaultConfig.middleware](doc:Endpoint#static-var-defaultConfig)
@@ -117,7 +131,53 @@ export type ExecuteReturnVal<T> = {
  */
 export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
 
-export type MiddlewareContext<T> = {
+/**
+ * This can be passed to `next` in middleware to skip all subsequent middleware in the chain, the call
+ * to `fetch` and resolve instead to the `promise` passed in.
+ *
+ * This is useful for middleware like [dedupeInFlightRequestsMiddleware](doc:dedupeInFlightRequestsMiddleware) where
+ * if a duplicate request is detected it just needs to wait for the original request to finish and return the
+ * same Response object.
+ *
+ * It can also be used to change how `fetch` is performed (`batchMiddleware` uses this).
+ *
+ * For example this just calls a completely different URL and uses the response object from that:
+ *
+ * ```js
+ * function customFetchMiddleware(next, urlConfig, requestInit, context) {
+ *   return next(new SkipToResponse(
+ *       return fetch('/somewhere-else/');
+ *   ));
+ * }
+ * ```
+ *
+ * Note that this completely bypasses any subsequent middleware in the chain (including response handling) so any
+ * security-related middleware should come before this.
+ *
+ * @extract-docs
+ * @menu-group Endpoint
+ */
+export class SkipToResponse {
+    promise: Promise<Response>;
+
+    /**
+     * @param promise The promise to resolve to instead of calling `fetch`.
+     */
+    constructor(promise: Promise<Response>) {
+        this.promise = promise;
+    }
+}
+
+// Symbol attached to a `Response` to store the decoded body. This is used to avoid decoding the response
+// more than once (which is an error).
+const DECODED_BODY = Symbol.for('@prestojs/Endpoint.DECODED_BODY');
+
+/**
+ * An instance of this is passed as the fourth parameter to middleware functions.
+ * @extract-docs
+ * @menu-group Endpoint
+ */
+export class MiddlewareContext<T> {
     /**
      * Function to re-execute the Endpoint. Accepts no arguments - it replays the request with identical arguments
      * as the first time. This will go through the full middleware cycle again. This is useful for middleware
@@ -142,7 +202,69 @@ export type MiddlewareContext<T> = {
      * This contains the `url`, `response`, `decodedBody` and `result`.
      */
     lastState: null | MiddlewareNextReturn<T>;
-};
+
+    /**
+     * Should not be instantiated manually. This is created by `Endpoint` as part of processing a request.
+     */
+    constructor(options: {
+        execute: () => Promise<T>;
+        executeOptions: EndpointExecuteOptions;
+        requestInit: EndpointRequestInit;
+        endpoint: Endpoint;
+        lastState: null | MiddlewareNextReturn<T>;
+    }) {
+        this.execute = options.execute;
+        this.executeOptions = options.executeOptions;
+        this.requestInit = options.requestInit;
+        this.endpoint = options.endpoint;
+        this.lastState = options.lastState;
+    }
+
+    private _fetchStartCallbacks: ((fetchPromise: Promise<Response>) => void)[] = [];
+
+    /**
+     * Mark a `Response` as decoded.
+     *
+     * You likely don't need this; use `decodeBody` on `Endpoint` instead. This is useful in cases
+     * where you want to bypass the normal `Endpoint` `decodeBody` functionality (for example in
+     * `batchMiddleware`).
+     *
+     * @param response The response object returned from `fetch`.
+     * @param decodedBody The decoded body extracted from `response`.
+     */
+    markResponseDecoded(response: Response, decodedBody: Promise<T>): void {
+        response[DECODED_BODY] = decodedBody;
+    }
+
+    /**
+     * Listen for the start of the call to `fetch`. The callback will be called immediately
+     * after `fetch` is called and is passed the `Promise` returned by `fetch`.
+     *
+     * This is useful for middleware like [dedupeInFlightRequestsMiddleware](doc:dedupeInFlightRequestsMiddleware)
+     * that need access to the `fetch` `Promise` directly. It can then cache the promise and subsequently pass it to
+     * [SkipToResponse](doc:SkipToResponse) to make other calls to an `Endpoint` use the same `fetch` `Response`.
+     *
+     * @param callback The callback that will be called when fetch starts. It will be passed the `Promise` returned by `fetch`
+     */
+    addFetchStartListener(callback: (fetchPromise: Promise<Response>) => void): () => void {
+        this._fetchStartCallbacks.push(callback);
+        return (): void => {
+            const index = this._fetchStartCallbacks.indexOf(callback);
+            if (index !== -1) {
+                this._fetchStartCallbacks.splice(index, 1);
+            }
+        };
+    }
+
+    /**
+     * Called internally by `Endpoint` to notify when `fetch` has started.
+     *
+     * Should not be called elsewhere.
+     */
+    notifyFetchStart(fetchPromise: Promise<Response>): void {
+        this._fetchStartCallbacks.forEach(cb => cb(fetchPromise));
+    }
+}
 
 export type MiddlewareNextReturn<ReturnT> = {
     /**
@@ -176,24 +298,28 @@ export type MiddlewareUrlConfig = {
     pattern: UrlPattern;
     args: Record<string, any>;
     query: Query;
+    baseUrl: string;
 };
 
 /**
- * @param next The next function in the middleware chain. Must be passed the `url` and `requestInit` objects.
+ * @param next The next function in the middleware chain. Must be passed the `url` and `requestInit` objects. Alternatively
+ * you can pass an instance of [SkipToResponse](doc:SkipToResponse) instead of `url` and `requestInit`.
  * @param urlConfig The URL config
  * @param requestInit See [fetch parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
  * @param context The context for the current execute. This gives you access to the original options and a function to re-execute the command.
  * @returns Returns the value from `fetch` after it has been transformed by each middleware further down the chain
  */
 export type MiddlewareFunction<T> = (
-    next: (
-        urlConfig: MiddlewareUrlConfig,
-        requestInit: RequestInit
-    ) => Promise<MiddlewareNextReturn<T>>,
+    next: MiddlewareNextFunction<T>,
     urlConfig: MiddlewareUrlConfig,
     requestInit: EndpointRequestInit,
     context: MiddlewareContext<T>
 ) => MiddlewareReturn<T>;
+
+type MiddlewareNextFunction<T> = {
+    (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit): Promise<MiddlewareNextReturn<T>>;
+    (skipToResponse: SkipToResponse): Promise<MiddlewareNextReturn<T>>;
+};
 
 /**
  * Object form of middleware. This allows more control over what the middleware can do. Specifically allows middleware
@@ -234,6 +360,13 @@ type DefaultConfig<ReturnT = any> = {
      * by the endpoint specific middleware.
      */
     getMiddleware: (middleware: Middleware<ReturnT>[], endpoint: Endpoint) => Middleware<ReturnT>[];
+    /**
+     * Base to use for all urls. This can be used to change all URL's to be on a different origin.
+     *
+     * This can also be customised by middleware by changing `urlConfig.baseUrl` (defaults to this setting) or
+     * in each `Endpoint` by passing `baseUrl` in options.
+     */
+    baseUrl: string;
 };
 
 /**
@@ -356,7 +489,9 @@ export class ApiError extends Error {
  * Otherwise Response object itself is returned
  * @param response
  */
-function defaultDecodeBody(response: Response): Response | Record<string, any> | string | null {
+export function defaultDecodeBody(
+    response: Response
+): Response | Record<string, any> | string | null {
     const contentType = response.headers.get('Content-Type');
     const emptyCodes = [204, 205];
 
@@ -379,10 +514,14 @@ function defaultDecodeBody(response: Response): Response | Record<string, any> |
 
 function defaultResolveUrl(
     urlPattern: UrlPattern,
-    urlArgs?: Record<string, any>,
-    query?: Query
+    urlArgs: Record<string, any>,
+    query: Query | undefined,
+    baseUrl: string
 ): string {
-    return this.urlPattern.resolve(urlArgs, { query });
+    if (baseUrl[baseUrl.length - 1] === '/') {
+        baseUrl = baseUrl.slice(0, -1);
+    }
+    return baseUrl + this.urlPattern.resolve(urlArgs, { query });
 }
 
 /**
@@ -555,7 +694,7 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * in any way (the first example above). `result` contains the value returned from any middleware
  * that handled the response before this one or otherwise `decodedBody` for the first middleware.
  *
- * The context object can be used to retrieve the original options from the [Endpoint.execute](doc:Endpoint#method-execute)
+ * The [context object](doc:MiddlewareContext) can be used to retrieve the original options from the [Endpoint.execute](doc:Endpoint#method-execute)
  * call and re-execute the command. This is useful for middleware that may replay a request after an initial failure,
  * eg. if user isn't authenticated on initial attempt.
  *
@@ -611,6 +750,17 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  *   to apply its changes to the options used (eg. change URL etc) such that `Endpoint` correctly caches the call.
  * * `process` - Process the middleware. This behaves the same as the function form described above.
  *
+ * ### Advanced
+ *
+ * For advanced use cases there's some additional hooks available.
+ *
+ * * [addFetchStartListener](doc:MiddlewareContext#method-addFetchStartListener) - This allows middleware to be notified
+ *   when the call to `fetch` starts and get access to the `Promise`. [dedupeInFlightRequestsMiddleware](doc:dedupeInFlightRequestsMiddleware)
+ *   uses this to cache an in flight request and return the same response for duplicate calls using [SkipToResponse](doc:SkipToResponse)
+ * * [SkipToResponse](doc:SkipToResponse) - This allows middleware to skip the rest of the middleware chain and the call
+ *   to `fetch`. Instead it is passed a promise that resolves to `Response` and this is used instead of doing the call
+ *   to `fetch` for you.
+ *
  * @menu-group Endpoint
  * @extract-docs
  */
@@ -629,13 +779,32 @@ export default class Endpoint<ReturnT = any> {
     urlPattern: UrlPattern;
     public requestInit: ExecuteInitOptions;
     private urlCache: Map<string, Map<{}, PreparedAction>>;
-    private decodeBody: (res: Response) => any;
-    private resolveUrl: (
+    public decodeBody: (res: Response) => any;
+    public resolveUrl: (
         urlPattern: UrlPattern,
-        urlArgs?: Record<string, any>,
-        query?: Query
+        urlArgs: Record<string, any>,
+        query: Query | undefined,
+        baseUrl: string
     ) => string;
     public middleware: Middleware<ReturnT>[];
+
+    private _baseUrl?: string;
+
+    /**
+     * The base URL to use for this endpoint. This is prepended to the URL returned from `urlPattern.resolve`.
+     *
+     * If not specified then it defaults to [Endpoint.defaultConfig.baseUrl](doc:Endpoint#static-var-defaultConfig).
+     *
+     * Note that middleware can override this as well.
+     */
+    get baseUrl(): string {
+        // This is a getter so that we can read `defaultConfig` when it's executing rather than when Endpoint
+        // is instantiated (ie. you can change `baseUrl` after endpoints have been created.
+        if (this._baseUrl == null) {
+            return Endpoint.defaultConfig.baseUrl;
+        }
+        return this._baseUrl;
+    }
 
     /**
      * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint
@@ -644,11 +813,13 @@ export default class Endpoint<ReturnT = any> {
         const {
             decodeBody = defaultDecodeBody,
             resolveUrl = defaultResolveUrl,
+            baseUrl,
             middleware = [],
             getMiddleware = Endpoint.defaultConfig.getMiddleware,
             ...requestInit
         } = options;
 
+        this._baseUrl = baseUrl;
         this.urlPattern = urlPattern;
         this.urlCache = new Map();
         this.decodeBody = decodeBody;
@@ -683,7 +854,7 @@ export default class Endpoint<ReturnT = any> {
             }
         }
         const { urlArgs = {}, query, ...init } = options;
-        const url = this.resolveUrl(this.urlPattern, urlArgs, query);
+        const url = this.resolveUrl(this.urlPattern, urlArgs, query, this.baseUrl);
         let cache = this.urlCache.get(url);
         if (!cache) {
             cache = new Map();
@@ -738,6 +909,7 @@ export default class Endpoint<ReturnT = any> {
             pattern: this.urlPattern,
             args: urlArgs,
             query: query,
+            baseUrl: this.baseUrl,
         };
 
         const cls = Object.getPrototypeOf(this).constructor;
@@ -751,58 +923,75 @@ export default class Endpoint<ReturnT = any> {
             requestInit,
             result: null,
         };
-        const runFetch = (url: string, requestInit: RequestInit): Promise<ReturnT> =>
-            fetch(url, requestInit)
-                .then(async res => {
-                    returnVal.response = res;
-                    if (!res.ok) {
-                        returnVal.decodedBody = await this.decodeBody(res);
-                        throw new ApiError(res.status, res.statusText, returnVal.decodedBody);
-                    }
-                    return res;
-                })
-                .then(async res => (returnVal.decodedBody = await this.decodeBody(res)));
+
         const executeWithMiddleware = async (): Promise<ReturnT> => {
             const middleware = [...this.middleware];
             let lastMiddleware;
-            const middlewareContext: MiddlewareContext<ReturnT> = {
+            const middlewareContext = new MiddlewareContext<ReturnT>({
                 execute: executeWithMiddleware,
                 executeOptions: options,
                 requestInit,
                 endpoint: this,
                 lastState: null,
-            };
+            });
             let lastMiddlewareReturn: MiddlewareNextReturn<ReturnT>;
             const next = async (
-                urlConfig: MiddlewareUrlConfig,
-                requestInit: EndpointRequestInit
+                urlConfigOrSkipToResponse: MiddlewareUrlConfig | SkipToResponse,
+                requestInit?: EndpointRequestInit
             ): Promise<MiddlewareNextReturn<ReturnT>> => {
-                let errors: string[] = [];
-                if (typeof urlConfig !== 'object') {
-                    errors.push(
-                        `'urlConfig' arg from middleware was not an object, received: ${urlConfig}`
-                    );
-                }
-                if (!requestInit || typeof requestInit != 'object') {
-                    errors.push(
-                        `'requestInit' arg from middleware was not an object, received: ${requestInit}`
-                    );
-                }
-                if (errors.length > 0) {
-                    const err = errors.join('\n');
-                    throw new Error(
-                        `Bad middleware implementation; invalid arguments\n\n${err}\n\nOccurred in middleware:\n\n${lastMiddleware}`
-                    );
+                const skipToResponse =
+                    urlConfigOrSkipToResponse instanceof SkipToResponse
+                        ? urlConfigOrSkipToResponse
+                        : false;
+                if (!skipToResponse) {
+                    let errors: string[] = [];
+                    if (typeof urlConfig !== 'object') {
+                        errors.push(
+                            `'urlConfig' arg from middleware was not an object, received: ${urlConfig}`
+                        );
+                    }
+                    if (!requestInit || typeof requestInit != 'object') {
+                        errors.push(
+                            `'requestInit' arg from middleware was not an object, received: ${requestInit}`
+                        );
+                    }
+                    if (errors.length > 0) {
+                        const err = errors.join('\n');
+                        throw new Error(
+                            `Bad middleware implementation; invalid arguments\n\n${err}\n\nOccurred in middleware:\n\n${lastMiddleware}`
+                        );
+                    }
                 }
                 const nextMiddleware = middleware.shift();
-                if (!nextMiddleware) {
-                    const url = this.resolveUrl(urlConfig.pattern, urlConfig.args, urlConfig.query);
+                if (!nextMiddleware || skipToResponse) {
+                    const url = this.resolveUrl(
+                        urlConfig.pattern,
+                        urlConfig.args,
+                        urlConfig.query,
+                        urlConfig.baseUrl
+                    );
                     returnVal.url = url;
                     returnVal.urlArgs = urlConfig.args;
                     returnVal.query = urlConfig.query;
-                    const result = await runFetch(url, requestInit);
+                    const fetchPromise = skipToResponse
+                        ? skipToResponse.promise
+                        : this.fetch(url, requestInit);
+                    middlewareContext.notifyFetchStart(fetchPromise);
+                    const response = await fetchPromise;
+                    // Make sure body is only decoded once. With `SkipToResponse` we can be dealing
+                    // with the same `Response` multiple times (eg. from dedupeInFlightRequestsMiddleware).
+                    if (!(DECODED_BODY in response)) {
+                        middlewareContext.markResponseDecoded(response, this.decodeBody(response));
+                    }
+                    const decodedBody = await response[DECODED_BODY];
+                    if (!response.ok) {
+                        throw new ApiError(response.status, response.statusText, decodedBody);
+                    }
+                    returnVal.response = response;
+                    returnVal.decodedBody = decodedBody;
+
                     lastMiddlewareReturn = {
-                        result,
+                        result: decodedBody,
                         url,
                         response: returnVal.response,
                         decodedBody: returnVal.decodedBody,
@@ -846,10 +1035,21 @@ export default class Endpoint<ReturnT = any> {
         returnVal.result = await executeWithMiddleware();
         return returnVal as ExecuteReturnVal<ReturnT>;
     }
+
+    /**
+     * Calls [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+     *
+     * You can extend `Endpoint` and override this if you need to customise something that isn't
+     * possible with middleware.
+     */
+    public async fetch(url: string, requestInit: RequestInit | undefined): Promise<Response> {
+        return fetch(url, requestInit);
+    }
 }
 
 // Initialisation is not done inline in class as doc extractor doesn't handle object literals well
 Endpoint.defaultConfig = {
+    baseUrl: '',
     requestInit: {},
     middleware: [requestDefaultsMiddleware],
     getMiddleware: <T>(middleware: Middleware<T>[]): Middleware<T>[] => [
