@@ -208,12 +208,15 @@ export default function useAsyncValue<T, U extends Id>(
         }
     }
     const isValueMissing = (id || ids) && !valueInChoices;
-    const { run, reset, isLoading, error, response: resolvedValue } = useAsync(resolve, {
-        args: [id || ids],
-        trigger: isValueMissing ? trigger : useAsync.MANUAL,
-        onSuccess,
-        onError,
-    });
+    const { run, reset, isLoading, error, result: resolvedValue } = useAsync<T | T[], Error>(
+        resolve,
+        {
+            args: [id || ids],
+            trigger: isValueMissing ? trigger : useAsync.MANUAL,
+            onSuccess,
+            onError,
+        }
+    );
 
     useEffect(() => {
         if (!isEqual(id || ids, idRef.current) && trigger === useAsync.MANUAL) {
@@ -225,7 +228,7 @@ export default function useAsyncValue<T, U extends Id>(
     // If we don't have id/ids we should never return a value
     // Otherwise return the value if it exists in existingChoices otherwise value
     // returned from `resolve` (if any)
-    let finalValue = null;
+    let finalValue: T | T[] | null = null;
     if (id || ids) {
         if (valueInChoices) {
             finalValue = valueInChoices;

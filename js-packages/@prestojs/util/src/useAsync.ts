@@ -5,8 +5,8 @@ import { isEqual as isEqualShallow } from './comparison';
 import { isPromise } from './misc';
 import useMemoOne from './useMemoOne';
 
-type ReducerState<ResponseT, ErrorT> = {
-    response: ResponseT | null;
+type ReducerState<ResultT, ErrorT> = {
+    result: ResultT | null;
     isLoading: boolean;
     error: ErrorT | null;
     // Id used to track calls. It is set by `start` and if `abort` is called with
@@ -16,7 +16,7 @@ type ReducerState<ResponseT, ErrorT> = {
     id?: number;
 };
 
-type ReducerAction<ResponseT, ErrorT> =
+type ReducerAction<ResultT, ErrorT> =
     | {
           type: 'start';
           id: number;
@@ -28,17 +28,17 @@ type ReducerAction<ResponseT, ErrorT> =
     | { type: 'reset' }
     | {
           type: 'success';
-          payload: ResponseT;
+          payload: ResultT;
       }
     | {
           type: 'error';
           payload: ErrorT;
       };
 
-function reducer<ResponseT, ErrorT>(
-    state: ReducerState<ResponseT, ErrorT>,
-    action: ReducerAction<ResponseT, ErrorT>
-): ReducerState<ResponseT, ErrorT> {
+function reducer<ResultT, ErrorT>(
+    state: ReducerState<ResultT, ErrorT>,
+    action: ReducerAction<ResultT, ErrorT>
+): ReducerState<ResultT, ErrorT> {
     switch (action.type) {
         case 'abort':
             if (state.id === action.id) {
@@ -46,16 +46,16 @@ function reducer<ResponseT, ErrorT>(
             }
             return state;
         case 'reset':
-            return { isLoading: false, error: null, response: null };
+            return { isLoading: false, error: null, result: null };
         case 'start':
             if (state.isLoading) {
                 return { ...state, id: action.id };
             }
             return { ...state, isLoading: true, id: action.id };
         case 'error':
-            return { isLoading: false, error: action.payload, response: null };
+            return { isLoading: false, error: action.payload, result: null };
         case 'success':
-            return { isLoading: false, response: action.payload, error: null };
+            return { isLoading: false, result: action.payload, error: null };
         default:
             throw new Error(`Bad action ${action}`);
     }
@@ -107,7 +107,7 @@ export type UseAsyncOptions = {
     args?: Array<any>;
     /**
      * Called when action resolves successfully. Is passed a single parameter which
-     * is the response from the async action.
+     * is the result from the async action.
      *
      * **NOTE:** If your component unmounts before the promise resolves this function
      * will NOT be called. This is to avoid the general case of calling React
@@ -115,7 +115,7 @@ export type UseAsyncOptions = {
      * method to be called regardless then attach your own callbacks to the
      * promise when you call `run` or in the async function definition itself.
      */
-    onSuccess?: (response: {}) => void;
+    onSuccess?: (result: {}) => void;
     /**
      * Called when action errors. Passed the error returned from async action.
      *
@@ -126,24 +126,28 @@ export type UseAsyncOptions = {
 
 const validOptionKeys = ['trigger', 'args', 'onSuccess', 'onError'];
 
-export type UseAsyncReturnObject = {
+export type UseAsyncReturnObject<ResultT, ErrorT> = {
     /**
      * True when action is in progress.
      */
     isLoading: boolean;
     /**
-     * Set to the rejected value of the promise. Only one of `error` and `response` can be set. If
+     * Set to the rejected value of the promise. Only one of `error` and `result` can be set. If
      * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
      * when you want the UI to show the previous value until the next value is ready.
      */
-    error: any;
+    error: ErrorT | null;
     /**
-     * Set to the resolved value of promise. Only one of `error` and `response` can be set. If
+     * Set to the resolved value of promise. Only one of `error` and `result` can be set. If
      * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
      * when you want the UI to show the previous value until the next value is ready (for example showing
      * the previous page of a paginated table with a loading indicator while next page is loading).
      */
-    response: any;
+    result: ResultT | null;
+    /**
+     * @deprecated Use `result` instead
+     */
+    response: ResultT | null;
     /**
      * A function to manually trigger the action. If `options.trigger` is `useAsync.MANUAL`
      * calling this function is the only way to trigger the action. You can pass
@@ -153,9 +157,9 @@ export type UseAsyncReturnObject = {
      * This function will return a promise that resolves/rejects to same value
      * resolved/rejected from the async action.
      */
-    run: (...args) => Promise<any>;
+    run: (...args) => Promise<ResultT>;
     /**
-     * When called will set both response or error to null. Will not immediately trigger
+     * When called will set both result or error to null. Will not immediately trigger
      * a call to the action but subsequent changes to `fn` or `options.args` will
      * according to the value of `trigger`.
      */
@@ -170,7 +174,7 @@ const comparisonByTrigger = {
 };
 
 /**
- * Hook to deal with triggering async function calls and handling response / errors and loading states.
+ * Hook to deal with triggering async function calls and handling result / errors and loading states.
  *
  * This can be used in two distinct modes:
  *  - _manual_ (`useAsync.MANUAL`) - the function is only triggered explicitly
@@ -191,7 +195,7 @@ const comparisonByTrigger = {
  * ```js live horizontal
  * function FollowerCount() {
  *     const [user, setUser] = React.useState('octocat')
- *     const { response, isLoading, error, run, reset } = useAsync(() => getGithubUser(user));
+ *     const { result, isLoading, error, run, reset } = useAsync(() => getGithubUser(user));
  *     return (
  *         <div>
  *             <input value={user} onChange={e => setUser(e.target.value)} />
@@ -199,10 +203,10 @@ const comparisonByTrigger = {
  *             <button onClick={run} disabled={isLoading} className="btn-blue">Query follower count</button>
  *             <button className="btn" onClick={reset}>Clear</button>
  *             </div>
- *             {response && (
+ *             {result && (
  *                 <p>
- *                     <img src={response.avatar_url} /><br />
- *                     {response.name} has {response.followers} followers
+ *                     <img src={result.avatar_url} /><br />
+ *                     {result.name} has {result.followers} followers
  *                 </p>
  *             )}
  *             {error && (<p>Failed with status: {error.status} {error.statusText}</p>)}
@@ -231,21 +235,21 @@ const comparisonByTrigger = {
  *
  * @extract-docs
  */
-function useAsync<ResponseT, ErrorT>(
-    fn: (...args: Array<any>) => Promise<ResponseT>,
+function useAsync<ResultT, ErrorT = Error>(
+    fn: (...args: Array<any>) => Promise<ResultT>,
     options: UseAsyncOptions = {}
-): UseAsyncReturnObject {
+): UseAsyncReturnObject<ResultT, ErrorT> {
     const { trigger = MANUAL, args = [], onSuccess, onError } = options;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [{ id, ...state }, dispatch] = useReducer<
         (
-            state: ReducerState<ResponseT, ErrorT>,
-            action: ReducerAction<ResponseT, ErrorT>
-        ) => ReducerState<ResponseT, ErrorT>
+            state: ReducerState<ResultT, ErrorT>,
+            action: ReducerAction<ResultT, ErrorT>
+        ) => ReducerState<ResultT, ErrorT>
     >(reducer, {
         isLoading: trigger !== MANUAL,
         error: null,
-        response: null,
+        result: null,
     });
 
     // =========================================================================
@@ -324,13 +328,13 @@ function useAsync<ResponseT, ErrorT>(
             throw new Error(message);
         }
         promise.then(
-            response => {
+            result => {
                 if (!isCurrent) {
                     return;
                 }
-                dispatch({ type: 'success', payload: response });
+                dispatch({ type: 'success', payload: result });
                 if (executeOnSuccess) {
-                    executeOnSuccess(response);
+                    executeOnSuccess(result);
                 }
             },
             e => {
@@ -424,7 +428,7 @@ function useAsync<ResponseT, ErrorT>(
 
     // =========================================================================
     // Reset should abort any current calls (which means the onSuccess/onError
-    // won't be called) and reset response, error and isLoading back to initial
+    // won't be called) and reset result, error and isLoading back to initial
     // values
     const reset = useCallback(() => {
         if (abortRef.current) {
@@ -440,6 +444,10 @@ function useAsync<ResponseT, ErrorT>(
             ...state,
             reset,
             run,
+            get response(): typeof state.result {
+                console.warn("'response' has been renamed to 'result' - please update usage");
+                return state.result;
+            },
         }),
         [run, state, reset]
     );
@@ -449,10 +457,7 @@ useAsync.MANUAL = MANUAL;
 useAsync.DEEP = DEEP;
 useAsync.SHALLOW = SHALLOW;
 
-export default (useAsync as unknown) as ((
-    fn: (...args: Array<any>) => Promise<any>,
-    options?: UseAsyncOptions
-) => UseAsyncReturnObject) & {
+export default useAsync as typeof useAsync & {
     readonly MANUAL: typeof MANUAL;
     readonly DEEP: typeof DEEP;
     readonly SHALLOW: typeof SHALLOW;
