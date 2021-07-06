@@ -48,6 +48,25 @@ function usePaginatorTestHook(props): ReturnType<typeof useAsyncListing> {
     });
 }
 
+let globalWarnSpy;
+beforeAll(() => {
+    const original = console.warn;
+    // For some reason when running these tests `response` is evaluated even though I've verified
+    // nothing touches it. Could not work out why so suppressing it here. Have tested in browser
+    // it does not occur.
+    globalWarnSpy = jest.spyOn(console, 'warn').mockImplementation(w => {
+        // Suppress warning on this message but keep anything else
+        if (w === "'response' has been renamed to 'result' - please update usage") {
+            return;
+        }
+        original.call(console, w);
+    });
+});
+
+afterAll(() => {
+    globalWarnSpy.mockRestore();
+});
+
 test('useAsyncListing should work without a paginator object', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
@@ -211,7 +230,7 @@ test('useAsyncListing should support accumulatePages', async () => {
     expect(result.current.result).toEqual(null);
     await advanceTimers();
     act(() => {
-        result.current.paginator.first();
+        result.current.paginator?.first();
     });
     await advanceTimers();
     expect(paginator.currentState).toEqual({ page: 1, pageSize: 3 });

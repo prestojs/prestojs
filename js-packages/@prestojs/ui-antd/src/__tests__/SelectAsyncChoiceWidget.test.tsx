@@ -154,6 +154,25 @@ function openDropDown(container): void {
     });
 }
 
+let globalWarnSpy;
+beforeAll(() => {
+    const original = console.warn;
+    // For some reason when running these tests `response` is evaluated even though I've verified
+    // nothing touches it. Could not work out why so suppressing it here. Have tested in browser
+    // it does not occur.
+    globalWarnSpy = jest.spyOn(console, 'warn').mockImplementation(w => {
+        // Suppress warning on this message but keep anything else
+        if (w === "'response' has been renamed to 'result' - please update usage") {
+            return;
+        }
+        original.call(console, w);
+    });
+});
+
+afterAll(() => {
+    globalWarnSpy.mockRestore();
+});
+
 afterEach(async () => {
     jest.useRealTimers();
 });

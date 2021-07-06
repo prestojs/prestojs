@@ -13,7 +13,7 @@ async function getBlob() {
 }
 export default function Basic() {
     const [fileList, setFileList] = useState<FileList | null>(null);
-    const { response: blob } = useAsync(getBlob, { trigger: 'SHALLOW' });
+    const { result: blob } = useAsync(getBlob, { trigger: 'SHALLOW' });
 
     return (
         <div className="grid grid-cols-1 gap-4 w-full mt-5">
