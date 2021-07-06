@@ -23,30 +23,47 @@ export default function ParameterTable({ parameters, nameHeader = 'Parameter', i
                     </tr>
                 </thead>
                 <tbody>
-                    {parameters.map(param => (
-                        <tr key={param.name}>
-                            {!isReturnType && (
+                    {parameters.map(param => {
+                        const deprecated = 'deprecated' in (param.comment?.tagsByName || {});
+                        const deprecatedReason = deprecated
+                            ? param.comment.tagsByName.deprecated
+                            : '';
+                        return (
+                            <tr key={param.name}>
+                                {!isReturnType && (
+                                    <td
+                                        className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs text-red-600 whitespace-nowrap align-top`}
+                                    >
+                                        {!param.flags?.isOptional && (
+                                            <abbr title="Required">*</abbr>
+                                        )}
+                                    </td>
+                                )}
                                 <td
-                                    className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs text-red-600 whitespace-no-wrap align-top`}
+                                    className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs text-purple-700 whitespace-nowrap align-top`}
                                 >
-                                    {!param.flags?.isOptional && <abbr title="Required">*</abbr>}
+                                    {deprecated ? (
+                                        <span className="line-through">{param.name}</span>
+                                    ) : (
+                                        param.name
+                                    )}
                                 </td>
-                            )}
-                            <td
-                                className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs text-purple-700 whitespace-no-wrap align-top`}
-                            >
-                                {param.name}
-                            </td>
-                            <td
-                                className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs align-top`}
-                            >
-                                <TypeDesc doc={param} isReturnType={isReturnType} />
-                            </td>
-                            <td className="p-2 border-t border-gray-300 font-mono text-xs text-blue-700 align-top table-mdx">
-                                <MdxWrapper mdx={param.mdx} />
-                            </td>
-                        </tr>
-                    ))}
+                                <td
+                                    className={`p-2 border-t font-semibold border-gray-300 font-mono text-xs align-top`}
+                                >
+                                    <TypeDesc doc={param} isReturnType={isReturnType} />
+                                </td>
+                                <td className="p-2 border-t border-gray-300 font-mono text-xs text-blue-700 align-top table-mdx">
+                                    <MdxWrapper mdx={param.mdx} />
+                                    {deprecated && (
+                                        <div className="text-red-400">
+                                            Deprecated{deprecatedReason && `: ${deprecatedReason}`}
+                                        </div>
+                                    )}
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         )
