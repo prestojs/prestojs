@@ -5,7 +5,7 @@ export default function UserSearch({ onSearch, onReset, disabled, buttonText }) 
 
     return (
         <>
-            <input value={user} onChange={e => setUser(e.target.value)} />
+            <input value={user} onChange={e => setUser(e.target.value)} type="text" />
             <div className="my-2 justify-between flex">
                 <button onClick={() => onSearch(user)} disabled={disabled} className="btn-blue">
                     {buttonText}

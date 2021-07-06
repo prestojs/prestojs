@@ -5,6 +5,7 @@ import './global.css';
 
 export default function MyApp({ Component, pageProps, router }) {
     const isExample = router.pathname.startsWith('/examples/');
+    const isUiAntd = router.pathname.includes('/ui-antd/');
     useEffect(() => {
         if (isExample && typeof document !== 'undefined') {
             const resizeObserver = new ResizeObserver(entries => {
@@ -22,9 +23,14 @@ export default function MyApp({ Component, pageProps, router }) {
             // .doc-antd matches selector in prefix-antd-styles.js postcss plugin
             // all antd styles are prefixed with this so it doesn't pollute styles throughout
             // rest of doc site
-            document.body.classList.add('doc-antd');
+            if (isUiAntd) {
+                document.body.classList.add('doc-antd');
+            }
         }
-    }, [isExample]);
+        return () => {
+            document.body.classList.remove('doc-antd');
+        };
+    }, [isUiAntd, isExample]);
     if (isExample) {
         return (
             <div className="p-10 code-examples">
