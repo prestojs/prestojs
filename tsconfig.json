@@ -23,6 +23,12 @@
     },
     {
       "path": "./js-packages/@prestojs/util/tsconfig.json"
+    },
+    {
+      "path": "./js-packages/@prestojs/routing/tsconfig.json"
+    },
+    {
+      "path": "./js-packages/@prestojs/rest/tsconfig.json"
     }
   ]
 }
