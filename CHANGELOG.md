@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+* The `response` key in the return value for [useAsync](https://prestojs.com/docs/util/useAsync) has been renamed to `result`. `response` is now deprecated; it will still work but any use will result in a warning.
+
 ## [0.0.17] - 2021-06-28
 
 ### Added
