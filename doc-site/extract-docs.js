@@ -1,9 +1,18 @@
 /* eslint-disable */
 const babel = require('@babel/core');
 const prettier = require('prettier');
-const typedoc = require('typedoc');
+const TypeDoc = require('typedoc');
+const ts = require('typescript');
 const fs = require('fs');
 const path = require('path');
+const {
+    expandPackages,
+    loadPackageManifest,
+    getTsEntryPointForPackage,
+    ignorePackage,
+} = require('typedoc/dist/lib/utils/package-manifest');
+const { UnknownType } = require('typedoc/dist/lib/models');
+const { normalizePath } = TypeDoc;
 
 function readDirRecursive(dir) {
     const files = [];
@@ -57,35 +66,13 @@ const exampleFiles = readDirRecursive(examplesDir).reduce((acc, fn) => {
 }, {});
 const pickedExamples = [];
 
-const app = new typedoc.Application();
-const options = {
-    target: 'es6',
-    name: 'prestojs',
-    mode: 'modules',
-    ignoreCompilerErrors: true,
-    preserveConstEnums: true,
-    exclude: ['*.test.ts', '*.test.tsx', '*/**/__tests__/**/*'],
-    'external-modulemap': '.*packages/(@prestojs/[^/]+)/.*',
-    stripInternal: false,
-    stripExternal: true,
-    tsconfig: '../tsconfig.json',
-};
-const result = app.bootstrap(options);
-
-if (result.hasErrors) {
-    process.exit(typedoc.ExitCode.OptionError);
-}
-
 const root = path.resolve(__dirname, '../');
-const src = app.expandInputFiles(['../js-packages/']);
-const project = app.convert(src);
-const tmpFile = './___temp.json';
-app.generateJson(project, tmpFile);
-const data = require(tmpFile);
-fs.unlinkSync(tmpFile);
+// const src = app.expandInputFiles(['../js-packages/']);
 
-async function process() {
-    const transformedData = data.children.filter(child => child.name.startsWith('@presto'));
+async function process(data) {
+    // const transformedData = data.children.filter(child => child.name.startsWith('@presto'));
+    // console.log(data.children.map(child => child.name));
+    const transformedData = data.children;
 
     async function extractChildren(node) {
         const { children, ...rest } = node;
@@ -162,6 +149,10 @@ async function process() {
             if (returnTagText) {
                 rest.type.declaration.signatures[0].comment.returns = returnTagText;
             }
+        }
+        if (!rest.sources) {
+            // TODO: But why
+            return [];
         }
         const { fileName } = rest.sources[0];
         const importPath = fileName.replace('js-packages/', '').replace('src/', '').split('.')[0];
@@ -271,4 +262,163 @@ ${missedExamples.join('\n')}
     }
 }
 
-process();
+function getEntryPointsForPackages(logger, packageGlobPaths) {
+    const results = [];
+    // --packages arguments are workspace tree roots, or glob patterns
+    // This expands them to leave only leaf packages
+    const expandedPackages = expandPackages(logger, '.', packageGlobPaths);
+    for (const packagePath of expandedPackages) {
+        const packageJsonPath = path.resolve(packagePath, 'package.json');
+        const packageJson = loadPackageManifest(logger, packageJsonPath);
+        if (packageJson === undefined) {
+            logger.error(`Could not load package manifest ${packageJsonPath}`);
+            return;
+        }
+        const packageEntryPoint = getTsEntryPointForPackage(logger, packageJsonPath, packageJson);
+        if (packageEntryPoint === undefined) {
+            logger.error(`Could not determine TS entry point for package ${packageJsonPath}`);
+            return;
+        }
+        if (packageEntryPoint === ignorePackage) {
+            continue;
+        }
+        const tsconfigFile = ts.findConfigFile(packageEntryPoint, ts.sys.fileExists);
+        if (tsconfigFile === undefined) {
+            logger.error(
+                `Could not determine tsconfig.json for source file ${packageEntryPoint} (it must be on an ancestor path)`
+            );
+            return;
+        }
+        // Consider deduplicating this with similar code in src/lib/utils/options/readers/tsconfig.ts
+        let fatalError = false;
+        const parsedCommandLine = ts.getParsedCommandLineOfConfigFile(
+            tsconfigFile,
+            {},
+            {
+                ...ts.sys,
+                onUnRecoverableConfigFileDiagnostic: error => {
+                    logger.diagnostic(error);
+                    fatalError = true;
+                },
+            }
+        );
+        if (!parsedCommandLine) {
+            return;
+        }
+        logger.diagnostics(parsedCommandLine.errors);
+        if (fatalError) {
+            return;
+        }
+        const program = ts.createProgram({
+            rootNames: parsedCommandLine.fileNames,
+            options: parsedCommandLine.options,
+        });
+        const sourceFile = program.getSourceFile(packageEntryPoint);
+        if (sourceFile === undefined) {
+            logger.error(
+                `Entry point "${packageEntryPoint}" does not appear to be built by the tsconfig found at "${tsconfigFile}"`
+            );
+            return;
+        }
+        results.push({
+            displayName: packageJson.name,
+            path: packageEntryPoint,
+            program,
+            sourceFile,
+        });
+    }
+    return results;
+}
+
+async function main() {
+    const app = new TypeDoc.Application();
+    app.options.addReader(new TypeDoc.TSConfigReader());
+    const packagesRoot = path.resolve(root, 'js-packages/@prestojs/');
+    const files = app
+        .expandInputFiles(
+            fs.readdirSync(packagesRoot).map(f => path.resolve(packagesRoot, f, 'src/'))
+        )
+        .filter(f => !f.includes('.test.') && !f.endsWith('index.ts'));
+    app.bootstrap({
+        // target: 'es6',
+        name: 'prestojs',
+        // packages: fs.readdirSync(packagesRoot).map(f => path.resolve(packagesRoot, f)),
+        packages: root,
+        // entryPoints: fs
+        //     .readdirSync(packagesRoot)
+        //     .map(f => path.resolve(packagesRoot, f, 'src/index.ts')),
+        // packages: ['../js-packages/@prestojs/util', '../js-packages/@prestojs/viewmodel'],
+        // mode: 'modules',
+        // ignoreCompilerErrors: true,
+        // preserveConstEnums: true,
+        exclude: ['*.test.ts', '*.test.tsx', '*/**/__tests__/**/*'],
+        // 'external-modulemap': '.*packages/(@prestojs/[^/]+)/.*',
+        // stripInternal: false,
+        // stripExternal: true,
+        excludeExternals: true,
+        excludeInternal: false,
+        tsconfig: '../tsconfig.lint.json',
+    });
+
+    const program = ts.createProgram(app.options.getFileNames(), app.options.getCompilerOptions());
+
+    const printer = ts.createPrinter();
+
+    /** @type {Map<import("typedoc").DeclarationReflection, UnknownType>} */
+    const typeOverrides = new Map();
+
+    app.converter.on(
+        TypeDoc.Converter.EVENT_CREATE_DECLARATION,
+        /**
+         *
+         * @param {import("typedoc/dist/lib/converter/context").Context} context
+         * @param {import("typedoc").DeclarationReflection} reflection
+         * @param {import("typescript").Node | undefined} node
+         */
+        (context, reflection, node) => {
+            if (reflection.kind === TypeDoc.ReflectionKind.TypeAlias && node) {
+                if (reflection.comment && reflection.comment.hasTag('quickinfo')) {
+                    // console.log(reflection.type.types[0]._target.declarations[0].type.members);
+                    reflection.comment.removeTags('quickinfo');
+                    const type = context.checker.getTypeAtLocation(node);
+                    const typeNode = context.checker.typeToTypeNode(
+                        type,
+                        node.getSourceFile(),
+                        ts.NodeBuilderFlags.InTypeAlias
+                    );
+                    typeOverrides.set(reflection, typeNode);
+                    // typeOverrides.set(reflection, context.converter.convertType(context, typeNode));
+                }
+            }
+        }
+    );
+
+    app.converter.on(TypeDoc.Converter.EVENT_RESOLVE_BEGIN, () => {
+        for (const [refl, type] of typeOverrides) {
+            console.log(type);
+            refl.extra = type;
+        }
+        typeOverrides.clear();
+    });
+
+    // Application.convert checks for compiler errors here.
+
+    const packages = app.options.getValue('packages').map(normalizePath);
+    const entryPoints = getEntryPointsForPackages(app.logger, packages);
+    // console.log(entryPoints);
+    const project = app.converter.convert(entryPoints, program);
+
+    // const project = app.convert();
+
+    if (project) {
+        const tmpFile = './___temp.json';
+        await app.generateJson(project, tmpFile);
+        // await app.generateDocs(project, path.resolve(root, 'doc-site/blah'));
+        const data = require(tmpFile);
+        // fs.unlinkSync(tmpFile);
+        process(data);
+    }
+}
+
+main().catch(console.error);
+// process(require('./___temp.json'));
