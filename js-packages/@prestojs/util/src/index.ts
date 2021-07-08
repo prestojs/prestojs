@@ -14,7 +14,7 @@ export { default as PageNumberPaginator } from './pagination/PageNumberPaginator
 export { default as LimitOffsetPaginator } from './pagination/LimitOffsetPaginator';
 export { default as CursorPaginator } from './pagination/CursorPaginator';
 export { default as Paginator } from './pagination/Paginator';
-export { getNodeLabel, isTextLabeled, isLabeled } from './Labeled';
+export { getNodeLabel, isTextLabeled, isLabeled, isNodeLabeled, getTextLabel } from './Labeled';
 export { parseTime, formatTime, InvalidTimeError } from './time';
 
 import type { Id, Identifiable } from './identifiable';

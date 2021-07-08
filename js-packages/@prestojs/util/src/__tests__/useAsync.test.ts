@@ -8,6 +8,23 @@ const matchesFunction = {
     },
 };
 
+let globalWarnSpy;
+
+beforeAll(() => {
+    const original = console.warn;
+    globalWarnSpy = jest.spyOn(console, 'warn').mockImplementation(w => {
+        // Suppress warning on this message but keep anything else
+        if (w === "'response' has been renamed to 'result' - please update usage") {
+            return;
+        }
+        original.call(console, w);
+    });
+});
+
+afterAll(() => {
+    globalWarnSpy.mockRestore();
+});
+
 test('useAsync should call action if trigger changes from manual', async () => {
     const callAction1 = jest.fn(() => Promise.resolve('test1'));
     const { result, waitForNextUpdate, rerender } = renderHook(
@@ -17,6 +34,7 @@ test('useAsync should call action if trigger changes from manual', async () => {
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -25,6 +43,7 @@ test('useAsync should call action if trigger changes from manual', async () => {
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -33,6 +52,7 @@ test('useAsync should call action if trigger changes from manual', async () => {
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -48,6 +68,7 @@ test('useAsync should not call action if trigger changes to manual', async () =>
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -56,6 +77,7 @@ test('useAsync should not call action if trigger changes to manual', async () =>
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -64,6 +86,7 @@ test('useAsync should not call action if trigger changes to manual', async () =>
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -79,6 +102,7 @@ test('useAsync should not re-call action if trigger changes from deep to shallow
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -87,6 +111,7 @@ test('useAsync should not re-call action if trigger changes from deep to shallow
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -95,6 +120,7 @@ test('useAsync should not re-call action if trigger changes from deep to shallow
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -111,6 +137,7 @@ test('useAsync should re-call action if trigger changes from deep to shallow', a
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -119,6 +146,7 @@ test('useAsync should re-call action if trigger changes from deep to shallow', a
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -127,6 +155,7 @@ test('useAsync should re-call action if trigger changes from deep to shallow', a
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -135,6 +164,7 @@ test('useAsync should re-call action if trigger changes from deep to shallow', a
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -144,6 +174,7 @@ test('useAsync should re-call action if trigger changes from deep to shallow', a
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -159,6 +190,7 @@ test('useAsync should not set state after unmount', async () => {
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -179,6 +211,7 @@ test('useAsync should not set state after unmount (multiple unresolved calls)', 
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -205,6 +238,7 @@ test('useAsync should not set state after unmount (multiple unresolved calls tri
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -229,6 +263,7 @@ test('useAsync with MANUAL trigger should not set state after unmount (trigger b
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -249,6 +284,7 @@ test('useAsync with MANUAL trigger should not set state after unmount (triggered
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -285,6 +321,7 @@ test('useAsync should support onSuccess/onError', async () => {
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -297,6 +334,7 @@ test('useAsync should support onSuccess/onError', async () => {
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -348,7 +386,7 @@ test('useAsync should properly memoize run', async () => {
     const callAction1 = jest.fn(id => Promise.resolve(`id: ${id}`));
     // If not memoized properly this will result in infinite loop
     function useTestHook(id): any {
-        const { run, isLoading, response } = useAsync(callAction1, { args: [id] });
+        const { run, isLoading, result } = useAsync(callAction1, { args: [id] });
 
         useEffect(() => {
             if (id) {
@@ -360,7 +398,7 @@ test('useAsync should properly memoize run', async () => {
             return 'loading';
         }
 
-        return response;
+        return result;
     }
     jest.useFakeTimers();
     const { result, rerender } = renderHook(({ id }) => useTestHook(id), {
@@ -392,6 +430,7 @@ test('useAsync should re-trigger if arguments changes when trigger is SHALLOW', 
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -402,6 +441,7 @@ test('useAsync should re-trigger if arguments changes when trigger is SHALLOW', 
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -410,6 +450,7 @@ test('useAsync should re-trigger if arguments changes when trigger is SHALLOW', 
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -419,6 +460,7 @@ test('useAsync should re-trigger if arguments changes when trigger is SHALLOW', 
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -429,6 +471,7 @@ test('useAsync should re-trigger if arguments changes when trigger is SHALLOW', 
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -437,6 +480,7 @@ test('useAsync should re-trigger if arguments changes when trigger is SHALLOW', 
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -453,6 +497,7 @@ test('useAsync should re-trigger if arguments changes when trigger is DEEP', asy
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -462,6 +507,7 @@ test('useAsync should re-trigger if arguments changes when trigger is DEEP', asy
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -470,6 +516,7 @@ test('useAsync should re-trigger if arguments changes when trigger is DEEP', asy
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -479,6 +526,7 @@ test('useAsync should re-trigger if arguments changes when trigger is DEEP', asy
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -489,6 +537,7 @@ test('useAsync should re-trigger if arguments changes when trigger is DEEP', asy
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -497,6 +546,7 @@ test('useAsync should re-trigger if arguments changes when trigger is DEEP', asy
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -520,6 +570,7 @@ test('useAsync should re-trigger if function changes when trigger is SHALLOW', a
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -529,6 +580,7 @@ test('useAsync should re-trigger if function changes when trigger is SHALLOW', a
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -537,6 +589,7 @@ test('useAsync should re-trigger if function changes when trigger is SHALLOW', a
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -545,6 +598,7 @@ test('useAsync should re-trigger if function changes when trigger is SHALLOW', a
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -555,6 +609,7 @@ test('useAsync should re-trigger if function changes when trigger is SHALLOW', a
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test2',
         response: 'test2',
         run: matchesFunction,
         reset: matchesFunction,
@@ -577,6 +632,7 @@ test('useAsync should re-trigger if function changes when trigger is DEEP', asyn
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -586,6 +642,7 @@ test('useAsync should re-trigger if function changes when trigger is DEEP', asyn
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -594,6 +651,7 @@ test('useAsync should re-trigger if function changes when trigger is DEEP', asyn
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -602,6 +660,7 @@ test('useAsync should re-trigger if function changes when trigger is DEEP', asyn
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -612,6 +671,7 @@ test('useAsync should re-trigger if function changes when trigger is DEEP', asyn
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test2',
         response: 'test2',
         run: matchesFunction,
         reset: matchesFunction,
@@ -635,6 +695,7 @@ test('useAsync should handle errors', async () => {
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -643,6 +704,7 @@ test('useAsync should handle errors', async () => {
     expect(result.current).toEqual({
         isLoading: false,
         error: error1,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -651,6 +713,7 @@ test('useAsync should handle errors', async () => {
     expect(result.current).toEqual({
         isLoading: true,
         error: error1,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -659,13 +722,14 @@ test('useAsync should handle errors', async () => {
     expect(result.current).toEqual({
         isLoading: false,
         error: error2,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
     });
 });
 
-test('useAsync return a reset function that clears response / error', async () => {
+test('useAsync return a reset function that clears result / error', async () => {
     jest.useFakeTimers();
     const callAction1 = jest.fn(() => new Promise(resolve => setTimeout(() => resolve('test1'))));
     const onSuccess = jest.fn();
@@ -686,6 +750,7 @@ test('useAsync return a reset function that clears response / error', async () =
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -696,6 +761,7 @@ test('useAsync return a reset function that clears response / error', async () =
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: 'test1',
         response: 'test1',
         run: matchesFunction,
         reset: matchesFunction,
@@ -708,6 +774,7 @@ test('useAsync return a reset function that clears response / error', async () =
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -716,6 +783,7 @@ test('useAsync return a reset function that clears response / error', async () =
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -730,6 +798,7 @@ test('useAsync return a reset function that clears response / error', async () =
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -742,6 +811,7 @@ test('useAsync return a reset function that clears response / error', async () =
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -776,6 +846,7 @@ test('useAsync should call reset loading state if call is aborted', async () => 
     expect(result.current).toEqual({
         isLoading: true,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
@@ -788,6 +859,7 @@ test('useAsync should call reset loading state if call is aborted', async () => 
     expect(result.current).toEqual({
         isLoading: false,
         error: null,
+        result: null,
         response: null,
         run: matchesFunction,
         reset: matchesFunction,
