@@ -21,6 +21,9 @@ html {
 .btn {
     @apply font-bold py-2 px-4 rounded;
 }
+.btn-text {
+    @apply font-normal underline hover:text-blue-400 text-blue-700;
+}
 .btn-blue {
     @apply btn bg-blue-500 text-white;
 }
@@ -54,7 +57,7 @@ html {
     font-size: inherit;
 }
 
-.table-mdx p {
+.table-mdx p:first-child {
     margin: 0;
 }
 .mdx a {

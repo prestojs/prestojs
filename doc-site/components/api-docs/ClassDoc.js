@@ -12,6 +12,7 @@ export default function ClassDoc({ doc, baseUrl }) {
     const classDetails = getClassDetails(doc);
     const { constructor, methods, properties, staticMethods, staticProperties } = classDetails;
     const typeArguments = getTypeArguments(doc);
+
     let sideLinkIds = [];
     if (doc.mdx) {
         const matches = doc.mdx.match(/data-anchorlink="([^"]*)"/g);

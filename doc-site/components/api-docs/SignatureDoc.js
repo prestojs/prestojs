@@ -12,6 +12,7 @@ export default function SignatureDoc({
     method,
     anchorLink,
     isConstructor,
+    parametersHeading = 'Parameters',
     showReturn = !isConstructor,
     signatureDefinitionTag = 'h4',
     bordered = true,
@@ -65,6 +66,7 @@ export default function SignatureDoc({
                     ...p,
                     name: p.name === '__namedParameters' ? 'props' : p.name,
                 }))}
+                overloadDesc={signature.comment?.tagsByName?.['overload-desc']}
             />
             {method && <SourceLink doc={method} />}
         </span>
@@ -80,7 +82,18 @@ export default function SignatureDoc({
         <div className={bordered ? 'pt-3 mt-3 border-t-2 border-gray-200' : ''}>
             {!hideName && header}
             <MdxWrapper mdx={signature.mdx} />
-            {parameters.length > 0 && <ParameterTable parameters={parameters} />}
+            {parameters.length > 0 && (
+                <>
+                    <AnchorLink
+                        Component="h2"
+                        id={parametersHeading}
+                        className="text-3xl font-normal my-4"
+                    >
+                        {parametersHeading}
+                    </AnchorLink>
+                    <ParameterTable parameters={parameters} />
+                </>
+            )}
             {showReturn && <ReturnType signature={signature} />}
         </div>
     );

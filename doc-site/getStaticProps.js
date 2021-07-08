@@ -5,10 +5,11 @@ import fs from 'fs';
 import path from 'path';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
+import AnchorLinkPrefix from './components/AnchorLinkPrefix';
 import mdxComponents from './components/mdxComponents';
 import docLinks from './remark-plugins/docLinks';
 
-async function traverse(obj, fn, visitedTracker = new Map()) {
+async function traverse(obj, fn, visitedTracker = new Map(), parent = null) {
     if (!obj || typeof obj !== 'object') {
         return obj;
     }
@@ -16,18 +17,23 @@ async function traverse(obj, fn, visitedTracker = new Map()) {
         return obj;
     }
     visitedTracker.set(obj, true);
-    if (await fn(obj)) {
+    if (await fn(obj, parent)) {
         return obj;
     }
-    for (const value of Array.isArray(obj) ? obj : Object.values(obj)) {
+    for (const [key, value] of Object.entries(Array.isArray(obj) ? obj : obj)) {
         if (Array.isArray(value)) {
-            for (const v of value) {
+            for (let i = 0; i < value.length; i++) {
+                const v = value[i];
                 if (value && typeof value == 'object') {
-                    await traverse(v, fn, visitedTracker);
+                    await traverse(v, fn, visitedTracker, {
+                        index: i,
+                        parent: obj,
+                        key,
+                    });
                 }
             }
         } else if (value && typeof value == 'object') {
-            await traverse(value, fn, visitedTracker);
+            await traverse(value, fn, visitedTracker, obj);
         }
     }
     return obj;
@@ -131,7 +137,7 @@ export default async function getStaticProps(
     }, {});
     const items = data.filter(filter);
     const extraNodes = {};
-    async function transformComment(obj) {
+    async function transformComment(obj, parent) {
         if (obj.comment && (obj.comment.shortText || obj.comment.text)) {
             if (/```.*live/.test(obj.comment.text || '')) {
                 obj.mdx = {
@@ -151,12 +157,20 @@ export default async function getStaticProps(
                         components: mdxComponents,
                     });
                 }
-                obj.mdx = ReactDOMServer.renderToStaticMarkup(
+                let toRender = (
                     <div className="mdx">
                         {short}
                         {long}
                     </div>
                 );
+                if (parent && parent.key === 'signatures') {
+                    toRender = (
+                        <AnchorLinkPrefix prefix={`sig${parent.index}-`}>
+                            {toRender}
+                        </AnchorLinkPrefix>
+                    );
+                }
+                obj.mdx = ReactDOMServer.renderToStaticMarkup(toRender);
             }
         }
         if (obj.comment && obj.comment.returns) {
@@ -191,11 +205,11 @@ export default async function getStaticProps(
         }
     }
     const visitedTracker = new Map();
-    async function transformObj(obj) {
-        await transformComment(obj);
+    async function transformObj(obj, parent) {
+        await transformComment(obj, parent);
         if (obj.type === 'reference' && !extraNodes[obj.id] && obj.id && byId[obj.id]) {
             extraNodes[obj.id] = byId[obj.id];
-            await traverse(byId[obj.id], transformObj, visitedTracker);
+            await traverse(byId[obj.id], transformObj, visitedTracker, obj);
         }
     }
     const docs = [];

@@ -1,6 +1,9 @@
 import React from 'react';
+import { useAnchorLinkPrefix } from './AnchorLinkPrefix';
 
 export default function AnchorLink({ Component, children, id, className = '' }) {
+    const prefix = useAnchorLinkPrefix();
+    id = prefix + id;
     return (
         <div id={id} className={`anchor-link ${className}`}>
             <a

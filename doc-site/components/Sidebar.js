@@ -62,11 +62,11 @@ function Links({ links }) {
     });
 }
 
-function LinksSection_({ title, links }) {
+function LinksSection_({ title, links, className, ...props }) {
     const router = useRouter();
     const anyActive = links.filter(({ href, as }) => isCurrent(router, as || href)).length > 0;
     return (
-        <div className="mb-8">
+        <div className={cx('mb-8', className)} {...props}>
             {title && (
                 <h5
                     className={`mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-sm lg:text-xs${
@@ -129,7 +129,7 @@ function LinksSection_({ title, links }) {
  *  ]
  *  ```
  */
-function LinksSection({ title, links }) {
+function LinksSection({ title, links, ...props }) {
     const router = useRouter();
     const defaultSection = [];
     const sections = [];
@@ -148,16 +148,18 @@ function LinksSection({ title, links }) {
         defaultSection.filter(({ href, as }) => isCurrent(router, as || href)).length > 0;
     return (
         <>
-            <h5
-                className={`mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-md lg:text-sm${
-                    anyActiveDefault ? ' current-section' : ''
-                }`}
-            >
-                {title}
-            </h5>
-            {defaultSection.length > 0 && <LinksSection_ links={defaultSection} />}
+            {title && (
+                <h5
+                    className={`mb-3 lg:mb-2 text-gray-500 uppercase tracking-wide font-bold text-md lg:text-sm${
+                        anyActiveDefault ? ' current-section' : ''
+                    }`}
+                >
+                    {title}
+                </h5>
+            )}
+            {defaultSection.length > 0 && <LinksSection_ links={defaultSection} {...props} />}
             {sections.map((section, i) => (
-                <LinksSection_ key={i} title={section.title} links={section.items} />
+                <LinksSection_ key={i} title={section.title} links={section.items} {...props} />
             ))}
         </>
     );

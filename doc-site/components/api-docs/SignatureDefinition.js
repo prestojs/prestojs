@@ -1,10 +1,18 @@
 import React from 'react';
+import AnchorLink from '../AnchorLink';
 import TypeDesc from './TypeDesc';
 
-export default function SignatureDefinition({ name, parameters, returnType, tag = 'div' }) {
+export default function SignatureDefinition({
+    name,
+    parameters,
+    returnType,
+    tag = 'div',
+    overloadDesc = null,
+    ...rest
+}) {
     const Tag = tag;
     return (
-        <Tag>
+        <Tag {...rest}>
             <span className="font-bold">{name}</span>
             <span className="signature-params">
                 (
@@ -24,6 +32,13 @@ export default function SignatureDefinition({ name, parameters, returnType, tag 
                     {' '}
                     {'=>'} <TypeDesc type={returnType} />
                 </>
+            )}
+            {overloadDesc && (
+                <div className="text-gray-600 underline">
+                    <AnchorLink Component="div" id={overloadDesc}>
+                        {overloadDesc}
+                    </AnchorLink>
+                </div>
             )}
         </Tag>
     );

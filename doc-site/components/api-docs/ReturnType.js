@@ -36,7 +36,7 @@ export default function ReturnType({ signature }) {
     }
     return (
         <div className="mt-5">
-            <AnchorLink id="return-type" Component="div" className="text-xl">
+            <AnchorLink id="Returns" Component="div" className="text-3xl font-normal my-4">
                 Returns
             </AnchorLink>
             {signature.comment?.tagsByName?.['return-type-name'] ? (

@@ -5,15 +5,47 @@ import SourceLink from './SourceLink';
 import Tooltip from './Tooltip';
 
 function CopyToClipboard({ text }) {
+    const [copied, setCopied] = React.useState(false);
+    React.useEffect(() => {
+        let timeout;
+        if (copied) {
+            timeout = setTimeout(() => {
+                setCopied(false);
+            }, 5000);
+        }
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [copied]);
     return (
         <button
             title="Copy to clipboard"
             className="transition duration-500 ease-in-out hover:text-gray-900 transform hover:scale-110"
             onClick={() => {
                 navigator.clipboard.writeText(text);
+                setCopied(true);
             }}
         >
-            <EditCopy className="w-4 fill-current" />
+            {!copied && <EditCopy className="w-4 fill-current" />}
+            {copied && (
+                <span className="flex items-center text-sm">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 text-green-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                        />
+                    </svg>
+                    Copied!
+                </span>
+            )}
         </button>
     );
 }

@@ -1,6 +1,7 @@
 import cx from 'classnames';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 import RightChevron from '../../assets/icon-right-chevron.svg';
+import AnchorLink from '../AnchorLink';
 import CodeBlock from '../CodeBlock';
 
 const OPEN_CODE_HEIGHT = 40;
@@ -122,15 +123,29 @@ function CodeExample({ example, container, language, showExpand }) {
 }
 
 function useLocalStorageState(key, defaultValue) {
+    const [, forceRender] = useReducer(i => !i, true);
     const localStorage = typeof window != 'undefined' ? window.localStorage : null;
-    const [value, setValue] = useState((localStorage && localStorage.getItem(key)) || defaultValue);
-    useEffect(() => {
-        if (localStorage && value !== localStorage.getItem(key)) {
-            localStorage.setItem(key, value);
-        }
-    }, [key, localStorage, value]);
+    const value = (localStorage && localStorage.getItem(key)) || defaultValue;
 
-    return [value, setValue];
+    useEffect(() => {
+        if (localStorage && !['jsx', 'tsx'].includes(value)) {
+            localStorage.removeItem(key);
+        }
+    }, [localStorage, key, value]);
+
+    useEffect(() => {
+        // Resolves issue on load where server rendering has set to defaultValue but user may have
+        // localStorage value we need to read.
+        forceRender();
+    }, []);
+
+    return [
+        value,
+        nextValue => {
+            localStorage.setItem(key, nextValue);
+            forceRender();
+        },
+    ];
 }
 
 export default function CodeExamples({ examples }) {
@@ -138,17 +153,19 @@ export default function CodeExamples({ examples }) {
     const [language, setLanguage] = useLocalStorageState('codeExamplesLanguage', 'jsx');
     return (
         <div className="my-5" ref={containerRef}>
-            <h3 className="text-4xl mb-5 flex justify-between">
-                Examples
-                <select
-                    value={language}
-                    onChange={({ target: { value } }) => setLanguage(value)}
-                    className="text-sm"
-                >
-                    <option value="jsx">Javascript</option>
-                    <option value="tsx">Typescript</option>
-                </select>
-            </h3>
+            <AnchorLink Component="h2" id="Examples" className="text-3xl font-normal my-4">
+                <div className="flex justify-between">
+                    Examples
+                    <select
+                        value={language}
+                        onChange={({ target: { value } }) => setLanguage(value)}
+                        className="text-sm"
+                    >
+                        <option value="jsx">Javascript</option>
+                        <option value="tsx">Typescript</option>
+                    </select>
+                </div>
+            </AnchorLink>
             <div
                 className={cx('grid gap-4 w-full', {
                     'grip-cols-1': examples.length === 1,

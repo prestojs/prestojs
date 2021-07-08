@@ -119,22 +119,12 @@ async function process() {
             const dir =
                 root + '/' + node.sources[0].fileName.split('/').slice(0, -1).join('/') + '/';
             if (comment.shortText && comment.shortText.includes('codesandbox=')) {
-                console.log(
-                    'wow',
-                    comment.text,
-                    comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`)
-                );
                 comment.shortText = comment.shortText.replace(
                     /codesandbox=/g,
                     `codesandbox=${dir}`
                 );
             }
             if (comment.text && comment.text.includes('codesandbox=')) {
-                console.log(
-                    'wow',
-                    comment.text,
-                    comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`)
-                );
                 comment.text = comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`);
             }
         }
@@ -223,8 +213,40 @@ async function process() {
         if (obj.type === 'reference' && byId[obj.id] && byId[obj.id].extractDocs) {
             obj.referenceSlug = byId[obj.id].slug;
         }
+        if (
+            obj.comment &&
+            obj.comment.tagsByName &&
+            typeof obj.comment.tagsByName.template == 'object'
+        ) {
+            const template = obj.comment.tagsByName.template;
+            if (obj.typeParameter) {
+                const matched = [];
+                obj.typeParameter.forEach(param => {
+                    if (template[param.name]) {
+                        matched.push(param.name);
+                        param.desc = template[param.name];
+                    }
+                });
+                const missing = Object.keys(template).filter(name => !matched.includes(name));
+                if (missing.length > 0) {
+                    console.error(
+                        `'${
+                            obj.name
+                        }' has @template docs that don't match available type parameters: ${missing.join(
+                            ', '
+                        )}`
+                    );
+                }
+            }
+        }
         if (obj.tags) {
             obj.tagsByName = obj.tags.reduce((acc, tag) => {
+                if (tag.tag === 'template') {
+                    acc.template = acc.template || {};
+                    const [name, ...rest] = tag.text.trim().split(' ');
+                    acc.template[name] = rest.join(' ');
+                    return acc;
+                }
                 acc[tag.tag] = tag.text.trim();
                 if (acc[tag.tag] === '') {
                     acc[tag.tag] = true;
