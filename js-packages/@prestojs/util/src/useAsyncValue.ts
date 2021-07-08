@@ -141,9 +141,10 @@ export type UseAsyncValueReturn<T> = {
  * may not have the data you care about. If it's there then the value will
  * be returned immediately.
  *
- * For multiple values see documentation below.
+ * For multiple values see the [documentation below](#sig1-Multiple%20values).
  *
  * @extract-docs
+ * @overload-desc Single value
  */
 export default function useAsyncValue<T, U extends Id>(
     props: UseAsyncValuePropsSingle<T, U>
@@ -161,10 +162,30 @@ export default function useAsyncValue<T, U extends Id>(
  * be returned immediately. Note that if any of the ids are missing from
  * `existingValues` then it will be ignored and a call to `resolve` will be made
  * requesting values for all `ids`.
+ *
+ * @overload-desc Multiple values
  */
 export default function useAsyncValue<T, U extends Id>(
     props: UseAsyncValuePropsMulti<T, U>
 ): UseAsyncValueReturn<T[]>;
+/**
+ * `useAsyncValue` can be used to resolve value(s), for example database record(s), from id(s).
+ *
+ *  There are two ways to call this hook - one with a single id and another with multiple ids. They are documented
+ *  separately below as [Single value](#sig0-Single%20value) and [Multiple values](#sig1-Multiple%20values).
+ *
+ * > INFO
+ * > **Which Hook to Use?**
+ * >
+ * > There are 3 async hooks provided that serve slightly different purposes.
+ * >
+ * > * [useAsyncListing](doc:useAsyncListing) is useful when you are dealing with a paginated list of data. It can optionally accumulate pages to implement infinite scroll.
+ * > * [useAsyncValue](doc:useAsyncValue) can be used to resolve value(s) from an identifier, optionally reading from a cache. For example if you had a form `select` widget that read the available options from the server but on initial render you needed to make sure the previously selected values were known you could use `useAsyncValue`.
+ * > * [useAsync](doc:useAsync) is used by the other two functions and is generic in its usage. You can use it to call any async function and then it's up to you what to do with the response.
+ * >
+ * > If in doubt just use [useAsync](doc:useAsync). Anything you can do with the other hooks can be done with `useAsync` -
+ * > you may just have to write a bit more code.
+ */
 export default function useAsyncValue<T, U extends Id>(
     props: CommonProps<T, U> & {
         id?: U | null;

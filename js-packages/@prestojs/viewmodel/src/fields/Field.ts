@@ -68,9 +68,9 @@ class UnboundFieldError<T, ParsableType, SingleType> extends Error {
  *
  * @extract-docs
  * @menu-group Fields
- * @template ValueType The type of the value for this field.
- * @template ParsableType The type this field knows how to parse into the ValueType
- * @template SingleType The type of a single value for this field. This is only different from `ValueType` if `ValueType` is eg. an array type
+ * @template ValueT The type of the value for this field.
+ * @template ParsableValueT The type this field knows how to parse into the ValueType
+ * @template SingleValueT The type of a single value for this field. This is only different from `ValueType` if `ValueType` is eg. an array type
  */
 export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleValueT = ValueT> {
     // These are just for internal usage with typescript

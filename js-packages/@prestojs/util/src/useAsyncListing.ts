@@ -65,7 +65,7 @@ export type UseAsyncListingProps<T> = {
     execute: (props: UseAsyncListingExecuteProps) => Promise<T>;
 };
 
-type UseAsyncListingReturnCommon<T> = {
+export type UseAsyncListingReturn<T> = {
     /**
      * True while `execute` call is in progress.
      */
@@ -89,46 +89,37 @@ type UseAsyncListingReturnCommon<T> = {
      * to the value of `trigger`.
      */
     reset: () => void;
+    /**
+     * Set to the rejected value of the promise. Only one of `error` and `result` can be set. If
+     * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
+     * when you want the UI to show the previous value until the next value is ready.
+     *
+     * Until first call has resolved neither error nor result will be set
+     */
+    error: Error;
+    /**
+     * The value returned from execute
+     */
+    result: T;
 };
-export type UseAsyncListingReturn<T> =
-    | (UseAsyncListingReturnCommon<T> & {
-          /**
-           * Until first call has resolved neither error nor result will be set
-           */
-          error: null;
-          result: null;
-      })
-    | (UseAsyncListingReturnCommon<T> & {
-          /**
-           * Set to the rejected value of the promise. Only one of `error` and `result` can be set. If
-           * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
-           * when you want the UI to show the previous value until the next value is ready.
-           */
-          error: Error;
-          /**
-           * Result will not be set when error is set
-           */
-          result: null;
-      })
-    | (UseAsyncListingReturnCommon<T> & {
-          /**
-           * Error will not be set when result is set
-           */
-          error: null;
-          /**
-           * The value returned from execute
-           */
-          result: T;
-      });
 
 /**
- * Execute an asynchronous call and return the value which can optionally be paginated.
+ * A version of `useAsync` that has built in support for [Paginator](doc:Paginator) and can optional accumulate results
+ * as pages are fetched. If you don't need pagination use [useAsync](doc:useAsync) instead.
  *
- * If the result is paginated you can pass `paginator`. Whenever the paginator state
- * is changed the function will be called unless `trigger` is `MANUAL`. You can pass
- * `accumulatePages` to accumulate results for sequential pages returned from `execute`.
- * This is useful to implement things like infinite scroll. If a non-sequential page
- * is accessed or `query` changes then accumulated results will be cleared.
+ * The function passed in `options.execute` gets passed an object containing the `paginator` (if `options.paginator` is used)
+ * and `query` (if `options.query` is used) and should fetch the relevant data for those arguments.
+ *
+ * Whenever pagination state or `options.query` changes then `execute` will be called again unless `options.trigger`
+ * is set to `"MANUAL"`.
+ *
+ * You can pass `accumulatePages` to accumulate results for sequential pages returned from `execute`.
+ * This is useful to implement things like infinite scroll. If a non-sequential page is accessed or
+ * `query` changes then accumulated results will be cleared.
+ *
+ * > This hook _will_ work with unpaginated data but for most of those cases you should use [useAsync](doc:useAsync)
+ * > directly instead. It may be desirable to use this if the call is _conditionally paginated_. The main
+ * > purpose of this hook is to support the `accumulatePages` option.
  *
  * @extract-docs
  */

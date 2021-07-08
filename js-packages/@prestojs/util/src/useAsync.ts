@@ -73,14 +73,41 @@ const DEEP = 'DEEP';
 // re-use the same component if moved from /a/1/ to /a/b2/ if no explicit key was specified
 // and so wouldn't re-call the function). As such we've decided not to include it.
 
+// Defined like this as it works better with docgen
+interface OnError<ErrorT> {
+    /**
+     * @param error The error that was thrown/rejected from the async function
+     */
+    (error: ErrorT): void;
+}
+
+interface OnSuccess<ResultT> {
+    /**
+     * @param result The result returned by the async function
+     */
+    (result: ResultT): void;
+}
+
+interface AsyncFunction<ResultT> {
+    /**
+     * @param args If `options.args` are passed to `useAsync` then they will be passed through to this function,
+     * otherwise nothing will be passed.
+     *
+     * @returns Any value; this will be the value that is returned by `useAsync` in its `result` key
+     */
+    (...args: Array<any>): Promise<ResultT>;
+}
+
 /**
  * @expand-properties
  */
-export type UseAsyncOptions = {
+export type UseAsyncOptions<ResultT, ErrorT> = {
     /**
      * Determines when the function is called. Defaults to `MANUAL`.
      *
-     * **NOTE**: If changing from MANUAL then the function will be called immediately regardless
+     * **NOTE**: If changing from `MANUAL` to anything else then the function will be called immediately regardless
+     *
+     * These are available as properties on `useAsync`:
      *
      * **useAsync.MANUAL (default)** - only called when you explicitly call `run`
      *
@@ -98,16 +125,17 @@ export type UseAsyncOptions = {
      */
     trigger?: typeof MANUAL | typeof SHALLOW | typeof DEEP;
     /**
-     * Arguments to be passed to asyncFn when it is called. Can be empty. If you are using `trigger` of
-     * `MANUAL` then it's usually simpler to just pass the arguments in `fn` manually (eg. by defining
-     * an arrow function inline). When using other values of `trigger` the value of `args` is compared
+     * Arguments to be passed to the async function. Can be empty.
+     *
+     * If you are using `trigger` of `MANUAL` then it's usually simpler to just pass the arguments in `fn` manually
+     * (eg. by defining an arrow function inline). When using other values of `trigger` the value of `args` is compared
      * and will trigger a call to `fn` when a change is detected according to the comparison logic of the
      * selected `trigger`.
      */
     args?: Array<any>;
     /**
-     * Called when action resolves successfully. Is passed a single parameter which
-     * is the result from the async action.
+     * Called when the async function resolves successfully. Is passed a single parameter which
+     * is the result from the async function.
      *
      * **NOTE:** If your component unmounts before the promise resolves this function
      * will NOT be called. This is to avoid the general case of calling React
@@ -115,20 +143,20 @@ export type UseAsyncOptions = {
      * method to be called regardless then attach your own callbacks to the
      * promise when you call `run` or in the async function definition itself.
      */
-    onSuccess?: (result: {}) => void;
+    onSuccess?: OnSuccess<ResultT>;
     /**
-     * Called when action errors. Passed the error returned from async action.
+     * Called when the async function errors. It is passed the error.
      *
      * See note above on `onSuccess` for behaviour when component has unmounted.
      */
-    onError?: (error: Error) => void;
+    onError?: OnError<ErrorT>;
 };
 
 const validOptionKeys = ['trigger', 'args', 'onSuccess', 'onError'];
 
 export type UseAsyncReturnObject<ResultT, ErrorT> = {
     /**
-     * True when action is in progress.
+     * True when function call is in progress.
      */
     isLoading: boolean;
     /**
@@ -149,18 +177,18 @@ export type UseAsyncReturnObject<ResultT, ErrorT> = {
      */
     response: ResultT | null;
     /**
-     * A function to manually trigger the action. If `options.trigger` is `useAsync.MANUAL`
-     * calling this function is the only way to trigger the action. You can pass
+     * A function to manually trigger the function call. If `options.trigger` is `useAsync.MANUAL`
+     * calling this function is the only way to trigger the function call. You can pass
      * arguments to `run` which will override the defaults. If no arguments are passed then
      * `options.args` will be passed by default (if supplied).
      *
      * This function will return a promise that resolves/rejects to same value
-     * resolved/rejected from the async action.
+     * resolved/rejected from the async function.
      */
     run: (...args) => Promise<ResultT>;
     /**
      * When called will set both result or error to null. Will not immediately trigger
-     * a call to the action but subsequent changes to `fn` or `options.args` will
+     * a call to the function but subsequent changes to `fn` or `options.args` will
      * according to the value of `trigger`.
      */
     reset: () => void;
@@ -188,56 +216,73 @@ const comparisonByTrigger = {
  * initially and then refetch it when some arguments change (eg. the id for a single
  * record or the filters for a list).
  *
- * ## Examples
+ * > INFO
+ * > **Which Hook to Use?**
+ * >
+ * > There are 3 async hooks provided that serve slightly different purposes.
+ * >
+ * > * [useAsyncListing](doc:useAsyncListing) is useful when you are dealing with a paginated list of data. It can optionally accumulate pages to implement infinite scroll.
+ * > * [useAsyncValue](doc:useAsyncValue) can be used to resolve value(s) from an identifier, optionally reading from a cache. For example if you had a form `select` widget that read the available options from the server but on initial render you needed to make sure the previously selected values were known you could use `useAsyncValue`.
+ * > * [useAsync](doc:useAsync) is used by the other two functions and is generic in its usage. You can use it to call any async function and then it's up to you what to do with the response.
+ * >
+ * > If in doubt just use [useAsync](doc:useAsync). Anything you can do with the other hooks can be done with `useAsync` -
+ * > you may just have to write a bit more code.
  *
- * Fetch and render a specified github profile
+ * ## Usage
  *
- * ```js live horizontal
- * function FollowerCount() {
- *     const [user, setUser] = React.useState('octocat')
- *     const { result, isLoading, error, run, reset } = useAsync(() => getGithubUser(user));
- *     return (
- *         <div>
- *             <input value={user} onChange={e => setUser(e.target.value)} />
- *             <div className="my-2 justify-between flex">
- *             <button onClick={run} disabled={isLoading} className="btn-blue">Query follower count</button>
- *             <button className="btn" onClick={reset}>Clear</button>
- *             </div>
- *             {result && (
- *                 <p>
- *                     <img src={result.avatar_url} /><br />
- *                     {result.name} has {result.followers} followers
- *                 </p>
- *             )}
- *             {error && (<p>Failed with status: {error.status} {error.statusText}</p>)}
- *         </div>
- *     );
- * }
- * // we don't define this inside FollowerCount() because that will create a new function on
- * // every render, causing useAsync() to re-run and triggering an infinite render loop
- * function getGithubUser(user) {
- *   return fetch(`https://api.github.com/users/${user}`).then(r => {
- *      if (r.ok) {
- *          return r.json();
- *      }
- *      throw r;
- *   });
- * }
+ * The simplest usage is to just pass a function. This will only be called when  `run` is explicitly called:
+ *
+ * ```js
+ * const { result, error, run } = useAsync(() => doSomething(arg1, arg2))
  * ```
+ *
+ * To run this automatically on mount and then whenever `arg1` or `arg2` change it could be refactored as:
+ *
+ * ```js
+ * const { result, error } = useAsync(doSomething, { args: [arg1, arg2], trigger: useAsync.SHALLOW });
+ * ```
+ *
+ * If `arg1` or `arg2` were objects that would fail a shallow equality check (`oldArg1 !== arg1`) then use
+ * `useAsync.DEEP`
+ *
+ * ```js
+ * // this will result in the call `doSomething([1, 2, 3])`. As the array is constructed every
+ * // render this will always fail shallow equality checks.
+ * const arg1 = [1, 2, 3];
+ * const { result, error } = useAsync(doSomething, { args: [arg1], trigger: useAsync.DEEP });
+ * ```
+ *
+ * See the [interactive examples](#Examples) at the bottom of the page for more complete examples.
+ *
  * @param fn A function that returns a promise. When `trigger` is `MANUAL` this is only
  * called when you manually call the returned `run` function, otherwise it's called
  * initially and then whenever an equality comparison fails between previous arguments and new
- * arguments. Note that when `trigger` is `SHALLOW` or `DEEP` changes to this function will
- * cause it to be called again so you must memoize it (eg. with `useCallback`) if it's defined
- * in your component or hook. To help detect runaway effects caused by this automatically
- * consider using [stop-runaway-react-effects](https://github.com/kentcdodds/stop-runaway-react-effects).
+ * arguments.
  *
+ * Note that when `trigger` is `SHALLOW` or `DEEP` then any changes to this function will
+ * cause it to be called again. If you need to pass a function defined inline in your component
+ * or hook you must memoize it (eg. with `useCallback`).  A better approach is to pass a
+ * stable function and use `options.args` instead:
+ *
+ * ```js
+ * // This will result in an infinite loop; the arrow function changes every render
+ * useAsync(() => myFn(1, 2, 3), { trigger: useAsync.SHALLOW })
+ *
+ * // `myFn` is constant and so won't change; `useAsync` will compare args every render and only call `myFn` when they change
+ * useAsync(myFn, { args: [1, 2, 3], trigger: useAsync.SHALLOW })
+ * ```
+ *
+ * **NOTE:** To help detect runaway effects caused by this automatically consider using
+ * [stop-runaway-react-effects](https://github.com/kentcdodds/stop-runaway-react-effects).
+ *
+ * @template ResultT The type of the value returned from `fn` on success
+ * @template ErrorT The type of the error value when `fn` rejects
  *
  * @extract-docs
  */
 function useAsync<ResultT, ErrorT = Error>(
-    fn: (...args: Array<any>) => Promise<ResultT>,
-    options: UseAsyncOptions = {}
+    fn: AsyncFunction<ResultT>,
+    options: UseAsyncOptions<ResultT, ErrorT> = {}
 ): UseAsyncReturnObject<ResultT, ErrorT> {
     const { trigger = MANUAL, args = [], onSuccess, onError } = options;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
