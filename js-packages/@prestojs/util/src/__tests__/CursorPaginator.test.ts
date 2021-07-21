@@ -211,7 +211,7 @@ test.each`
         decodedBody: {
             count: 0,
             results: [],
-            previous: null,
+            previous: '?limit=0',
             next: null,
         },
     });
