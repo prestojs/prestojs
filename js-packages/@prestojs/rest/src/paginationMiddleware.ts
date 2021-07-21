@@ -170,11 +170,28 @@ export class PaginationMiddleware<T> {
                 }
                 return paginationState.results;
             } else {
-                // TODO: If you specify a paginator and the response is not paginated should
-                // we warn? I think yes as I can't think of a reason why not but may need to
-                // revisit this if we find a usecase
+                let msg = '';
+                if (this.resultPath) {
+                    if (!requestDetails.decodedBody) {
+                        msg = `'resultPath' was specified as '${this.resultPath}' but that key does not exist in the data. Is it spelled correctly?.`;
+                    } else {
+                        msg = `'resultPath' was specified as '${this.resultPath}' and that key exists but does not appear to be paginated data.`;
+                    }
+                } else {
+                    msg = "If the pagination data is nested specify the 'resultPath' option.";
+                }
                 console.warn(
-                    'A paginator was defined but the response was not paginated. Paginator state has not been updated.'
+                    `A paginator was defined but the response does not appear to be paginated.
+${msg}
+
+Attempted to process pagination state using ${this.paginatorClass.name} - if this is incorrect pass the correct class to 'paginationMiddleware'.
+
+Paginator state has not been updated.
+
+Data received:\n`,
+                    decodedBody,
+                    `\n\nRequest details:\n`,
+                    requestDetails
                 );
             }
         }

@@ -5,6 +5,7 @@
 ### Changed
 
 * The `response` key in the return value for [useAsync](https://prestojs.com/docs/util/useAsync) has been renamed to `result`. `response` is now deprecated; it will still work but any use will result in a warning.
+* Fixed `InferredPaginator` to correctly infer `PageNumberPaginator` instead of `LimitOffsetPaginator`
 
 ## [0.0.17] - 2021-06-28
 

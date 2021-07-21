@@ -188,7 +188,7 @@ test.each`
         decodedBody: {
             count: 5,
             results: [1, 2, 3, 4, 5],
-            next: null,
+            next: '?limit=5',
             previous: null,
         },
     });

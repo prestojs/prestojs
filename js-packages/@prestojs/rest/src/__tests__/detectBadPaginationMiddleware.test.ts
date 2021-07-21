@@ -107,12 +107,15 @@ test.each`
         });
         await act(async () => {
             const mockError = jest.spyOn(global.console, 'error');
+            const mockWarn = jest.spyOn(global.console, 'warn');
+            mockWarn.mockImplementation(() => undefined);
             mockError.mockImplementation(() => undefined);
             await expect(() => endpoint.execute()).rejects.toThrowError();
             expect(mockError).toHaveBeenCalledWith(
                 expect.stringContaining("looks paginated but 'paginationMiddleware' is not present")
             );
             mockError.mockClear();
+            mockWarn.mockClear();
         });
 
         endpoint = new Endpoint(new UrlPattern('/user/'), {
@@ -125,12 +128,15 @@ test.each`
 
         await act(async () => {
             const mockError = jest.spyOn(global.console, 'error');
+            const mockWarn = jest.spyOn(global.console, 'warn');
+            mockWarn.mockImplementation(() => undefined);
             mockError.mockImplementation(() => undefined);
             await expect(() => endpoint.execute()).rejects.toThrowError();
             expect(mockError).toHaveBeenCalledWith(
                 expect.stringContaining("looks paginated and 'paginationMiddleware' is present")
             );
             mockError.mockClear();
+            mockWarn.mockClear();
         });
 
         let { result: hookResult } = renderHook(() => useTestHook(paginatorClass));
@@ -151,6 +157,8 @@ test.each`
 
         await act(async () => {
             const mockError = jest.spyOn(global.console, 'error');
+            const mockWarn = jest.spyOn(global.console, 'warn');
+            mockWarn.mockImplementation(() => undefined);
             mockError.mockImplementation(() => undefined);
 
             await expect(() =>
@@ -160,6 +168,7 @@ test.each`
                 expect.stringContaining("looks paginated but 'paginationMiddleware' is not present")
             );
             mockError.mockClear();
+            mockWarn.mockClear();
         });
     }
 );
