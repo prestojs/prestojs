@@ -12,6 +12,13 @@ import Endpoint, {
 
 import { PaginationMiddleware } from './paginationMiddleware';
 
+function isPkSet(data: Record<string, any>, pkFieldName: string | string[]): boolean {
+    if (Array.isArray(pkFieldName)) {
+        return [pkFieldName.map(fieldName => fieldName in data)].every(Boolean);
+    }
+    return pkFieldName in data;
+}
+
 /**
  * Transform data into either a single instance of a ViewModel or an array of instances and cache them.
  *
@@ -23,6 +30,18 @@ function cacheDataForModel<T extends ViewModelConstructor<any>>(model: T, data):
         model.cache.addList(records);
         return records;
     }
+    if (!isPkSet(data, model.pkFieldName)) {
+        console.warn(
+            `Data received by viewModelCachingMiddleware does not look a single record or list of records. If the data is nested under a key make sure you pass the mapping to 'viewModelCachingMiddleware'.
+
+     * If the response is for a list of records check that it is an array. If the data is paginated make sure the endpoint includes 'paginationMiddleware'.
+     * If the response is for a single record check that you are including the primary key '${model.pkFieldName}' (there's no value for this in the returned data).
+
+Data received: `,
+            data
+        );
+    }
+
     const record = new model(data);
     model.cache.add(record);
     return record;
