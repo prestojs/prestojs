@@ -127,9 +127,11 @@ test('should infer correct paginator based on getPaginationState', () => {
     let state = InferredPaginator.getPaginationState({
         ...defaultOptions,
         decodedBody: {
-            count: 5,
+            count: 10,
             results: [1, 2, 3, 4, 5],
-            next: null,
+            // LimitOffsetPaginator is only inferred if one of the urls contains offset or limit
+            // This is to avoid conflicts with PageNumberPaginator which has the same structure.
+            next: '?offset=5',
             previous: null,
         },
     });
@@ -152,7 +154,21 @@ test('should infer correct paginator based on getPaginationState', () => {
     state = InferredPaginator.getPaginationState({
         ...defaultOptions,
         decodedBody: {
+            count: 10,
+            next: '?page=2',
+            results: [1, 2, 3, 4, 5],
+        },
+    });
+    result = renderHook(() => useTestHook()).result;
+    act(() => result.current.setResponse(state as Record<string, any>));
+    expect(result.current.paginator).toBeInstanceOf(PageNumberPaginator);
+
+    state = InferredPaginator.getPaginationState({
+        ...defaultOptions,
+        decodedBody: {
             count: 5,
+            next: null,
+            previous: null,
             results: [1, 2, 3, 4, 5],
         },
     });

@@ -257,7 +257,17 @@ export default class LimitOffsetPaginator extends Paginator<
             // There should be a count or total as well - otherwise it's probably CursorPaginator
             ('count' in decodedBody || 'total' in decodedBody)
         ) {
-            const { limit } = qs.parse(qs.extract(decodedBody.previous || decodedBody.next || ''));
+            const parsedParams = qs.parse(
+                qs.extract(decodedBody.previous || decodedBody.next || '')
+            );
+            // Only infer LimitOffsetPaginator if next/previous contain offset or limit query params. This is
+            // to differentiate between PageNumberPaginator which has the same structure. Note that this means
+            // if there is only 1 page then LimitOffsetPaginator will never be inferred... but if there's only
+            // one page it likely doesn't matter (PageNumberPaginator will be inferred instead).
+            if (!('offset' in parsedParams) && !('limit' in parsedParams)) {
+                return false;
+            }
+            const { limit } = parsedParams;
             const r: Record<string, any> = {
                 total: decodedBody.count ?? decodedBody.total,
                 results: decodedBody.results,
