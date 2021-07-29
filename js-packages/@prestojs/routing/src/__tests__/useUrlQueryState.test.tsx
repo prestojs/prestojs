@@ -484,3 +484,21 @@ test('useUrlQueryState initial render should return initialValues', () => {
     expect([...distinctStates.values()]).toEqual([2]);
     expect(navigation.search).toBe('test_a=1&test_value=Test');
 });
+
+test('useUrlQueryState initial render should handle merging initialState', () => {
+    navigation.pathname = '/test/';
+    navigation.search = '?page=2&pageSize=5';
+    let hookStatus = renderUrlQueryStateHook({ page: '1', ref: 'abc' });
+    const setQueryState = (nextState: {}): void => hookStatus.result.current[1](nextState);
+    expect(hookStatus).queryStateEquals({ page: '2', pageSize: '5', ref: 'abc' });
+    expect(navigation.search).toBe('page=2&pageSize=5&ref=abc');
+    act(() => setQueryState({ page: '3', pageSize: '10' }));
+    expect(hookStatus).queryStateEquals({ page: '3', pageSize: '10' });
+    expect(navigation.search).toBe('page=3&pageSize=10');
+
+    navigation.pathname = '/test/';
+    navigation.search = '?page=2&pageSize=5';
+    hookStatus = renderUrlQueryStateHook({ page: '1' }, { prefix: 'p_' });
+    expect(hookStatus).queryStateEquals({ page: '1' });
+    expect(navigation.search).toBe('p_page=1&page=2&pageSize=5');
+});
