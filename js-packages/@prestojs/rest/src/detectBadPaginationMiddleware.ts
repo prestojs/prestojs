@@ -66,14 +66,18 @@ function defaultIsPaginated<T>(
     requestInit: EndpointRequestInit,
     context: MiddlewareContext<T>
 ): boolean {
-    const paginationRequestDetails = {
-        query: urlConfig.query,
-        decodedBody: context.lastState?.decodedBody,
-        url: context.lastState?.url as string,
-        urlArgs: urlConfig.args,
-        response: context.lastState?.response,
-    };
-    return !!InferredPaginator.getPaginationState(paginationRequestDetails);
+    const decodedBody = context.lastState?.decodedBody;
+    if (typeof decodedBody === 'object' && decodedBody !== null) {
+        const paginationRequestDetails = {
+            query: urlConfig.query,
+            decodedBody,
+            url: context.lastState?.url as string,
+            urlArgs: urlConfig.args,
+            response: context.lastState?.response,
+        };
+        return !!InferredPaginator.getPaginationState(paginationRequestDetails);
+    }
+    return false;
 }
 
 /**

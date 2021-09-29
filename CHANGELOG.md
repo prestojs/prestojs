@@ -5,6 +5,7 @@
 ### Changed
 
 * (bugfix) Fix bug in [useUrlQueryState](https://prestojs.com/docs/routing/useUrlQueryState/) where it would incorrectly replace existing URL query parameters with the initial version in a conflict.
+* (bugfix) Fix bug in [detectBadPaginationMiddleware](https://prestojs.com/docs/rest/detectBadPaginationMiddleware/#main-content) that would break on non-JSON responses
 
 ## [0.0.18] - 2021-07-27
 
