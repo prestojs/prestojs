@@ -506,10 +506,12 @@ export default function useUrlQueryState(
 
     // Return the current query params without the prefix
     const unPrefixedQueryObject = useMemo(() => {
-        const state = buildQueryForState(qs.parse(search), prefix, params, controlledKeys);
+        const state = {};
         if (pendingInitialState.current) {
+            // Assign pending first so that current query state in URL overrides any conflicts
             Object.assign(state, initialStateRef.current);
         }
+        Object.assign(state, buildQueryForState(qs.parse(search), prefix, params, controlledKeys));
         // If state hasn't changed return the same object
         if (previousStateRef.current && isEqual(previousStateRef.current, state)) {
             return previousStateRef.current;

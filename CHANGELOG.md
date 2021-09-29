@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+* (bugfix) Fix bug in [useUrlQueryState](https://prestojs.com/docs/routing/useUrlQueryState/) where it would incorrectly replace existing URL query parameters with the initial version in a conflict.
+
 ## [0.0.18] - 2021-07-27
 
 ### Changed
