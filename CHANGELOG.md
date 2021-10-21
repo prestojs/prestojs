@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.20] - 2021-10-21
+
+### Changed
+
+* (bugfix) Fix bug when using [ManyRelatedViewModelField](https://prestojs.com/docs/viewmodel/fields/ManyRelatedViewModelField/) that meant deleting a related record broke caching
+* Improve [viewModelCachingMiddleware](https://prestojs.com/docs/rest/viewModelCachingMiddleware/) so that on a single listener call is made for each model even if multiple changes are made (eg. when `deleteViewModel` is specified).
+
 ## [0.0.19] - 2021-09-30
 
 ### Changed
