@@ -571,6 +571,39 @@ test('should cache records with empty ManyRelatedViewModelFields', () => {
     expect(Test2.cache.get(6, '*')?.toJS()).toEqual({ id: 6, records: [], recordIds: [] });
 });
 
+test('should not break when related records are deleted', () => {
+    class Test1 extends viewModelFactory({
+        name: new CharField(),
+    }) {}
+    class Test2 extends viewModelFactory({
+        records: new ManyRelatedViewModelField({
+            to: Test1,
+            sourceFieldName: 'recordIds',
+        }),
+        recordIds: new ListField({
+            childField: new IntegerField(),
+        }),
+    }) {}
+
+    const record1 = new Test2({
+        id: 5,
+        records: [
+            { id: 1, name: 'Test1' },
+            { id: 2, name: 'Test2' },
+        ],
+    });
+    Test2.cache.add(record1);
+    expect(Test2.cache.get(5, '*')?.toJS()).toEqual({
+        id: 5,
+        records: [
+            { id: 1, name: 'Test1' },
+            { id: 2, name: 'Test2' },
+        ],
+        recordIds: [1, 2],
+    });
+    Test1.cache.delete(1);
+});
+
 test('should use correct cache key for nested related records', () => {
     class Test1 extends viewModelFactory({
         name: new CharField(),
