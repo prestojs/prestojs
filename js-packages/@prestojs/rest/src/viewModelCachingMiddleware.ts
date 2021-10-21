@@ -270,14 +270,17 @@ export default function viewModelCachingMiddleware<ReturnT = any>(
                         'Expected `getDeleteId` to return the id to use to remove the deleted item from the cache but nothing was returned.'
                     );
                 } else {
+                    if (deleteViewModel) {
+                        // Batch so listeners only notified once for all changes
+                        return _viewModelMapping.cache.batch(() => {
+                            const transformed = cacheAndTransform(result);
+                            _viewModelMapping.cache.delete(id);
+                            return transformed;
+                        });
+                    }
                     _viewModelMapping.cache.delete(id);
                 }
-                if (!result) {
-                    return {} as ReturnT;
-                }
-                if (!deleteViewModel) {
-                    return result;
-                }
+                return (result || {}) as ReturnT;
             }
             return cacheAndTransform(result);
         },

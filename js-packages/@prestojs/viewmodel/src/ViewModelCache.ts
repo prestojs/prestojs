@@ -459,7 +459,9 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                                 record = record.clone(assignedFieldNames);
                             }
                             if (record) {
-                                if (!after) {
+                                // If record was removed cleanup. For ManyRelatedViewModelField this will be an array of
+                                // values - if any are null that means we no longer find the cached items and cleanup
+                                if (!after || (Array.isArray(after) && after.includes(null))) {
                                     this.cleanupKey(fieldsKey);
                                 } else if (!isShallowEqual(after, record[fieldName])) {
                                     const newRecord = new this.viewModel({

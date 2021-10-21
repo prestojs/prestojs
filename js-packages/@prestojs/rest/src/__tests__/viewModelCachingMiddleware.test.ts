@@ -1,6 +1,12 @@
 import { UrlPattern } from '@prestojs/routing';
 import { PageNumberPaginator } from '@prestojs/util';
-import { CharField, viewModelFactory } from '@prestojs/viewmodel';
+import {
+    CharField,
+    IntegerField,
+    ListField,
+    ManyRelatedViewModelField,
+    viewModelFactory,
+} from '@prestojs/viewmodel';
 import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
 import qs from 'query-string';
@@ -372,4 +378,47 @@ test('object notation should work with pagination', async () => {
             extraDetails: [1, 2, 3],
         });
     });
+});
+
+test('should fire single listeners on delete', async () => {
+    const { User, bilbo, frodo } = createData();
+    class Test2 extends viewModelFactory({
+        records: new ManyRelatedViewModelField({
+            to: User,
+            sourceFieldName: 'recordIds',
+        }),
+        recordIds: new ListField({
+            childField: new IntegerField(),
+        }),
+    }) {}
+
+    const record1 = new Test2({
+        id: 5,
+        records: [bilbo, frodo],
+    });
+    Test2.cache.add(record1);
+
+    const listener = jest.fn();
+    Test2.cache.addListener(5, ['id', 'recordIds', 'records'], listener);
+
+    const endpoint = new Endpoint(new UrlPattern('/user/:id/'), {
+        method: 'DELETE',
+        middleware: [
+            viewModelCachingMiddleware(
+                {
+                    record: Test2,
+                },
+                { deleteViewModel: User }
+            ),
+        ],
+    });
+
+    mockJsonResponse({ record: { id: 5, recordIds: [frodo.id] } });
+    await endpoint.execute({ urlArgs: { id: bilbo.id } });
+    expect(User.cache.get(1, ['firstName', 'lastName'])).toBeNull();
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(
+        null,
+        recordEqualTo({ id: 5, recordIds: [frodo.id], records: [frodo] })
+    );
 });
