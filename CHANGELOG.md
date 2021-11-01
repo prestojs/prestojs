@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.21] - 2021-11-01
+
+### Changed
+
+* (types) Fix types on `Endpoint.resolveUrl` - it was missing the last parameter `baseUrl`
+* (types) Fix bad outputted types for ImageWidget that included a relative import that would not resolve in the distributed build
+
 ## [0.0.20] - 2021-10-21
 
 ### Changed
