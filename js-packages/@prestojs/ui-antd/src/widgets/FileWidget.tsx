@@ -1,5 +1,5 @@
 import { EditOutlined, InboxOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
-import { InputProps, WidgetProps } from '@prestojs/ui';
+import type { InputProps, WidgetProps } from '@prestojs/ui';
 import { isPromise } from '@prestojs/util';
 import { Button, Upload } from 'antd';
 import type { RcFile, UploadFile, UploadFileStatus, UploadProps } from 'antd/es/upload/interface';

@@ -59,7 +59,12 @@ export type EndpointOptions<ReturnT> = ExecuteInitOptions & {
      *  }
      * ```
      */
-    resolveUrl?: (urlPattern: UrlPattern, urlArgs?: Record<string, any>, query?: Query) => string;
+    resolveUrl?: (
+        urlPattern: UrlPattern,
+        urlArgs: Record<string, any>,
+        query: Query | undefined,
+        baseUrl: string
+    ) => string;
     /**
      * Base URL to use. This is prepended to the return value of `urlPattern.resolve(...)` and can be used
      * to change the call to occur to a different domain.

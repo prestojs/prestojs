@@ -1,5 +1,6 @@
 import React from 'react';
-import FileWidget, { UploadWidgetProps } from './FileWidget';
+import type { UploadWidgetProps } from './FileWidget';
+import FileWidget from './FileWidget';
 
 /**
  * See [FileWidget](doc:FileWidget) for props available
