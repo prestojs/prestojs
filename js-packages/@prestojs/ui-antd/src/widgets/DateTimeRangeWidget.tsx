@@ -44,4 +44,7 @@ function DateTimeRangeWidget(
     );
 }
 
-export default React.forwardRef(DateTimeRangeWidget);
+export default React.forwardRef<
+    DatePickerProps,
+    RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>
+>(DateTimeRangeWidget);

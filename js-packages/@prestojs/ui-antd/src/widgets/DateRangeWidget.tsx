@@ -39,4 +39,7 @@ function DateRangeWidget(
     );
 }
 
-export default React.forwardRef(DateRangeWidget);
+export default React.forwardRef<
+    DatePickerProps,
+    RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>
+>(DateRangeWidget);
