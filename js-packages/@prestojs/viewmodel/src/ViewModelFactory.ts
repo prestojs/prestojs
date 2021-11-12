@@ -1121,6 +1121,8 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 if (!this.__recordBoundFields) {
                     const { fields } = this._model;
                     const { _data } = this;
+                    // eslint-disable-next-line @typescript-eslint/no-this-alias
+                    const record = this;
                     this.__recordBoundFields = this._assignedFields.reduce((acc, fieldName) => {
                         acc[fieldName] = new Proxy(fields[fieldName], {
                             get(target, prop): any {
@@ -1129,6 +1131,9 @@ export default function viewModelFactory<T extends FieldsMapping>(
                                 }
                                 if (prop === 'isBound') {
                                     return true;
+                                }
+                                if (prop === 'boundRecord') {
+                                    return record;
                                 }
                                 return target[prop];
                             },

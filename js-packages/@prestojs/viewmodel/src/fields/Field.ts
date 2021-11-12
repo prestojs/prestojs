@@ -1,4 +1,4 @@
-import { ViewModelConstructor } from '../ViewModelFactory';
+import { ViewModelConstructor, ViewModelInterface } from '../ViewModelFactory';
 import { AsyncChoicesInterface } from './AsyncChoices';
 
 /**
@@ -330,6 +330,17 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
     }
 
     /**
+     * When accessed on a [bound field](doc:viewModelFactory#var-_f) will return the current instance of the ViewModel
+     * the field is bound to.
+     *
+     * If called on an unbound field then this will always be undefined and a warning will be raised.
+     */
+    public get boundRecord(): undefined | ViewModelInterface<any, any> {
+        console.warn('Accessed value on unbound field - this will never return a value');
+        return undefined;
+    }
+
+    /**
      * Called once after fields are attached to a ViewModel. This occurs the first time `.fields` is
      * accessed on the ViewModel.
      *
@@ -349,4 +360,5 @@ export interface RecordBoundField<ValueT, ParsableType extends any = ValueT, Sin
     extends Field<ValueT, ParsableType, SingleValueT> {
     readonly value: ValueT;
     readonly isBound: true;
+    readonly boundRecord: ViewModelInterface<any, any>;
 }
