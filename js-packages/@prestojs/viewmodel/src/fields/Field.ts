@@ -87,6 +87,12 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
     public set model(viewModel: ViewModelConstructor<any>) {
         this._model = viewModel;
     }
+
+    /**
+     * The [ViewModel](doc:viewModelFactory) class this field is attached to.
+     *
+     * This will throw an error if the field is not attached to a model.
+     */
     public get model(): ViewModelConstructor<any> {
         if (!this._model) {
             throw new UnboundFieldError<ValueT, ParsableValueT, SingleValueT>(this);
@@ -98,6 +104,12 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
     public set name(name: string) {
         this._name = name;
     }
+
+    /**
+     * The name of this field.
+     *
+     * This will throw an error if the field is not attached to a model.
+     */
     public get name(): string {
         if (!this._name) {
             throw new UnboundFieldError<ValueT, ParsableValueT, SingleValueT>(this);

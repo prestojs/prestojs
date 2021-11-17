@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.22] - 2021-11-17
+
+### Added
+
+* Add [boundRecord](https://prestojs.com/docs/viewmodel/fields/Field/#var-boundRecord) to `Field`. This can be used to access the record a field is attached to when using the [_f](https://prestojs.com/docs/viewmodel/viewModelFactory#var-_f) shortcut
+
 ## [0.0.21] - 2021-11-01
 
 ### Changed
