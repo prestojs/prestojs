@@ -43,7 +43,11 @@ function Union({ doc, type, isArray = false, ...rest }) {
 export default function TypeDesc({ doc, type, isArray, isReturnType, isTypeParameter = false }) {
     const typeArgs = useTypeArguments();
     if (!type) {
-        type = doc.type;
+        if (doc.kindString === 'Accessor' && doc.getSignature && doc.getSignature.length > 0) {
+            type = doc.getSignature[0].type;
+        } else {
+            type = doc.type;
+        }
     }
     if (!type) {
         return '';

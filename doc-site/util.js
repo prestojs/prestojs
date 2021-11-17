@@ -1,3 +1,5 @@
+import sortBy from 'lodash/sortBy';
+
 export function expandProperties(param, force, hideProperties = []) {
     if (param.type === 'reference' && param.name === 'Pick' && param.typeArguments?.length === 2) {
         const fieldNames = param.typeArguments[1].types.map(t => t.value);
@@ -140,10 +142,15 @@ export function getClassDetails(doc) {
     if (groups['Object literals']?.children) {
         groupProperties.push(...groups['Object literals'].children);
     }
-    const properties =
+    if (groups.Accessors) {
+        groupProperties.push(...groups.Accessors.children);
+    }
+    const properties = sortBy(
         [...new Set(groupProperties)]
             .map(id => children[id])
-            .filter(prop => !prop.flags.isPrivate && !prop.name.startsWith('__')) || [];
+            .filter(prop => !prop.flags.isPrivate && !prop.name.startsWith('__')) || [],
+        'name'
+    );
     return {
         constructor,
         methods: getMethods(methods, false),
