@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import viewModelFactory from '../../ViewModelFactory';
 import CharField from '../CharField';
 import Field from '../Field';
 import { ManyRelatedViewModelField, RelatedViewModelField } from '../RelatedViewModelField';
@@ -87,4 +88,21 @@ test('Field should clone correctly', () => {
     ]) {
         expect(f2[prop]).toEqual(f1[prop]);
     }
+});
+
+test('boundRecord', () => {
+    class A extends viewModelFactory({
+        field1: new Field(),
+        field2: new Field(),
+    }) {}
+    const record = new A({ id: 1, field1: 'normal', field2: 'special' });
+    const mockWarn = jest.spyOn(global.console, 'warn');
+    mockWarn.mockImplementation(() => undefined);
+    expect(A.fields.field1.boundRecord).toBeUndefined();
+    expect(mockWarn).toHaveBeenCalledWith(
+        expect.stringContaining('Accessed value on unbound field - this will never return a value')
+    );
+    mockWarn.mockClear();
+    expect(record._f.field1.boundRecord).toBe(record);
+    expect(mockWarn).not.toHaveBeenCalled();
 });

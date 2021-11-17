@@ -10,7 +10,7 @@ export type JSON<T> = string & { ' __JSON': T };
  * @extract-docs
  * @menu-group Fields
  */
-export default class JsonField<T> extends CharField {
+export default class JsonField extends CharField {
     static fieldClassName = 'JsonField';
     parse<T>(json: JSON<T>): T {
         try {
