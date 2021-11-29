@@ -437,7 +437,7 @@ function SelectAsyncChoicesWidget<
             setLastValue([value]);
             return onChange(value.value);
         },
-        [onChange]
+        [asyncChoices.multiple, onChange]
     );
 
     const isMissingLabel =
