@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+* [SelectAsyncChoicesWidget](https://prestojs.com/docs/ui-antd/widgets/SelectAsyncChoicesWidget/) fixes:
+  * Clears keywords on close or select. This avoids display bug where keywords overlap with selected item and works better for multi-select.
+  * Fix bug where closing dropdown immediately after typing could cause component to crash
+* Fix [useAsyncListing](https://prestojs.com/docs/util/useAsyncListing) to avoid infinite loop if `query` object changed every render but had same field/values
+
 ## [0.0.22] - 2021-11-17
 
 ### Added
