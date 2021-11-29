@@ -304,9 +304,11 @@ function SelectAsyncChoicesWidget<
         keywords: '',
         internalKeywords: '',
     });
+    const isOpenRef = useRef(isOpen);
+    isOpenRef.current = isOpen;
     // Internal input state for keywords. This differs from 'keywords' in that 'keywords' are debounced but 'internalKeywords' are not
     const setInternalKeywords = (s): void => dispatch({ type: 'setInternalKeywords', keywords: s });
-    // Track the last value set so we can use it's labels if we need to. This is necessary for the case where
+    // Track the last value set so we can use its labels if we need to. This is necessary for the case where
     // values have been selected but then the list is further filtered such that the selected items are no
     // longer in the list of choices.
     const [lastValue, setLastValue] = useState<Choice<T>[]>([]);
@@ -356,9 +358,11 @@ function SelectAsyncChoicesWidget<
     const debouncedSetKeywords = useMemo(
         () =>
             debounce(keywords => {
-                setKeywords(keywords);
-                if (paginator?.responseIsSet) {
-                    paginator.first();
+                if (isOpenRef.current) {
+                    setKeywords(keywords);
+                    if (paginator?.responseIsSet) {
+                        paginator.first();
+                    }
                 }
             }, debounceWait),
         [paginator, debounceWait]
