@@ -159,7 +159,6 @@ export default function useAsyncListing<T extends Array<any>>(
     // early (eg. the UI can still show the previous results while next is loading)
     const shouldResetAccumulatedValues = useRef(false);
 
-    const resultCurrent = useRef<null | T>(null);
     const { run, reset: resetAsync, result, isLoading, error } = useAsync(
         async (): Promise<T> => {
             // If paginator state has changed to anything except the next value we have to reset accumulator
@@ -189,12 +188,7 @@ export default function useAsyncListing<T extends Array<any>>(
             if (
                 Array.isArray(executeResult) &&
                 accumulatePages &&
-                !shouldResetAccumulatedValues.current &&
-                // Only accumulate if result hasn't changed since this call (can happen
-                // if multiple requests occur together - eg. from reset() triggering
-                // a call at same time useAsyncListing detects a change because keywords
-                // are cleared)
-                resultCurrent.current === result
+                !shouldResetAccumulatedValues.current
             ) {
                 return ([...(result || []), ...executeResult] as unknown) as T;
             }
@@ -202,7 +196,6 @@ export default function useAsyncListing<T extends Array<any>>(
             return executeResult;
         }
     );
-    resultCurrent.current = result;
 
     const reset = useCallback(() => {
         // If reset is called we need to reset accumulated values too
@@ -223,12 +216,17 @@ export default function useAsyncListing<T extends Array<any>>(
         !isLoading &&
         (paginationChanged || queryChanged || executeChanged || initialRun.current);
 
+    // Avoid using query as dep to useEffect below as we want to do deep comparison for query -
+    // this is handled by `queryChanged`. We can then read the current value from this ref if needed .
+    const currentQuery = useRef(query);
+    currentQuery.current = query;
+
     // Main effect that handles calling endpoint and monitoring changes in pagination
     // state and query state.
     useEffect(() => {
         // Only update cached lastQuery if we are doing a fetch
         if (shouldFetch && (queryChanged || executeChanged)) {
-            lastQuery.current = query;
+            lastQuery.current = currentQuery.current;
             lastExecute.current = execute;
             // Changing query results in accumulated values being reset
             if (accumulatePages) {
@@ -258,7 +256,6 @@ export default function useAsyncListing<T extends Array<any>>(
         paginator,
         queryChanged,
         accumulatePages,
-        query,
         run,
         trigger,
         resetAsync,

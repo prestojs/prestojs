@@ -240,20 +240,22 @@ function defaultRenderNextPageButton({ isLoading, onClick }): React.ReactNode {
 }
 
 type SelectReducerState = { isOpen: boolean; keywords: string; internalKeywords: string };
-type SelectReducerAction =
+type SelectReducerAction<T> =
     | { type: 'open' }
     | { type: 'close' }
     | { type: 'setKeywords'; keywords: string }
-    | { type: 'setInternalKeywords'; keywords: string };
+    | { type: 'setInternalKeywords'; keywords: string }
+    | { type: 'onChange'; value?: null | Choice<T> | Choice<T>[] };
 
-function reducer(state: SelectReducerState, action: SelectReducerAction): SelectReducerState {
+function reducer<T>(state: SelectReducerState, action: SelectReducerAction<T>): SelectReducerState {
     switch (action.type) {
+        case 'onChange':
+            // Clear keywords on change - this is particularly desirable for multiselect
+            return { ...state, keywords: '', internalKeywords: '' };
         case 'open':
-            return { ...state, isOpen: true, keywords: '', internalKeywords: '' };
+            return { ...state, isOpen: true };
         case 'close':
-            // Originally attempted to clear keywords on close... but that caused an infinite loop that
-            // I was unable to track down. Clear them in 'open' instead.
-            return { ...state, isOpen: false };
+            return { ...state, isOpen: false, keywords: '', internalKeywords: '' };
         case 'setKeywords':
             return { ...state, keywords: action.keywords };
         case 'setInternalKeywords':
@@ -418,6 +420,7 @@ function SelectAsyncChoicesWidget<
     const { onChange } = input;
     const wrappedOnChange = useCallback(
         (value?: null | Choice<T> | Choice<T>[]) => {
+            dispatch({ type: 'onChange', value });
             if (value == null) {
                 setLastValue([]);
                 return onChange(asyncChoices.multiple ? [] : null);
