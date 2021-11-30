@@ -240,20 +240,22 @@ function defaultRenderNextPageButton({ isLoading, onClick }): React.ReactNode {
 }
 
 type SelectReducerState = { isOpen: boolean; keywords: string; internalKeywords: string };
-type SelectReducerAction =
+type SelectReducerAction<T> =
     | { type: 'open' }
     | { type: 'close' }
     | { type: 'setKeywords'; keywords: string }
-    | { type: 'setInternalKeywords'; keywords: string };
+    | { type: 'setInternalKeywords'; keywords: string }
+    | { type: 'onChange'; value?: null | Choice<T> | Choice<T>[] };
 
-function reducer(state: SelectReducerState, action: SelectReducerAction): SelectReducerState {
+function reducer<T>(state: SelectReducerState, action: SelectReducerAction<T>): SelectReducerState {
     switch (action.type) {
+        case 'onChange':
+            // Clear keywords on change - this is particularly desirable for multiselect
+            return { ...state, keywords: '', internalKeywords: '' };
         case 'open':
-            return { ...state, isOpen: true, keywords: '', internalKeywords: '' };
+            return { ...state, isOpen: true };
         case 'close':
-            // Originally attempted to clear keywords on close... but that caused an infinite loop that
-            // I was unable to track down. Clear them in 'open' instead.
-            return { ...state, isOpen: false };
+            return { ...state, isOpen: false, keywords: '', internalKeywords: '' };
         case 'setKeywords':
             return { ...state, keywords: action.keywords };
         case 'setInternalKeywords':
@@ -304,9 +306,11 @@ function SelectAsyncChoicesWidget<
         keywords: '',
         internalKeywords: '',
     });
+    const isOpenRef = useRef(isOpen);
+    isOpenRef.current = isOpen;
     // Internal input state for keywords. This differs from 'keywords' in that 'keywords' are debounced but 'internalKeywords' are not
     const setInternalKeywords = (s): void => dispatch({ type: 'setInternalKeywords', keywords: s });
-    // Track the last value set so we can use it's labels if we need to. This is necessary for the case where
+    // Track the last value set so we can use its labels if we need to. This is necessary for the case where
     // values have been selected but then the list is further filtered such that the selected items are no
     // longer in the list of choices.
     const [lastValue, setLastValue] = useState<Choice<T>[]>([]);
@@ -356,9 +360,11 @@ function SelectAsyncChoicesWidget<
     const debouncedSetKeywords = useMemo(
         () =>
             debounce(keywords => {
-                setKeywords(keywords);
-                if (paginator?.responseIsSet) {
-                    paginator.first();
+                if (isOpenRef.current) {
+                    setKeywords(keywords);
+                    if (paginator?.responseIsSet) {
+                        paginator.first();
+                    }
                 }
             }, debounceWait),
         [paginator, debounceWait]
@@ -414,6 +420,7 @@ function SelectAsyncChoicesWidget<
     const { onChange } = input;
     const wrappedOnChange = useCallback(
         (value?: null | Choice<T> | Choice<T>[]) => {
+            dispatch({ type: 'onChange', value });
             if (value == null) {
                 setLastValue([]);
                 return onChange(asyncChoices.multiple ? [] : null);
@@ -433,7 +440,7 @@ function SelectAsyncChoicesWidget<
             setLastValue([value]);
             return onChange(value.value);
         },
-        [onChange]
+        [asyncChoices.multiple, onChange]
     );
 
     const isMissingLabel =

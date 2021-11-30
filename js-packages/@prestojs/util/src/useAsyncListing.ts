@@ -216,12 +216,17 @@ export default function useAsyncListing<T extends Array<any>>(
         !isLoading &&
         (paginationChanged || queryChanged || executeChanged || initialRun.current);
 
+    // Avoid using query as dep to useEffect below as we want to do deep comparison for query -
+    // this is handled by `queryChanged`. We can then read the current value from this ref if needed .
+    const currentQuery = useRef(query);
+    currentQuery.current = query;
+
     // Main effect that handles calling endpoint and monitoring changes in pagination
     // state and query state.
     useEffect(() => {
         // Only update cached lastQuery if we are doing a fetch
         if (shouldFetch && (queryChanged || executeChanged)) {
-            lastQuery.current = query;
+            lastQuery.current = currentQuery.current;
             lastExecute.current = execute;
             // Changing query results in accumulated values being reset
             if (accumulatePages) {
@@ -251,7 +256,6 @@ export default function useAsyncListing<T extends Array<any>>(
         paginator,
         queryChanged,
         accumulatePages,
-        query,
         run,
         trigger,
         resetAsync,
