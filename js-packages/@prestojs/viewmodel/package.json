@@ -1,6 +1,6 @@
 {
   "name": "@prestojs/viewmodel",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "license": "MIT",
   "typings": "build/index.d.ts",
   "main": "build/cjs/index.js",
