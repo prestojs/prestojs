@@ -1,25 +1,15 @@
 import { isEqual } from '@prestojs/util';
-import {
-    FieldDataMappingRaw,
-    isViewModelClass,
-    ViewModelConstructor,
-    ViewModelInterface,
-} from '../ViewModelFactory';
+import { FieldDataMappingRaw, isViewModelClass, ViewModelConstructor } from '../ViewModelFactory';
 import Field, { FieldProps } from './Field';
 import ListField from './ListField';
 
-type RelatedViewModelValueType<
-    TargetViewModelT extends ViewModelConstructor<any>
-> = ViewModelInterface<
-    TargetViewModelT['fields'],
-    any,
-    TargetViewModelT['__pkFieldType'],
-    TargetViewModelT['__pkType']
->;
-type BaseRelatedViewModelValueType<T extends ViewModelConstructor<any>> =
+type RelatedViewModelValueType<TargetViewModelT extends ViewModelConstructor<any, any>> =
+    InstanceType<TargetViewModelT>;
+
+type BaseRelatedViewModelValueType<T extends ViewModelConstructor<any, any>> =
     | RelatedViewModelValueType<T>
     | RelatedViewModelValueType<T>[];
-type RelatedViewModelParsableType<T extends ViewModelConstructor<any>> =
+type RelatedViewModelParsableType<T extends ViewModelConstructor<any, any>> =
     | FieldDataMappingRaw<T['fields']>
     | FieldDataMappingRaw<T['fields']>[];
 
@@ -27,7 +17,7 @@ type RelatedViewModelParsableType<T extends ViewModelConstructor<any>> =
  * @expand-properties
  */
 type RelatedViewModelFieldProps<
-    TargetViewModelT extends ViewModelConstructor<any>,
+    TargetViewModelT extends ViewModelConstructor<any, any>,
     FieldValueT
 > = FieldProps<FieldValueT> & {
     /**
@@ -43,7 +33,7 @@ type RelatedViewModelFieldProps<
 };
 
 export class UnresolvedRelatedViewModelFieldError<
-    TargetViewModelT extends ViewModelConstructor<any>,
+    TargetViewModelT extends ViewModelConstructor<any, any>,
     FieldValueT extends BaseRelatedViewModelValueType<TargetViewModelT>,
     ParsableValueT extends RelatedViewModelParsableType<TargetViewModelT>
 > extends Error {
@@ -64,7 +54,7 @@ export class UnresolvedRelatedViewModelFieldError<
  * Use `ManyRelatedViewModelField` if `sourceFieldName` refers to a `ListField` otherwise `RelatedViewModelField`.
  */
 export abstract class BaseRelatedViewModelField<
-    TargetViewModelT extends ViewModelConstructor<any>,
+    TargetViewModelT extends ViewModelConstructor<any, any>,
     FieldValueT extends BaseRelatedViewModelValueType<TargetViewModelT>,
     ParsableValueT extends RelatedViewModelParsableType<TargetViewModelT>
 > extends Field<FieldValueT, ParsableValueT> {
@@ -302,7 +292,7 @@ export abstract class BaseRelatedViewModelField<
  * @menu-group Fields
  */
 export class RelatedViewModelField<
-    TargetViewModelT extends ViewModelConstructor<any>
+    TargetViewModelT extends ViewModelConstructor<any, any>
 > extends BaseRelatedViewModelField<
     TargetViewModelT,
     RelatedViewModelValueType<TargetViewModelT>,
@@ -317,9 +307,9 @@ export class RelatedViewModelField<
             return value;
         }
         if (!(value instanceof this.to)) {
-            return new this.to(value);
+            return new this.to(value) as RelatedViewModelValueType<TargetViewModelT>;
         }
-        return value;
+        return value as RelatedViewModelValueType<TargetViewModelT>;
     }
 
     /**
@@ -346,7 +336,7 @@ export class RelatedViewModelField<
  * @menu-group Fields
  */
 export class ManyRelatedViewModelField<
-    TargetViewModelT extends ViewModelConstructor<any>
+    TargetViewModelT extends ViewModelConstructor<any, any>
 > extends BaseRelatedViewModelField<
     TargetViewModelT,
     RelatedViewModelValueType<TargetViewModelT>[],
@@ -367,9 +357,9 @@ export class ManyRelatedViewModelField<
         }
         return value.map(v => {
             if (!(v instanceof this.to)) {
-                return new this.to(v);
+                return new this.to(v) as RelatedViewModelValueType<TargetViewModelT>;
             }
-            return v;
+            return v as RelatedViewModelValueType<TargetViewModelT>;
         });
     }
 

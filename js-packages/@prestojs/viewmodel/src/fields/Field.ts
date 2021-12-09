@@ -83,8 +83,8 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      */
     __parsableValueType: ParsableValueT;
 
-    private _model: ViewModelConstructor<any>;
-    public set model(viewModel: ViewModelConstructor<any>) {
+    private _model: ViewModelConstructor<any, any>;
+    public set model(viewModel: ViewModelConstructor<any, any>) {
         this._model = viewModel;
     }
 
@@ -93,7 +93,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      *
      * This will throw an error if the field is not attached to a model.
      */
-    public get model(): ViewModelConstructor<any> {
+    public get model(): ViewModelConstructor<any, any> {
         if (!this._model) {
             throw new UnboundFieldError<ValueT, ParsableValueT, SingleValueT>(this);
         }
@@ -251,7 +251,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      * @param value
      */
     public parse(value: ParsableValueT | null): ValueT | null {
-        return (value as unknown) as ValueT;
+        return value as unknown as ValueT;
     }
 
     /**
@@ -280,7 +280,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      * @param value
      */
     public normalize(value: ParsableValueT): ValueT | null {
-        return (value as unknown) as ValueT;
+        return value as unknown as ValueT;
     }
 
     /**
@@ -363,7 +363,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      * then it will be called on both A and B.
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public contributeToClass(viewModel: ViewModelConstructor<any>): void {
+    public contributeToClass(viewModel: ViewModelConstructor<any, any>): void {
         // Do nothing by default
     }
 }

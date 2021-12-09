@@ -3,9 +3,13 @@ import { act, renderHook } from '@testing-library/react-hooks';
 import { Field, useViewModelCache, viewModelFactory } from '../index';
 
 test('useListChangeObserver should detect additions', async () => {
-    const Test1 = viewModelFactory({
-        name: new Field(),
-    });
+    const Test1 = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    );
     const data1 = new Test1({ id: 1, name: 'a' });
     const data2 = new Test1({ id: 2, name: 'b' });
     const data3 = new Test1({ id: 3, name: 'c' });
@@ -52,9 +56,13 @@ test('useListChangeObserver should detect additions', async () => {
 });
 
 test('useListChangeObserver should detect updates', async () => {
-    const Test1 = viewModelFactory({
-        name: new Field(),
-    });
+    const Test1 = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    );
     const data1 = new Test1({ id: 1, name: 'a' });
     const data2 = new Test1({ id: 1, name: 'aa' });
     const data3 = new Test1({ id: 1, name: 'aaa' });
@@ -99,9 +107,13 @@ test('useListChangeObserver should detect updates', async () => {
 });
 
 test('useListChangeObserver should detect deletes', async () => {
-    const Test1 = viewModelFactory({
-        name: new Field(),
-    });
+    const Test1 = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    );
     const data1 = new Test1({ id: 1, name: 'a' });
     const data2 = new Test1({ id: 2, name: 'b' });
     const data3 = new Test1({ id: 3, name: 'c' });

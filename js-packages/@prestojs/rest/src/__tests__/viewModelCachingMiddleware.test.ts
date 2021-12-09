@@ -27,14 +27,22 @@ beforeEach(() => {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function createData() {
-    const User = viewModelFactory({
-        firstName: new CharField(),
-        lastName: new CharField(),
-    });
+    const User = viewModelFactory(
+        {
+            id: new IntegerField(),
+            firstName: new CharField(),
+            lastName: new CharField(),
+        },
+        { pkFieldName: 'id' }
+    );
 
-    const Food = viewModelFactory({
-        name: new CharField(),
-    });
+    const Food = viewModelFactory(
+        {
+            id: new IntegerField(),
+            name: new CharField(),
+        },
+        { pkFieldName: 'id' }
+    );
 
     const users = [
         {
@@ -106,18 +114,8 @@ test('should support single ViewModel as mapping for standard single/list respon
 });
 
 test('should support object mapping', async () => {
-    const {
-        User,
-        Food,
-        users,
-        foodItems,
-        sausage,
-        cheese,
-        bagel,
-        bilbo,
-        frodo,
-        gandalf,
-    } = createData();
+    const { User, Food, users, foodItems, sausage, cheese, bagel, bilbo, frodo, gandalf } =
+        createData();
     const endpoint = new Endpoint(new UrlPattern('/combined/'), {
         middleware: [
             viewModelCachingMiddleware({
@@ -382,15 +380,19 @@ test('object notation should work with pagination', async () => {
 
 test('should fire single listeners on delete', async () => {
     const { User, bilbo, frodo } = createData();
-    class Test2 extends viewModelFactory({
-        records: new ManyRelatedViewModelField({
-            to: User,
-            sourceFieldName: 'recordIds',
-        }),
-        recordIds: new ListField({
-            childField: new IntegerField(),
-        }),
-    }) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: new IntegerField(),
+            records: new ManyRelatedViewModelField({
+                to: User,
+                sourceFieldName: 'recordIds',
+            }),
+            recordIds: new ListField({
+                childField: new IntegerField(),
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test2({
         id: 5,

@@ -2,6 +2,7 @@ import { PageNumberPaginator, usePaginator } from '@prestojs/util';
 import { act, renderHook } from '@testing-library/react-hooks';
 import AsyncChoices from '../fields/AsyncChoices';
 import CharField from '../fields/CharField';
+import NumberField from '../fields/NumberField';
 import useAsyncChoices from '../useAsyncChoices';
 import useViewModelCache from '../useViewModelCache';
 import viewModelFactory from '../ViewModelFactory';
@@ -99,9 +100,14 @@ test('useAsyncChoices should support basic usage', async () => {
 });
 
 test('useAsyncChoices should support hooking up to ViewModelCache easily', async () => {
-    const ItemModel = viewModelFactory({
-        label: new CharField(),
-    });
+    const ItemModel = viewModelFactory(
+        {
+            id: new NumberField(),
+
+            label: new CharField(),
+        },
+        { pkFieldName: 'id' }
+    );
     type ItemModelInstance = InstanceType<typeof ItemModel>;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const data = testData.map(item => ItemModel.cache.add(item));
@@ -114,17 +120,16 @@ test('useAsyncChoices should support hooking up to ViewModelCache easily', async
         getLabel,
         getValue,
         useResolveItems<T extends ItemModelInstance | ItemModelInstance[] | null>(item: T): T {
-            return useViewModelCache<typeof ItemModel, T>(
-                ItemModel,
-                (cache): T => {
-                    if (item == null) {
-                        return item;
-                    }
-                    return (Array.isArray(item)
-                        ? cache.getList(item as ItemModelInstance[])
-                        : cache.get(item as ItemModelInstance) || item) as T;
+            return useViewModelCache<typeof ItemModel, T>(ItemModel, (cache): T => {
+                if (item == null) {
+                    return item;
                 }
-            );
+                return (
+                    Array.isArray(item)
+                        ? cache.getList(item as ItemModelInstance[])
+                        : cache.get(item as ItemModelInstance) || item
+                ) as T;
+            });
         },
     });
     const { rerender, result, waitForNextUpdate } = renderHook(
