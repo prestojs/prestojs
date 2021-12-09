@@ -1,4 +1,9 @@
-import { isViewModelClass, PrimaryKey, ViewModelConstructor } from '@prestojs/viewmodel';
+import {
+    isViewModelClass,
+    PrimaryKey,
+    ViewModelConstructor,
+    ViewModelInterface,
+} from '@prestojs/viewmodel';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -24,11 +29,16 @@ function isPkSet(data: Record<string, any>, pkFieldName: string | string[]): boo
  *
  * The instance(s) of the ViewModel are then returned.
  */
-function cacheDataForModel<T extends ViewModelConstructor<any>>(model: T, data): T | T[] {
+function cacheDataForModel<T extends ViewModelConstructor<any, any>>(
+    model: T,
+    data
+):
+    | ViewModelInterface<T['fields'], T['pkFieldName']>
+    | ViewModelInterface<T['fields'], T['pkFieldName']>[] {
     if (Array.isArray(data)) {
         const records = data.map(datum => new model(datum));
         model.cache.addList(records);
-        return records;
+        return records as ViewModelInterface<T['fields'], T['pkFieldName']>[];
     }
     if (!isPkSet(data, model.pkFieldName)) {
         console.warn(
@@ -44,10 +54,12 @@ Data received: `,
 
     const record = new model(data);
     model.cache.add(record);
-    return record;
+    return record as ViewModelInterface<T['fields'], T['pkFieldName']>;
 }
 
-type ViewModelMapping = ViewModelConstructor<any> | Record<string, ViewModelConstructor<any>>;
+type ViewModelMapping =
+    | ViewModelConstructor<any, any>
+    | Record<string, ViewModelConstructor<any, any>>;
 type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<ViewModelMapping>);
 
 /**
@@ -78,8 +90,8 @@ type ViewModelCachingOptions<T> = {
      * the result.
      */
     deleteViewModel?:
-        | ViewModelConstructor<any>
-        | (() => ViewModelConstructor<any> | Promise<ViewModelConstructor<any>>);
+        | ViewModelConstructor<any, any>
+        | (() => ViewModelConstructor<any, any> | Promise<ViewModelConstructor<any, any>>);
 };
 
 /**

@@ -1,10 +1,8 @@
 import { useDebugValue, useLayoutEffect, useReducer, useRef } from 'react';
-
-import ViewModelCache from './ViewModelCache';
 import { ViewModelConstructor } from './ViewModelFactory';
 
 type Selector<T extends ViewModelConstructor<any, any>, ResultType, U extends any[]> = (
-    cache: ViewModelCache<T>,
+    cache: T['cache'],
     ...args: U
 ) => ResultType;
 

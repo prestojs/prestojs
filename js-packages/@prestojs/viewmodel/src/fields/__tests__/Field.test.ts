@@ -91,10 +91,14 @@ test('Field should clone correctly', () => {
 });
 
 test('boundRecord', () => {
-    class A extends viewModelFactory({
-        field1: new Field(),
-        field2: new Field(),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            field1: new Field(),
+            field2: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     const record = new A({ id: 1, field1: 'normal', field2: 'special' });
     const mockWarn = jest.spyOn(global.console, 'warn');
     mockWarn.mockImplementation(() => undefined);

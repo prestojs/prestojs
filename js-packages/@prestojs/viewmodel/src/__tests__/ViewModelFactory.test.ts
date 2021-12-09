@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { getId, isIdentifiable } from '@prestojs/util';
-import CharField from '../fields/CharField';
 import Field from '../fields/Field';
-import NumberField from '../fields/NumberField';
 import { RelatedViewModelField } from '../fields/RelatedViewModelField';
-import viewModelFactory from '../ViewModelFactory';
-import ViewModelFactory, {
+import viewModelFactory, {
     expandRelationFieldPaths,
     flattenFieldPath,
     getAssignedFieldsDeep,
@@ -23,16 +20,13 @@ declare global {
     }
 }
 
-test('Should be able to invoke ViewModelFactory directly and explicitly creates a pk without error', () => {
-    ViewModelFactory({
-        id: new Field(),
-    }).fields;
-});
-
 test('_model property returns the class', () => {
-    class A extends ViewModelFactory({
-        id: new Field(),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     class B extends A {}
     const record1 = new A({ id: 1 });
@@ -44,15 +38,21 @@ test('_model property returns the class', () => {
 });
 
 test('ViewModelFactory should ensure required properties are specified', () => {
-    class Test1 extends ViewModelFactory({
-        id: new Field(),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     expect(() => Test1.label).toThrow(/You must define/);
     expect(() => Test1.labelPlural).toThrow(/You must define/);
 
-    class Test2 extends ViewModelFactory({
-        id: new Field(),
-    }) {
+    class Test2 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {
         static label = 'Test';
         static labelPlural = 'Tests';
     }
@@ -61,10 +61,13 @@ test('ViewModelFactory should ensure required properties are specified', () => {
 });
 
 test('ViewModel should be accessible via the field', () => {
-    class A extends ViewModelFactory({
-        id: new Field(),
-        name: new Field(),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     expect(A.fields.name.model).toBe(A);
     expect(A.fields.id.model).toBe(A);
@@ -84,14 +87,17 @@ test('ViewModel should be accessible via the field', () => {
 });
 
 test('field name and label should be set automatically', () => {
-    class A extends ViewModelFactory({
-        id: new Field(),
-        firstName: new Field(),
-        LastName: new Field(),
-        email_address: new Field(),
-        CONTACT_NUMBER: new Field(),
-        age: new Field({ label: 'User Age' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            LastName: new Field(),
+            email_address: new Field(),
+            CONTACT_NUMBER: new Field(),
+            age: new Field({ label: 'User Age' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     expect(A.fields.firstName.name).toBe('firstName');
     expect(A.fields.firstName.label).toBe('First Name');
     expect(A.fields.LastName.name).toBe('LastName');
@@ -104,115 +110,21 @@ test('field name and label should be set automatically', () => {
     expect(A.fields.age.label).toBe('User Age');
 });
 
-test('should generate pk automatically where possible', () => {
-    class A extends ViewModelFactory({}) {}
-    expect(A.fields.id).toBeInstanceOf(NumberField);
-    expect(A.pkFieldName).toBe('id');
-
-    class B extends ViewModelFactory(
-        {},
-        {
-            getImplicitPkField(): [string, Field<any>] {
-                return ['EntityId', new CharField()];
-            },
-        }
-    ) {}
-
-    expect(B.pkFieldName).toBe('EntityId');
-    // We can't type dynamic pk field names - will ignore them throughout this method
-    // @ts-ignore
-    expect(B.fields.EntityId).toBeInstanceOf(CharField);
-
-    class C extends ViewModelFactory(
-        {},
-        {
-            getImplicitPkField(): [string[], Field<any>[]] {
-                return [
-                    ['model', 'uuid'],
-                    [new CharField(), new NumberField()],
-                ];
-            },
-        }
-    ) {}
-    expect(C.pkFieldName).toEqual(['model', 'uuid']);
-    // @ts-ignore
-    expect(C.fields.model).toBeInstanceOf(CharField);
-    // @ts-ignore
-    expect(C.fields.uuid).toBeInstanceOf(NumberField);
-
-    class D extends ViewModelFactory({
-        id: new CharField(),
-    }) {}
-    expect(D.fields.id).toBeInstanceOf(CharField);
-    expect(D.pkFieldName).toBe('id');
-
-    class DynamicBase extends ViewModelFactory(
-        {},
-        {
-            getImplicitPkField(model, fields): [string, Field<any>] {
-                if ('EntityId' in fields) {
-                    // @ts-ignore
-                    return ['EntityId', fields.EntityId];
-                }
-                // Generate a name base on model, eg. `userId`
-                const name = model.name[0].toLowerCase() + model.name.slice(1);
-                return [`${name}Id`, new NumberField()];
-            },
-        }
-    ) {}
-
-    class User extends DynamicBase {}
-    expect(User.pkFieldName).toEqual('userId');
-    // @ts-ignore
-    expect(User.fields.userId).toBeInstanceOf(NumberField);
-
-    // Multi level inheritance should follow same rules and not inherit implicit
-    // keys from parent
-    class AdminUser extends User {}
-    expect(AdminUser.pkFieldName).toEqual('adminUserId');
-    // @ts-ignore
-    expect(AdminUser.fields.adminUserId).toBeInstanceOf(NumberField);
-    // @ts-ignore
-    expect(AdminUser.fields.adminUserId.name).toBe('adminUserId');
-    // @ts-ignore
-    expect(User.fields.userId.name).toBe('userId');
-    expect(User.pkFieldName).toEqual('userId');
-    // @ts-ignore
-    expect(User.fields.userId).toBeInstanceOf(NumberField);
-
-    // Multi level inheritance should follow same rules and not inherit implicit
-    // keys from parent
-    class BlogPost extends DynamicBase.augment({ EntityId: new CharField() }) {}
-    expect(BlogPost.pkFieldName).toEqual('EntityId');
-    expect(BlogPost.fields.EntityId).toBeInstanceOf(CharField);
-});
-
-test('should error if pkFieldName and getImplicitPkField provided', () => {
-    expect(() => {
-        ViewModelFactory(
-            {},
-            {
-                pkFieldName: 'id',
-                // Typescript knows this is not valid
-                // @ts-ignore
-                getImplicitPkField(): [string, Field<any>] {
-                    return ['EntityId', new CharField()];
-                },
-            }
-        );
-    }).toThrow(/Only one of 'pkFieldName' and 'getImplicitPkField' should be provided/);
-});
-
 test('ViewModel should validate primary key fields exist when binding fields', () => {
     // Passing data for fields that don't exist triggers a warning; suppress them for this test
     // eslint-disable-next-line
     const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
-    class A extends ViewModelFactory({}) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     const record1 = new A({ id: 1 });
 
     expect(record1._key).toBe(1);
 
-    class B extends ViewModelFactory(
+    class B extends viewModelFactory(
         {},
         {
             // Not valid types; no such fields id1, id2
@@ -225,7 +137,7 @@ test('ViewModel should validate primary key fields exist when binding fields', (
         /B has 'pkFieldName' set to 'id1, id2' but the field\(s\) 'id1, id2'/
     );
 
-    class C extends ViewModelFactory(
+    class C extends viewModelFactory(
         {
             id1: new Field({ label: 'Id' }),
         },
@@ -244,14 +156,17 @@ test('ViewModel should validate primary key fields exist when binding fields', (
 });
 
 test('_key should return primary key', () => {
-    class A extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new A({ id: 1 });
     expect(record1._key).toBe(1);
 
-    class B extends ViewModelFactory(
+    class B extends viewModelFactory(
         {
             id1: new Field({ label: 'Id' }),
             id2: new Field({ label: 'Id' }),
@@ -266,9 +181,12 @@ test('_key should return primary key', () => {
 });
 
 test('should validate primary key is provided', () => {
-    class A extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     // Type fails because `id` is required, ignore
     // @ts-ignore
@@ -279,36 +197,45 @@ test('should validate primary key is provided', () => {
 });
 
 test('should validate primary keys are provided', () => {
-    class A extends ViewModelFactory(
+    class A extends viewModelFactory(
         {
-            id1: new Field({ label: 'Id1' }),
-            id2: new Field({ label: 'Id2' }),
+            id1: new Field<number>({ label: 'Id1' }),
+            id2: new Field<number>({ label: 'Id2' }),
         },
         {
             pkFieldName: ['id1', 'id2'],
         }
     ) {}
 
+    // @ts-ignore
     expect(() => new A({})).toThrowError(/Missing value\(s\) for primary key\(s\) 'id1', 'id2'/);
+    // @ts-ignore
     expect(() => new A({ id1: 1 })).toThrowError(/Missing value\(s\) for primary key\(s\) 'id2'/);
+    // @ts-ignore
     expect(() => new A({ id2: 1 })).toThrowError(/Missing value\(s\) for primary key\(s\) 'id1'/);
+    // @ts-ignore
     expect(() => new A({ id1: null })).toThrowError(
         /Primary key\(s\) 'id1' was provided but was null or undefined, Missing value\(s\) for primary key\(s\) 'id2'/
     );
+    // @ts-ignore
     expect(() => new A({ id2: null })).toThrowError(
         /Primary key\(s\) 'id2' was provided but was null or undefined, Missing value\(s\) for primary key\(s\) 'id1'/
     );
+    // @ts-ignore
     expect(() => new A({ id1: null, id2: null })).toThrowError(
         /Primary key\(s\) 'id1', 'id2' was provided but was null or undefined/
     );
 });
 
 test('_assignedFields should be based on passed data', () => {
-    class A extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-        name: new Field({ label: 'Name' }),
-        email: new Field({ label: 'Email' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     let record = new A({ id: 1 });
     expect(record._assignedFields).toEqual(['id']);
@@ -320,11 +247,14 @@ test('_assignedFields should be based on passed data', () => {
 });
 
 test('toJS() should be return assigned data', () => {
-    class A extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-        name: new Field({ label: 'Name' }),
-        email: new Field({ label: 'Email' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     let record = new A({ id: 1 });
     expect(record.toJS()).toEqual({ id: 1 });
@@ -341,11 +271,14 @@ test('toJS() should support custom field behaviour', () => {
             return value.toString().toLowerCase();
         }
     }
-    class A extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-        name: new Field({ label: 'Name' }),
-        email: new LowerField({ label: 'Email' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new LowerField({ label: 'Email' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record = new A({ id: 1, name: 'Dave', email: 'A@B.COM' });
     expect(record.toJS()).toEqual({ id: 1, name: 'Dave', email: 'a@b.com' });
@@ -357,11 +290,14 @@ test('ViewModel should use normalize() from field', () => {
             return value.toString().toLowerCase();
         }
     }
-    class A extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-        name: new Field({ label: 'Name' }),
-        email: new LowerField({ label: 'Email' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new LowerField({ label: 'Email' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record = new A({ id: 1, name: 'Dave', email: 'A@B.COM' });
     expect(record.email).toBe('a@b.com');
@@ -373,12 +309,15 @@ test('Should be able to compare if two records are equal', () => {
             return value1.getTime() === value2.getTime();
         }
     }
-    class A extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-        name: new Field({ label: 'Name' }),
-        email: new Field({ label: 'Email' }),
-        createdAt: new TestDateField({ label: 'Created At' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
+            createdAt: new TestDateField({ label: 'Created At' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     expect(new A({ id: 1 }).isEqual(new A({ id: 1 }))).toBe(true);
     expect(new A({ id: 1 }).isEqual(new A({ id: 1, name: null }))).toBe(false);
@@ -394,12 +333,15 @@ test('Should be able to compare if two records are equal', () => {
         )
     ).toBe(false);
 
-    class B extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-        name: new Field({ label: 'Name' }),
-        email: new Field({ label: 'Email' }),
-        createdAt: new TestDateField({ label: 'Created At' }),
-    }) {}
+    class B extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
+            createdAt: new TestDateField({ label: 'Created At' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     const data = {
         id: 1,
         name: 'John',
@@ -414,25 +356,34 @@ test('Should be able to compare if two records are equal', () => {
 });
 
 test('Should be able to compare if two nested records are equal', async () => {
-    const Group = viewModelFactory({
-        name: new Field<string>(),
-    });
-    const User = viewModelFactory({
-        name: new Field<string>(),
-        groupId: new Field<number>(),
-        group: new RelatedViewModelField({
-            to: (): Promise<typeof Group> => Promise.resolve(Group),
-            sourceFieldName: 'groupId',
-        }),
-    });
+    const Group = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field<string>(),
+        },
+        { pkFieldName: 'id' }
+    );
+    const User = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field<string>(),
+            groupId: new Field<number>(),
+            group: new RelatedViewModelField({
+                to: (): Promise<typeof Group> => Promise.resolve(Group),
+                sourceFieldName: 'groupId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    );
     const fields = {
+        id: new Field(),
         userId: new Field<number>(),
         user: new RelatedViewModelField<typeof User>({
             to: (): Promise<typeof User> => Promise.resolve(User),
             sourceFieldName: 'userId',
         }),
     };
-    const Subscription = viewModelFactory(fields);
+    const Subscription = viewModelFactory(fields, { pkFieldName: 'id' });
     await Subscription.fields.user.resolveViewModel();
     const record1 = new Subscription({
         id: 1,
@@ -472,11 +423,14 @@ test('Should be able to compare if two nested records are equal', async () => {
 });
 
 test('should clone a ViewModel record', () => {
-    class A extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-        name: new Field({ label: 'Name' }),
-        email: new Field({ label: 'Email' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new A({
         id: 1,
@@ -528,11 +482,14 @@ describe('env tests', () => {
 
     test('should error when accessing unfetched fields', () => {
         process.env.NODE_ENV = 'development';
-        class A extends ViewModelFactory({
-            id: new Field({ label: 'Id' }),
-            name: new Field({ label: 'Name' }),
-            email: new Field({ label: 'Email' }),
-        }) {}
+        class A extends viewModelFactory(
+            {
+                id: new Field({ label: 'Id' }),
+                name: new Field({ label: 'Name' }),
+                email: new Field({ label: 'Email' }),
+            },
+            { pkFieldName: 'id' }
+        ) {}
         const record1 = new A({
             id: 1,
             name: 'bob',
@@ -559,10 +516,14 @@ describe('env tests', () => {
 
     test('should error if attempt to set a field', () => {
         process.env.NODE_ENV = 'development';
-        class A extends ViewModelFactory({
-            name: new Field({ label: 'Name' }),
-            email: new Field({ label: 'Email' }),
-        }) {}
+        class A extends viewModelFactory(
+            {
+                id: new Field(),
+                name: new Field({ label: 'Name' }),
+                email: new Field({ label: 'Email' }),
+            },
+            { pkFieldName: 'id' }
+        ) {}
         const record1 = new A({
             id: 1,
             name: 'bob',
@@ -604,10 +565,13 @@ describe('env tests', () => {
 });
 
 test('augmenting should extend the source class', () => {
-    class A extends ViewModelFactory({
-        id: new Field(),
-        name: new Field(),
-    }) {
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {
         static label = 'A';
         static labelPlural = 'As';
     }
@@ -639,10 +603,13 @@ test('augmenting should extend the source class', () => {
 });
 
 test('augment should support removing fields', () => {
-    class A extends ViewModelFactory({
-        id: new Field(),
-        name: new Field(),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     class B extends A.augment({ email: new Field(), name: null }) {}
 
@@ -654,10 +621,13 @@ test('augment should support removing fields', () => {
 });
 
 test('augment should support changing options', () => {
-    class A extends ViewModelFactory({
-        id: new Field(),
-        name: new Field(),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     class B extends A.augment(
         { email: new Field(), id: null, uuid: new Field() },
@@ -668,8 +638,57 @@ test('augment should support changing options', () => {
     expect(Object.keys(B.fields)).toEqual(['name', 'email', 'uuid']);
 });
 
+test('baseClass must extend BaseViewModel', () => {
+    class Base {}
+    expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        class A extends viewModelFactory(
+            {
+                id: new Field(),
+                name: new Field(),
+            },
+            // @ts-ignore
+            { pkFieldName: 'id', baseClass: Base }
+        ) {
+            static label = 'A';
+            static labelPlural = 'As';
+        }
+    }).toThrowError(/'baseClass' must extend BaseViewModel/);
+
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {
+        static label = 'A';
+        static labelPlural = 'As';
+    }
+
+    class B extends viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id', baseClass: A }
+    ) {
+        static label = 'A';
+        static labelPlural = 'As';
+    }
+
+    expect(B.label).toBe('A');
+    expect(B.labelPlural).toBe('As');
+    expect(Object.keys(B.fields)).toEqual(['id', 'name']);
+});
+
 test('isViewModelInstance should identify ViewModel instances', () => {
-    class A extends ViewModelFactory({}) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     expect(isViewModelInstance(A)).toBe(false);
     expect(isViewModelInstance(new A({ id: 1 }))).toBe(true);
     expect(isViewModelInstance(null)).toBe(false);
@@ -682,7 +701,12 @@ test('isViewModelInstance should identify ViewModel instances', () => {
 });
 
 test('isViewModelClass should identify ViewModel classes', () => {
-    class A extends ViewModelFactory({}) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     expect(isViewModelClass(A)).toBe(true);
     expect(isViewModelClass(new A({ id: 1 }))).toBe(false);
     expect(isViewModelClass(null)).toBe(false);
@@ -698,31 +722,26 @@ test('should disallow naming fields one of reserved names', () => {
     const reservedNames = ['toJS', 'clone', 'isEqual'];
     for (const name of reservedNames) {
         expect(() => {
-            ViewModelFactory({
-                [name]: new Field(),
-            });
-        }).toThrow(/is reserved and cannot be used as a field name/);
-
-        expect(() => {
-            class A extends ViewModelFactory(
-                {},
+            viewModelFactory(
                 {
-                    getImplicitPkField(): [string, Field<any>] {
-                        return [name, new CharField()];
-                    },
-                }
-            ) {}
-            A.pkFieldNames;
+                    id: new Field(),
+                    [name]: new Field(),
+                },
+                { pkFieldName: 'id' }
+            );
         }).toThrow(/is reserved and cannot be used as a field name/);
     }
 });
 
 test('should bind fields to _f', () => {
-    class A extends ViewModelFactory({
-        id: new Field({ label: 'Id' }),
-        name: new Field({ label: 'Name' }),
-        email: new Field({ label: 'Email' }),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field({ label: 'Id' }),
+            name: new Field({ label: 'Name' }),
+            email: new Field({ label: 'Email' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new A({
         id: 1,
@@ -737,9 +756,12 @@ test('should bind fields to _f', () => {
 });
 
 test('should conform to Identifiable', () => {
-    class Test1 extends ViewModelFactory({
-        id: new Field(),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test1({ id: 1 });
     const record2 = new Test1({ id: 2 });
@@ -753,25 +775,35 @@ test('should conform to Identifiable', () => {
 test('should support cloning across related fields', async () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const mockWarn = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
-    const Group = viewModelFactory({
-        name: new Field<string>(),
-    });
-    const User = viewModelFactory({
-        name: new Field<string>(),
-        groupId: new Field<number>(),
-        group: new RelatedViewModelField({
-            to: (): Promise<typeof Group> => Promise.resolve(Group),
-            sourceFieldName: 'groupId',
-        }),
-    });
+    const Group = viewModelFactory(
+        {
+            id: new Field(),
+
+            name: new Field<string>(),
+        },
+        { pkFieldName: 'id' }
+    );
+    const User = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field<string>(),
+            groupId: new Field<number>(),
+            group: new RelatedViewModelField({
+                to: (): Promise<typeof Group> => Promise.resolve(Group),
+                sourceFieldName: 'groupId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    );
     const fields = {
+        id: new Field(),
         userId: new Field<number>(),
         user: new RelatedViewModelField<typeof User>({
             to: (): Promise<typeof User> => Promise.resolve(User),
             sourceFieldName: 'userId',
         }),
     };
-    const Subscription = viewModelFactory(fields);
+    const Subscription = viewModelFactory(fields, { pkFieldName: 'id' });
     await Subscription.fields.user.resolveViewModel();
     const record1 = new Subscription({
         id: 1,
@@ -851,25 +883,35 @@ test('should support cloning across related fields', async () => {
 });
 
 test('getAssignedFieldsDeep should handle related view model data', async () => {
-    const Group = viewModelFactory({
-        name: new Field<string>(),
-    });
-    const User = viewModelFactory({
-        name: new Field<string>(),
-        groupId: new Field<number>(),
-        group: new RelatedViewModelField({
-            to: (): Promise<typeof Group> => Promise.resolve(Group),
-            sourceFieldName: 'groupId',
-        }),
-    });
+    const Group = viewModelFactory(
+        {
+            id: new Field(),
+
+            name: new Field<string>(),
+        },
+        { pkFieldName: 'id' }
+    );
+    const User = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field<string>(),
+            groupId: new Field<number>(),
+            group: new RelatedViewModelField({
+                to: (): Promise<typeof Group> => Promise.resolve(Group),
+                sourceFieldName: 'groupId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    );
     const fields = {
+        id: new Field(),
         userId: new Field<number>(),
         user: new RelatedViewModelField<typeof User>({
             to: (): Promise<typeof User> => Promise.resolve(User),
             sourceFieldName: 'userId',
         }),
     };
-    const Subscription = viewModelFactory(fields);
+    const Subscription = viewModelFactory(fields, { pkFieldName: 'id' });
     await Subscription.fields.user.resolveViewModel();
     const record1 = new Subscription({
         id: 1,
@@ -970,30 +1012,43 @@ test('flattenFieldPath should flatten nested paths', async () => {
 });
 
 test('expandPaths should correctly expand paths', async () => {
-    const Group = viewModelFactory({
-        name: new Field<string>(),
-        ownerId: new Field<number>(),
-        owner: new RelatedViewModelField({
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            to: (): Promise<typeof User> => Promise.resolve(User),
-            sourceFieldName: 'ownerId',
-        }),
-    });
-    const User = viewModelFactory({
-        name: new Field<string>(),
-        groupId: new Field<number>(),
-        group: new RelatedViewModelField({
-            to: (): Promise<typeof Group> => Promise.resolve(Group),
-            sourceFieldName: 'groupId',
-        }),
-    });
-    const Subscription = viewModelFactory({
-        userId: new Field<number>(),
-        user: new RelatedViewModelField<typeof User>({
-            to: (): Promise<typeof User> => Promise.resolve(User),
-            sourceFieldName: 'userId',
-        }),
-    });
+    const Group = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field<string>(),
+            ownerId: new Field<number>(),
+            owner: new RelatedViewModelField({
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                to: (): Promise<typeof User> => Promise.resolve(User),
+                sourceFieldName: 'ownerId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    );
+    const User = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field<string>(),
+            groupId: new Field<number>(),
+            group: new RelatedViewModelField({
+                to: (): Promise<typeof Group> => Promise.resolve(Group),
+                sourceFieldName: 'groupId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    );
+    const Subscription = viewModelFactory(
+        {
+            id: new Field(),
+            userId: new Field<number>(),
+            user: new RelatedViewModelField<typeof User>({
+                to: (): Promise<typeof User> => Promise.resolve(User),
+                sourceFieldName: 'userId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    );
+
     await Subscription.fields.user.resolveViewModel();
     expect(expandRelationFieldPaths(Subscription, [['user', 'group']])).toEqual([
         'userId',
@@ -1068,43 +1123,58 @@ test('expandPaths should correctly expand paths', async () => {
 });
 
 test('getField should support traversing relations', async () => {
-    class Group extends viewModelFactory({
-        name: new Field<string>(),
-        ownerId: new Field<number>(),
-        owner: new RelatedViewModelField({
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            to: (): Promise<ViewModelConstructor<any>> => Promise.resolve(User),
-            sourceFieldName: 'ownerId',
-        }),
-    }) {}
-    class User extends viewModelFactory({
-        name: new Field<string>(),
-        groupId: new Field<number>(),
-        group: new RelatedViewModelField({
-            to: (): Promise<typeof Group> => Promise.resolve(Group),
-            sourceFieldName: 'groupId',
-        }),
-    }) {}
-    class Subscription extends viewModelFactory({
-        userId: new Field<number>(),
-        user: new RelatedViewModelField<typeof User>({
-            to: (): Promise<typeof User> => Promise.resolve(User),
-            sourceFieldName: 'userId',
-        }),
-    }) {}
+    class Group extends viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field<string>(),
+            ownerId: new Field<number>(),
+            owner: new RelatedViewModelField({
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                to: (): Promise<ViewModelConstructor<any, any>> => Promise.resolve(User),
+                sourceFieldName: 'ownerId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class User extends viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field<string>(),
+            groupId: new Field<number>(),
+            group: new RelatedViewModelField({
+                to: (): Promise<typeof Group> => Promise.resolve(Group),
+                sourceFieldName: 'groupId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Subscription extends viewModelFactory(
+        {
+            id: new Field(),
+            userId: new Field<number>(),
+            user: new RelatedViewModelField<typeof User>({
+                to: (): Promise<typeof User> => Promise.resolve(User),
+                sourceFieldName: 'userId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     await Subscription.fields.user.resolveViewModel();
     expect(Subscription.getField('user')).toBe(Subscription.fields.user);
     expect(Subscription.getField(['user', 'group'])).toBe(User.fields.group);
     expect(Subscription.getField(['user', 'group', 'owner'])).toBe(Group.fields.owner);
 
+    // @ts-ignore
     expect(() => Subscription.getField('asdf')).toThrow(
         new Error("Unknown field 'asdf' on ViewModel 'Subscription'")
     );
 
+    // @ts-ignore
     expect(() => Subscription.getField(['user', 'blah', 'id'])).toThrow(
         new Error("Unknown field 'blah' (from [user, blah, id]) on ViewModel 'User'")
     );
 
+    // @ts-ignore
     expect(() => Subscription.getField(['user', 'name', 'id'])).toThrow(
         new Error(
             "Field 'name' (from [user, name, id]) on ViewModel 'User' is not a field that extends BaseRelatedViewModelField"

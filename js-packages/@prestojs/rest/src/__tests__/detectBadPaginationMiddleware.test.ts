@@ -7,7 +7,7 @@ import {
     PaginatorInterface,
     PaginatorInterfaceClass,
 } from '@prestojs/util';
-import { CharField, viewModelFactory } from '@prestojs/viewmodel';
+import { CharField, NumberField, viewModelFactory } from '@prestojs/viewmodel';
 import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
 import qs from 'query-string';
@@ -20,9 +20,13 @@ import viewModelCachingMiddleware from '../viewModelCachingMiddleware';
 
 const fetchMock = fetch as FetchMock;
 
-const User = viewModelFactory({
-    name: new CharField(),
-});
+const User = viewModelFactory(
+    {
+        id: new NumberField(),
+        name: new CharField(),
+    },
+    { pkFieldName: 'id' }
+);
 const users = Array.from({ length: 50 }, (_, i) => ({ id: i, name: `User ${i + 1}` }));
 
 test.each`

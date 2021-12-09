@@ -1,43 +1,156 @@
+import { isEqual } from '@prestojs/util';
 import intersectionBy from 'lodash/intersectionBy';
-import isEqual from 'lodash/isEqual';
 import startCase from 'lodash/startCase';
 import Field, { RecordBoundField } from './fields/Field';
-import IntegerField from './fields/IntegerField';
-
-import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
+import { BaseRelatedViewModelField, RelatedViewModelField } from './fields/RelatedViewModelField';
 import { freezeObject, isDev } from './util';
 import ViewModelCache from './ViewModelCache';
 
-// Fields are defined as an object mapping field name to a field instance
+export type SinglePrimaryKey = string | number;
+export type CompoundPrimaryKey = { [fieldName: string]: SinglePrimaryKey };
+export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
+
 export type FieldsMapping = { [fieldName: string]: Field<any> };
+
 export type FieldsMappingOrNull<T extends FieldsMapping> =
     | Record<string, Field<any>>
     | {
           [K in keyof T]?: null | undefined | Field<any>;
       };
 
-// Extract field names from specified ViewModel. Guarantees keys are of type string which `keyof T['fields']` doesn't (includes symbol etc)
-type ExtractFieldNames<T extends ViewModelConstructor<any>> = Extract<keyof T['fields'], string>;
-
-// Extract mapping of field name to it's underlying data type
-export type FieldDataMapping<T extends FieldsMapping> = {
-    readonly [K in keyof T]: T[K]['__fieldValueType'];
+type ExtractRelatedFields<T extends ViewModelConstructor<any, any>> = {
+    [P in keyof T['fields'] as T['fields'][P] extends RelatedViewModelField<any>
+        ? P
+        : never]: T['fields'][P] extends RelatedViewModelField<infer X> ? X : never;
 };
 
-// Extract mapping of field name to it's parsable data type. For most fields
-// this is the same as the underlying type but could be something different, eg.
-// parsing a string => number
+type ValueOf<T> = T[keyof T];
+
+type FieldPathInner<
+    FieldNames extends string[],
+    T extends ViewModelConstructor<any, any>,
+    R extends ExtractRelatedFields<T> = ExtractRelatedFields<T>
+> =
+    | [...FieldNames, keyof T['fields']]
+    | [
+          ...FieldNames,
+          ...ValueOf<{
+              [K in Extract<keyof R, string>]: ValueOf<{
+                  [J in Extract<keyof R[K]['fields'], string>]:
+                      | [K, J]
+                      | (R[K]['fields'][J] extends RelatedViewModelField<infer X>
+                            ? FieldPathInner<[K, J], X>
+                            : never);
+              }>;
+          }>
+      ];
+
+export type FieldPath<
+    T extends ViewModelConstructor<any, any>,
+    R extends ExtractRelatedFields<T> = ExtractRelatedFields<T>
+> =
+    | Extract<keyof T['fields'], string>
+    | ValueOf<{
+          [K in Extract<keyof R, string>]: ValueOf<{
+              [J in Extract<keyof R[K]['fields'], string>]:
+                  | [K, J]
+                  | (R[K]['fields'][J] extends RelatedViewModelField<infer X>
+                        ? FieldPathInner<[K, J], X>
+                        : never);
+          }>;
+      }>;
+
+export type FieldDataMapping<FieldMappingType extends FieldsMapping> = {
+    readonly [K in keyof FieldMappingType]: FieldMappingType[K]['__fieldValueType'];
+};
+
 export type FieldDataMappingRaw<T extends FieldsMapping> = {
     [K in keyof T]?: T[K]['__parsableValueType'];
 };
 
-export type SinglePrimaryKey = string | number;
-export type CompoundPrimaryKey = { [fieldName: string]: SinglePrimaryKey };
-export type PrimaryKey = SinglePrimaryKey | CompoundPrimaryKey;
+export type ExtractFieldNames<FieldMappingType extends FieldsMapping> = Extract<
+    keyof FieldMappingType,
+    string
+>;
 
-type KeysOfType<O, T> = {
-    [K in keyof O]: O[K] extends T ? K : never;
-}[keyof O];
+type ExtractPkFieldTypes<FieldMappingType extends FieldsMapping> =
+    | ExtractFieldNames<FieldMappingType>
+    | ExtractFieldNames<FieldMappingType>[];
+
+type ViewModelPkFieldType<FieldMappingType extends FieldsMapping> =
+    | Extract<keyof FieldMappingType, string>
+    | Extract<keyof FieldMappingType, string>[];
+
+// https://github.com/microsoft/TypeScript/issues/13298#issuecomment-724542300
+type UnionToTuple<T> = (
+    (T extends any ? (t: T) => T : never) extends infer U
+        ? (U extends any ? (u: U) => any : never) extends (v: infer V) => any
+            ? V
+            : never
+        : never
+) extends (_: any) => infer W
+    ? [...UnionToTuple<Exclude<T, W>>, W]
+    : [];
+
+/**
+ * Flatten a nested path to a single level with dot notation
+ *
+ * eg.
+ * ```
+ * flattenFieldPath([
+ *   'id',
+ *   ['user', ['group', 'id']],
+ *   ['user', 'groupId'],
+ *   ['user', 'id'],
+ *   'userId'
+ * ])
+ * // ['id', 'user.group.id', 'user.groupId', 'user.id', 'userId']
+ * ```
+ */
+export function flattenFieldPath<
+    T extends ViewModelConstructor<any, any>,
+    R extends ExtractRelatedFields<T> = ExtractRelatedFields<T>
+>(fieldPath: FieldPath<T, R>[] | FieldPath<T, R>, separator = '.'): string[] {
+    if (!Array.isArray(fieldPath)) {
+        return [fieldPath];
+    }
+    const flattenedPath: string[] = [];
+    for (const path of fieldPath) {
+        if (typeof path === 'string') {
+            flattenedPath.push(path);
+        } else {
+            flattenedPath.push(path.join(separator));
+        }
+    }
+    return flattenedPath;
+}
+
+/**
+ * @expand-properties
+ */
+interface ViewModelOptions<
+    T extends FieldsMapping,
+    PkFieldNameT extends ExtractFieldNames<T> | ExtractFieldNames<T>[]
+> {
+    /**
+     * Optional base class to extend. When calling `augment` this is set the augmented class.
+     *
+     * @type-name Class
+     */
+    baseClass?: ViewModelConstructor<any, any>;
+    /**
+     * Primary key name(s) to use. There should be field(s) with the corresponding name in the
+     * provided `fields`.
+     *
+     * Only `pkFieldName` or `getImplicitPkField` should be provided. If neither are provided then
+     * a field called `id` will be used and created if not provided in `fields`.
+     *
+     * @type-name string|string[]
+     */
+    pkFieldName: PkFieldNameT;
+}
+
+type KeysOfType<O, T> = keyof { [P in keyof O as O[P] extends T ? P : never]: O[P] };
 
 type AugmentFields<
     OriginalFields extends FieldsMapping,
@@ -45,102 +158,363 @@ type AugmentFields<
 > = Omit<OriginalFields, keyof AugmentedFields> &
     Omit<AugmentedFields, KeysOfType<AugmentedFields, undefined | null>>;
 
-/**
- * Creates a ViewModel class with the specified fields.
- *
- * ```js
- * const fields = {
- *     userId: new IntegerField({ label: 'User ID' })
- *     firstName: new CharField({ label: 'First Name' }),
- *     // label is optional; will be generated as 'Last name'
- *     lastName: new CharField(),
- * };
- * // Options are all optional and can be omitted entirely
- * const options = {
- *     // If not specified will create a default field called 'id'
- *     pkFieldName: 'userId',
- * };
- * class User extends viewModelFactory(fields, options) {
- *     // Optional; default cache is usually sufficient
- *     static cache = new MyCustomCache();
- *
- *     // Used to describe a single user
- *     static label = 'User';
- *     // User to describe an indeterminate number of users
- *     static labelPlural = 'Users';
- * }
- * ```
- *
- * @type-name ViewModel
- */
-export type ViewModelInterface<
+type ExtractPkFields<
     FieldMappingType extends FieldsMapping,
-    // The field names that actually have data
-    FieldNames extends keyof FieldMappingType,
-    PkFieldType extends string | string[] = string | string[],
-    PkType extends PrimaryKey = PrimaryKey
-> = {
-    readonly [K in FieldNames]: FieldMappingType[K]['__fieldValueType'];
-} & {
-    /** @private */
-    __instanceFieldMappingType: {
-        [k in FieldNames]: FieldMappingType[k];
-    };
-    /**
-     * Get the actual ViewModel class for this instance
-     */
-    _model: ViewModelConstructor<FieldMappingType, PkFieldType, PkType>;
-    /**
-     * Return the data for this record as an object
-     */
-    toJS(): FieldDataMapping<FieldMappingType>;
-    /**
-     * Compares two records to see if they are equivalent.
-     *
-     * - If the ViewModel is different then the records are always considered different
-     * - If the records were initialised with a different set of fields then they are
-     *   considered different even if the common fields are the same and other fields are
-     *   all null
-     */
-    isEqual(record: ViewModelInterface<any, any> | null): boolean;
+    PkFieldType extends ExtractPkFieldTypes<FieldMappingType>
+> = PkFieldType extends string
+    ? Record<PkFieldType, FieldMappingType[PkFieldType]>
+    : {
+          [K in keyof FieldMappingType as K extends PkFieldType[number]
+              ? K
+              : never]: FieldMappingType[K];
+      };
 
-    /**
-     * Clone this record, optionally with only a subset of the fields
-     */
-    clone<CloneFieldNames extends keyof FieldMappingType>(
-        fieldNames?: readonly CloneFieldNames[]
-    ): ViewModelInterface<FieldMappingType, CloneFieldNames, PkFieldType, PkType>;
-    clone(fieldNames?: FieldPath[]): ViewModelInterface<FieldMappingType, any, PkFieldType, PkType>;
+type ViewModelInterfaceInputData<
+    FieldMappingType extends FieldsMapping,
+    PkFieldType extends ExtractPkFieldTypes<FieldMappingType>
+> = FieldDataMappingRaw<FieldMappingType> & {
+    [K in keyof ExtractPkFields<FieldMappingType, PkFieldType>]: ExtractPkFields<
+        FieldMappingType,
+        PkFieldType
+    >[K]['__parsableValueType'];
+};
 
-    /**
-     * Access record bound fields. A record bound field is a normal field with it's `value` property
-     * set to the corresponding value for that field on the record. This is useful as a shortcut
-     * to get both the field and it's value.
-     *
-     * ```js
-     * class User extends viewModelFactory({ username: CharField() }) {}
-     *
-     * const admin = new User({ id: 1, username: 'admin' });
-     *
-     * // true
-     * admin._f.username instanceof CharField();
-     * admin._f.username.value === 'admin'
-     * ```
-     *
-     * @type-name Object
-     */
-    readonly _f: {
-        readonly [K in FieldNames]: RecordBoundField<
-            FieldMappingType[K]['__fieldValueType'],
-            FieldMappingType[K]['__parsableValueType']
-        >;
-    };
+/**
+ * Thrown when cloning a record and requested fields cannot be found
+ *
+ * Gives details on missing fields and will indicate if related records are missing entirely vs
+ * just some fields
+ */
+export class MissingFieldsError extends Error {
+    missingFieldNames: string[];
+    missingRelations: [string, string[]][];
+    assignedFields: string[];
+    constructor(
+        record: ViewModelInterface<any, any>,
+        assignedFields: string[],
+        requestedFieldNames: FieldPath<any, any>[],
+        missingFieldNames: string[],
+        missingRelations: [string, string[]][]
+    ) {
+        assignedFields = [...assignedFields];
+        assignedFields.sort();
+        missingFieldNames.sort();
+        let err = `Can't clone ${record._model.name} with fields ${flattenFieldPath(
+            requestedFieldNames
+        ).join(', ')} as only these fields are set: ${assignedFields.join(
+            ', '
+        )}.\n Missing fields: ${missingFieldNames.join(', ')}`;
+        if (missingRelations.length > 0) {
+            err +=
+                '\nThe following relations had no data so the associated fields could not be retrieved:\n';
+            err += missingRelations.map(
+                ([relationName, relationFieldNames]) =>
+                    ` The relation '${relationName}' for fields '${relationFieldNames.join(', ')}'`
+            );
+        }
+        super(err);
+        this.missingFieldNames = missingFieldNames;
+        this.missingRelations = missingRelations;
+        this.assignedFields = assignedFields;
+    }
+}
 
+export class BaseViewModel<
+    FieldMappingType extends FieldsMapping,
+    PkFieldType extends ExtractPkFieldTypes<FieldMappingType>,
+    AssignedFieldNames extends ExtractFieldNames<FieldMappingType> = ExtractFieldNames<FieldMappingType>
+> {
+    get _model(): ViewModelConstructor<FieldMappingType, PkFieldType> {
+        return Object.getPrototypeOf(this).constructor;
+    }
+
+    // TODO: return type
     /**
      * Returns the primary key value(s) for this instance. This is to conform to the
      * [Identifiable](doc:Identifiable) interface.
      */
-    readonly _key: PkType;
+    get _key(): PkFieldType extends string
+        ? FieldMappingType[PkFieldType]['__fieldValueType']
+        : {
+              [K in keyof FieldMappingType as K extends PkFieldType[number]
+                  ? K
+                  : never]: FieldMappingType[K]['__fieldValueType'];
+          } {
+        const { pkFieldName } = this._model;
+        if (Array.isArray(pkFieldName)) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            return pkFieldName.reduce((acc, fieldName) => {
+                acc[fieldName as string] = this._data[fieldName as string];
+                return acc;
+            }, {});
+        }
+        return this._data[pkFieldName as string];
+    }
+
+    toJS(): {
+        readonly [K in AssignedFieldNames]: FieldMappingType[K]['__fieldValueType'];
+    } {
+        const data = {};
+        for (const [fieldName, value] of Object.entries(this._data)) {
+            data[fieldName] = this._model.fields[fieldName].toJS(value);
+        }
+        return data as {
+            readonly [K in AssignedFieldNames]: FieldMappingType[K]['__fieldValueType'];
+        };
+    }
+
+    isEqual(record: ViewModelInterface<any, any> | null): boolean {
+        if (!record) {
+            return false;
+        }
+        if (record._model !== this._model) {
+            return false;
+        }
+        if (!isEqual(record._assignedFields, this._assignedFields)) {
+            return false;
+        }
+        for (const fieldName of this._assignedFields) {
+            const field = this._model.fields[fieldName];
+            if (!field.isEqual(this[fieldName], record[fieldName])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    clone<CloneFieldNames extends ExtractFieldNames<FieldMappingType>>(
+        fieldNames?:
+            | CloneFieldNames[]
+            | FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>[]
+    ): ViewModelInterface<FieldMappingType, PkFieldType, CloneFieldNames> {
+        if (!fieldNames) {
+            fieldNames = this._assignedFields as unknown as ExtractFieldNames<FieldMappingType>[];
+        }
+        const missingFieldNames: string[] = [];
+        const nestedToClone: Record<
+            string,
+            FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>[]
+        > = {};
+        const nonRelatedFieldNames: string[] = [];
+        for (const pathElement of fieldNames as FieldPath<
+            ViewModelConstructor<FieldMappingType, PkFieldType>
+        >[]) {
+            if (typeof pathElement === 'string') {
+                if (!this._assignedFields.includes(pathElement)) {
+                    missingFieldNames.push(pathElement);
+                } else {
+                    nonRelatedFieldNames.push(pathElement);
+                }
+            } else {
+                const [name, ...p] = pathElement;
+                if (!nestedToClone[name]) {
+                    nestedToClone[name] = [];
+                }
+                if (p.length > 1) {
+                    // Nested fields - need to pass the whole array
+                    // eg. [user, group, id]
+                    nestedToClone[name].push(
+                        p as FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>
+                    );
+                } else {
+                    // A specific field on this record
+                    // eg. [user, name]
+                    nestedToClone[name].push(p[0]);
+                }
+            }
+        }
+        const data: Record<string, any> = {};
+        const missingRelations: [string, string[]][] = [];
+        const assignedFields: string[] = [...this._assignedFields];
+        for (const [name, nestedFieldNames] of Object.entries(nestedToClone)) {
+            if (!this._assignedFields.includes(name)) {
+                missingFieldNames.push(name);
+                missingRelations.push([name, flattenFieldPath(nestedFieldNames)]);
+            } else {
+                try {
+                    if (Array.isArray(this[name])) {
+                        data[name] = this[name].map(r => r.clone(nestedFieldNames));
+                    } else {
+                        data[name] = this[name].clone(nestedFieldNames);
+                    }
+                } catch (err) {
+                    if (err instanceof MissingFieldsError) {
+                        assignedFields.push(
+                            ...err.assignedFields.map(fieldName => `${name}.${fieldName}`)
+                        );
+                        missingFieldNames.push(
+                            ...err.missingFieldNames.map(fieldName => `${name}.${fieldName}`)
+                        );
+                        missingRelations.push(
+                            ...(err.missingRelations.map(([relationName, relationFieldNames]) => [
+                                `${name}.${relationName}`,
+                                relationFieldNames,
+                            ]) as [string, string[]][])
+                        );
+                    } else {
+                        throw err;
+                    }
+                }
+            }
+        }
+        if (fieldNames && missingFieldNames.length > 0) {
+            throw new MissingFieldsError(
+                this as ViewModelInterface<any, any>,
+                assignedFields,
+                fieldNames as FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>[],
+                missingFieldNames,
+                missingRelations
+            );
+        }
+
+        for (const fieldName of nonRelatedFieldNames) {
+            // TODO: Unclear to me if this needs to call a method on the Field on not. Revisit this.
+            data[fieldName as string] = this[fieldName];
+        }
+
+        // Always clone primary keys
+        const pkFieldNames = this._model.pkFieldNames;
+        pkFieldNames.forEach(name => (data[name] = this[name as string]));
+
+        return new this._model(data as ViewModelInterfaceInputData<FieldMappingType, PkFieldType>);
+    }
+
+    private __recordBoundFields: {
+        readonly [K in AssignedFieldNames]: RecordBoundField<
+            FieldMappingType[K]['__fieldValueType'],
+            FieldMappingType[K]['__parsableValueType']
+        >;
+    };
+    /**
+     * Get fields bound to this record instance. Each field behaves the same as accessing it via ViewModel.fields but
+     * has a `value` property that contains the value for that field on this record.
+     *
+     * This is useful when you need to know both the field on the ViewModel and the value on a record (eg. when formatting
+     * a value from a record
+     *
+     * ```js
+     * const user = new User({ name: 'Jon Snow' });
+     * user.name
+     * // Jon Snow
+     * user._f.name
+     * // CharField({ name: 'name', label: 'Label' });
+     * user._f.name.value
+     * // Jon Snow
+     * ```
+     */
+    get _f(): {
+        readonly [K in AssignedFieldNames]: RecordBoundField<
+            FieldMappingType[K]['__fieldValueType'],
+            FieldMappingType[K]['__parsableValueType']
+        >;
+    } {
+        if (!this.__recordBoundFields) {
+            const { fields } = this._model;
+            const { _data } = this;
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
+            const record = this;
+            this.__recordBoundFields = this._assignedFields.reduce((acc: {}, fieldName) => {
+                acc[fieldName] = new Proxy(fields[fieldName], {
+                    get(target, prop): any {
+                        if (prop === 'value') {
+                            return _data[fieldName];
+                        }
+                        if (prop === 'isBound') {
+                            return true;
+                        }
+                        if (prop === 'boundRecord') {
+                            return record;
+                        }
+                        return target[prop];
+                    },
+                });
+                return acc;
+            }, {}) as {
+                readonly [K in AssignedFieldNames]: RecordBoundField<
+                    FieldMappingType[K]['__fieldValueType'],
+                    FieldMappingType[K]['__parsableValueType']
+                >;
+            };
+        }
+        return this.__recordBoundFields;
+    }
+
+    constructor(data: {
+        [K in AssignedFieldNames]: FieldMappingType[K]['__parsableValueType'];
+    }) {
+        if (!data) {
+            throw new Error('data must be specified');
+        }
+        const pkFieldNames = this._model.pkFieldNames;
+        const missing = pkFieldNames.filter(name => !(name in data));
+        const empty = pkFieldNames.filter(name => name in data && data[name as string] == null);
+        const errors: string[] = [];
+        if (empty.length > 0) {
+            errors.push(
+                `Primary key(s) '${empty.join("', '")}' was provided but was null or undefined`
+            );
+        }
+        if (missing.length > 0) {
+            errors.push(
+                `Missing value(s) for primary key(s) '${missing.join(
+                    "', '"
+                )}'. If this was constructed from data returned from an endpoint ensure it is setup to return these field(s).`
+            );
+        }
+
+        if (errors.length) {
+            throw new Error(`(${this._model.name}): ${errors.join(', ')}`);
+        }
+
+        const assignedData: Record<string, any> = {};
+        const assignedFields: string[] = [];
+        const fields = this._model.fields;
+        for (const [key, value] of Object.entries(data)) {
+            const field = fields[key];
+            if (field) {
+                assignedData[key] = field.normalize(value);
+                if (field instanceof BaseRelatedViewModelField) {
+                    // TODO: Make doing this part of interface rather than special case?
+                    const pkOrPks = field.many
+                        ? assignedData[key]?.map(r => r._key)
+                        : assignedData[key]?._key;
+                    const hasValue = Array.isArray(pkOrPks)
+                        ? pkOrPks.length > 0 && data[field.sourceFieldName]?.length > 0
+                        : pkOrPks != null && data[field.sourceFieldName];
+                    if (hasValue && !isEqual(data[field.sourceFieldName], pkOrPks)) {
+                        const { name, sourceFieldName } = field;
+                        const pk = Array.isArray(pkOrPks) ? pkOrPks.join(', ') : pkOrPks;
+                        console.warn(
+                            `Related field ${name} was created from nested object that had a different id to the source field name ${sourceFieldName}: ${data[sourceFieldName]} !== ${pk}. ${pk} has been used for both.`
+                        );
+                    }
+                    // Key could be set but the value is null. In that case we want the sourceFieldName to be set to
+                    // null as well.
+                    if (key in assignedData) {
+                        assignedData[field.sourceFieldName] = pkOrPks ?? null;
+                        if (!data[field.sourceFieldName]) {
+                            assignedFields.push(field.sourceFieldName);
+                        }
+                    }
+                }
+                assignedFields.push(key);
+            } else {
+                // TODO: Should extra keys in data be a warning or ignored?
+                console.warn(
+                    `Received value for key ${key}. No such field exists on ${this._model.name}`
+                );
+            }
+        }
+        // Sort fields so consistent order; primarily as it makes testing easier
+        assignedFields.sort();
+        this._assignedFields = assignedFields;
+        this._data = freezeObject(assignedData) as {
+            [k in AssignedFieldNames]: FieldMappingType[k]['__fieldValueType'];
+        };
+
+        return this;
+    }
 
     /**
      * The assigned data for this record. You usually don't need to access this directly; values
@@ -149,7 +523,7 @@ export type ViewModelInterface<
      * @type-name Object
      */
     readonly _data: {
-        [k in FieldNames]: FieldMappingType[k]['__fieldValueType'];
+        [k in AssignedFieldNames]: FieldMappingType[k]['__fieldValueType'];
     };
 
     /**
@@ -157,26 +531,36 @@ export type ViewModelInterface<
      *
      * @type-name string[]
      */
-    readonly _assignedFields: FieldNames[];
-};
+    readonly _assignedFields: string[];
+}
+
+export type ViewModelInterface<
+    FieldMappingType extends FieldsMapping,
+    PkFieldType extends ExtractPkFieldTypes<FieldMappingType>,
+    AssignedFieldNames extends ExtractFieldNames<FieldMappingType> = ExtractFieldNames<FieldMappingType>
+> = BaseViewModel<FieldMappingType, PkFieldType, AssignedFieldNames> &
+    FieldDataMapping<Pick<FieldMappingType, AssignedFieldNames>>;
 
 /**
- * @type-name ViewModel Class
+ * Check if an object is ViewModel
  */
+export function isViewModelInstance<T extends ViewModelInterface<any, any, any>>(
+    view: any
+): view is T {
+    return !!(view && view instanceof BaseViewModel);
+}
+
+/**
+ * Check if a class is a ViewModel
+ */
+export function isViewModelClass<T extends ViewModelConstructor<any, any>>(view: any): view is T {
+    return !!(view && view.prototype instanceof BaseViewModel);
+}
+
 export interface ViewModelConstructor<
     FieldMappingType extends FieldsMapping,
-    PkFieldType extends
-        | Extract<keyof FieldMappingType, string>
-        | Extract<keyof FieldMappingType, string>[]
-        | string
-        | string[] = Extract<keyof FieldMappingType, string>,
-    PkType extends PrimaryKey = PrimaryKey
+    PkFieldType extends ViewModelPkFieldType<FieldMappingType>
 > {
-    /** @private */
-    __pkFieldType: PkFieldType;
-    /** @private */
-    __pkType: PkType;
-
     // This is necessary for when the base class is extended so that it still conforms to
     // ViewModelConstructor - without this there will be no matching type (for some reason?)
     // due to `IncomingData`. It's important to fix this otherwise anywhere that accepts
@@ -199,19 +583,22 @@ export interface ViewModelConstructor<
     // a2.age
     //
     // You can fix it with:
-    // const C: ViewModelConstructor<any> = B;
+    // const C: ViewModelConstructor<any, any> = B;
     // const a3 = new C({ name: 'test' });
     // Error: Property 'age' does not exist on type ...
     // a3.age
-    new (
-        // When we know primary key is 'id' then we can require it be provided in types (pk is always required)
-        // When pk customised we can't provide this check
-        data: PkFieldType extends 'id'
-            ? FieldDataMappingRaw<FieldMappingType> & {
-                  id: FieldMappingType['id']['__parsableValueType'];
-              }
-            : FieldDataMappingRaw<FieldMappingType>
-    ): ViewModelInterface<FieldMappingType, keyof FieldMappingType, PkFieldType, PkType>;
+    // This overload makes it so fields set on the record match the data passed in. Unfortunately this
+    // information is lost if you extend the class. The second overload makes extending a class work
+    // while still satisfying ViewModelConstructor (without the overload it won't be assignable to
+    // ViewModelConstructor for some reason not obvious to me)
+    new <D extends ViewModelInterfaceInputData<FieldMappingType, PkFieldType>>(
+        data: D
+    ): ViewModelInterface<FieldMappingType, PkFieldType, Extract<keyof D, string>>;
+    new (data: ViewModelInterfaceInputData<FieldMappingType, PkFieldType>): ViewModelInterface<
+        FieldMappingType,
+        PkFieldType,
+        Extract<keyof typeof data, ExtractFieldNames<FieldMappingType>>
+    >;
 
     /**
      * The bound fields for this ViewModel. These will match the `fields` passed in to `ViewModel` with the
@@ -250,7 +637,7 @@ export interface ViewModelConstructor<
     readonly labelPlural: string;
 
     /**
-     * Name of the primary key field for this this ViewModel (or fields for compound keys)
+     * Name of the primary key field for this ViewModel (or fields for compound keys)
      *
      * If `options.pkFieldName` is not specified a field will be created from `options.getImplicitPk`
      * if provided otherwise a default field with name 'id' will be created.
@@ -260,7 +647,7 @@ export interface ViewModelConstructor<
     /**
      * Shortcut to get pkFieldName as an array always, even for non-compound keys
      */
-    readonly pkFieldNames: Extract<keyof FieldMappingType, string>[];
+    readonly pkFieldNames: PkFieldType extends string ? [PkFieldType] : PkFieldType;
 
     /**
      * Shortcut to get the names of all fields excluding primary keys.
@@ -285,7 +672,12 @@ export interface ViewModelConstructor<
      * @param fieldName Either a string or an array of strings where the last element is the final field name to return
      * and each other element is a [RelatedViewModelField](doc:RelatedViewModelField) on a ViewModel.
      */
-    getField(fieldName: FieldPath): Field<any>;
+    getField(
+        fieldName: FieldPath<
+            ViewModelConstructor<FieldMappingType, PkFieldType>,
+            ExtractRelatedFields<ViewModelConstructor<FieldMappingType, PkFieldType>>
+        >
+    ): Field<any>;
 
     /**
      * The cache instance for this ViewModel. A default instance of [ViewModelCache](doc:ViewModelCache)
@@ -297,7 +689,7 @@ export interface ViewModelConstructor<
      * }
      * ```
      */
-    cache: ViewModelCache<this>;
+    cache: ViewModelCache<ViewModelConstructor<FieldMappingType, PkFieldType>>;
 
     /**
      * Create a new class that extends this class with the additional specified fields. To remove a
@@ -356,77 +748,25 @@ export interface ViewModelConstructor<
      * @param newOptions Provide optional overrides for the options that the original class was created with
      * @return A new ViewModel class with fields modified according to `newFields`.
      */
-    augment<T extends FieldsMappingOrNull<FieldMappingType>>(
+    augment<
+        T extends FieldsMappingOrNull<FieldMappingType>,
+        AugmentPkFieldType extends ViewModelPkFieldType<
+            AugmentFields<FieldMappingType, T>
+        > = PkFieldType extends string
+            ? T[PkFieldType] extends Field<any>
+                ? PkFieldType
+                : // This means the original pk field name doesn't exist in T OR we've lost the type - this seems
+                  // to happen when you augment multiple levels without explicitly passing pkFieldName. Typing this
+                  // as any so it still works (ideally would be never but that breaks the multilevel augment right now)
+                  any
+            : // This is for compound key but I don't know how to type it better
+              any
+    >(
         newFields: T,
-        newOptions?: ViewModelOptions<AugmentFields<FieldMappingType, T>>
-    ): ViewModelConstructor<AugmentFields<FieldMappingType, T>, PkFieldType, PkType>;
-}
-
-type GetImplicitPkFieldCompound<T extends FieldsMapping> = (
-    // Type is any instead of T as fields on model vs fields may no be finalised and may differ (eg. from implicit keys)
-    model: ViewModelConstructor<any>,
-    fields: T
-) => [string[], Field<any>[]];
-
-type GetImplicitPkFieldSingle<T extends FieldsMapping> = (
-    model: ViewModelConstructor<any>,
-    fields: T
-) => [string, Field<any>];
-
-type GetImplicitPkField<T extends FieldsMapping> =
-    | GetImplicitPkFieldCompound<T>
-    | GetImplicitPkFieldSingle<T>;
-
-/**
- * @expand-properties
- */
-interface ViewModelOptions<T extends FieldsMapping> {
-    /**
-     * Optional base class to extend. When calling `augment` this is set the augmented class.
-     *
-     * @type-name Class
-     */
-    baseClass?: ViewModelConstructor<T>;
-    /**
-     * Primary key name(s) to use. There should be field(s) with the corresponding name in the
-     * provided `fields`.
-     *
-     * Only `pkFieldName` or `getImplicitPkField` should be provided. If neither are provided then
-     * a field called `id` will be used and created if not provided in `fields`.
-     *
-     * @type-name string|string[]
-     */
-    pkFieldName?: null | undefined | keyof T | (keyof T)[];
-    /**
-     * A function to generate field(s) to use for the primary key. It is passed the model class and
-     * the fields on the model. It should return an array of size 2 - first element should be the
-     * field name and the second an instance of `Field`.
-     *
-     * @type-name Function
-     */
-    getImplicitPkField?: null | undefined | GetImplicitPkField<T>;
-}
-
-interface ViewModelOptionsPkFieldNameSingle<T extends FieldsMapping> extends ViewModelOptions<T> {
-    pkFieldName: Extract<keyof T, string>;
-}
-interface ViewModelOptionsPkFieldNameCompound<T extends FieldsMapping> extends ViewModelOptions<T> {
-    pkFieldName: Extract<keyof T, string>[];
-}
-
-interface ViewModelOptionsGetImplicitPkFieldSingle<T extends FieldsMapping>
-    extends ViewModelOptions<T> {
-    getImplicitPkField: GetImplicitPkFieldSingle<T>;
-}
-
-interface ViewModelOptionsGetImplicitPkFieldCompound<T extends FieldsMapping>
-    extends ViewModelOptions<T> {
-    getImplicitPkField: GetImplicitPkFieldCompound<T>;
-}
-
-interface ViewModelOptionsDefault<T extends FieldsMapping> extends ViewModelOptions<T> {
-    pkFieldName: 'id';
-    getImplicitPkField: undefined;
+        newOptions?: Partial<
+            ViewModelOptions<AugmentFields<FieldMappingType, T>, AugmentPkFieldType>
+        >
+    ): ViewModelConstructor<AugmentFields<FieldMappingType, T>, AugmentPkFieldType>;
 }
 
 /**
@@ -500,7 +840,13 @@ function buildFieldGetterSetter(fieldName: string): { set(value: any): any; get:
     };
 }
 
-function bindFields<T extends FieldsMapping>(fields: T, bindTo: ViewModelConstructor<T>): T {
+function bindFields<
+    FieldMappingType extends FieldsMapping,
+    PkFieldNameT extends ExtractFieldNames<FieldMappingType> | ExtractFieldNames<FieldMappingType>[]
+>(
+    fields: FieldMappingType,
+    bindTo: ViewModelConstructor<FieldMappingType, PkFieldNameT>
+): FieldMappingType {
     const newFields = Object.entries(fields).reduce((acc, [fieldName, field]) => {
         acc[fieldName] = field.clone();
         acc[fieldName].model = bindTo;
@@ -510,25 +856,7 @@ function bindFields<T extends FieldsMapping>(fields: T, bindTo: ViewModelConstru
         }
         return acc;
     }, {});
-    return freezeObject(newFields) as T;
-}
-
-function defaultGetImplicitPkField<T extends FieldsMapping>(
-    model: ViewModelConstructor<T>,
-    fields: T
-): ['id', IntegerField] {
-    return ['id', fields.id || new IntegerField()];
-}
-
-const IS_VIEW_MODEL = Symbol.for('@prestojs/IS_VIEW_MODEL');
-
-// TODO: Refactor so we use a real base class and can use instanceof directly instead, see https://github.com/prestojs/prestojs/issues/41
-export function isViewModelInstance(view: any): view is ViewModelInterface<any, any> {
-    return !!(view && view.constructor && view.constructor[IS_VIEW_MODEL]);
-}
-
-export function isViewModelClass(view: any): view is ViewModelConstructor<any> {
-    return !!(view && view[IS_VIEW_MODEL]);
+    return freezeObject(newFields) as FieldMappingType;
 }
 
 const reservedFieldNames = ['toJS', 'clone', 'isEqual'];
@@ -541,52 +869,23 @@ function checkReservedFieldNames(fields): void {
     });
 }
 
-export type FieldPath = string | string[];
-
-/**
- * Flatten a nested path to a single level with dot notation
- *
- * eg.
- * ```
- * flattenFieldPath([
- *   'id',
- *   ['user', ['group', 'id']],
- *   ['user', 'groupId'],
- *   ['user', 'id'],
- *   'userId'
- * ])
- * // ['id', 'user.group.id', 'user.groupId', 'user.id', 'userId']
- * ```
- */
-export function flattenFieldPath(fieldPath: FieldPath[] | FieldPath, separator = '.'): string[] {
-    if (typeof fieldPath === 'string') {
-        return [fieldPath];
-    }
-    const flattenedPath: string[] = [];
-    for (const path of fieldPath) {
-        if (typeof path === 'string') {
-            flattenedPath.push(path);
-        } else {
-            flattenedPath.push(path.join(separator));
-        }
-    }
-    return flattenedPath;
-}
-
 /**
  * Get assigned field paths for the record.
  *
  * See test cases for example of what this looks like
  */
-export function getAssignedFieldsDeep(record: ViewModelInterface<any, any>): FieldPath[] {
-    const fieldNames: FieldPath[] = [];
-    for (const fieldName of record._assignedFields as string[]) {
+export function getAssignedFieldsDeep<T extends ViewModelConstructor<any, any>>(
+    record: InstanceType<T>
+): FieldPath<T>[] {
+    const fieldNames: FieldPath<T>[] = [];
+    if (!Array.isArray(record._assignedFields)) console.log(record, record._assignedFields);
+    for (const fieldName of record._assignedFields) {
         const data = record[fieldName];
         const field = record._model.fields[fieldName];
         if (field instanceof BaseRelatedViewModelField && data) {
             if (field.many) {
                 if (data.length === 0) {
-                    fieldNames.push([fieldName]);
+                    fieldNames.push([fieldName] as unknown as FieldPath<T>);
                 } else {
                     // If we have many records we can only take the common set of fields
                     // Failing to do this will cause various issues with caching.
@@ -594,16 +893,25 @@ export function getAssignedFieldsDeep(record: ViewModelInterface<any, any>): Fie
                         flattenFieldPath(p).join('|')
                     );
                     for (const path of paths) {
-                        fieldNames.push([fieldName, ...(Array.isArray(path) ? path : [path])]);
+                        fieldNames.push([
+                            fieldName,
+                            ...(Array.isArray(path) ? path : [path]),
+                        ] as FieldPath<T>);
                     }
                 }
             } else {
+                if (!data._assignedFields) {
+                    console.log(field);
+                }
                 for (const path of getAssignedFieldsDeep(data)) {
-                    fieldNames.push([fieldName, ...(Array.isArray(path) ? path : [path])]);
+                    fieldNames.push([
+                        fieldName,
+                        ...(Array.isArray(path) ? path : [path]),
+                    ] as FieldPath<T>);
                 }
             }
         } else {
-            fieldNames.push(fieldName);
+            fieldNames.push(fieldName as FieldPath<T>);
         }
     }
     return fieldNames;
@@ -630,7 +938,10 @@ export function getAssignedFieldsDeep(record: ViewModelInterface<any, any>): Fie
  * @param model
  * @param fieldName
  */
-function expandField(model: ViewModelConstructor<any>, fieldName: string): FieldPath[] {
+function expandField<T extends ViewModelConstructor<any, any>>(
+    model: T,
+    fieldName: ExtractFieldNames<T['fields']>
+): FieldPath<T>[] {
     const field = model.fields[fieldName];
     if (field instanceof BaseRelatedViewModelField) {
         return field.to.fieldNames
@@ -672,18 +983,18 @@ export class InvalidFieldError extends Error {}
  * @param model
  * @param paths
  */
-export function expandRelationFieldPaths(
-    model: ViewModelConstructor<any>,
-    paths: FieldPath[]
-): FieldPath[] {
-    const expanded: FieldPath[] = [];
+export function expandRelationFieldPaths<T extends ViewModelConstructor<any, any>>(
+    model: T,
+    paths: FieldPath<T>[]
+): FieldPath<T>[] {
+    const expanded: FieldPath<T>[] = [];
     const fieldsAdded = new Set<string>();
     for (const path of paths) {
         if (typeof path === 'string') {
             const field = model.fields[path];
             if (field instanceof BaseRelatedViewModelField) {
                 fieldsAdded.add(field.sourceFieldName);
-                expanded.push(field.sourceFieldName);
+                expanded.push(field.sourceFieldName as FieldPath<T>);
             }
             for (const p of expandField(model, path)) {
                 const dottedP = Array.isArray(p) ? p.join('.') : p;
@@ -725,7 +1036,7 @@ export function expandRelationFieldPaths(
                         : sourcePath;
                     if (!fieldsAdded.has(sourceDottedPath)) {
                         fieldsAdded.add(sourceDottedPath);
-                        expanded.push(sourcePath);
+                        expanded.push(sourcePath as FieldPath<T>);
                     }
                     if (isLast) {
                         for (const p of expandField(currentModel, fieldName).map(subPath => [
@@ -734,7 +1045,7 @@ export function expandRelationFieldPaths(
                         ])) {
                             const dottedP = p.join('.');
                             if (!fieldsAdded.has(dottedP)) {
-                                expanded.push(p);
+                                expanded.push(p as FieldPath<T>);
                                 fieldsAdded.add(dottedP);
                             }
                         }
@@ -750,471 +1061,22 @@ export function expandRelationFieldPaths(
     return expanded;
 }
 
-/**
- * Thrown when cloning a record and requested fields cannot be found
- *
- * Gives details on missing fields and will indicate if related records are missing entirely vs
- * just some fields
- */
-export class MissingFieldsError extends Error {
-    missingFieldNames: string[];
-    missingRelations: [string, string[]][];
-    assignedFields: string[];
-    constructor(
-        record: ViewModelInterface<any, any>,
-        assignedFields: string[],
-        requestedFieldNames: FieldPath[],
-        missingFieldNames: string[],
-        missingRelations: [string, string[]][]
-    ) {
-        assignedFields = [...assignedFields];
-        assignedFields.sort();
-        missingFieldNames.sort();
-        let err = `Can't clone ${record._model.name} with fields ${flattenFieldPath(
-            requestedFieldNames
-        ).join(', ')} as only these fields are set: ${assignedFields.join(
-            ', '
-        )}.\n Missing fields: ${missingFieldNames.join(', ')}`;
-        if (missingRelations.length > 0) {
-            err +=
-                '\nThe following relations had no data so the associated fields could not be retrieved:\n';
-            err += missingRelations.map(
-                ([relationName, relationFieldNames]) =>
-                    ` The relation '${relationName}' for fields '${relationFieldNames.join(', ')}'`
-            );
-        }
-        super(err);
-        this.missingFieldNames = missingFieldNames;
-        this.missingRelations = missingRelations;
-        this.assignedFields = assignedFields;
+export default function viewModelFactory<
+    FieldMappingType extends FieldsMapping,
+    PkFieldNameT extends ExtractFieldNames<FieldMappingType> | ExtractFieldNames<FieldMappingType>[]
+>(
+    fields: FieldMappingType,
+    options: ViewModelOptions<FieldMappingType, PkFieldNameT>
+): ViewModelConstructor<FieldMappingType, PkFieldNameT> {
+    if (options.baseClass && !(options.baseClass.prototype instanceof BaseViewModel)) {
+        throw new Error("'baseClass' must extend BaseViewModel");
     }
-}
 
-// Using very strongly typed overloads instead a single type with optional properties so we can more accurately type
-// the primary key and fields (specifically for default case we can add the implicit 'id' field that will be created)
-export default function viewModelFactory<T extends FieldsMapping>(
-    fields: T,
-    options: ViewModelOptionsPkFieldNameSingle<T>
-): ViewModelConstructor<
-    T,
-    typeof options['pkFieldName'],
-    typeof options['pkFieldName'] extends keyof T
-        ? T[typeof options['pkFieldName']] extends Field<infer X>
-            ? X extends string | number
-                ? X
-                : never
-            : SinglePrimaryKey
-        : SinglePrimaryKey
->;
-export default function viewModelFactory<T extends FieldsMapping>(
-    fields: T,
-    options: ViewModelOptionsPkFieldNameCompound<T>
-): ViewModelConstructor<T, typeof options['pkFieldName'], CompoundPrimaryKey>;
-export default function viewModelFactory<T extends FieldsMapping>(
-    fields: T,
-    options: ViewModelOptionsGetImplicitPkFieldSingle<T>
-): ViewModelConstructor<
-    T,
-    string,
-    ReturnType<typeof options['getImplicitPkField']>[1] extends Field<infer X> ? X : PrimaryKey
->;
-export default function viewModelFactory<T extends FieldsMapping>(
-    fields: T,
-    options: ViewModelOptionsGetImplicitPkFieldCompound<T>
-): ViewModelConstructor<T, string[], CompoundPrimaryKey>;
-export default function viewModelFactory<T extends FieldsMapping>(
-    fields: T,
-    options?: ViewModelOptionsDefault<{ id: IntegerField } & T>
-): ViewModelConstructor<
-    { id: IntegerField } & T,
-    'id',
-    // If field is provided it must be either a number or string
-    T['id'] extends Field<number>
-        ? number
-        : T['id'] extends Field<string>
-        ? string // This is the default; IntegerField
-        : number
->;
-/**
- * Creates a ViewModel class with the specified fields.
- *
- * ```js
- * const fields = {
- *     userId: new IntegerField({ label: 'User ID' })
- *     firstName: new CharField({ label: 'First Name' }),
- *     // label is optional; will be generated as 'Last name'
- *     lastName: new CharField(),
- * };
- * // Options are all optional and can be omitted entirely
- * const options = {
- *     // Only one of pkFieldName or getImplicitPkField can be defined.
- *     // If neither are provided a default field called 'id' will be created.
- *     pkFieldName: 'userId',
- *     // Multiple names can be specified for compound keys
- *     pkFieldName: ['organisationId', 'departmentId']
- *     // You can also specify a function to create the primary key
- *     getImplicitPkField(model, fields) {
- *          if ('EntityId' in fields) {
- *              return ['EntityId', fields.EntityId];
- *          }
- *          // Generate a name base on model, eg. `userId`
- *          const name = model.name[0].toLowerCase() + model.name.slice(1);
- *          return [`${name}Id`, new NumberField()];
- *      },
- *      // Optionally can specify a baseClass for this model. When using `augment`
- *      // this is automatically set to the class being augmented.
- *      baseClass: BaseViewModel,
- * };
- * class User extends viewModelFactory(fields, options) {
- *     // Optional; default cache is usually sufficient
- *     static cache = new MyCustomCache();
- *
- *     // Used to describe a single user
- *     static label = 'User';
- *     // User to describe an indeterminate number of users
- *     static labelPlural = 'Users';
- * }
- * ```
- *
- * @param fields A map of field name to an instance of `Field`
- */
-export default function viewModelFactory<T extends FieldsMapping>(
-    fields: T,
-    options: ViewModelOptions<T> = {}
-): ViewModelConstructor<any, any> {
-    if (options.pkFieldName && options.getImplicitPkField) {
-        throw new Error("Only one of 'pkFieldName' and 'getImplicitPkField' should be provided");
-    }
     checkReservedFieldNames(fields);
-    // If pkFieldName isn't specified it will be created automatically as 'id'
-    // Otherwise the field name will be included in `fields` and we don't need to modify the type.
-    // getImplicitPkField will create a new field if specified but we can't type it so we ignore it
-    // (nested ternary is unavoidable to use the typescripts `extends` behaviour)
-    type FinalFields = typeof options.pkFieldName extends string | string[]
-        ? T // eslint-disable-next-line @typescript-eslint/ban-types
-        : typeof options.getImplicitPkField extends Function
-        ? T
-        : { id: IntegerField } & T;
-    type PkFieldType = typeof options.pkFieldName extends string
-        ? string
-        : typeof options.pkFieldName extends string[]
-        ? string[]
-        : typeof options.getImplicitPkField extends GetImplicitPkFieldCompound<T>
-        ? string[]
-        : typeof options.getImplicitPkField extends GetImplicitPkFieldSingle<T>
-        ? string
-        : 'id';
-
-    type PkValueType = typeof options.pkFieldName extends string
-        ? SinglePrimaryKey
-        : typeof options.pkFieldName extends string[]
-        ? CompoundPrimaryKey
-        : typeof options.getImplicitPkField extends GetImplicitPkFieldCompound<T>
-        ? CompoundPrimaryKey
-        : typeof options.getImplicitPkField extends GetImplicitPkFieldSingle<T>
-        ? SinglePrimaryKey
-        : T['id'] extends Field<number>
-        ? number
-        : T['id'] extends Field<string>
-        ? string
-        : SinglePrimaryKey;
-
-    // This is the constructor function for the created class. We aren't using an ES6 class
-    // here as I couldn't get types to work nicely (possibly ignorance on my behalf - can look
-    // to refactor down the track)
-    function _Base(
-        data: PkFieldType extends 'id'
-            ? FieldDataMappingRaw<FinalFields> & {
-                  id: FinalFields['id']['__parsableValueType'];
-              }
-            : FieldDataMappingRaw<FinalFields>
-    ): {
-        [k in Extract<keyof typeof data, keyof FinalFields>]: FinalFields[k]['__fieldValueType'];
-    } {
-        if (!data) {
-            throw new Error('data must be specified');
-        }
-        const pkFieldNames = this._model.pkFieldNames;
-        const missing = pkFieldNames.filter(name => !(name in data));
-        const empty = pkFieldNames.filter(name => name in data && data[name] == null);
-        const errors: string[] = [];
-        if (empty.length > 0) {
-            errors.push(
-                `Primary key(s) '${empty.join("', '")}' was provided but was null or undefined`
-            );
-        }
-        if (missing.length > 0) {
-            errors.push(
-                `Missing value(s) for primary key(s) '${missing.join(
-                    "', '"
-                )}'. If this was constructed from data returned from an endpoint ensure it is setup to return these field(s).`
-            );
-        }
-
-        if (errors.length) {
-            throw new Error(`(${this._model.name}): ${errors.join(', ')}`);
-        }
-
-        const assignedData: Record<string, any> = {};
-        const assignedFields: string[] = [];
-        const fields = this._model.fields;
-        for (const [key, value] of Object.entries(data)) {
-            const field = fields[key];
-            if (field) {
-                assignedData[key] = field.normalize(value);
-                if (field instanceof BaseRelatedViewModelField) {
-                    // TODO: Make doing this part of interface rather than special case?
-                    const pkOrPks = field.many
-                        ? assignedData[key]?.map(r => r._key)
-                        : assignedData[key]?._key;
-                    const hasValue = Array.isArray(pkOrPks)
-                        ? pkOrPks.length > 0 && data[field.sourceFieldName]?.length > 0
-                        : pkOrPks != null && data[field.sourceFieldName];
-                    if (hasValue && !isEqual(data[field.sourceFieldName], pkOrPks)) {
-                        const { name, sourceFieldName } = field;
-                        const pk = Array.isArray(pkOrPks) ? pkOrPks.join(', ') : pkOrPks;
-                        console.warn(
-                            `Related field ${name} was created from nested object that had a different id to the source field name ${sourceFieldName}: ${data[sourceFieldName]} !== ${pk}. ${pk} has been used for both.`
-                        );
-                    }
-                    // Key could be set but the value is null. In that case we want the sourceFieldName to be set to
-                    // null as well.
-                    if (key in assignedData) {
-                        assignedData[field.sourceFieldName] = pkOrPks ?? null;
-                        if (!data[field.sourceFieldName]) {
-                            assignedFields.push(field.sourceFieldName);
-                        }
-                    }
-                }
-                assignedFields.push(key);
-            } else {
-                // TODO: Should extra keys in data be a warning or ignored?
-                console.warn(
-                    `Received value for key ${key}. No such field exists on ${this._model.name}`
-                );
-            }
-        }
-        // Sort fields so consistent order; primarily as it makes testing easier
-        assignedFields.sort();
-        this._assignedFields = assignedFields;
-        this._data = freezeObject(assignedData);
-
-        return this;
-    }
-
-    if (options.baseClass) {
-        // TODO: Not entirely sure what's correct here. setPrototypeOf made it such that static properties
-        // from base class were also available. Object.create made instanceof work properly.
-        Object.setPrototypeOf(_Base, options.baseClass);
-        _Base.prototype = Object.create(options.baseClass.prototype);
-    }
-
-    _Base[IS_VIEW_MODEL] = true;
-
-    // Extend prototype to include required static properties/methods
-    const properties = {
-        _model: {
-            get(): typeof _Base {
-                return Object.getPrototypeOf(this).constructor;
-            },
-        },
-        _key: {
-            get(): PrimaryKey {
-                const { pkFieldName } = this._model;
-                if (Array.isArray(pkFieldName)) {
-                    return pkFieldName.reduce((acc, fieldName) => {
-                        acc[fieldName] = this[fieldName];
-                        return acc;
-                    }, {});
-                }
-                return this[pkFieldName];
-            },
-        },
-        toJS: {
-            value(): FieldDataMapping<FinalFields> {
-                const data = {};
-                for (const [fieldName, value] of Object.entries(this._data)) {
-                    data[fieldName] = this._model.fields[fieldName].toJS(value);
-                }
-                return data as FieldDataMapping<FinalFields>;
-            },
-        },
-        isEqual: {
-            value(record: ViewModelInterface<FieldsMapping, any> | null): boolean {
-                if (!record) {
-                    return false;
-                }
-                if (record._model !== this._model) {
-                    return false;
-                }
-                if (!isEqual(record._assignedFields, this._assignedFields)) {
-                    return false;
-                }
-                for (const fieldName of this._assignedFields) {
-                    const field = this._model.fields[fieldName];
-                    if (!field.isEqual(this[fieldName], record[fieldName])) {
-                        return false;
-                    }
-                }
-                return true;
-            },
-        },
-        clone: {
-            value<CloneFieldNames extends keyof FinalFields>(
-                fieldNames?: CloneFieldNames[] | FieldPath[]
-            ): ViewModelInterface<FinalFields, CloneFieldNames, PkFieldType, PkValueType> {
-                if (!fieldNames) {
-                    fieldNames = this._assignedFields;
-                }
-                const missingFieldNames: string[] = [];
-                const nestedToClone: Record<string, FieldPath[]> = {};
-                const nonRelatedFieldNames: string[] = [];
-                for (const pathElement of fieldNames as FieldPath[]) {
-                    if (typeof pathElement === 'string') {
-                        if (!this._assignedFields.includes(pathElement)) {
-                            missingFieldNames.push(pathElement);
-                        } else {
-                            nonRelatedFieldNames.push(pathElement);
-                        }
-                    } else {
-                        const [name, ...p] = pathElement;
-                        if (!nestedToClone[name]) {
-                            nestedToClone[name] = [];
-                        }
-                        if (p.length > 1) {
-                            // Nested fields - need to pass the whole array
-                            // eg. [user, group, id]
-                            nestedToClone[name].push(p);
-                        } else {
-                            // A specific field on this record
-                            // eg. [user, name]
-                            nestedToClone[name].push(p[0]);
-                        }
-                    }
-                }
-                const data: Record<string, any> = {};
-                const missingRelations: [string, string[]][] = [];
-                const assignedFields: string[] = [...this._assignedFields];
-                for (const [name, nestedFieldNames] of Object.entries(nestedToClone)) {
-                    if (!this._assignedFields.includes(name)) {
-                        missingFieldNames.push(name);
-                        missingRelations.push([name, flattenFieldPath(nestedFieldNames)]);
-                    } else {
-                        try {
-                            if (Array.isArray(this[name])) {
-                                data[name] = this[name].map(r => r.clone(nestedFieldNames));
-                            } else {
-                                data[name] = this[name].clone(nestedFieldNames);
-                            }
-                        } catch (err) {
-                            if (err instanceof MissingFieldsError) {
-                                assignedFields.push(
-                                    ...err.assignedFields.map(fieldName => `${name}.${fieldName}`)
-                                );
-                                missingFieldNames.push(
-                                    ...err.missingFieldNames.map(
-                                        fieldName => `${name}.${fieldName}`
-                                    )
-                                );
-                                missingRelations.push(
-                                    ...(err.missingRelations.map(
-                                        ([relationName, relationFieldNames]) => [
-                                            `${name}.${relationName}`,
-                                            relationFieldNames,
-                                        ]
-                                    ) as [string, string[]][])
-                                );
-                            } else {
-                                throw err;
-                            }
-                        }
-                    }
-                }
-                if (fieldNames && missingFieldNames.length > 0) {
-                    throw new MissingFieldsError(
-                        this,
-                        assignedFields,
-                        fieldNames as FieldPath[],
-                        missingFieldNames,
-                        missingRelations
-                    );
-                }
-
-                for (const fieldName of nonRelatedFieldNames) {
-                    // TODO: Unclear to me if this needs to call a method on the Field on not. Revisit this.
-                    data[fieldName as string] = this[fieldName];
-                }
-
-                // Always clone primary keys
-                const pkFieldNames = this._model.pkFieldNames;
-                pkFieldNames.forEach(name => (data[name] = this[name]));
-
-                return new this._model(data);
-            },
-        },
-        _f: {
-            /**
-             * Get fields bound to this record instance. Each field behaves the same as accessing it via ViewModel.fields but
-             * has a `value` property that contains the value for that field on this record.
-             *
-             * This is useful when you need to know both the field on the ViewModel and the value on a record (eg. when formatting
-             * a value from a record
-             *
-             * ```js
-             * const user = new User({ name: 'Jon Snow' });
-             * user.name
-             * // Jon Snow
-             * user._f.name
-             * // CharField({ name: 'name', label: 'Label' });
-             * user._f.name.value
-             * // Jon Snow
-             * ```
-             */
-
-            get<IncomingData extends FieldDataMappingRaw<FinalFields>>(): {
-                readonly [K in Extract<keyof IncomingData, keyof FinalFields>]: RecordBoundField<
-                    FinalFields[K]['__fieldValueType'],
-                    FinalFields[K]['__parsableValueType']
-                >;
-            } {
-                if (!this.__recordBoundFields) {
-                    const { fields } = this._model;
-                    const { _data } = this;
-                    // eslint-disable-next-line @typescript-eslint/no-this-alias
-                    const record = this;
-                    this.__recordBoundFields = this._assignedFields.reduce((acc, fieldName) => {
-                        acc[fieldName] = new Proxy(fields[fieldName], {
-                            get(target, prop): any {
-                                if (prop === 'value') {
-                                    return _data[fieldName];
-                                }
-                                if (prop === 'isBound') {
-                                    return true;
-                                }
-                                if (prop === 'boundRecord') {
-                                    return record;
-                                }
-                                return target[prop];
-                            },
-                        });
-                        return acc;
-                    }, {});
-                }
-                return this.__recordBoundFields;
-            },
-        },
-    };
-    // Build getter/setter for all known fields. Note that we need to do this in _bindFields below as well in the
-    // case that primary key fields are created.
-    Object.keys(fields).forEach(fieldName => {
-        properties[fieldName] = buildFieldGetterSetter(fieldName);
-    });
-    Object.defineProperties(_Base.prototype, properties);
-
     // Store bound fields and primary key name for all models in the hierarchy
     const boundFields: Map<
-        ViewModelConstructor<FinalFields>,
-        [FinalFields, string | string[]]
+        ViewModelConstructor<FieldMappingType, PkFieldNameT>,
+        FieldMappingType
     > = new Map();
 
     /**
@@ -1228,120 +1090,63 @@ export default function viewModelFactory<T extends FieldsMapping>(
      * The return value is a 2-tuple of the field mapping object and the primary key name(s).
      */
     function _bindFields(
-        modelClass: ViewModelConstructor<FinalFields>
-    ): [FinalFields, string | string[]] {
+        modelClass: ViewModelConstructor<FieldMappingType, PkFieldNameT>
+    ): FieldMappingType {
         let f = boundFields.get(modelClass);
         if (!f) {
             const toBind = { ...fields };
-            let { getImplicitPkField } = options;
-            let finalPkFieldName;
-
-            // If a primary key wasn't explicitly provided we need to create one
-            if (!options.pkFieldName || getImplicitPkField) {
-                if (!getImplicitPkField) {
-                    getImplicitPkField = defaultGetImplicitPkField;
-                }
-                const [pkFieldName, pkField] = getImplicitPkField(modelClass, fields);
-                const extraFields = {};
-                if (Array.isArray(pkFieldName) && Array.isArray(pkField)) {
-                    if (pkFieldName.length !== pkField.length) {
-                        throw new Error(
-                            `When defining a compound key both the name and field definition must be an array of the same size. Received ${pkFieldName} and ${pkField}.`
-                        );
-                    }
-                    pkFieldName.forEach((fieldName, i) => {
-                        if (!modelClass.prototype.hasOwnProperty(fieldName)) {
-                            extraFields[fieldName] = pkField[i];
-                        }
-                    });
-                } else {
-                    if (Array.isArray(pkFieldName) || Array.isArray(pkField)) {
-                        throw new Error(
-                            `When defining a compound key both the name and field definition must be an array. Received ${pkFieldName} and ${pkField}.`
-                        );
-                    }
-                    if (!modelClass.prototype.hasOwnProperty(pkFieldName)) {
-                        extraFields[pkFieldName] = pkField;
-                    }
-                }
-                if (Object.keys(extraFields).length > 0) {
-                    Object.keys(extraFields).map(fieldName => {
-                        Object.defineProperty(
-                            modelClass.prototype,
-                            fieldName,
-                            buildFieldGetterSetter(fieldName)
-                        );
-                    });
-                    checkReservedFieldNames(extraFields);
-                    Object.assign(toBind, extraFields);
-                }
-                finalPkFieldName = pkFieldName;
-            } else {
-                finalPkFieldName = options.pkFieldName;
-            }
-            const pkFieldNames = Array.isArray(finalPkFieldName)
-                ? finalPkFieldName
-                : [finalPkFieldName];
-            const missingFields = pkFieldNames.filter(fieldName => !toBind[fieldName]);
+            const missingFields = modelClass.pkFieldNames.filter(fieldName => !toBind[fieldName]);
             if (missingFields.length > 0) {
                 throw new Error(
-                    `${modelClass.name} has 'pkFieldName' set to '${pkFieldNames.join(
+                    `${modelClass.name} has 'pkFieldName' set to '${modelClass.pkFieldNames.join(
                         ', '
                     )}' but the field(s) '${missingFields.join(
                         ', '
                     )}' does not exist in 'fields'. Either add the missing field(s) or update 'pkFieldName' to reflect the actual primary key field.`
                 );
             }
-            f = [
-                bindFields<FinalFields>(
-                    toBind as FinalFields,
-                    modelClass as ViewModelConstructor<FinalFields>
-                ),
-                finalPkFieldName,
-            ];
-            boundFields.set(modelClass as ViewModelConstructor<FinalFields>, f);
-            Object.values(f[0]).forEach(field => field.contributeToClass(modelClass));
+            f = bindFields(toBind, modelClass);
+            boundFields.set(modelClass, f);
+            Object.values(f).forEach(field => field.contributeToClass(modelClass));
         }
         return f;
     }
 
-    if (!options.baseClass) {
-        defineRequiredGetter(
-            _Base,
-            'label',
-            "You must define a static property 'label' on your class"
-        );
-        defineRequiredGetter(
-            _Base,
-            'labelPlural',
-            "You must define a static property 'labelPlural' on your class"
-        );
-    }
+    const baseClass = options.baseClass ?? BaseViewModel;
+
+    const _Base = class extends baseClass<FieldMappingType, PkFieldNameT> {};
 
     Object.defineProperties(_Base, {
         __cache: {
             value: new Map<
-                ViewModelConstructor<FinalFields>,
-                ViewModelCache<ViewModelConstructor<FinalFields, PkFieldType, PkValueType>>
+                ViewModelConstructor<FieldMappingType, PkFieldNameT>,
+                ViewModelCache<ViewModelConstructor<FieldMappingType, PkFieldNameT>>
             >(),
+        },
+        pkFieldName: {
+            get(): PkFieldNameT {
+                return options.pkFieldName;
+            },
         },
         pkFieldNames: {
             /**
              * Shortcut to get pkFieldName as an array always, even for non-compound keys
              */
-            get(): Extract<keyof FinalFields, string>[] {
+            get(): PkFieldNameT extends string
+                ? [PkFieldNameT]
+                : UnionToTuple<PkFieldNameT[number]> {
                 const pkFieldNames = this.pkFieldName;
-                if (!Array.isArray(pkFieldNames)) {
+                if (typeof pkFieldNames == 'string') {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
                     return [pkFieldNames];
                 }
                 return pkFieldNames;
             },
         },
-        pkFieldName: {
-            get(): string | string[] {
-                // We need to ensure fields are bound in case getImplicitPkField creates
-                // a dynamic field name
-                return _bindFields(this)[1];
+        fields: {
+            get(): FieldMappingType {
+                return _bindFields(this);
             },
         },
         fieldNames: {
@@ -1351,7 +1156,13 @@ export default function viewModelFactory<T extends FieldsMapping>(
             },
         },
         getField: {
-            value(fieldName: FieldPath): Field<any> {
+            value(
+                fieldName: FieldPath<
+                    ViewModelConstructor<FieldMappingType, PkFieldNameT>,
+                    ExtractRelatedFields<ViewModelConstructor<FieldMappingType, PkFieldNameT>>
+                >
+                // TODO: can we extract the precise field?
+            ): Field<any> {
                 const [first, ...parts] = Array.isArray(fieldName) ? fieldName : [fieldName];
                 const firstField = this.fields[first];
                 if (!firstField) {
@@ -1400,13 +1211,8 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 return lastModel.fields[last];
             },
         },
-        fields: {
-            get(): FinalFields {
-                return _bindFields(this)[0];
-            },
-        },
         cache: {
-            get(): ViewModelCache<ViewModelConstructor<FinalFields, PkFieldType, PkValueType>> {
+            get(): ViewModelCache<ViewModelConstructor<FieldMappingType, PkFieldNameT>> {
                 // This is a getter so we can instantiate cache on each ViewModel independently without
                 // having to have the descendant create the cache
                 let cache = this.__cache.get(this);
@@ -1416,9 +1222,7 @@ export default function viewModelFactory<T extends FieldsMapping>(
                 }
                 return cache;
             },
-            set(
-                value: ViewModelCache<ViewModelConstructor<FinalFields, PkFieldType, PkValueType>>
-            ): void {
+            set(value: ViewModelCache<ViewModelConstructor<FieldMappingType, PkFieldNameT>>): void {
                 if (!(value instanceof ViewModelCache)) {
                     throw new Error(
                         `cache class must extend ViewModelCache. See ${this.name}.cache`
@@ -1434,10 +1238,23 @@ export default function viewModelFactory<T extends FieldsMapping>(
         },
     });
 
-    function augment<T extends FieldsMappingOrNull<FinalFields>>(
+    // Build getter/setter for all known fields. Note that we need to do this in _bindFields below as well in the
+    // case that primary key fields are created.
+    const properties: Record<string, any> = {};
+    Object.keys(fields).forEach(fieldName => {
+        properties[fieldName] = buildFieldGetterSetter(fieldName);
+    });
+    Object.defineProperties(_Base.prototype, properties);
+
+    function augment<
+        T extends FieldsMappingOrNull<FieldMappingType>,
+        AugmentPkFieldType extends ViewModelPkFieldType<AugmentFields<FieldMappingType, T>>
+    >(
         newFields: T,
-        newOptions?: ViewModelOptions<AugmentFields<FinalFields, T>>
-    ): ViewModelConstructor<AugmentFields<FinalFields, T>, PkFieldType, PkValueType> {
+        newOptions?: Partial<
+            ViewModelOptions<AugmentFields<FieldMappingType, T>, AugmentPkFieldType>
+        >
+    ): ViewModelConstructor<AugmentFields<FieldMappingType, T>, AugmentPkFieldType> {
         const f: FieldsMapping = {
             ...fields,
         };
@@ -1453,15 +1270,412 @@ export default function viewModelFactory<T extends FieldsMapping>(
             ...newOptions,
             baseClass: this,
         };
-        // Can't work this out, not a big deal as internal function anyway (main definition is on ViewModelConstructor)
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        return viewModelFactory(f, finalOptions);
+        return viewModelFactory(
+            f as AugmentFields<FieldMappingType, T>,
+            finalOptions as ViewModelOptions<AugmentFields<FieldMappingType, T>, AugmentPkFieldType>
+        );
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     _Base.augment = augment;
-    return (_Base as unknown) as ViewModelConstructor<FinalFields, PkFieldType, PkValueType>;
+
+    if (!options.baseClass) {
+        defineRequiredGetter(
+            _Base,
+            'label',
+            "You must define a static property 'label' on your class"
+        );
+        defineRequiredGetter(
+            _Base,
+            'labelPlural',
+            "You must define a static property 'labelPlural' on your class"
+        );
+    }
+
+    return _Base as unknown as ViewModelConstructor<FieldMappingType, PkFieldNameT>;
 }
+
+// const BaseUser = viewModelFactory(
+//     {
+//         id: new Field<number>(),
+//         firstName: new Field<string>(),
+//         age: new Field<number>(),
+//     },
+//     { pkFieldName: 'id' }
+// );
+// class User extends BaseUser {
+//     getYourStuff(): number {
+//         return 5;
+//     }
+// }
+//
+// interface ExtendedViewModel<
+//     Extended extends ViewModelConstructor<any, any>,
+//     D extends ViewModelInterfaceInputData<Extended['fields'], Extended['pkFieldName']>
+// > {
+//     new (data: D): Pick<
+//         InstanceType<Extended>,
+//         Exclude<
+//             keyof InstanceType<Extended>,
+//             | keyof Extended['fields']
+//             | keyof ViewModelInterface<
+//                   Extended['fields'],
+//                   Extended['pkFieldName'],
+//                   Extract<keyof D, string>
+//               >
+//         >
+//     > &
+//         ViewModelInterface<Extended['fields'], Extended['pkFieldName'], Extract<keyof D, string>>;
+// }
+// // class NewUser<D extends ViewModelInterfaceInputData<typeof User['fields'], typeof User['pkFieldName']>> extends User implements ExtendedViewModel<typeof User, D> {
+// class NewUser extends User {
+//     getName(): string {
+//         return this.firstName;
+//     }
+//     getMore(): void {
+//         // asdf
+//     }
+//     static blah = 5;
+//     static getBlah(): number {
+//         return this.blah;
+//     }
+// }
+// {
+//     const a: ViewModelConstructor<any, any> = User;
+//     const b: ViewModelConstructor<any, any> = NewUser;
+//     const c: ViewModelInterface<any, any> = new NewUser({ id: 5, firstName: 'string' });
+// }
+//
+// // new NewUser({ firstName: 'string' });
+// // new NewUser({ id: 5, firstName: 'string' });
+// //
+// // const User33 = viewModelFactory(
+// //     {
+// //         userId: new Field<number>(),
+// //         firstName: new Field<string>(),
+// //         age: new Field<number>(),
+// //     },
+// //     { pkFieldName: 'userId' }
+// // );
+// //
+// // const uu = new User33({ userId: 5, firstName: 'string' });
+// // uu.age;
+// // type LLOL = typeof uu._key;
+// //
+// // const UserCompound = viewModelFactory(
+// //     {
+// //         userId: new Field<number>(),
+// //         userId2: new Field<string>(),
+// //         firstName: new Field<string>(),
+// //         age: new Field<number>(),
+// //     },
+// //     { pkFieldName: ['userId', 'userId2'] }
+// // );
+// // type W = typeof UserCompound.pkFieldNames;
+// // const dsf: W = ['userId', 'userId2'];
+// //
+// // const uc = new UserCompound({ userId: 1, userId2: '2', firstName: 'string' });
+// // type ROFL = typeof uc._key;
+// //
+// // type X = ConstructorParameters<typeof UserCompound>;
+// // type YYY = ConstructorParameters<typeof User33>;
+// //
+// // type FieldNameMa = typeof UserCompound['fields'];
+// // type PkFieldType = Extract<keyof FieldNameMa, string>[];
+// // type MMM = keyof FieldNameMa;
+// // type WOW = {
+// //     [K in keyof FieldNameMa as K extends PkFieldType[0]
+// //         ? K
+// //         : never]: FieldNameMa[K]['__parsableValueType'];
+// // };
+// //
+// // // class User extends ViewModel<typeof fields, 'id'> {
+// // //     static label = "lol";
+// // //     static fields = fields;
+// // // }
+// //
+// // const data = { id: 1, age: 5 };
+// // {
+// //     const x = new BaseUser({ id: 1, age: 5 });
+// //     const y = x._data;
+// //     y.firstName;
+// //     y.id;
+// //     y.age;
+// //     x.age;
+// //     x.firstName;
+// //     x._assignedFields
+// // }
+// //
+// // {
+// //     const x = new User({ id: 1, age: 5 });
+// //     const y = x._data;
+// //     y.firstName;
+// //     y.id;
+// //     y.age;
+// //     x.age;
+// //     x.firstName;
+// // }
+// //
+// // {
+// //     const x = new NewUser({ id: 1, age: 5 });
+// //     x.getName();
+// //     x.getMore();
+// //     x.age;
+// //     const y = x._data;
+// //     y.firstName;
+// //     y.age;
+// //     x.age;
+// //     x.firstName;
+// // }
+// // {
+// //     type LOL = ViewModelInterfaceInputData<typeof NewUser['fields'], typeof NewUser['pkFieldName']>;
+// //     type BLAH = Extract<keyof LOL, string>;
+// //     type X = Pick<NewUser, 'getName'>;
+// //     type ExtendedViewModel<Extended extends ViewModelConstructor<any, any>> =
+// //         // Pick<
+// //         //     Extended,
+// //         //     keyof Extended
+// //         // > &
+// //         // Extended &
+// //         {
+// //             new <
+// //                 D extends ViewModelInterfaceInputData<Extended['fields'], Extended['pkFieldName']>
+// //             >(
+// //                 data: D
+// //             ): Pick<
+// //                 InstanceType<Extended>,
+// //                 Exclude<
+// //                     keyof InstanceType<Extended>,
+// //                     | keyof Extended['fields']
+// //                     | keyof ViewModelInterface<
+// //                           Extended['fields'],
+// //                           Extended['pkFieldName'],
+// //                           Extract<keyof D, string>
+// //                       >
+// //                 >
+// //             > &
+// //                 ViewModelInterface<
+// //                     Extended['fields'],
+// //                     Extended['pkFieldName'],
+// //                     Extract<keyof D, string>
+// //                 >;
+// //         } & Extended;
+// //     // const _NewUser = NewUser as Pick<typeof NewUser, keyof typeof NewUser> & ({ new<
+// //     //         D extends
+// //     //             ViewModelInterfaceInputData<typeof NewUser['fields'], typeof NewUser['pkFieldName']>
+// //     //         >(data: D): Pick<NewUser, Exclude<keyof NewUser, keyof typeof NewUser['fields'] | keyof ViewModelInterface<typeof NewUser['fields'], typeof NewUser['pkFieldName'], Extract<keyof D, string>>>> & ViewModelInterface<typeof NewUser['fields'], typeof NewUser['pkFieldName'], 'id'|'age'>
+// //     // });
+// //     const __NewUser = NewUser as ExtendedViewModel<typeof NewUser>;
+// //     const _NewUser = class extends NewUser {} as ExtendedViewModel<typeof NewUser>;
+// //     type OISDF = keyof typeof NewUser;
+// //     type IODFS8 = Pick<typeof NewUser, keyof typeof NewUser>;
+// //     _NewUser.pkFieldName;
+// //     _NewUser.pkFieldNames;
+// //     _NewUser.blah;
+// //     _NewUser.getBlah();
+// //     const x = new _NewUser({ id: 1, age: 5 });
+// //     x.getName();
+// //     x.getMore();
+// //     x.getYourStuff();
+// //     x.getSomewairjmaw();
+// //     x.age;
+// //     x.id;
+// //     const y = x._data;
+// //     y.firstName;
+// //     y.age;
+// //     y.id;
+// //     x.age;
+// //     x.firstName;
+// // }
+// //
+// // {
+// //     const X: ViewModelConstructor<any, any> = NewUser;
+// //     const x: BaseViewModel<any, any> = new NewUser({ id: 1 });
+// // }
+// //
+// // type Y = Pick<typeof User.fields, Extract<keyof typeof data, string>>;
+// // type ZZ = ViewModelFieldIndexer<Y>;
+// //
+// // type ExtractByValue<O, T> = { [P in keyof O as O[P] extends T ? P : never]: O[P] };
+// //
+// // // type FieldPathNewest3<
+// // //     B extends string[],
+// // //     T extends ViewModelConstructor<any, any>,
+// // //     R extends RelatedFields<T> = RelatedFields<T>
+// // //     > = (
+// // //     | [...B, keyof T['fields']]
+// // //     | (T['fields'][R] extends RelatedViewModelField<infer X>
+// // //     ? [...B, R,  ExtractFieldNames<X['fields']>]
+// // //     : never)
+// // //     )[];
+// // //
+// // // type FieldPathNewest2<
+// // //     B extends string[],
+// // //     T extends ViewModelConstructor<any, any>,
+// // //     R extends RelatedFields<T>
+// // //     > = (
+// // //     | [...B, keyof T['fields']]
+// // //     | (T['fields'][R] extends RelatedViewModelField<infer X>
+// // //     ? [...B, R, ExtractFieldNames<X['fields']>] | FieldPathNewest3<[...B, R], X,  RelatedFields<X>>// | FieldPath2<T, F, X, ExtractFieldNames<X>>
+// // //     : never)
+// // //     );
+// //
+// class Parent5 extends viewModelFactory(
+//     {
+//         id: new Field<string>(),
+//         parent5Name: new Field<string>(),
+//     },
+//     { pkFieldName: 'id' }
+// ) {}
+// class Parent4 extends viewModelFactory(
+//     {
+//         id: new Field<string>(),
+//         parent4Name: new Field<string>(),
+//         parent5: new RelatedViewModelField<typeof Parent5>({
+//             sourceFieldName: 'asdf',
+//             to: Parent5,
+//         }),
+//     },
+//     { pkFieldName: 'id' }
+// ) {}
+//
+// class Parent3 extends viewModelFactory(
+//     {
+//         id: new Field<string>(),
+//         parent3Name: new Field<string>(),
+//         parent4: new RelatedViewModelField<typeof Parent4>({
+//             sourceFieldName: 'asdf',
+//             to: Parent4,
+//         }),
+//     },
+//     { pkFieldName: 'id' }
+// ) {}
+//
+// class Parent2 extends viewModelFactory(
+//     {
+//         id: new Field<string>(),
+//         parent2Name: new Field<string>(),
+//         parent3: new RelatedViewModelField<typeof Parent3>({
+//             sourceFieldName: 'asdf',
+//             to: Parent3,
+//         }),
+//     },
+//     { pkFieldName: 'id' }
+// ) {}
+//
+// class Parent1 extends viewModelFactory(
+//     {
+//         id: new Field<string>(),
+//         parent1Name: new Field<string>(),
+//         parent2: new RelatedViewModelField({
+//             sourceFieldName: 'asdf',
+//             to: Parent2,
+//         }),
+//     },
+//     { pkFieldName: 'id' }
+// ) {}
+//
+// class Group extends viewModelFactory(
+//     {
+//         id: new Field<string>(),
+//         groupName: new Field<string>(),
+//         owner: new RelatedViewModelField<typeof User>({
+//             sourceFieldName: 'asdf',
+//             to: User,
+//         }),
+//         parent: new RelatedViewModelField<typeof Parent1>({
+//             sourceFieldName: 'asdf',
+//             to: Parent1,
+//         }),
+//     },
+//     { pkFieldName: 'id' }
+// ) {
+//     getName(): string {
+//         return this.groupName;
+//     }
+// }
+// class Address extends viewModelFactory(
+//     {
+//         id: new Field<string>(),
+//         address1: new Field<string>(),
+//         postcode: new Field<string>(),
+//         addressGroup: new RelatedViewModelField<typeof Group>({
+//             sourceFieldName: 'asdf',
+//             to: Group,
+//         }),
+//     },
+//     { pkFieldName: 'id' }
+// ) {}
+// class User2 extends viewModelFactory(
+//     {
+//         id: new Field<string>(),
+//         firstName: new Field<string>(),
+//         groupId: new Field<number | null>(),
+//         group: new RelatedViewModelField<typeof Group>({
+//             sourceFieldName: 'asdf',
+//             to: Group,
+//         }),
+//         adminGroup: new RelatedViewModelField<typeof Group>({
+//             sourceFieldName: 'asdf',
+//             to: Group,
+//         }),
+//         address: new RelatedViewModelField<typeof Address>({
+//             sourceFieldName: 'asdf',
+//             to: Address,
+//         }),
+//     },
+//     { pkFieldName: 'id' }
+// ) {
+//     getName(): string {
+//         return this.firstName;
+//     }
+// }
+// //
+// // // Ummm.. get Field is for a single field!
+// // User2.getField(['firstName', ['group', 'groupName'], ['group', 'owner']]);
+// //
+// // // type XX = ExtractRelatedFields<typeof User2>
+// // // type X = FieldPathNewest<typeof User2>
+// // // type Z =  FieldPathNewest<typeof Group, ExtractRelatedFields<typeof Group>>
+// // // type YY = NestedFieldNames<ExtractRelatedFields<typeof User2>>
+// // //
+// {
+//     type X = FieldPath<typeof User2>[];
+//     const x: X = ['firstName', 'groupId', ['adminGroup', 'owner'], ['address', 'postcode']];
+//     const y: X = [
+//         'firstName',
+//         ['group', 'owner', 'age'],
+//         ['address', 'addressGroup', 'owner', 'firstName'],
+//     ];
+//     const z: X = [
+//         'firstName',
+//         ['group', 'owner', 'age'],
+//         ['address', 'addressGroup', 'owner', 'firstName'],
+//         ['address', 'addressGroup', 'parent', 'parent1Name'],
+//         ['address', 'addressGroup', 'parent', 'parent2', 'parent2Name'],
+//         ['address', 'addressGroup', 'parent', 'parent2', 'parent3'],
+//         ['address', 'addressGroup', 'parent', 'parent2', 'parent3', 'parent4'],
+//         [
+//             'address',
+//             'addressGroup',
+//             'parent',
+//             'parent2',
+//             'parent3',
+//             'parent4',
+//             'parent5',
+//             'parent5Name',
+//         ],
+//     ];
+//     const xx: X = ['firstName', ['group', '*']];
+//
+// }
+// // //
+// // // type ValueOf<T> = T[keyof T]
+// // //
+// // // type NestedFieldNames<X extends Record<string, ViewModelConstructor<any, any>>> = ValueOf<{
+// // //     [K in keyof X]: ValueOf<{[J in keyof X[K]['fields']]: [K, J] |(X[K]['fields'][J] extends RelatedViewModelField<infer X> ? [K, J, keyof X['fields']] : never)}>
+// // // }>
 
 /**
  * Type to describe values of an instance of ViewModel
@@ -1477,15 +1691,14 @@ export default function viewModelFactory<T extends FieldsMapping>(
  * ```
  */
 export type ViewModelValues<
-    T extends ViewModelConstructor<any>,
+    T extends ViewModelConstructor<any, any>,
     FieldNames extends keyof T['fields'] = keyof T['fields'],
     OptionalFieldNames extends keyof T['fields'] = keyof T['fields']
 > = {
     [K in Extract<keyof T['fields'], FieldNames>]: T['fields'][K]['__fieldValueType'];
-} &
-    {
-        [K in Extract<keyof T['fields'], OptionalFieldNames>]?: T['fields'][K]['__fieldValueType'];
-    };
+} & {
+    [K in Extract<keyof T['fields'], OptionalFieldNames>]?: T['fields'][K]['__fieldValueType'];
+};
 
 /**
  * Type to describe a ViewModel instance with only some of the fields set
@@ -1501,7 +1714,18 @@ export type ViewModelValues<
  * ```
  */
 export type PartialViewModel<
-    T extends ViewModelConstructor<any>,
-    FieldNames extends keyof T['fields']
+    T extends ViewModelConstructor<any, any>,
+    FieldNames extends ExtractFieldNames<T['fields']>
 > = InstanceType<T> &
-    ViewModelInterface<T['fields'], FieldNames, T['__pkFieldType'], T['__pkType']>;
+    ViewModelInterface<
+        T['fields'],
+        T['pkFieldName'],
+        FieldNames | (T['pkFieldName'] extends string ? T['pkFieldName'] : T['pkFieldName'][number])
+    >;
+
+// TODO: ^ make this work and always include the pk field names
+
+export type ExtractPkFieldParseableValueType<T extends ViewModelConstructor<any, any>> =
+    T['pkFieldName'] extends string
+        ? T['fields'][T['pkFieldName']]['__parsableValueType']
+        : { [K in T['pkFieldNames']]: T['fields'][K]['__parsableValueType'] };

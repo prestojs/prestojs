@@ -1,9 +1,9 @@
 import { Field, viewModelFactory } from '@prestojs/viewmodel';
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
+import FieldFormatter from '../FieldFormatter';
 
 import UiProvider from '../UiProvider';
-import FieldFormatter from '../FieldFormatter';
 
 test('FieldFormatter should support record bound fields or passing value direct', () => {
     function DefaultFormatter({ value }): React.ReactElement {
@@ -26,10 +26,14 @@ test('FieldFormatter should support record bound fields or passing value direct'
         );
     }
 
-    class A extends viewModelFactory({
-        field1: new Field(),
-        field2: new Field(),
-    }) {}
+    class A extends viewModelFactory(
+        {
+            id: new Field(),
+            field1: new Field(),
+            field2: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     const record = new A({ id: 1, field1: 'normal', field2: 'special' });
 
     const { rerender, container } = render(<TestWrapper field={record._f.field1} />);

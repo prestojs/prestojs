@@ -19,60 +19,87 @@ declare global {
 describe('RelatedViewModelField', () => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     function createTestModels(circular = false, promise = false) {
-        class Group extends viewModelFactory({
-            name: new Field<string>(),
-            ...(circular
-                ? {
-                      ownerId: new Field<number>(),
-                      owner: new RelatedViewModelField({
-                          // Type here isn't typeof User as it seemed to confuse typescript.. I guess
-                          // because of the circular reference
-                          to: promise
-                              ? // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                                (): Promise<ViewModelConstructor<any>> => Promise.resolve(User)
-                              : // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                                (): ViewModelConstructor<any> => User,
-                          sourceFieldName: 'ownerId',
-                      }),
-                  }
-                : {}),
-        }) {}
-        class User extends viewModelFactory({
-            name: new Field<string>(),
-            groupId: new Field<number | null>(),
-            group: new RelatedViewModelField({
-                to: promise ? (): Promise<typeof Group> => Promise.resolve(Group) : Group,
-                sourceFieldName: 'groupId',
-            }),
-        }) {}
-        class Subscription extends viewModelFactory({
-            userId: new Field<number>(),
-            user: new RelatedViewModelField<typeof User>({
-                to: promise ? (): Promise<typeof User> => Promise.resolve(User) : User,
-                sourceFieldName: 'userId',
-            }),
-        }) {}
+        class Group extends viewModelFactory(
+            {
+                id: new Field<number>(),
+                name: new Field<string>(),
+                ...(circular
+                    ? {
+                          ownerId: new Field<number>(),
+                          owner: new RelatedViewModelField({
+                              // Type here isn't typeof User as it seemed to confuse typescript.. I guess
+                              // because of the circular reference
+                              to: promise
+                                  ? (): Promise<ViewModelConstructor<any, any>> =>
+                                        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                                        Promise.resolve(User)
+                                  : // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                                    (): ViewModelConstructor<any, any> => User,
+                              sourceFieldName: 'ownerId',
+                          }),
+                      }
+                    : {}),
+            },
+            { pkFieldName: 'id' }
+        ) {}
+        class User extends viewModelFactory(
+            {
+                id: new Field<number>(),
+                name: new Field<string>(),
+                groupId: new Field<number | null>(),
+                group: new RelatedViewModelField({
+                    to: promise ? (): Promise<typeof Group> => Promise.resolve(Group) : Group,
+                    sourceFieldName: 'groupId',
+                }),
+            },
+            { pkFieldName: 'id' }
+        ) {}
+        class Subscription extends viewModelFactory(
+            {
+                id: new Field<number>(),
+                userId: new Field<number>(),
+                user: new RelatedViewModelField<typeof User>({
+                    to: promise ? (): Promise<typeof User> => Promise.resolve(User) : User,
+                    sourceFieldName: 'userId',
+                }),
+            },
+            { pkFieldName: 'id' }
+        ) {}
         return { User, Group, Subscription };
     }
 
     test('should validate sourceFieldName', () => {
-        const User = viewModelFactory({});
+        const User = viewModelFactory(
+            {
+                id: new Field<number>(),
+            },
+            { pkFieldName: 'id' }
+        );
         expect(() => {
-            viewModelFactory({
+            viewModelFactory(
+                {
+                    id: new Field<number>(),
+                    user: new RelatedViewModelField({
+                        to: (): Promise<typeof User> => Promise.resolve(User),
+                        sourceFieldName: 'userId',
+                    }),
+                },
+                { pkFieldName: 'id' }
+            ).fields;
+        }).toThrow(/'userId' does not exist on/);
+
+        viewModelFactory(
+            {
+                id: new Field<number>(),
+
+                userId: new Field<number>(),
                 user: new RelatedViewModelField({
                     to: (): Promise<typeof User> => Promise.resolve(User),
                     sourceFieldName: 'userId',
                 }),
-            }).fields;
-        }).toThrow(/'userId' does not exist on/);
-
-        viewModelFactory({
-            userId: new Field<number>(),
-            user: new RelatedViewModelField({
-                to: (): Promise<typeof User> => Promise.resolve(User),
-                sourceFieldName: 'userId',
-            }),
-        });
+            },
+            { pkFieldName: 'id' }
+        );
     });
 
     test('creating with nested data should populate sourceFieldName', async () => {
@@ -127,6 +154,8 @@ describe('RelatedViewModelField', () => {
             );
             // Another level...
             expect(
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore Recursive types cause problems
                 User.cache.get(1, [
                     'name',
                     ['group', 'name'],
@@ -156,6 +185,8 @@ describe('RelatedViewModelField', () => {
                 })
             );
             expect(
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore Recursive types cause problems
                 User.cache.get(1, [
                     'name',
                     ['group', 'name'],
@@ -281,39 +312,52 @@ describe('RelatedViewModelField', () => {
 describe('ManyRelatedViewModelField', () => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     function createTestModels(circular = false, promise = false) {
-        class Group extends viewModelFactory({
-            name: new Field<string>(),
-            ...(circular
-                ? {
-                      ownerId: new Field<number>(),
-                      owner: new RelatedViewModelField({
-                          // Type here isn't typeof User as it seemed to confuse typescript.. I guess
-                          // because of the circular reference
-                          to: promise
-                              ? // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                                (): Promise<ViewModelConstructor<any>> => Promise.resolve(User)
-                              : // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                                (): ViewModelConstructor<any> => User,
-                          sourceFieldName: 'ownerId',
-                      }),
-                  }
-                : {}),
-        }) {}
-        class User extends viewModelFactory({
-            name: new Field<string>(),
-            groupIds: new ListField({ childField: new Field<number | null>() }),
-            groups: new ManyRelatedViewModelField({
-                to: promise ? (): Promise<typeof Group> => Promise.resolve(Group) : Group,
-                sourceFieldName: 'groupIds',
-            }),
-        }) {}
-        class Subscription extends viewModelFactory({
-            userId: new Field<number>(),
-            user: new RelatedViewModelField<typeof User>({
-                to: promise ? (): Promise<typeof User> => Promise.resolve(User) : User,
-                sourceFieldName: 'userId',
-            }),
-        }) {}
+        class Group extends viewModelFactory(
+            {
+                id: new Field<number>(),
+                name: new Field<string>(),
+                ...(circular
+                    ? {
+                          ownerId: new Field<number>(),
+                          owner: new RelatedViewModelField({
+                              // Type here isn't typeof User as it seemed to confuse typescript.. I guess
+                              // because of the circular reference
+                              to: promise
+                                  ? (): Promise<ViewModelConstructor<any, any>> =>
+                                        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                                        Promise.resolve(User)
+                                  : // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                                    (): ViewModelConstructor<any, any> => User,
+                              sourceFieldName: 'ownerId',
+                          }),
+                      }
+                    : {}),
+            },
+            { pkFieldName: 'id' }
+        ) {}
+        class User extends viewModelFactory(
+            {
+                id: new Field<number>(),
+                name: new Field<string>(),
+                groupIds: new ListField({ childField: new Field<number | null>() }),
+                groups: new ManyRelatedViewModelField({
+                    to: promise ? (): Promise<typeof Group> => Promise.resolve(Group) : Group,
+                    sourceFieldName: 'groupIds',
+                }),
+            },
+            { pkFieldName: 'id' }
+        ) {}
+        class Subscription extends viewModelFactory(
+            {
+                id: new Field<number>(),
+                userId: new Field<number>(),
+                user: new RelatedViewModelField<typeof User>({
+                    to: promise ? (): Promise<typeof User> => Promise.resolve(User) : User,
+                    sourceFieldName: 'userId',
+                }),
+            },
+            { pkFieldName: 'id' }
+        ) {}
         return { User, Group, Subscription };
     }
 
@@ -543,18 +587,27 @@ describe('ManyRelatedViewModelField', () => {
 });
 
 test('should cache records with empty ManyRelatedViewModelFields', () => {
-    class Test1 extends viewModelFactory({
-        name: new CharField(),
-    }) {}
-    class Test2 extends viewModelFactory({
-        records: new ManyRelatedViewModelField({
-            to: Test1,
-            sourceFieldName: 'recordIds',
-        }),
-        recordIds: new ListField({
-            childField: new IntegerField(),
-        }),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field<number>(),
+
+            name: new CharField(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            records: new ManyRelatedViewModelField({
+                to: Test1,
+                sourceFieldName: 'recordIds',
+            }),
+            recordIds: new ListField({
+                childField: new IntegerField(),
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test2({ id: 5, records: [{ id: 1, name: 'Test1' }] });
     expect(new Set(record1._assignedFields)).toEqual(new Set(['id', 'records', 'recordIds']));
@@ -572,18 +625,26 @@ test('should cache records with empty ManyRelatedViewModelFields', () => {
 });
 
 test('should not break when related records are deleted', () => {
-    class Test1 extends viewModelFactory({
-        name: new CharField(),
-    }) {}
-    class Test2 extends viewModelFactory({
-        records: new ManyRelatedViewModelField({
-            to: Test1,
-            sourceFieldName: 'recordIds',
-        }),
-        recordIds: new ListField({
-            childField: new IntegerField(),
-        }),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new CharField(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            records: new ManyRelatedViewModelField({
+                to: Test1,
+                sourceFieldName: 'recordIds',
+            }),
+            recordIds: new ListField({
+                childField: new IntegerField(),
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test2({
         id: 5,
@@ -605,28 +666,40 @@ test('should not break when related records are deleted', () => {
 });
 
 test('should use correct cache key for nested related records', () => {
-    class Test1 extends viewModelFactory({
-        name: new CharField(),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new CharField(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
-    class Test2 extends viewModelFactory({
-        name: new CharField(),
-        record: new RelatedViewModelField({
-            to: Test1,
-            sourceFieldName: 'recordId',
-        }),
-        recordId: new IntegerField(),
-    }) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new CharField(),
+            record: new RelatedViewModelField({
+                to: Test1,
+                sourceFieldName: 'recordId',
+            }),
+            recordId: new IntegerField(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
-    class Test3 extends viewModelFactory({
-        records: new ManyRelatedViewModelField({
-            to: Test2,
-            sourceFieldName: 'recordIds',
-        }),
-        recordIds: new ListField({
-            childField: new IntegerField(),
-        }),
-    }) {}
+    class Test3 extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            records: new ManyRelatedViewModelField({
+                to: Test2,
+                sourceFieldName: 'recordIds',
+            }),
+            recordIds: new ListField({
+                childField: new IntegerField(),
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test3({
         id: 3,
@@ -639,16 +712,24 @@ test('should use correct cache key for nested related records', () => {
 });
 
 test('should cache records with empty RelatedViewModelFields', () => {
-    class Test1 extends viewModelFactory({
-        name: new CharField(),
-    }) {}
-    class Test2 extends viewModelFactory({
-        record: new RelatedViewModelField({
-            to: Test1,
-            sourceFieldName: 'recordId',
-        }),
-        recordId: new IntegerField(),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new CharField(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            record: new RelatedViewModelField({
+                to: Test1,
+                sourceFieldName: 'recordId',
+            }),
+            recordId: new IntegerField(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test2({ id: 5, record: { id: 1, name: 'Test1' } });
     expect(new Set(record1._assignedFields)).toEqual(new Set(['id', 'record', 'recordId']));

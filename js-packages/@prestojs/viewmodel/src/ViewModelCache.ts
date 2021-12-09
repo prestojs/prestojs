@@ -4,6 +4,8 @@ import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
 import { isDev } from './util';
 import {
     expandRelationFieldPaths,
+    ExtractFieldNames,
+    ExtractPkFieldParseableValueType,
     FieldDataMappingRaw,
     FieldPath,
     flattenFieldPath,
@@ -11,7 +13,6 @@ import {
     InvalidFieldError,
     isViewModelInstance,
     PartialViewModel,
-    PrimaryKey,
     ViewModelConstructor,
     ViewModelInterface,
 } from './ViewModelFactory';
@@ -46,7 +47,7 @@ function withEnableListeners<T>(run: () => T): T {
  * have to check if the _assignedFields is what we expect and then clone - it's easier and faster
  * to just check if it's an instanceof RecordPointer
  */
-class RecordPointer<ViewModelClassType extends ViewModelConstructor<any, any, any>> {
+class RecordPointer<ViewModelClassType extends ViewModelConstructor<any, any>> {
     /**
      * This is the value that was replaced by this pointer in the cache. When we actually clone
      * the record we compare against this value - if it's the same we return the original object
@@ -75,15 +76,17 @@ class RecordPointer<ViewModelClassType extends ViewModelConstructor<any, any, an
     }
 
     clone(
-        fieldNames: readonly (keyof ViewModelClassType['fields'])[]
+        fieldNames: readonly ExtractFieldNames<ViewModelClassType['fields']>[]
     ): PartialViewModel<ViewModelClassType, typeof fieldNames[number]>;
-    clone(fieldNames: FieldPath[]): InstanceType<ViewModelClassType>;
+    clone(fieldNames: FieldPath<ViewModelClassType>[]): InstanceType<ViewModelClassType>;
     clone(
-        fieldNames: readonly (keyof ViewModelClassType['fields'])[] | FieldPath[]
+        fieldNames:
+            | readonly ExtractFieldNames<ViewModelClassType['fields']>[]
+            | FieldPath<ViewModelClassType>[]
     ): ViewModelInterface<any, any> {
         // First clone existing record as list of field names may be a subset. When we compare
         // values below we need to only compare the specified fields.
-        const cloned = this.record.clone(fieldNames as FieldPath[]);
+        const cloned = this.record.clone(fieldNames as FieldPath<ViewModelClassType>[]);
         // Check if the value has actually changed from what it used to be. If not we can return
         // the old value so that equality checks still hold.
         if (this.currentCachedRecord && cloned.isEqual(this.currentCachedRecord)) {
@@ -93,7 +96,7 @@ class RecordPointer<ViewModelClassType extends ViewModelConstructor<any, any, an
     }
 }
 
-function isEqual<T extends ViewModelConstructor<any, any, any>>(
+function isEqual<T extends ViewModelConstructor<any, any>>(
     a: null | InstanceType<T> | RecordPointer<T>,
     b: null | InstanceType<T> | RecordPointer<T>
 ): boolean {
@@ -155,13 +158,14 @@ const CACHE_KEY_FIELD_SEPARATOR = '⁞';
 /**
  * Must be kept in sync with `reverseCacheKey`
  */
-function getFieldNameCacheKey(
-    fieldNames: readonly FieldPath[],
-    viewModel: ViewModelConstructor<any>
+function getFieldNameCacheKey<ViewModelClassType extends ViewModelConstructor<any, any>>(
+    fieldNames: readonly FieldPath<ViewModelClassType>[],
+    viewModel: ViewModelConstructor<any, any>
 ): string {
     const flatFieldNames = new Set<string>();
-    for (const path of fieldNames as FieldPath[]) {
+    for (const path of fieldNames as FieldPath<ViewModelClassType>[]) {
         if (typeof path === 'string') {
+            // TODO: Why did I do this check? It means if you just fetch the id field the key will be empty string
             if (!viewModel.pkFieldNames.includes(path)) {
                 flatFieldNames.add(path);
             }
@@ -188,7 +192,7 @@ function getFieldNameCacheKey(
                 // the value is set (it's just empty) and the `fieldNames` will be ['title', ['foreignKeys']]
                 // and so the path is to the related field itself (because there's no subfields set because
                 // it's null)
-                path.length === 1 ? path : path.slice(0, -1)
+                path.length === 1 ? path : (path.slice(0, -1) as FieldPath<any>)
             ) as BaseRelatedViewModelField<any, any, any>;
             if (!relatedField.to.pkFieldNames.includes(path[path.length - 1])) {
                 flatFieldNames.add(path.join('.'));
@@ -225,7 +229,7 @@ function getFieldNameCacheKey(
  *    and return it.
  * 4) Otherwise we return null
  **/
-class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>> {
+class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any>> {
     viewModel: ViewModelClassType;
     pkFieldNames: string[];
     cache: Map<
@@ -236,10 +240,14 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
     latestRecords: { [fieldsKey: string]: number };
     counter = 0;
     onAnyChange: () => void;
-    recordPk: PrimaryKey;
+    recordPk: ExtractPkFieldParseableValueType<ViewModelClassType>;
     relationListeners: Map<string, Map<FieldNameCacheKey, ChangeListenerUnsubscribe>>;
 
-    constructor(viewModel: ViewModelClassType, onAnyChange: () => void, pk: PrimaryKey) {
+    constructor(
+        viewModel: ViewModelClassType,
+        onAnyChange: () => void,
+        pk: ExtractPkFieldParseableValueType<ViewModelClassType>
+    ) {
         this.cache = new Map();
         this.cacheListeners = new Map();
         this.relationListeners = new Map();
@@ -255,10 +263,8 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
      *
      * Must be kept in sync with `reverseCacheKey`
      */
-    private getCacheKey(
-        fieldNames: readonly (keyof ViewModelClassType['fields'])[] | FieldPath[]
-    ): string {
-        return getFieldNameCacheKey(fieldNames as FieldPath[], this.viewModel);
+    private getCacheKey(fieldNames: FieldPath<ViewModelClassType>[]): string {
+        return getFieldNameCacheKey(fieldNames as FieldPath<ViewModelClassType>[], this.viewModel);
     }
 
     /**
@@ -266,14 +272,14 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
      *
      * Must be kept in sync with `getCacheKey`/`getFieldNameCacheKey`
      */
-    private reverseCacheKey(fieldsKey: string): FieldPath[] {
+    private reverseCacheKey(fieldsKey: string): FieldPath<ViewModelClassType>[] {
         return fieldsKey.split(CACHE_KEY_FIELD_SEPARATOR).map(fieldName => {
             const parts = fieldName.split('.');
             if (parts.length === 1) {
                 return parts[0];
             }
             return parts;
-        });
+        }) as FieldPath<ViewModelClassType>[];
     }
 
     /**
@@ -288,18 +294,23 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
      * @private
      */
     private getRelationFields(
-        fieldNames: FieldPath[],
+        fieldNames: FieldPath<ViewModelClassType>[],
         viewModel = this.viewModel
-    ): { relations: Record<string, FieldPath[]>; nonRelationFieldNames: string[] } {
-        const relations: Record<string, FieldPath[]> = {};
+    ): {
+        relations: Record<string, FieldPath<ViewModelClassType>[]>;
+        nonRelationFieldNames: string[];
+    } {
+        const relations: Record<string, FieldPath<ViewModelClassType>[]> = {};
         const nonRelationFieldNames: string[] = [];
-        for (const fieldName of fieldNames as FieldPath[]) {
+        for (const fieldName of fieldNames as FieldPath<ViewModelClassType>[]) {
             if (Array.isArray(fieldName)) {
                 relations[fieldName[0]] = relations[fieldName[0]] || [];
                 if (fieldName.length === 2) {
                     relations[fieldName[0]].push(fieldName[1]);
                 } else {
-                    relations[fieldName[0]].push(fieldName.slice(1));
+                    relations[fieldName[0]].push(
+                        fieldName.slice(1) as FieldPath<ViewModelClassType>
+                    );
                 }
             } else if (viewModel.fields[fieldName] instanceof BaseRelatedViewModelField) {
                 relations[fieldName] = relations[fieldName] || [];
@@ -308,6 +319,11 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                 if (!viewModel.pkFieldNames.includes(fieldName)) {
                     nonRelationFieldNames.push(fieldName);
                 }
+                // if (!viewModel.fields[fieldName]) {
+                //     console.warn(
+                //         `Unknown field ${fieldName}`
+                //     );
+                // }
             }
         }
         for (const [relationName, relationFieldNames] of Object.entries(relations)) {
@@ -417,8 +433,11 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
      *  - This ensure that updates to partial records involving both `group` and `groupId` are kept
      *    in sync
      */
-    addKeyPlaceholder(fieldNames: FieldPath[]): void {
-        fieldNames = expandRelationFieldPaths(this.viewModel, fieldNames as FieldPath[]);
+    addKeyPlaceholder(fieldNames: FieldPath<ViewModelClassType>[]): void {
+        fieldNames = expandRelationFieldPaths(
+            this.viewModel,
+            fieldNames as FieldPath<ViewModelClassType>[]
+        );
         const fieldsKey = this.getCacheKey(fieldNames);
         if (!this.cache.has(fieldsKey)) {
             this.cache.set(fieldsKey, null);
@@ -489,13 +508,12 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
     private createRecordForSubKey(
         record: InstanceType<ViewModelClassType> | RecordPointer<ViewModelClassType>,
         key: FieldNameCacheKey,
-        assignedFieldNames: FieldPath[]
+        assignedFieldNames: FieldPath<ViewModelClassType>[]
     ): InstanceType<ViewModelClassType> | RecordPointer<ViewModelClassType> | null {
         const fieldNames = flattenFieldPath(assignedFieldNames);
         const cacheFieldNames = this.reverseCacheKey(key);
-        const { nonRelationFieldNames: otherNonRelationFieldKeys } = this.getRelationFields(
-            fieldNames
-        );
+        const { nonRelationFieldNames: otherNonRelationFieldKeys } =
+            this.getRelationFields(assignedFieldNames);
         const { relations, nonRelationFieldNames } = this.getRelationFields(cacheFieldNames);
         if (isSubset(flattenFieldPath(cacheFieldNames), fieldNames)) {
             if (record instanceof RecordPointer) {
@@ -607,12 +625,11 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
     /**
      * Get the cached record for the specified field names
      */
+    get(fieldNames: FieldPath<ViewModelClassType>[]): InstanceType<ViewModelClassType> | null;
     get(
-        fieldNames: readonly (keyof ViewModelClassType['fields'])[]
-    ): PartialViewModel<ViewModelClassType, typeof fieldNames[number]> | null;
-    get(fieldNames: FieldPath[]): InstanceType<ViewModelClassType> | null;
-    get(
-        fieldNames: readonly (keyof ViewModelClassType['fields'])[] | FieldPath[]
+        fieldNames:
+            | readonly ExtractFieldNames<ViewModelClassType['fields']>[]
+            | FieldPath<ViewModelClassType>[]
     ): InstanceType<ViewModelClassType> | null {
         // Expand any related record paths so we cache on the actual field names. eg.
         // Imagine "group" is a RelatedViewModelField two fields, this gets expanded from
@@ -622,7 +639,10 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
         // So we always cache on the field names that will be returned. This simplifies
         // the implementation so don't need to worry about caching on explicit list of
         // all fields or the implicit version
-        fieldNames = expandRelationFieldPaths(this.viewModel, fieldNames as FieldPath[]);
+        fieldNames = expandRelationFieldPaths(
+            this.viewModel,
+            fieldNames as FieldPath<ViewModelClassType>[]
+        );
         const fieldsKey = this.getCacheKey(fieldNames);
         if (!this.cache.has(fieldsKey)) {
             // No cache entries exist but there may be cached records that
@@ -641,16 +661,14 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
                 const underlyingRecord = record instanceof RecordPointer ? record.record : record;
                 if (
                     isSubset(
-                        flattenFieldPath(fieldNames as FieldPath[]),
+                        flattenFieldPath(fieldNames as FieldPath<ViewModelClassType>[]),
                         flattenFieldPath(getAssignedFieldsDeep(underlyingRecord))
                     )
                 ) {
                     // Create a new record with subset of fields and cache
                     // it so that we maintain object equality if you fetch
                     // this entry from the cache multiple times
-                    const newRecord = record.clone(fieldNames as string[]) as InstanceType<
-                        ViewModelClassType
-                    >;
+                    const newRecord = record.clone(fieldNames) as InstanceType<ViewModelClassType>;
                     this.setValueForKey(fieldsKey, newRecord);
                     this.setupRelationListeners(newRecord, fieldsKey);
                     return newRecord;
@@ -662,7 +680,7 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
         if (recordOrPointer instanceof RecordPointer) {
             // If a pointer to a record with a superset of fields exists then
             // clone that record with just the fields requested.
-            const record = recordOrPointer.clone(fieldNames as FieldPath[]);
+            const record = recordOrPointer.clone(fieldNames as FieldPath<ViewModelClassType>[]);
             this.setValueForKey(fieldsKey, record);
             this.setupRelationListeners(record, fieldsKey);
             // Refetch the record from the cache - setValueForKey has optimisations to avoid using a new
@@ -706,7 +724,11 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
      *
      * Returns true if anything was deleted otherwise false
      */
-    delete(fieldNames?: readonly (keyof ViewModelClassType['fields'])[] | FieldPath[]): boolean {
+    delete(
+        fieldNames?:
+            | readonly ExtractFieldNames<ViewModelClassType['fields']>[]
+            | FieldPath<ViewModelClassType>[]
+    ): boolean {
         if (!fieldNames) {
             for (const key of this.cache.keys()) {
                 this.cleanupKey(key);
@@ -714,7 +736,7 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
             return true;
         }
         const fieldsKey = this.getCacheKey(
-            expandRelationFieldPaths(this.viewModel, fieldNames as FieldPath[])
+            expandRelationFieldPaths(this.viewModel, fieldNames as FieldPath<ViewModelClassType>[])
         );
         if (!this.cache.has(fieldsKey)) {
             return false;
@@ -729,19 +751,21 @@ class RecordCache<ViewModelClassType extends ViewModelConstructor<any, any, any>
      * @param listener Function to call with any changes
      */
     addListener(
-        fieldNames: readonly (keyof ViewModelClassType['fields'])[],
+        fieldNames: readonly ExtractFieldNames<ViewModelClassType['fields']>[],
         listener: ChangeListener<InstanceType<ViewModelClassType>>
     ): ChangeListenerUnsubscribe;
     addListener(
-        fieldNames: FieldPath[],
+        fieldNames: FieldPath<ViewModelClassType>[],
         listener: ChangeListener<InstanceType<ViewModelClassType>>
     ): ChangeListenerUnsubscribe;
     addListener(
-        fieldNames: readonly (keyof ViewModelClassType['fields'])[] | FieldPath[],
+        fieldNames:
+            | readonly ExtractFieldNames<ViewModelClassType['fields']>[]
+            | FieldPath<ViewModelClassType>[],
         listener: ChangeListener<InstanceType<ViewModelClassType>>
     ): ChangeListenerUnsubscribe {
         const fieldsKey = this.getCacheKey(
-            expandRelationFieldPaths(this.viewModel, fieldNames as FieldPath[])
+            expandRelationFieldPaths(this.viewModel, fieldNames as FieldPath<ViewModelClassType>[])
         );
         if (!this.cache.has(fieldsKey)) {
             // This handles the case where a listener is added _after_ an item that
@@ -1007,9 +1031,7 @@ const defaultListenerBatcher = {
  * @extract-docs
  * @menu-group Caching
  */
-export default class ViewModelCache<
-    ViewModelClassType extends ViewModelConstructor<any, any, any>
-> {
+export default class ViewModelCache<ViewModelClassType extends ViewModelConstructor<any, any>> {
     /**
      * @private
      */
@@ -1058,13 +1080,15 @@ export default class ViewModelCache<
     /**
      * Get the cache key to use into for the primary key. Handles compound keys.
      */
-    private getPkCacheKey(pk: PrimaryKey): string | number {
+    private getPkCacheKey(
+        pk: ExtractPkFieldParseableValueType<ViewModelClassType>
+    ): string | number {
         if (typeof pk === 'object') {
             const entries = Object.entries(pk);
             entries.sort(compareEntriesOnKey);
             return entries.reduce((acc, pair) => (acc += pair.join(CACHE_KEY_FIELD_SEPARATOR)), '');
         }
-        return pk;
+        return pk as string | number;
     }
 
     private isInstanceOfModel(a: any): a is InstanceType<ViewModelClassType> {
@@ -1085,15 +1109,15 @@ export default class ViewModelCache<
      */
     add<T extends InstanceType<ViewModelClassType>>(recordOrData: T): T;
     add<T extends InstanceType<ViewModelClassType>>(recordOrData: T[]): T[];
-    add<FieldNames extends keyof ViewModelClassType['fields']>(
+    add<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
         recordOrData: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>
     ): PartialViewModel<ViewModelClassType, FieldNames>;
-    add<FieldNames extends keyof ViewModelClassType['fields']>(
+    add<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
         recordOrData: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>[]
     ): PartialViewModel<ViewModelClassType, FieldNames>[];
     add<
         T extends InstanceType<ViewModelClassType>,
-        FieldNames extends keyof ViewModelClassType['fields']
+        FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>
     >(
         recordOrData:
             | T
@@ -1147,20 +1171,20 @@ export default class ViewModelCache<
      * each record in the list.
      */
     addList<T extends InstanceType<ViewModelClassType>>(records: T[]): T[];
-    addList<FieldNames extends keyof ViewModelClassType['fields']>(
+    addList<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
         records: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>[]
     ): PartialViewModel<ViewModelClassType, FieldNames>[];
     addList<
         T extends InstanceType<ViewModelClassType>,
-        FieldNames extends keyof ViewModelClassType['fields']
+        FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>
     >(
         records: (T | FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>)[]
     ): (T | PartialViewModel<ViewModelClassType, FieldNames>)[] {
         return withEnableListeners(() => {
             return this.cacheClass.listenerBatcher.batch(() => {
-                return records.map(record => this.add(record)) as InstanceType<
-                    ViewModelClassType
-                >[];
+                return records.map(record =>
+                    this.add(record)
+                ) as InstanceType<ViewModelClassType>[];
             });
         });
     }
@@ -1168,13 +1192,13 @@ export default class ViewModelCache<
     /**
      * Resolves '*' to all fields and validates passed fields are all valid
      */
-    private resolveFieldNames<FieldNames extends keyof ViewModelClassType['fields']>(
-        fieldNames: readonly FieldNames[] | FieldPath[] | '*'
-    ): readonly FieldNames[] | FieldPath[] {
+    private resolveFieldNames<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
+        fieldNames: readonly FieldNames[] | FieldPath<ViewModelClassType>[] | '*'
+    ): readonly FieldNames[] | FieldPath<ViewModelClassType>[] {
         if (fieldNames === '*') {
             return this.viewModel.fieldNames as FieldNames[];
         }
-        const fieldErrors = (fieldNames as FieldPath[])
+        const fieldErrors = (fieldNames as FieldPath<ViewModelClassType>[])
             .map(fieldName => {
                 try {
                     this.viewModel.getField(fieldName);
@@ -1210,17 +1234,20 @@ export default class ViewModelCache<
      *
      * @returns The cached record or null if none found
      */
-    get<FieldNames extends keyof ViewModelClassType['fields']>(
-        pk: PrimaryKey,
+    get<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
+        pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
         fieldNames: readonly FieldNames[] | '*'
     ): PartialViewModel<ViewModelClassType, FieldNames> | null;
-    get(pk: PrimaryKey, fieldNames: FieldPath[]): InstanceType<ViewModelClassType> | null;
+    get(
+        pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
+        fieldNames: FieldPath<ViewModelClassType>[]
+    ): InstanceType<ViewModelClassType> | null;
     get<
-        FieldNames extends keyof ViewModelClassType['fields'],
+        FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>,
         T extends InstanceType<ViewModelClassType>
     >(
-        pkOrRecord: PrimaryKey | T,
-        fieldNames?: readonly FieldNames[] | FieldPath[] | '*'
+        pkOrRecord: ExtractPkFieldParseableValueType<ViewModelClassType> | T,
+        fieldNames?: readonly FieldNames[] | FieldPath<ViewModelClassType>[] | '*'
     ): T | null {
         let pk = pkOrRecord;
         if (isViewModelInstance(pk)) {
@@ -1276,13 +1303,13 @@ export default class ViewModelCache<
             return null;
         }
         // If record exists under fieldNames key already then return it
-        let record = recordCache.get(fieldNames as FieldPath[]);
+        let record = recordCache.get(fieldNames as FieldPath<ViewModelClassType>[]);
         if (record) {
-            return record;
+            return record as T;
         }
         const relations: BaseRelatedViewModelField<any, any, any>[] = [];
         const sourceFieldNames: FieldNames[] = [];
-        const nestedFields: Record<string, FieldPath[]> = {};
+        const nestedFields: Record<string, FieldPath<ViewModelClassType>[]> = {};
         for (const pathElement of fieldNames) {
             const fieldName: string = Array.isArray(pathElement)
                 ? pathElement[0]
@@ -1296,7 +1323,7 @@ export default class ViewModelCache<
                 if (p.length > 1) {
                     // Nested fields - need to pass the whole array
                     // eg. [user, group, id]
-                    nestedFields[name].push(p);
+                    nestedFields[name].push(p as FieldPath<ViewModelClassType>);
                 } else {
                     // A specific field on this record
                     // eg. [user, name]
@@ -1332,7 +1359,8 @@ export default class ViewModelCache<
         // If record exists with the related field ids then attempt to resolve the
         // related record
         if (record && relations.length > 0) {
-            let cacheFieldNames: FieldPath[] = fieldNames as FieldPath[];
+            let cacheFieldNames: FieldPath<ViewModelClassType>[] =
+                fieldNames as FieldPath<ViewModelClassType>[];
             // For each request relation the corresponding record will be populated in this
             // object. If any of the requested relations don't exist in the cache then it's
             // considered a miss and `null` will be returned.
@@ -1348,12 +1376,18 @@ export default class ViewModelCache<
                             relation.to.fields[fieldName] instanceof BaseRelatedViewModelField
                         );
                     });
+                // TODO: This block seems to be unnecessary as it seems like it's always set above (no test case tests this)
                 if (!nestedFields[relation.name]) {
-                    const index = cacheFieldNames.indexOf(relation.name);
+                    const index = cacheFieldNames.indexOf(
+                        relation.name as FieldPath<ViewModelClassType>
+                    );
                     cacheFieldNames.splice(
                         index,
                         1,
-                        ...(relatedFieldNames as string[]).map(f => [relation.name, f])
+                        ...(relatedFieldNames.map(f => [
+                            relation.name,
+                            f,
+                        ]) as FieldPath<ViewModelClassType>)
                     );
                 }
                 if (record[relation.sourceFieldName] == null) {
@@ -1388,9 +1422,11 @@ export default class ViewModelCache<
                 // This could exist as cachedFieldNames can be changed above - if so we can return the
                 // record now otherwise we must create a new cache entry for the record with resolved
                 // relations.
-                let cachedRecord = recordCache.get(cacheFieldNames as FieldPath[]);
+                let cachedRecord = recordCache.get(
+                    cacheFieldNames as FieldPath<ViewModelClassType>[]
+                );
                 if (cachedRecord) {
-                    return cachedRecord;
+                    return cachedRecord as T;
                 }
                 // Add a null entry for these fields. This handles the case when nested data is fetched
                 // but some part of the hierarchy is null (eg. the value is legitimately optional) -
@@ -1403,7 +1439,7 @@ export default class ViewModelCache<
                 // We can now return the underlying record for the cache key requested (ie. the original
                 // related field name rather than the source field name). It would work without this but
                 // this ensures that it's the same object if you were to fetch the cached record again.
-                cachedRecord = recordCache.get(cacheFieldNames as FieldPath[]);
+                cachedRecord = recordCache.get(cacheFieldNames as FieldPath<ViewModelClassType>[]);
 
                 // If record isn't found there's something wrong with how keys are generated and it's
                 // certainly an internal bug
@@ -1412,10 +1448,10 @@ export default class ViewModelCache<
                         'Record should be cached but is not; this is unexpected and a bug - please raise an issue'
                     );
                 }
-                return cachedRecord;
+                return cachedRecord as T;
             }
         }
-        return record;
+        return record as T | null;
     }
 
     /**
@@ -1441,21 +1477,25 @@ export default class ViewModelCache<
      * @param removeNulls whether to remove entries that have no record in the cache. Defaults to true.
      * @returns an array of the cached records. Any records not found will be in the array as a null value if `removeNulls` is false otherwise they will be removed.
      */
-    getList<FieldNames extends keyof ViewModelClassType['fields']>(
-        pks: PrimaryKey[],
+    getList<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
+        pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
         fieldNames: readonly FieldNames[] | '*',
         removeNulls?: boolean
     ): (PartialViewModel<ViewModelClassType, FieldNames> | null)[];
     getList(
-        pks: PrimaryKey[],
-        fieldNames: readonly FieldPath[]
+        pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
+        fieldNames: readonly FieldPath<ViewModelClassType>[]
     ): (InstanceType<ViewModelClassType> | null)[];
     getList<
-        FieldNames extends keyof ViewModelClassType['fields'],
+        FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>,
         T extends InstanceType<ViewModelClassType>
     >(
-        pksOrRecords: (T | PrimaryKey)[],
-        fieldNames?: readonly FieldNames[] | boolean | readonly FieldPath[] | '*',
+        pksOrRecords: (T | ExtractPkFieldParseableValueType<ViewModelClassType>)[],
+        fieldNames?:
+            | readonly FieldNames[]
+            | boolean
+            | readonly FieldPath<ViewModelClassType>[]
+            | '*',
         removeNulls = true
     ): (T | null)[] {
         if (pksOrRecords.length === 0) {
@@ -1467,13 +1507,13 @@ export default class ViewModelCache<
             records = (pksOrRecords as T[]).map(record => this.get(record));
         } else {
             for (const pk of pksOrRecords) {
-                records.push(this.get(pk, fieldNames as FieldPath[]));
+                records.push(this.get(pk, fieldNames as FieldPath<ViewModelClassType>[]));
             }
         }
         if (removeNulls) {
-            return records.filter(Boolean);
+            return records.filter(Boolean) as T[];
         }
-        return records;
+        return records as (T | null)[];
     }
 
     /**
@@ -1490,12 +1530,12 @@ export default class ViewModelCache<
      *
      * @param fieldNames List of field names to return records for. See [Field notation](#Field_notation) for supported format.
      */
-    getAll<FieldNames extends keyof ViewModelClassType['fields']>(
+    getAll<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
         fieldNames: readonly FieldNames[] | '*'
     ): PartialViewModel<ViewModelClassType, FieldNames>[];
-    getAll(fieldNames: FieldPath[]): InstanceType<ViewModelClassType>[];
-    getAll<FieldNames extends keyof ViewModelClassType['fields']>(
-        fieldNames: readonly FieldNames[] | FieldPath[] | '*'
+    getAll(fieldNames: FieldPath<ViewModelClassType>[]): InstanceType<ViewModelClassType>[];
+    getAll<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
+        fieldNames: readonly FieldNames[] | FieldPath<ViewModelClassType>[] | '*'
     ): PartialViewModel<ViewModelClassType, FieldNames>[] {
         fieldNames = this.resolveFieldNames(fieldNames);
         const records: PartialViewModel<ViewModelClassType, FieldNames>[] = [];
@@ -1539,8 +1579,10 @@ export default class ViewModelCache<
      * @returns true if anything was removed, false otherwise
      */
     delete(
-        pk: PrimaryKey,
-        fieldNames?: readonly (keyof ViewModelClassType['fields'])[] | FieldPath[]
+        pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
+        fieldNames?:
+            | readonly ExtractFieldNames<ViewModelClassType['fields']>[]
+            | FieldPath<ViewModelClassType>[]
     ): boolean {
         const pkKey = this.getPkCacheKey(pk);
         const recordCache = this.cache.get(pkKey);
@@ -1581,33 +1623,36 @@ export default class ViewModelCache<
      * @param batch Whether or not to batch this call with other calls (defaults to true). You shouldn't need to change the default.
      * @returns A function that removes the listener
      */
-    addListener<FieldNames extends keyof ViewModelClassType['fields']>(
-        pkOrPks: PrimaryKey,
+    addListener<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
+        pkOrPks: ExtractPkFieldParseableValueType<ViewModelClassType>,
         fieldNames: FieldNames[],
         listener: ChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>,
         batch?: boolean
     ): ChangeListenerUnsubscribe;
-    addListener<FieldNames extends keyof ViewModelClassType['fields']>(
-        pkOrPks: PrimaryKey[],
+    addListener<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
+        pkOrPks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
         fieldNames: FieldNames[],
         listener: MultiChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>,
         batch?: boolean
     ): ChangeListenerUnsubscribe;
     addListener(
-        pkOrPks: PrimaryKey,
-        fieldNames: FieldPath[],
+        pkOrPks: ExtractPkFieldParseableValueType<ViewModelClassType>,
+        fieldNames: FieldPath<ViewModelClassType>[],
         listener: ChangeListener<InstanceType<ViewModelClassType>>,
         batch?: boolean
     ): ChangeListenerUnsubscribe;
     addListener(
-        pkOrPks: PrimaryKey[],
-        fieldNames: FieldPath[],
+        pkOrPks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
+        fieldNames: FieldPath<ViewModelClassType>[],
         listener: MultiChangeListener<InstanceType<ViewModelClassType>>,
         batch?: boolean
     ): ChangeListenerUnsubscribe;
-    addListener<FieldNames extends keyof ViewModelClassType['fields']>(
-        pkOrPksOrListener: PrimaryKey | PrimaryKey[] | (() => void),
-        fieldNames?: FieldNames[] | FieldPath[],
+    addListener<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
+        pkOrPksOrListener:
+            | ExtractPkFieldParseableValueType<ViewModelClassType>
+            | ExtractPkFieldParseableValueType<ViewModelClassType>[]
+            | (() => void),
+        fieldNames?: FieldNames[] | FieldPath<ViewModelClassType>[],
         listener?:
             | MultiChangeListener<
                   | PartialViewModel<ViewModelClassType, FieldNames>
@@ -1636,11 +1681,13 @@ export default class ViewModelCache<
         if (!listener) {
             throw new Error('Listener function must be provided');
         }
-        const pkOrPks: PrimaryKey | PrimaryKey[] = pkOrPksOrListener;
+        const pkOrPks:
+            | ExtractPkFieldParseableValueType<ViewModelClassType>
+            | ExtractPkFieldParseableValueType<ViewModelClassType>[] = pkOrPksOrListener;
         if (Array.isArray(pkOrPks)) {
             return this.addListenerList(
                 pkOrPks,
-                fieldNames as FieldPath[],
+                fieldNames as FieldPath<ViewModelClassType>[],
                 // TODO: I couldn't work out how to type this otherwise. I tried
                 // function overload but doesn't seem to be possible to narrow
                 // to type of the function to differentiate between ChangeListener
@@ -1657,44 +1704,47 @@ export default class ViewModelCache<
             recordCache = new RecordCache(this.viewModel, this.onAnyChange.bind(this), pkOrPks);
             this.cache.set(pkKey, recordCache);
         }
-        return recordCache.addListener(fieldNames as FieldPath[], (before, after) => {
-            this.cacheClass.listenerBatcher.call(
-                listener as ChangeListener<
-                    | PartialViewModel<ViewModelClassType, FieldNames>
-                    | InstanceType<ViewModelClassType>
-                >,
-                before,
-                after,
-                batch
-            );
-        });
+        return recordCache.addListener(
+            fieldNames as FieldPath<ViewModelClassType>[],
+            (before, after) => {
+                this.cacheClass.listenerBatcher.call(
+                    listener as ChangeListener<
+                        | PartialViewModel<ViewModelClassType, FieldNames>
+                        | InstanceType<ViewModelClassType>
+                    >,
+                    before,
+                    after,
+                    batch
+                );
+            }
+        );
     }
 
-    addListenerList<FieldNames extends keyof ViewModelClassType['fields']>(
-        pks: PrimaryKey[],
+    addListenerList<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
+        pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
         fieldNames: FieldNames[],
         listener: MultiChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>
     ): ChangeListenerUnsubscribe;
     addListenerList(
-        pks: PrimaryKey[],
-        fieldNames: FieldPath[],
+        pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
+        fieldNames: FieldPath<ViewModelClassType>[],
         listener: MultiChangeListener<InstanceType<ViewModelClassType>>
     ): ChangeListenerUnsubscribe;
-    addListenerList<FieldNames extends keyof ViewModelClassType['fields']>(
-        pks: PrimaryKey[],
-        fieldNames: FieldNames[] | FieldPath[],
-        listener: MultiChangeListener<
-            PartialViewModel<ViewModelClassType, FieldNames> | InstanceType<ViewModelClassType>
-        >
+    addListenerList<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
+        pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
+        fieldNames: FieldNames[] | FieldPath<ViewModelClassType>[],
+        listener:
+            | MultiChangeListener<InstanceType<ViewModelClassType>>
+            | MultiChangeListener<PartialViewModel<ViewModelClassType, FieldNames>>
     ): ChangeListenerUnsubscribe {
-        let previous = pks.map(pk => this.get(pk, fieldNames as FieldPath[]));
+        let previous = pks.map(pk => this.get(pk, fieldNames as FieldPath<ViewModelClassType>[]));
         const cb = (): void => {
-            const next = pks.map(pk => this.get(pk, fieldNames as FieldPath[]));
+            const next = pks.map(pk => this.get(pk, fieldNames as FieldPath<ViewModelClassType>[]));
             this.cacheClass.listenerBatcher.call(listener, previous, next);
             previous = [...next];
         };
         const unsubscribes = pks.map(pk =>
-            this.addListener(pk, fieldNames as FieldPath[], () => {
+            this.addListener(pk, fieldNames as FieldPath<ViewModelClassType>[], () => {
                 cb();
             })
         );

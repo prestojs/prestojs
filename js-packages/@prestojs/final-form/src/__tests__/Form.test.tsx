@@ -1,14 +1,18 @@
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
 import { UiProvider } from '@prestojs/ui';
-import { NumberField, Field, viewModelFactory } from '@prestojs/viewmodel';
+import { Field, NumberField, viewModelFactory } from '@prestojs/viewmodel';
+import { fireEvent, render } from '@testing-library/react';
+import React from 'react';
 
 import Form from '../Form';
 
-class User extends viewModelFactory({
-    age: new NumberField({ label: 'Age' }),
-    email: new Field({ label: 'Email' }),
-}) {
+class User extends viewModelFactory(
+    {
+        id: new NumberField(),
+        age: new NumberField({ label: 'Age' }),
+        email: new Field({ label: 'Email' }),
+    },
+    { pkFieldName: 'id' }
+) {
     static label = 'User';
     static labelPlural = 'Users';
 }

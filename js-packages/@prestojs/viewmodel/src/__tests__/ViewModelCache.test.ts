@@ -4,19 +4,29 @@ import Field from '../fields/Field';
 import ListField from '../fields/ListField';
 import { ManyRelatedViewModelField, RelatedViewModelField } from '../fields/RelatedViewModelField';
 import ViewModelCache from '../ViewModelCache';
-import viewModelFactory, { isViewModelInstance, ViewModelConstructor } from '../ViewModelFactory';
+import viewModelFactory, {
+    FieldPath,
+    isViewModelInstance,
+    ViewModelConstructor,
+} from '../ViewModelFactory';
 
 function F<T>(name): Field<T> {
     return new Field<T>({ label: name });
 }
 
 test('should cache records from record instance', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
-    class Test2 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: F('id'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test1({ id: 5 });
     // Should always get independent caches
@@ -32,9 +42,12 @@ test('should cache records from record instance', () => {
 });
 
 test('should handle id of 0', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test1({ id: 0 });
     expect(Test1.cache.add(record1)).toBe(record1);
@@ -43,12 +56,18 @@ test('should handle id of 0', () => {
 });
 
 test('should cache records from plain object', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
-    class Test2 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: F('id'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1Data = { id: 5 };
 
@@ -64,12 +83,18 @@ test('should cache records from plain object', () => {
 });
 
 test('should throw error if caching different ViewModel', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
-    class Test2 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: F('id'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test1({ id: 5 });
     const record2 = new Test2({ id: 5 });
@@ -120,9 +145,12 @@ test('should cache records with compound keys', () => {
 });
 
 test('should validate pk(s)', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     const record1 = new Test1({ id: 5 });
 
     Test1.cache.add(record1);
@@ -168,10 +196,13 @@ test('should always use primary key in cache regardless of whether specified', (
         }
     ) {}
 
-    class Test2 extends viewModelFactory({
-        id: F('id'),
-        name: F('name'),
-    }) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: F('id'),
+            name: F('name'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test1({ id1: 5, id2: 6, name: 'one' });
 
@@ -209,14 +240,14 @@ test('should support custom cache', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        class TestBad extends viewModelFactory({}) {
+        class TestBad extends viewModelFactory({ id: new Field() }, { pkFieldName: 'id' }) {
             static cache = new MyInvalidCache();
         }
     }).toThrowError('cache class must extend ViewModelCache');
 
     class MyCache<T extends ViewModelConstructor<any, any>> extends ViewModelCache<T> {}
     class MyCache2<T extends ViewModelConstructor<any, any>> extends ViewModelCache<T> {}
-    class Test1 extends viewModelFactory({}) {
+    class Test1 extends viewModelFactory({ id: new Field() }, { pkFieldName: 'id' }) {
         static cache = new MyCache<typeof Test1>(Test1);
     }
 
@@ -244,12 +275,15 @@ test('should support custom cache', () => {
 });
 
 test('updating a record should result in cache for subset of fields being updated', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     Test1.cache.add(new Test1({ id: 5, firstName: 'B' }));
     Test1.cache.add(new Test1({ id: 5, email: 'E' }));
     Test1.cache.add(new Test1({ id: 5, lastName: 'J' }));
@@ -309,12 +343,15 @@ test('updating a record should result in cache for subset of fields being update
     // This handles cases where you may try and access a cache for subset of fields that hasn't explicitly
     // been cached yet but is available as a superset of those fields. In those cases we expect the cache to
     // be populated lazily
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test1({ id: 5, firstName: 'Bob', lastName: 'Jack', email: 'a@b.com' });
     Test1.cache.add(record1);
@@ -347,12 +384,15 @@ test('updating a record should result in cache for subset of fields being update
 });
 
 test('should use most recently set superset of fields', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
 
@@ -370,12 +410,15 @@ test('should use most recently set superset of fields', () => {
 });
 
 test('should support removing records from cache', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.delete(2);
@@ -396,12 +439,15 @@ test('should support removing records from cache', () => {
 });
 
 test('should support removing records from cache for only specified field names', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.delete(2, ['id', 'lastName', 'email']);
@@ -414,12 +460,15 @@ test('should support removing records from cache for only specified field names'
 });
 
 test('should support retrieving multiple records', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 3, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
@@ -446,12 +495,15 @@ test('should support retrieving multiple records', () => {
 });
 
 test('should support using * for all fields', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const bob = { id: 2, firstName: 'Bob', lastName: 'So', email: 'bob@b.com' };
     const jack = { id: 3, lastName: 'Jack', email: 'jack@b.com' };
@@ -473,12 +525,15 @@ test('should support using * for all fields', () => {
 });
 
 test('should notify listeners on add, change, delete', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     const cb1 = jest.fn();
     Test1.cache.addListener(2, ['id', 'firstName'], cb1);
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
@@ -543,12 +598,15 @@ test('should notify listeners on add, change, delete', () => {
 });
 
 test('should not notify if identical record added', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const cb1 = jest.fn();
     Test1.cache.addListener(2, ['id', 'firstName', 'email'], cb1);
@@ -565,12 +623,15 @@ test('should not notify if identical record added', () => {
 });
 
 test('should support listening to multiple pks', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     const cb1 = jest.fn();
     const unsubscribe = Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
     const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
@@ -597,12 +658,15 @@ test('should support listening to multiple pks', () => {
 });
 
 test('should support listening to multiple pks, batch notifications', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const cb1 = jest.fn();
     const cb2 = jest.fn();
@@ -621,12 +685,15 @@ test('should support listening to multiple pks, batch notifications', () => {
 });
 
 test('should support listening to multiple pks without specifying primary keys in field names', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const cb1 = jest.fn();
     Test1.cache.addListenerList([2, 3, 4], ['firstName', 'email'], cb1);
@@ -639,12 +706,15 @@ test('should support listening to multiple pks without specifying primary keys i
 });
 
 test('should support adding list of plain objects', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
     const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
@@ -659,12 +729,15 @@ test('should support adding list of plain objects', () => {
 });
 
 test('should support adding list of via add', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
     const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
@@ -685,12 +758,15 @@ test.each`
     ${true}
     ${false}
 `('Should support getting all records, listeners = $withListeners ', ({ withListeners }) => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
     const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
@@ -745,12 +821,15 @@ test.each`
 });
 
 test('should support listening all changes on a ViewModel', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: F('id'),
+            firstName: F('firstName'),
+            lastName: F('lastName'),
+            email: F('email'),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const cb1 = jest.fn();
     const cb2 = jest.fn();
@@ -780,40 +859,52 @@ test('should support listening all changes on a ViewModel', () => {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function createTestModels(circular = false, many = false) {
-    class Group extends viewModelFactory({
-        name: new Field<string>(),
-        ...(circular
-            ? {
-                  ownerId: new Field<number>(),
-                  owner: new RelatedViewModelField({
-                      // Type here isn't typeof User as it seemed to confuse typescript.. I guess
-                      // because of the circular reference
-                      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                      to: (): Promise<ViewModelConstructor<any>> => Promise.resolve(User),
-                      sourceFieldName: 'ownerId',
-                  }),
-              }
-            : {}),
-    }) {}
-    class User extends viewModelFactory({
-        name: new Field<string>(),
-        groupId: many
-            ? new ListField({ childField: new Field<number | null>() })
-            : new Field<number | null>(),
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        group: new (many ? ManyRelatedViewModelField : RelatedViewModelField)({
-            to: (): Promise<typeof Group> => Promise.resolve(Group),
-            sourceFieldName: 'groupId',
-        }),
-    }) {}
-    class Subscription extends viewModelFactory({
-        userId: new Field<number>(),
-        user: new RelatedViewModelField<typeof User>({
-            to: (): Promise<typeof User> => Promise.resolve(User),
-            sourceFieldName: 'userId',
-        }),
-    }) {}
+    class Group extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            ...(circular
+                ? {
+                      ownerId: new Field<number>(),
+                      owner: new RelatedViewModelField({
+                          // Type here isn't typeof User as it seemed to confuse typescript.. I guess
+                          // because of the circular reference
+                          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                          to: (): Promise<ViewModelConstructor<any, any>> => Promise.resolve(User),
+                          sourceFieldName: 'ownerId',
+                      }),
+                  }
+                : {}),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class User extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            groupId: many
+                ? new ListField({ childField: new Field<number | null>() })
+                : new Field<number | null>(),
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            group: new (many ? ManyRelatedViewModelField : RelatedViewModelField)({
+                to: (): Promise<typeof Group> => Promise.resolve(Group),
+                sourceFieldName: 'groupId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Subscription extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            userId: new Field<number>(),
+            user: new RelatedViewModelField<typeof User>({
+                to: (): Promise<typeof User> => Promise.resolve(User),
+                sourceFieldName: 'userId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     return { User, Group, Subscription };
 }
 test('cache should support traversing models', async () => {
@@ -827,6 +918,8 @@ test('cache should support traversing models', async () => {
     });
     const r = Subscription.cache.get(1, ['userId']);
     expect(r?.userId).toBe(1);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     expect(() => r?.user).toThrow(/'user' accessed on .* but was not instantiated with it/);
     expect(() => Subscription.cache.get(1, ['user'])).toThrow(/Call .*resolveViewModel\(\) first/);
     await Subscription.fields.user.resolveViewModel();
@@ -1024,13 +1117,19 @@ test('order of fields should not matter', async () => {
     });
     expect(User.cache.get(10, ['name', 'group'])).toBe(User.cache.get(10, ['group', 'name']));
     // Using shortcut for all fields should be same as enumerating them explicitly
-    expect(Subscription.cache.get(1, ['user', ['user', 'group'], ['user', 'group', 'owner']])).toBe(
+    expect(
+        Subscription.cache.get(1, [
+            'user',
+            ['user', 'group'],
+            ['user', 'group', 'owner'],
+        ] as FieldPath<typeof Subscription>[])
+    ).toBe(
         Subscription.cache.get(1, [
             ['user', 'group', 'owner'],
             ['user', 'group', 'name'],
             ['user', 'group', 'ownerId'],
             'user',
-        ])
+        ] as FieldPath<typeof Subscription>[])
     );
 });
 
@@ -1062,7 +1161,7 @@ test('should support nested paths', async () => {
         Subscription.cache.get(1, [
             ['user', 'name'],
             ['user', 'group', 'name'],
-        ])
+        ] as FieldPath<typeof Subscription>[])
     ).toBeEqualToRecord(
         new Subscription({
             id: 1,
@@ -1121,7 +1220,7 @@ test('should handle nullable values', async () => {
         Subscription.cache.get(1, [
             ['user', 'group'],
             ['user', 'group', 'owner'],
-        ])
+        ] as FieldPath<typeof Subscription>[])
     ).toBeEqualToRecord(
         new Subscription({
             id: 1,
@@ -1292,7 +1391,12 @@ test('listeners should work across deeply nested related models', async () => {
         Subscription.cache.addListener(1, ['id', 'userId'], subscriptionListenerSimple),
         Subscription.cache.addListener(
             1,
-            ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+            [
+                'id',
+                ['user', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'owner', 'name'],
+            ] as FieldPath<typeof Subscription>[],
             subscriptionListenerNested
         ),
         Subscription.cache.addListener(subscriptionListenerAll),
@@ -1547,7 +1651,12 @@ test('getting a subset of keys should not trigger listeners', async () => {
 
     Subscription.cache.addListener(
         1,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ] as FieldPath<typeof Subscription>[],
         subscriptionListenerNested
     );
 
@@ -1557,7 +1666,7 @@ test('getting a subset of keys should not trigger listeners', async () => {
             ['user', 'name'],
             ['user', 'group', 'name'],
             ['user', 'group', 'owner', 'name'],
-        ])
+        ] as FieldPath<typeof Subscription>[])
     ).toEqual(
         new Subscription({
             id: 1,
@@ -1595,7 +1704,12 @@ test('deletes should still work if listener added after record created', async (
 
     Subscription.cache.addListener(
         1,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ] as FieldPath<typeof Subscription>[],
         subscriptionListenerNested
     );
     User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested);
@@ -1622,7 +1736,7 @@ test('deletes should still work if listener added after record created', async (
             ['user', 'name'],
             ['user', 'group', 'name'],
             ['user', 'group', 'owner', 'name'],
-        ])
+        ] as FieldPath<typeof Subscription>[])
     ).toBeNull();
     expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
     expect(subscriptionListenerNested).toHaveBeenCalledWith(
@@ -1651,7 +1765,12 @@ test('deletes should work across deeply nested related models', async () => {
 
     Subscription.cache.addListener(
         1,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ] as FieldPath<typeof Subscription>[],
         subscriptionListenerNested
     );
     User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested);
@@ -1711,7 +1830,7 @@ test('listeners should handle missing nested', async () => {
         [
             ['user', 'group'],
             ['user', 'group', 'owner'],
-        ],
+        ] as FieldPath<typeof Subscription>[],
         cb
     );
     User.cache.add({
@@ -1740,34 +1859,46 @@ test('listeners should handle missing nested', async () => {
 });
 
 test('listeners should work across related models with partial fields', async () => {
-    class Group extends viewModelFactory({
-        name: new Field<string>(),
-        ownerId: new Field<number>(),
-        owner: new RelatedViewModelField({
-            // Type here isn't typeof User as it seemed to confuse typescript.. I guess
-            // because of the circular reference
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            to: (): Promise<ViewModelConstructor<any>> => Promise.resolve(User),
-            sourceFieldName: 'ownerId',
-        }),
-    }) {}
-    class User extends viewModelFactory({
-        name: new Field<string>(),
-        email: new Field<string>(),
-        groupId: new Field<number | null>(),
-        group: new RelatedViewModelField({
-            to: (): Promise<typeof Group> => Promise.resolve(Group),
-            sourceFieldName: 'groupId',
-        }),
-    }) {}
-    class Subscription extends viewModelFactory({
-        label: new Field<string>(),
-        userId: new Field<number>(),
-        user: new RelatedViewModelField<typeof User>({
-            to: (): Promise<typeof User> => Promise.resolve(User),
-            sourceFieldName: 'userId',
-        }),
-    }) {}
+    class Group extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            ownerId: new Field<number>(),
+            owner: new RelatedViewModelField({
+                // Type here isn't typeof User as it seemed to confuse typescript.. I guess
+                // because of the circular reference
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                to: (): Promise<ViewModelConstructor<any, any>> => Promise.resolve(User),
+                sourceFieldName: 'ownerId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class User extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            email: new Field<string>(),
+            groupId: new Field<number | null>(),
+            group: new RelatedViewModelField({
+                to: (): Promise<typeof Group> => Promise.resolve(Group),
+                sourceFieldName: 'groupId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Subscription extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            label: new Field<string>(),
+            userId: new Field<number>(),
+            user: new RelatedViewModelField<typeof User>({
+                to: (): Promise<typeof User> => Promise.resolve(User),
+                sourceFieldName: 'userId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     await Subscription.fields.user.resolveViewModel();
     const subscriptionListenerNested = jest.fn();
     Subscription.cache.addListener(
@@ -1935,7 +2066,12 @@ test('list listeners should work across related models', async () => {
         Subscription.cache.addListenerList([1, 2, 3], ['id', 'userId'], subscriptionListenerSimple),
         Subscription.cache.addListener(
             [1, 2, 3],
-            ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+            [
+                'id',
+                ['user', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'owner', 'name'],
+            ] as FieldPath<typeof Subscription>[],
             subscriptionListenerNested
         ),
         Subscription.cache.addListener(subscriptionListenerAll),
@@ -2773,10 +2909,14 @@ test('getAll should work across caches', async () => {
 test('should validate field names', async () => {
     const { Subscription } = createTestModels(true);
     await Subscription.fields.user.resolveViewModel();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     expect(() => Subscription.cache.get(1, ['userId', ['user', 'nam']])).toThrowError(
         /Invalid field\(s\) provided:/
     );
     expect(() =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         Subscription.cache.get(1, [
             ['use', 'name'],
             ['user', 'group', 'name'],
@@ -2787,15 +2927,19 @@ test('should validate field names', async () => {
     expect(() =>
         Subscription.cache.getList(
             [1],
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             [
                 ['use', 'name'],
                 ['user', 'group', 'name'],
                 ['user', 'group', 'own'],
-            ]
+            ] as FieldPath<typeof Subscription>[]
         )
     ).toThrowError(/Invalid field\(s\) provided:/);
 
     expect(() =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         Subscription.cache.getAll([
             ['use', 'name'],
             ['user', 'group', 'name'],
@@ -2832,12 +2976,19 @@ test('should be performant', async () => {
         Subscription.cache.addListener(i, ['id', 'userId'], nextFn());
         Subscription.cache.addListener(
             i,
-            ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+            [
+                'id',
+                ['user', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'owner', 'name'],
+            ] as FieldPath<typeof Subscription>[],
             nextFn()
         );
         Subscription.cache.addListener(
             i,
-            ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']],
+            ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']] as FieldPath<
+                typeof Subscription
+            >[],
             nextFn()
         );
         Subscription.cache.addListener(
@@ -2847,7 +2998,7 @@ test('should be performant', async () => {
                 ['user', 'name'],
                 ['user', 'group', 'name'],
                 ['user', 'group', 'owner', 'group'],
-            ],
+            ] as FieldPath<typeof Subscription>[],
             nextFn()
         );
         User.cache.addListener(i, ['id', 'name'], nextFn());
@@ -2858,17 +3009,30 @@ test('should be performant', async () => {
     const ids = Array.from({ length: count }, (_, i) => i);
     Subscription.cache.addListenerList(
         ids,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        // Explicit cast as recursive relations not supported by types
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ] as FieldPath<typeof Subscription>[],
         jest.fn()
     );
     Subscription.cache.addListenerList(
         ids,
-        ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']],
+        ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']] as FieldPath<
+            typeof Subscription
+        >[],
         jest.fn()
     );
     Subscription.cache.addListenerList(
         ids,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'group']],
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'group'],
+        ] as FieldPath<typeof Subscription>[],
         jest.fn()
     );
     User.cache.addListener(jest.fn());
