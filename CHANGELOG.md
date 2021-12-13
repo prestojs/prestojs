@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.24] - 2021-12-13
+
+### Changed
+
+* `@prestojs/util` is now a peerDep of `@prestojs/viewmodel`. Prior to this version `@prestojs/viewmodel` may have had an old version of `@prestojs/util` installed even after upgrading to the latest.
+
 ## [0.0.23] - 2021-11-30
 
 ### Changed
