@@ -19,9 +19,11 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
+    "@prestojs/util": "*",
     "react": ">= 16.12.0 < 18"
   },
   "devDependencies": {
+    "@prestojs/util": "*",
     "@testing-library/react": "^10.0.4",
     "@testing-library/react-hooks": "^3.2.1",
     "react": "^16.12.0",
@@ -30,7 +32,6 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "@prestojs/util": "~0.0.11",
     "lodash": "^4.17.15"
   }
 }
