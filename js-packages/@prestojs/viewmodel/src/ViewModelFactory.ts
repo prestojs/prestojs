@@ -62,6 +62,9 @@ export type FieldPath<
           }>;
       }>;
 
+/**
+ * @type-name '*'|[string|string[]][]
+ */
 export type FieldPaths<
     T extends ViewModelConstructor<any, any>,
     R extends ExtractRelatedFields<T> = ExtractRelatedFields<T>
@@ -110,6 +113,9 @@ export type FieldDataMappingRaw<T extends FieldsMapping> = {
     [K in keyof T]?: T[K]['__parsableValueType'];
 };
 
+/**
+ * @type-name string
+ */
 export type ExtractFieldNames<FieldMappingType extends FieldsMapping> = Extract<
     keyof FieldMappingType,
     string
@@ -281,29 +287,6 @@ export class BaseViewModel<
     }
 
     /**
-     * Returns the primary key value(s) for this instance. This is to conform to the
-     * [Identifiable](doc:Identifiable) interface.
-     */
-    get _key(): PkFieldType extends string
-        ? FieldMappingType[PkFieldType]['__fieldValueType']
-        : {
-              [K in keyof FieldMappingType as K extends PkFieldType[number]
-                  ? K
-                  : never]: FieldMappingType[K]['__fieldValueType'];
-          } {
-        const { pkFieldName } = this._model;
-        if (Array.isArray(pkFieldName)) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            return pkFieldName.reduce((acc, fieldName) => {
-                acc[fieldName as string] = this._data[fieldName as string];
-                return acc;
-            }, {});
-        }
-        return this._data[pkFieldName as string];
-    }
-
-    /**
      * Return the data for this record as a plain object
      */
     toJS(): {
@@ -467,6 +450,8 @@ export class BaseViewModel<
      * user._f.name.value
      * // Jon Snow
      * ```
+     *
+     * @type-name {[fieldName: string]: Field}
      */
     get _f(): {
         readonly [K in AssignedFieldNames]: RecordBoundField<
@@ -675,6 +660,31 @@ export class BaseViewModel<
     readonly _assignedFieldPaths: ViewModelFieldPaths<
         ViewModelConstructor<FieldMappingType, PkFieldType>
     >;
+
+    /**
+     * Returns the primary key value(s) for this instance. This is to conform to the
+     * [Identifiable](doc:Identifiable) interface.
+     *
+     * @type-name PkFieldType
+     */
+    get _key(): PkFieldType extends string
+        ? FieldMappingType[PkFieldType]['__fieldValueType']
+        : {
+              [K in keyof FieldMappingType as K extends PkFieldType[number]
+                  ? K
+                  : never]: FieldMappingType[K]['__fieldValueType'];
+          } {
+        const { pkFieldName } = this._model;
+        if (Array.isArray(pkFieldName)) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            return pkFieldName.reduce((acc, fieldName) => {
+                acc[fieldName as string] = this._data[fieldName as string];
+                return acc;
+            }, {});
+        }
+        return this._data[pkFieldName as string];
+    }
 }
 
 export type ViewModelInterface<
@@ -787,11 +797,15 @@ export interface ViewModelConstructor<
      *
      * If `options.pkFieldName` is not specified a field will be created from `options.getImplicitPk`
      * if provided otherwise a default field with name 'id' will be created.
+     *
+     * @type-name string
      */
     readonly pkFieldName: PkFieldType;
 
     /**
      * Shortcut to get pkFieldName as an array always, even for non-compound keys
+     *
+     * @type-name string[]
      */
     readonly pkFieldNames: PkFieldType extends string ? [PkFieldType] : PkFieldType;
 
@@ -800,15 +814,17 @@ export interface ViewModelConstructor<
      *
      * If you want all fields including primary key use `allFieldNames`
      */
-    readonly fieldNames: Extract<keyof FieldMappingType, string>[];
+    readonly fieldNames: ExtractFieldNames<FieldMappingType>[];
 
     /**
      * Shortcut to get all field names including primary keys
      */
-    readonly allFieldNames: Extract<keyof FieldMappingType, string>[];
+    readonly allFieldNames: ExtractFieldNames<FieldMappingType>[];
 
     /**
      * Shortcut to get the names of all relation fields
+     *
+     * @type-name string[]
      */
     readonly relationFieldNames: Extract<
         keyof ExtractRelatedFields<ViewModelConstructor<FieldMappingType, PkFieldType>>,

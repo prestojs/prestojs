@@ -5,7 +5,7 @@ import CharField from '../fields/CharField';
 import NumberField from '../fields/NumberField';
 import useAsyncChoices from '../useAsyncChoices';
 import useViewModelCache from '../useViewModelCache';
-import viewModelFactory from '../ViewModelFactory';
+import viewModelFactory, { PartialViewModel } from '../ViewModelFactory';
 
 type TestDataItem = { label: string; id: number };
 const testData: TestDataItem[] = Array.from({ length: 20 }, (_, i) => ({
@@ -108,9 +108,9 @@ test('useAsyncChoices should support hooking up to ViewModelCache easily', async
         },
         { pkFieldName: 'id' }
     );
-    type ItemModelInstance = InstanceType<typeof ItemModel>;
+    type ItemModelInstance = PartialViewModel<typeof ItemModel>;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const data = testData.map(item => ItemModel.cache.add(item));
+    const data = testData.map(item => ItemModel.cache.add(item)) as ItemModelInstance[];
     const list = (): Promise<ItemModelInstance[]> => Promise.resolve(data.slice(0, 10));
     const retrieve = (i: number): Promise<ItemModelInstance> => Promise.resolve(data[i]);
     const asyncChoices = new AsyncChoices({

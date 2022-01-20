@@ -40,6 +40,9 @@ const CACHE_KEY_FIELD_SEPARATOR = '⁞';
 
 /**
  * Stores the field paths for a model in a standardised form for use in caching.
+ *
+ * @extract-docs
+ * @menu-group Utils
  */
 export class ViewModelFieldPaths<T extends ViewModelConstructor<any, any>> {
     modelClass: T;
@@ -224,6 +227,9 @@ const viewModelNormalizedFieldPathCache = new Map<
  *
  * @param modelClass The ViewModel class the fields are from
  * @param fieldNames The array of field paths to normalize
+ *
+ * @extract-docs
+ * @menu-group Utils
  */
 export function normalizeFields<T extends ViewModelConstructor<any, any>>(
     modelClass: T,
