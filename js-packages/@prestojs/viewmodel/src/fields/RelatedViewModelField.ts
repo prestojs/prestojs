@@ -1,4 +1,5 @@
 import { isEqual } from '@prestojs/util';
+import ViewModelCache from '../ViewModelCache';
 import { FieldDataMappingRaw, isViewModelClass, ViewModelConstructor } from '../ViewModelFactory';
 import Field, { FieldProps } from './Field';
 import ListField from './ListField';
@@ -18,18 +19,23 @@ type RelatedViewModelParsableType<T extends ViewModelConstructor<any, any>> =
  */
 type RelatedViewModelFieldProps<
     TargetViewModelT extends ViewModelConstructor<any, any>,
-    FieldValueT
+    FieldValueT,
+    SourceFieldNameT extends string
 > = FieldProps<FieldValueT> & {
     /**
      * The name of the field on the [ViewModel](doc:viewModelFactory) that stores the
      * ID for this relation
      */
-    sourceFieldName: string;
+    sourceFieldName: SourceFieldNameT;
     /**
      * Either a [ViewModel](doc:viewModelFactory), a function that returns a [ViewModel](doc:viewModelFactory)
      * or a function that returns a `Promise` that resolves to a [ViewModel](doc:viewModelFactory).
      */
     to: (() => Promise<TargetViewModelT> | TargetViewModelT) | TargetViewModelT;
+    /**
+     * The cache to use to retrieve related records from. Uses the default model cache if not specified.
+     */
+    cache?: ViewModelCache<TargetViewModelT>;
 };
 
 export class UnresolvedRelatedViewModelFieldError<
@@ -56,21 +62,27 @@ export class UnresolvedRelatedViewModelFieldError<
 export abstract class BaseRelatedViewModelField<
     TargetViewModelT extends ViewModelConstructor<any, any>,
     FieldValueT extends BaseRelatedViewModelValueType<TargetViewModelT>,
-    ParsableValueT extends RelatedViewModelParsableType<TargetViewModelT>
+    ParsableValueT extends RelatedViewModelParsableType<TargetViewModelT>,
+    // This exists so we can infer the field name for the id to include when
+    SourceFieldNameT extends string = string
 > extends Field<FieldValueT, ParsableValueT> {
     private _loadTo: () => Promise<TargetViewModelT> | TargetViewModelT;
     private _resolvedTo: TargetViewModelT;
     private _resolvingTo?: Promise<TargetViewModelT>;
-    sourceFieldName: string;
+    private _cache?: ViewModelCache<TargetViewModelT>;
+    sourceFieldName: SourceFieldNameT;
     sourceField: Field<any>;
 
     get many(): boolean {
         return this.sourceField instanceof ListField;
     }
 
-    constructor(props: RelatedViewModelFieldProps<TargetViewModelT, FieldValueT>) {
-        const { to, sourceFieldName, ...fieldProps } = props;
+    constructor(
+        props: RelatedViewModelFieldProps<TargetViewModelT, FieldValueT, SourceFieldNameT>
+    ) {
+        const { to, sourceFieldName, cache, ...fieldProps } = props;
         super(fieldProps);
+        this._cache = cache;
         if (isViewModelClass(to)) {
             this._resolvedTo = to;
         } else {
@@ -176,6 +188,13 @@ export abstract class BaseRelatedViewModelField<
         }
         return this._resolvedTo;
     }
+
+    get cache(): ViewModelCache<TargetViewModelT> {
+        if (this._cache) {
+            return this._cache;
+        }
+        return this.to.cache as unknown as ViewModelCache<TargetViewModelT>;
+    }
 }
 
 /**
@@ -261,7 +280,7 @@ export abstract class BaseRelatedViewModelField<
  * // }
  * ```
  *
- * `to` can also be a a function that returns a Promise. This is useful to
+ * `to` can also be a function that returns a Promise. This is useful to
  * lazy load modules:
  *
  * ```js
@@ -292,11 +311,13 @@ export abstract class BaseRelatedViewModelField<
  * @menu-group Fields
  */
 export class RelatedViewModelField<
-    TargetViewModelT extends ViewModelConstructor<any, any>
+    TargetViewModelT extends ViewModelConstructor<any, any>,
+    SourceFieldNameT extends string = string
 > extends BaseRelatedViewModelField<
     TargetViewModelT,
     RelatedViewModelValueType<TargetViewModelT>,
-    FieldDataMappingRaw<TargetViewModelT['fields']>
+    FieldDataMappingRaw<TargetViewModelT['fields']>,
+    SourceFieldNameT
 > {
     static fieldClassName = 'RelatedViewModelField';
     /**
@@ -336,11 +357,13 @@ export class RelatedViewModelField<
  * @menu-group Fields
  */
 export class ManyRelatedViewModelField<
-    TargetViewModelT extends ViewModelConstructor<any, any>
+    TargetViewModelT extends ViewModelConstructor<any, any>,
+    SourceFieldNameT extends string = string
 > extends BaseRelatedViewModelField<
     TargetViewModelT,
     RelatedViewModelValueType<TargetViewModelT>[],
-    FieldDataMappingRaw<TargetViewModelT['fields']>[]
+    FieldDataMappingRaw<TargetViewModelT['fields']>[],
+    SourceFieldNameT
 > {
     static fieldClassName = 'ManyRelatedViewModelField';
     /**

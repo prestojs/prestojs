@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+import ViewModelCache from '../../ViewModelCache';
 import viewModelFactory, { ViewModelConstructor } from '../../ViewModelFactory';
 import CharField from '../CharField';
 import Field from '../Field';
@@ -672,7 +671,9 @@ test('should use correct cache key for nested related records', () => {
             name: new CharField(),
         },
         { pkFieldName: 'id' }
-    ) {}
+    ) {
+        static cache: ViewModelCache<typeof Test1> = new ViewModelCache(Test1);
+    }
 
     class Test2 extends viewModelFactory(
         {
@@ -685,7 +686,9 @@ test('should use correct cache key for nested related records', () => {
             recordId: new IntegerField(),
         },
         { pkFieldName: 'id' }
-    ) {}
+    ) {
+        static cache: ViewModelCache<typeof Test2> = new ViewModelCache(Test2);
+    }
 
     class Test3 extends viewModelFactory(
         {
@@ -699,7 +702,9 @@ test('should use correct cache key for nested related records', () => {
             }),
         },
         { pkFieldName: 'id' }
-    ) {}
+    ) {
+        static cache: ViewModelCache<typeof Test3> = new ViewModelCache(Test3);
+    }
 
     const record1 = new Test3({
         id: 3,
