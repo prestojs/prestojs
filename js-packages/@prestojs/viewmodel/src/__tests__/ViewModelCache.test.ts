@@ -2954,6 +2954,60 @@ test('should support manual nested batching', async () => {
     );
 });
 
+test('many fields should work with empty list of ids', async () => {
+    const { User, Group } = createTestModels(true, true);
+    await User.fields.group.resolveViewModel();
+
+    const cb = jest.fn();
+    User.cache.addListener(1, ['id', 'name', 'groupId', 'group'], cb);
+
+    User.cache.add({
+        id: 1,
+        name: 'Bob',
+        groupId: [],
+    });
+
+    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenLastCalledWith(
+        null,
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: [],
+                group: [],
+            })
+        )
+    );
+    cb.mockReset();
+
+    User.cache.add({
+        id: 1,
+        name: 'Bobby',
+        groupId: [],
+    });
+
+    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenLastCalledWith(
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: [],
+                group: [],
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bobby',
+                groupId: [],
+                group: [],
+            })
+        )
+    );
+});
+
 test('listeners should work across related models (many)', async () => {
     const { User, Group } = createTestModels(true, true);
     await User.fields.group.resolveViewModel();

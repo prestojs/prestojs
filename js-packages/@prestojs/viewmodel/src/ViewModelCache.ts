@@ -2,7 +2,7 @@ import { isEqual as isShallowEqual } from '@prestojs/util';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
-import { normalizeFields, ViewModelFieldPaths } from './fieldUtils';
+import { CACHE_KEY_FIELD_SEPARATOR, normalizeFields, ViewModelFieldPaths } from './fieldUtils';
 import { isDev } from './util';
 import {
     ExtractFieldNames,
@@ -63,8 +63,11 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
         ChangeListener<PartialViewModel<ViewModelClassType>>[]
     >;
     /**
-     * When a record has relation fields it needs to listen for changes on those records so it can
-     * update itself and notify it's direct listeners. This Map keeps track of those listeners.
+     * When a record has relation fields a listener is added to listen for changes on the related
+     * records. When it receives notifications for those related records it can then in turn notify
+     * the listeners on the original record.
+     *
+     * This map stores these listeners.
      */
     relationListenerUnsubscribe: Map<
         ViewModelFieldPaths<ViewModelClassType>,
@@ -82,12 +85,19 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
      * This is used to choose the most recent record when a new record with a subset
      * of the fields needs to be created. For example if there are 2 existing records
      * created in this order:
-     * { id: 1, firstName: 'Jon', lastName: 'Doe', active: true }
+     *
+     * ```
+     * { id: 1, firstName: 'Jon', lastName: 'Doe', email: 'jon@doe.com' }
      * { id: 1, firstName: 'John', lastName: 'Doe' }
+     * ```
+     *
      * But a record is requested for just 'firstName' we need to create a new record
      * with just that field. We could create it from either of the existing records
      * but we want to use the _last_ record inserted - so in this case it would be:
+     *
+     * ```
      * { id: 1, firstName: 'John' }
+     * ```
      */
     private lastUpdatedKeys: ViewModelFieldPaths<ViewModelClassType>[] = [];
 
@@ -105,7 +115,9 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
     }
 
     /**
-     * Set a value for the specified key notifying any listeners
+     * Set a value for the specified `key`, then notify any listeners
+     *
+     * `lastUpdatedKeys` is always updated even if the value being set is identical.
      */
     private setValueForKey(
         key: ViewModelFieldPaths<ViewModelClassType>,
@@ -122,7 +134,7 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
         if (before === value) {
             return;
         }
-        if (before && value && isShallowEqual(before, value)) {
+        if (isShallowEqual(before, value)) {
             return;
         }
         this.cache.set(key, value);
@@ -201,7 +213,7 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                     if (idOrIds == null || (Array.isArray(idOrIds) && idOrIds.length === 0)) {
                         data[relationFieldName] = relationField.many ? [] : null;
                     } else {
-                        if (Array.isArray(idOrIds)) {
+                        if (relationField.many) {
                             const records = relationField.cache.getList(
                                 idOrIds,
                                 relationFieldPaths,
@@ -272,7 +284,8 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
 
     /**
      * Given a `baseRecord` with no related fields resolved (ie. we just have the id's, not the nested records) construct
-     * a record with all the nested records attached if those records exist in the cache.
+     * a record with all the nested records attached if those records exist in the cache. If any requested record doesn't
+     * exist in the cache then this will return `null`.
      *
      * @param key The key that contains the relations we need to resolve
      * @param baseRecord The record with the id's of the related records
@@ -288,7 +301,9 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                 relationFieldName
             ) as BaseRelatedViewModelField<any, any, any>;
             const idOrIds = baseRecord[relationField.sourceFieldName];
-            if (idOrIds != null) {
+            if (idOrIds == null || (Array.isArray(idOrIds) && idOrIds.length === 0)) {
+                newData[relationFieldName] = relationField.many ? [] : null;
+            } else {
                 if (Array.isArray(idOrIds)) {
                     const records = relationField.cache.getList(idOrIds, relationFieldPath, true);
                     if (records.length !== idOrIds.length) {
@@ -302,8 +317,6 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                     }
                     newData[relationFieldName] = record;
                 }
-            } else {
-                newData[relationFieldName] = null;
             }
         }
         return new this.viewModel(newData) as PartialViewModel<ViewModelClassType>;
@@ -337,6 +350,9 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
             return;
         }
         registeredPaths.push(key);
+        // This may already be set for a previous call to this function for a different record (ie.
+        // a previous version of the record with different related record id(s)). In that case remove
+        // the old listeners and add new ones to ensure they match the latest related record id(s).
         this.relationListenerUnsubscribe.get(key)?.forEach(unsub => unsub());
         const relationUnsubscribes: ChangeListenerUnsubscribe[] = [];
         for (const [relationFieldName, relationFieldPath] of Object.entries(key.relations)) {
@@ -693,7 +709,9 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      */
     private getPkCacheKey(pk: ExtractPkFieldParseableValueType<ViewModelClassType>): string {
         if (typeof pk === 'object') {
-            return this.viewModel.pkFieldNames.map(fieldName => pk[fieldName]).join('⁞');
+            return this.viewModel.pkFieldNames
+                .map(fieldName => pk[fieldName])
+                .join(CACHE_KEY_FIELD_SEPARATOR);
         }
         return pk.toString();
     }

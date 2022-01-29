@@ -417,7 +417,6 @@ export class BaseViewModel<
         }
 
         for (const fieldName of nonRelatedFieldNames) {
-            // TODO: Unclear to me if this needs to call a method on the Field on not. Revisit this.
             data[fieldName as string] = this[fieldName];
         }
 
@@ -510,7 +509,6 @@ export class BaseViewModel<
                     if (field.many && !assignedData[key]) {
                         assignedData[key] = [];
                     }
-                    // TODO: Make doing this part of interface rather than special case?
                     const pkOrPks = field.many
                         ? assignedData[key]?.map(r => r._key)
                         : assignedData[key]?._key;
@@ -677,7 +675,7 @@ export class BaseViewModel<
         const { pkFieldName } = this._model;
         if (Array.isArray(pkFieldName)) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
+            // @ts-ignore Typing the `acc` was too much effort to make work
             return pkFieldName.reduce((acc, fieldName) => {
                 acc[fieldName as string] = this._data[fieldName as string];
                 return acc;

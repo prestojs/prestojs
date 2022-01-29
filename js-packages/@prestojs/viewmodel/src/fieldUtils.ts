@@ -6,8 +6,8 @@ const expandedFields = new Map<ViewModelConstructor<any, any>, FieldPath<any>[]>
 /**
  * For a model expand the fields according to the rules for the '*' specification.
  *
- * This includes all field names apart from relation fields (but it does include the
- * relation `sourceFieldName`).
+ * This includes all field names apart from relation fields - however it does include the
+ * relation `sourceFieldName`.
  */
 function expandStarFields<T extends ViewModelConstructor<any, any>>(
     modelClass: T,
@@ -36,7 +36,7 @@ function expandStarFields<T extends ViewModelConstructor<any, any>>(
 
 // Separator used to join multiple values when generating a string key, eg.
 // ['a', 'b', 'c'] becomes 'a⁞b⁞c'
-const CACHE_KEY_FIELD_SEPARATOR = '⁞';
+export const CACHE_KEY_FIELD_SEPARATOR = '⁞';
 
 /**
  * Stores the field paths for a model in a standardised form for use in caching.
@@ -156,7 +156,7 @@ class ViewModelFieldPathsCache<T extends ViewModelConstructor<any, any>> {
                     const field = modelClass.getField(relatedFieldName);
                     if (!(field instanceof BaseRelatedViewModelField)) {
                         throw new InvalidFieldError(
-                            `Field '${relatedFieldName}' does not extend BaseRelatedViewModelField.`
+                            `Field '${modelClass.name}.${relatedFieldName}' does not extend BaseRelatedViewModelField.`
                         );
                     }
                     resolvedFieldNames.add(field.sourceFieldName);
@@ -196,8 +196,9 @@ class ViewModelFieldPathsCache<T extends ViewModelConstructor<any, any>> {
         const f = [...resolvedFieldNames].map(f => (Array.isArray(f) ? f.join('.') : f));
         f.sort();
         // See if it already exists
+        const key = f.join(CACHE_KEY_FIELD_SEPARATOR);
         for (const viewModelFieldPaths of this.cache.values()) {
-            if (viewModelFieldPaths.key === f.join(CACHE_KEY_FIELD_SEPARATOR)) {
+            if (viewModelFieldPaths.key === key) {
                 this.cache.set(cacheKey, viewModelFieldPaths);
                 return viewModelFieldPaths;
             }
