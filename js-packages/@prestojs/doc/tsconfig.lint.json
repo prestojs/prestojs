@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.lint.json",
+
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "/tmp/tsc-output/@prestojs/doc.tsbuildinfo",
+    "outDir": "/tmp/tsc-output/@prestojs/doc"
+  },
+  "references": [
+    {
+    }
+  ],
+
+  "include": ["src/**/*"],
+  "exclude": ["*/__tests__/**/*"]
+}

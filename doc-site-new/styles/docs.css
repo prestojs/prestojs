@@ -1,0 +1,26 @@
+.docs h1 {
+    @apply text-6xl font-bold;
+}
+.docs > p:first-of-type {
+    @apply text-2xl text-gray-600;
+}
+.docs hr {
+    @apply my-10;
+}
+.docs blockquote, .mdx blockquote  {
+    background-color: #fffbe6;
+    border-left: 4px solid #ffe58f;
+    @apply py-4 pl-6 pr-3 -mx-5 my-5;
+}
+.docs blockquote:first-child, .mdx blockquote:first-child  {
+    @apply m-0;
+}
+.docs blockquote p, .mdx blockquote p {
+    @apply mt-1;
+}
+.docs ul {
+    @apply my-3 pl-5;
+}
+.docs li {
+    @apply py-3 list-disc;
+}

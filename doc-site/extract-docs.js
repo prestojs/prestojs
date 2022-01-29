@@ -5,13 +5,13 @@ const TypeDoc = require('typedoc');
 const ts = require('typescript');
 const fs = require('fs');
 const path = require('path');
-const {
-    expandPackages,
-    loadPackageManifest,
-    getTsEntryPointForPackage,
-    ignorePackage,
-} = require('typedoc/dist/lib/utils/package-manifest');
-const { UnknownType } = require('typedoc/dist/lib/models');
+// const {
+//     expandPackages,
+//     loadPackageManifest,
+//     getTsEntryPointForPackage,
+//     ignorePackage,
+// } = require('typedoc/dist/lib/utils/package-manifest.js');
+// const { UnknownType } = require('typedoc/dist/lib/models');
 const { normalizePath } = TypeDoc;
 
 function readDirRecursive(dir) {
@@ -176,6 +176,11 @@ async function process(data) {
         }
         const extractedChildren = [rest];
         for (const child of node.children) {
+            if (child.kindString === 'Namespace') {
+                // This is specifically for the typedoc-plugin-missing-exports plugin which adds internal types into
+                // a namespace called <internal>
+                child.sources = node.sources;
+            }
             extractedChildren.push(...(await extractChildren(child)));
         }
         return extractedChildren;
@@ -234,32 +239,7 @@ async function process(data) {
         }
     });
 
-    fs.writeFileSync('./data/typeDocs.json', JSON.stringify(finalData, null, 2));
-
-    const menuByName = {};
-    for (const datum of finalData) {
-        if (datum.extractDocs) {
-            const slug = datum.slug.split('/').filter(Boolean);
-            const groupName = datum.menuGroup;
-            menuByName[datum.packageName] = menuByName[datum.packageName] || {};
-            menuByName[datum.packageName][groupName] =
-                menuByName[datum.packageName][groupName] || [];
-            menuByName[datum.packageName][groupName].push({
-                title: datum.name,
-                slug: slug.join('/'),
-            });
-        }
-    }
-
-    fs.writeFileSync('./data/apiMenu.json', JSON.stringify(menuByName, null, 2));
-
-    const missedExamples = Object.keys(exampleFiles).filter(key => !pickedExamples.includes(key));
-    if (missedExamples.length > 0) {
-        console.error(`There are example files that were not matched to a source file:
-    
-${missedExamples.join('\n')}
-    `);
-    }
+    return finalData;
 }
 
 function getEntryPointsForPackages(logger, packageGlobPaths) {
@@ -330,7 +310,86 @@ function getEntryPointsForPackages(logger, packageGlobPaths) {
     return results;
 }
 
+function getTsFiles(dir) {
+    if (dir.endsWith('__tests__')) {
+        return [];
+    }
+    const files = [];
+    for (const f of fs.readdirSync(dir)) {
+        if (f === 'index.ts') {
+            continue;
+        }
+        const fn = path.join(dir, f);
+        if (fs.statSync(fn).isDirectory()) {
+            files.push(...getTsFiles(fn));
+        } else if (fn.endsWith('ts') || fs.endsWith('tsx')) {
+            files.push(fn);
+        }
+    }
+    return files;
+}
+
 async function main() {
+    let data = [];
+
+    const packagesRoot = path.resolve(root, 'js-packages/@prestojs/');
+
+    for (const pkg of ['util', 'viewmodel']) {
+        //fs.readdirSync(packagesRoot)) {
+        if (pkg === 'codegen') continue;
+        const app = new TypeDoc.Application();
+
+        app.options.addReader(new TypeDoc.TSConfigReader());
+        const entryPoints = getTsFiles(path.join(packagesRoot, pkg, 'src/'));
+        console.log(entryPoints);
+        app.bootstrap({
+            // entryPoints: [path.join(packagesRoot, pkg, 'src/index.ts')],
+            entryPoints,
+            tsconfig: path.join(packagesRoot, pkg, 'tsconfig.json'),
+            // plugin: [
+            //     path.resolve(root, 'doc-site/plugins/forceExport.js'),
+            //     'typedoc-plugin-rename-defaults',
+            // ],
+        });
+
+        const project = app.convert();
+
+        const tmpFile = `./___temp_${pkg}.json`;
+        await app.generateJson(project, tmpFile);
+        const moduleData = await process(require(tmpFile));
+        data.push(...moduleData);
+        // fs.unlinkSync(tmpFile);
+    }
+
+    fs.writeFileSync('./data/typeDocs.json', JSON.stringify(data, null, 2));
+
+    const menuByName = {};
+    for (const datum of data) {
+        if (datum.extractDocs) {
+            const slug = datum.slug.split('/').filter(Boolean);
+            const groupName = datum.menuGroup;
+            menuByName[datum.packageName] = menuByName[datum.packageName] || {};
+            menuByName[datum.packageName][groupName] =
+                menuByName[datum.packageName][groupName] || [];
+            menuByName[datum.packageName][groupName].push({
+                title: datum.name,
+                slug: slug.join('/'),
+            });
+        }
+    }
+
+    fs.writeFileSync('./data/apiMenu.json', JSON.stringify(menuByName, null, 2));
+
+    const missedExamples = Object.keys(exampleFiles).filter(key => !pickedExamples.includes(key));
+    if (missedExamples.length > 0) {
+        console.error(`There are example files that were not matched to a source file:
+    
+${missedExamples.join('\n')}
+    `);
+    }
+}
+
+async function main_old() {
     const app = new TypeDoc.Application();
     app.options.addReader(new TypeDoc.TSConfigReader());
     const packagesRoot = path.resolve(root, 'js-packages/@prestojs/');
@@ -404,11 +463,11 @@ async function main() {
     // Application.convert checks for compiler errors here.
 
     const packages = app.options.getValue('packages').map(normalizePath);
-    const entryPoints = getEntryPointsForPackages(app.logger, packages);
+    // const entryPoints = getEntryPointsForPackages(app.logger, packages);
     // console.log(entryPoints);
-    const project = app.converter.convert(entryPoints, program);
+    // const project = app.converter.convert(entryPoints, program);
 
-    // const project = app.convert();
+    const project = app.convert();
 
     if (project) {
         const tmpFile = './___temp.json';
