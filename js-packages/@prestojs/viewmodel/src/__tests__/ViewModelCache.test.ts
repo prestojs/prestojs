@@ -894,6 +894,20 @@ test('should support nested paths', async () => {
     ]);
 });
 
+test('should handle nested related when related id is updated', async () => {
+    const { User } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+
+    User.cache.add({ id: 1, name: 'Bob', group: { id: 1, name: 'Staff', ownerId: 1 } });
+    expect(User.cache.get(1, ['id', 'name', ['group', 'name']])).toBeEqualToRecord(
+        new User({ id: 1, name: 'Bob', group: { id: 1, name: 'Staff' } })
+    );
+    User.cache.add({ id: 1, name: 'Bobby', groupId: 1 });
+    expect(User.cache.get(1, ['id', 'name', ['group', 'name']])).toBeEqualToRecord(
+        new User({ id: 1, name: 'Bobby', group: { id: 1, name: 'Staff' } })
+    );
+});
+
 test('should handle nullable values', async () => {
     const { User, Group, Subscription } = createTestModels(true);
     await User.fields.group.resolveViewModel();

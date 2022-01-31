@@ -1,6 +1,5 @@
 import { isEqual as isShallowEqual } from '@prestojs/util';
-import get from 'lodash/get';
-import set from 'lodash/set';
+import pick from 'lodash/pick';
 import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
 import { CACHE_KEY_FIELD_SEPARATOR, normalizeFields, ViewModelFieldPaths } from './fieldUtils';
 import { isDev } from './util';
@@ -158,13 +157,16 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
      */
     add(record: PartialViewModel<ViewModelClassType>): void {
         for (const cacheKey of new Set([...this.cache.keys(), ...this.cacheListeners.keys()])) {
-            if (record._assignedFieldPaths.isSubset(cacheKey as ViewModelFieldPaths<any>)) {
-                const data = cacheKey.fieldPaths.reduce((acc, path) => {
-                    set(acc, path, get(record, path));
-                    return acc;
-                }, {});
-                const r = new this.viewModel(data) as PartialViewModel<ViewModelClassType>;
-                this.setValueForKey(cacheKey, r);
+            // Check if subset but don't worry about nested fields (second argument). Nested fields are
+            // handled in `constructWithRelatedRecords`. This makes it so a key that contains nested
+            // fields will work even if a record with only the id for that relation is set so long as
+            // the nested values already exist in the related record cache.
+            // See the 'should handle nested related when related id is updated' test case for example.
+            if (record._assignedFieldPaths.isSubset(cacheKey as ViewModelFieldPaths<any>, true)) {
+                const recordWithRelations = this.constructWithRelatedRecords(cacheKey, record);
+                if (recordWithRelations) {
+                    this.setValueForKey(cacheKey, recordWithRelations);
+                }
             }
         }
         // If record contains related records we have to populate the related caches as well
@@ -295,7 +297,8 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
         key: ViewModelFieldPaths<ViewModelClassType>,
         baseRecord: PartialViewModel<ViewModelClassType>
     ): PartialViewModel<ViewModelClassType> | null {
-        const newData = { ...baseRecord._data } as Record<string, any>;
+        // Only keep the fields that are actually in `key` - any extra fields on baseRecord are discarded
+        const newData = pick(baseRecord, key.nonRelationFieldNames);
         for (const [relationFieldName, relationFieldPath] of Object.entries(key.relations)) {
             const relationField = this.viewModel.getField(
                 relationFieldName
