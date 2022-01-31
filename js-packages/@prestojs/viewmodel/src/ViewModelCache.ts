@@ -689,7 +689,7 @@ const defaultListenerBatcher = {
  */
 export default class ViewModelCache<ViewModelClassType extends ViewModelConstructor<any, any>> {
     viewModel: ViewModelClassType;
-    fieldNameCache: Map<string, RecordFieldNameCache<ViewModelClassType>>;
+    private fieldNameCache: Map<string, RecordFieldNameCache<ViewModelClassType>>;
     static listenerBatcher = defaultListenerBatcher;
 
     /**
@@ -698,6 +698,12 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     constructor(viewModel: ViewModelClassType) {
         this.viewModel = viewModel;
         this.fieldNameCache = new Map();
+    }
+
+    get cache(): never {
+        throw new Error(
+            "'cache' property renamed to 'fieldNameCache'. This is a private implementation detail and should not be used."
+        );
     }
 
     /**

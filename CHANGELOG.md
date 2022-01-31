@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+* ViewModelCache rewritten to resolve some longstanding bugs and make implementation easier to maintain
+  * The private `cache` attribute on the ViewModelCache has been renamed to `fieldNameCache`. Ideally you should not access this as it may change in the future but if you rely on it update to use the new name.
+    * If you just need the id's that are cached you can use `model.cache.getAll(model.pkFieldNames).map(record => record._key)`
+  * The accepted values for specifying the field paths to retrieves is more strict for related records. If you wish to retrieve all fields on a related record you could previously specify it as a nested array with a single element, eg
+    `[['members']]`. Now you must specify it without the redundant array: `['members']`.
+
 ## [0.0.24] - 2021-12-13
 
 ### Changed
