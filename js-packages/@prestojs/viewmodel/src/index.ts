@@ -1,4 +1,4 @@
-export { default as viewModelFactory } from './ViewModelFactory';
+export { default as viewModelFactory, BaseViewModel } from './ViewModelFactory';
 export { default as ViewModelCache } from './ViewModelCache';
 export { default as Field } from './fields/Field';
 

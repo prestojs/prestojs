@@ -41,7 +41,6 @@ class User extends viewModelFactory(
         return '';
     }
 }
-const x = User.fields.group.sourceFieldName;
 
 {
     // Test 'add', 'addList'
@@ -140,6 +139,12 @@ const x = User.fields.group.sourceFieldName;
             'firstName' | 'id' | 'groupId' | 'groupIds' | 'groups' | 'group'
         > | null)[]
     >(User.cache.getList([1], '*', false));
+    const records = [
+        new User({ id: 1, firstName: 'test' }),
+        new User({ id: 1, firstName: 'test' }),
+    ];
+    expectType<typeof records>(User.cache.getList(records));
+    expectType<(typeof records[number] | null)[]>(User.cache.getList(records, false));
 }
 
 {

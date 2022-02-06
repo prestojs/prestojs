@@ -188,7 +188,9 @@ interface ViewModelOptions<
     PkFieldNameT extends ExtractFieldNames<T> | ExtractFieldNames<T>[]
 > {
     /**
-     * Optional base class to extend. When calling `augment` this is set the augmented class.
+     * Optional base class to extend. This must extend [BaseViewModel](doc:BaseViewModel).
+     *
+     * When calling `augment` this is set the augmented class.
      *
      * @type-name Class
      */
@@ -274,6 +276,14 @@ export class MissingFieldsError extends Error {
     }
 }
 
+/**
+ * The base class all ViewModel classes will extend.
+ *
+ * If you use the [baseClass](doc:viewModelFactory##method-viewmodel) option the class passed must extend
+ * `BaseViewModel`.
+ *
+ * @extract-docs
+ */
 export class BaseViewModel<
     FieldMappingType extends FieldsMapping,
     PkFieldType extends ExtractPkFieldTypes<FieldMappingType>,

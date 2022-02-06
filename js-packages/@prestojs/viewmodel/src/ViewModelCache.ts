@@ -13,6 +13,7 @@ import {
     isViewModelInstance,
     PartialViewModel,
     ViewModelConstructor,
+    ViewModelInterface,
 } from './ViewModelFactory';
 
 type ChangeListener<T> = (previous?: T | null, next?: T | null) => void;
@@ -1056,6 +1057,13 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      * @param removeNulls whether to remove entries that have no record in the cache. Defaults to true.
      * @returns an array of the cached records. Any records not found will be in the array as a null value if `removeNulls` is false otherwise they will be removed.
      **/
+    getList<
+        T extends ViewModelInterface<
+            ViewModelClassType['fields'],
+            ViewModelClassType['pkFieldName']
+        >,
+        RemoveNullsT extends boolean = true
+    >(records: T[], removeNulls?: RemoveNullsT): RemoveNullsT extends true ? T[] : (T | null)[];
     getList<T extends FieldPath<ViewModelClassType>, RemoveNullsT extends boolean = true>(
         records: PartialViewModel<ViewModelClassType, T>[],
         removeNulls?: RemoveNullsT
