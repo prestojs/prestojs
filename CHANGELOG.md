@@ -9,6 +9,21 @@
     * If you just need the id's that are cached you can use `model.cache.getAll(model.pkFieldNames).map(record => record._key)`
   * The accepted values for specifying the field paths to retrieves is more strict for related records. If you wish to retrieve all fields on a related record you could previously specify it as a nested array with a single element, eg
     `[['members']]`. Now you must specify it without the redundant array: `['members']`.
+  * Previously it was common to type field names to pass to `ViewModelCache` like: `const projectFieldNames = ['title', 'clientTitle'] as const;`. You can now type them as `const projectFieldNames: FieldPath<typeof Project>[] = ['title', 'clientTitle'];` which will check all fields specified are valid.
+  * To get the best typing on the default cache for a ViewModel explicitly assign it as shown below
+  
+    ```typescript
+    export default class Timecard extends viewModelFactory({ ...}, { ... }) {
+        static cache: ViewModelCache<typeof Timecard> = new ViewModelCache(Timecard);
+    }
+    ```
+  * ViewModelFactory adds some new properties to the ViewModel class
+    * You must now always pass `pkFieldName` and the old implicit foreign key support has been removed. This was done to greatly simplify types and implementation.
+      * If you are using codegen to create models then you likely do not need to do anything at all. For any manually created classes check that the `id` field is explicitly defined and `pkFieldName` is passed.
+    * [_assignedFieldsDeep](https://prestojs.com/docs/viewmodel/viewModelFactory/#var-_assignedFieldsDeep) - Deep field names set on this record. If no relations are set this is the same as `_assignedFields`.
+    * [_assignedFieldPaths](https://prestojs.com/docs/viewmodel/viewModelFactory/#var-_assignedFieldPaths) - A new structure that is unique based on the fields set. If 2 records have the same fields set then this will be the same instance so can be compared directly.
+    * Various typing improvements
+  * Added the `cache` option to [RelatedViewModelField](https://prestojs.com/docs/viewmodel/fields/RelatedViewModelField/#constructor)
 
 ## [0.0.24] - 2021-12-13
 
