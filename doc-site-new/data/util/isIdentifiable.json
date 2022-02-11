@@ -1,0 +1,66 @@
+{
+  "id": 33,
+  "name": "isIdentifiable",
+  "kind": 64,
+  "kindString": "Function",
+  "flags": {},
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+      "line": 29,
+      "character": 16
+    }
+  ],
+  "signatures": [
+    {
+      "id": 34,
+      "name": "isIdentifiable",
+      "kind": 4096,
+      "kindString": "Call signature",
+      "flags": {},
+      "comment": {
+        "shortText": "Check if a value conforms to Identifiable",
+        "tags": [
+          {
+            "tag": "extract-docs",
+            "text": ""
+          },
+          {
+            "tag": "menu-group",
+            "text": "Identifiable\n"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "id": 35,
+          "name": "item",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "type": {
+            "type": "intrinsic",
+            "name": "any"
+          }
+        }
+      ],
+      "type": {
+        "type": "predicate",
+        "name": "item",
+        "asserts": false,
+        "targetType": {
+          "type": "reference",
+          "id": 55,
+          "name": "Identifiable"
+        }
+      }
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "Identifiable",
+  "permaLink": "util/isIdentifiable",
+  "packageName": "util",
+  "childIds": []
+}

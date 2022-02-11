@@ -1,0 +1,64 @@
+{
+  "id": 11,
+  "name": "getNodeLabel",
+  "kind": 64,
+  "kindString": "Function",
+  "flags": {},
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
+      "line": 82,
+      "character": 16
+    }
+  ],
+  "signatures": [
+    {
+      "id": 12,
+      "name": "getNodeLabel",
+      "kind": 4096,
+      "kindString": "Call signature",
+      "flags": {},
+      "comment": {
+        "shortText": "Get a React node label from an item",
+        "text": "If item implements `getNodeLabel` that will be used otherwise `getLabel` will be used.\n\nIf neither are defined an error is thrown. To conditional call this check if labeled first\nwith `isLabeled`.\n",
+        "tags": [
+          {
+            "tag": "extract-docs",
+            "text": ""
+          },
+          {
+            "tag": "menu-group",
+            "text": "Labeled\n"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "id": 13,
+          "name": "item",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "type": {
+            "type": "intrinsic",
+            "name": "any"
+          }
+        }
+      ],
+      "type": {
+        "type": "reference",
+        "id": 717,
+        "qualifiedName": "React.ReactNode",
+        "package": "@types/react",
+        "name": "React.ReactNode"
+      }
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "Labeled",
+  "permaLink": "util/getNodeLabel",
+  "packageName": "util",
+  "childIds": []
+}

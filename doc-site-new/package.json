@@ -11,8 +11,12 @@
     "build-storybook": "build-storybook -s public"
   },
   "dependencies": {
-    "antd": "^4.15.0",
     "@ant-design/icons": "^4.7.0",
+    "@mdx-js/mdx": "^2.0.0",
+    "@mdx-js/loader": "^2.0.0",
+    "@mdx-js/react": "^2.0.0",
+    "@mdx-js/runtime": "^1.6.22",
+    "@next/mdx": "^12.0.10",
     "@prestojs/final-form": "*",
     "@prestojs/rest": "*",
     "@prestojs/routing": "*",
@@ -20,6 +24,7 @@
     "@prestojs/ui-antd": "*",
     "@prestojs/util": "*",
     "@prestojs/viewmodel": "*",
+    "antd": "^4.15.0",
     "autoprefixer": "^10.4.2",
     "next": "12.0.8",
     "postcss": "^8.4.5",

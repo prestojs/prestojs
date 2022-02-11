@@ -1,0 +1,66 @@
+{
+  "id": 5,
+  "name": "isNodeLabeled",
+  "kind": 64,
+  "kindString": "Function",
+  "flags": {},
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
+      "line": 55,
+      "character": 16
+    }
+  ],
+  "signatures": [
+    {
+      "id": 6,
+      "name": "isNodeLabeled",
+      "kind": 4096,
+      "kindString": "Call signature",
+      "flags": {},
+      "comment": {
+        "shortText": "Check if a value conforms to NodeLabeled",
+        "tags": [
+          {
+            "tag": "extract-docs",
+            "text": ""
+          },
+          {
+            "tag": "menu-group",
+            "text": "Labeled\n"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "id": 7,
+          "name": "item",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "type": {
+            "type": "intrinsic",
+            "name": "any"
+          }
+        }
+      ],
+      "type": {
+        "type": "predicate",
+        "name": "item",
+        "asserts": false,
+        "targetType": {
+          "type": "reference",
+          "id": 20,
+          "name": "NodeLabeled"
+        }
+      }
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "Labeled",
+  "permaLink": "util/isNodeLabeled",
+  "packageName": "util",
+  "childIds": []
+}

@@ -9,7 +9,7 @@ data.children?.[0].kindString === '';
 
 const root = path.resolve(__dirname, '../../');
 
-async function extractChildren(node) {
+async function extractChildren(node: JSONOutput.DeclarationReflection) {
     const { children, ...rest } = node;
     let extractDocs = false;
     let menuGroup;
@@ -22,10 +22,11 @@ async function extractChildren(node) {
     let returnTagText;
     let docClass;
     let isForwardRef = false;
+    let tagsByName: Record<string, any> = {};
     if (comment && comment.tags) {
-        const tagsByName = comment.tags.reduce((acc, tag) => {
+        tagsByName = comment.tags.reduce((acc, tag) => {
             acc[tag.tag] = tag.text.trim();
-            if (tag.tag === 'param') {
+            if (tag.param) {
                 paramTags[tag.param] = tag.text;
             }
             if (tag.tag === 'return' || tag.tag === 'returns') {
@@ -37,38 +38,34 @@ async function extractChildren(node) {
         docClass = tagsByName['doc-class'];
         menuGroup = tagsByName['menu-group'] || 'default';
         isForwardRef = 'forward-ref' in tagsByName;
-        comment.tagsByName = tagsByName;
-        const dir = root + '/' + node.sources[0].fileName.split('/').slice(0, -1).join('/') + '/';
-        if (comment.shortText && comment.shortText.includes('codesandbox=')) {
-            console.log(
-                'wow',
-                comment.text,
-                comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`)
-            );
-            comment.shortText = comment.shortText.replace(/codesandbox=/g, `codesandbox=${dir}`);
-        }
-        if (comment.text && comment.text.includes('codesandbox=')) {
-            console.log(
-                'wow',
-                comment.text,
-                comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`)
-            );
-            comment.text = comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`);
-        }
+        // const dir = root + '/' + node.sources[0].fileName.split('/').slice(0, -1).join('/') + '/';
+        // if (comment.shortText && comment.shortText.includes('codesandbox=')) {
+        //     console.log(
+        //         'wow',
+        //         comment.text,
+        //         comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`)
+        //     );
+        //     comment.shortText = comment.shortText.replace(/codesandbox=/g, `codesandbox=${dir}`);
+        // }
+        // if (comment.text && comment.text.includes('codesandbox=')) {
+        //     console.log(
+        //         'wow',
+        //         comment.text,
+        //         comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`)
+        //     );
+        //     comment.text = comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`);
+        // }
     }
-    rest.isForwardRef = isForwardRef;
-    rest.docClass = docClass;
-    rest.extractDocs = extractDocs;
-    rest.menuGroup = menuGroup;
+    let mdx: string | null = null;
     // Hacky workaround to get param descriptions for function type aliases
     if (
         Object.keys(paramTags).length > 0 &&
         rest.kindString === 'Type alias' &&
-        rest.type.type === 'reflection' &&
+        rest.type?.type === 'reflection' &&
         rest.type.declaration &&
         rest.type.declaration.signatures
     ) {
-        rest.type.declaration.signatures[0].parameters.forEach(param => {
+        rest.type.declaration.signatures[0].parameters?.forEach(param => {
             if (paramTags[param.name]) {
                 param.comment = {
                     text: paramTags[param.name],
@@ -96,16 +93,22 @@ async function extractChildren(node) {
     //     pickedExamples.push(exampleKey);
     //     rest.examples = examples;
     // }
-    rest.slug = permaLink;
-    rest.packageName = packageName;
-    if (children) {
-        rest.childIds = children.map(child => child.id);
-    }
-    rest.children = children;
+    const docItem = {
+        ...rest,
+        mdx,
+        isForwardRef,
+        docClass,
+        extractDocs,
+        menuGroup,
+        permaLink,
+        packageName,
+        childIds: children ? children.map(child => child.id) : [],
+        children,
+    };
     if (!node.children) {
-        return [rest];
+        return [docItem];
     }
-    const extractedChildren = [rest];
+    const extractedChildren = [docItem];
     for (const child of node.children) {
         if (child.kindString === 'Namespace') {
             // This is specifically for the typedoc-plugin-missing-exports plugin which adds internal types into
@@ -118,17 +121,34 @@ async function extractChildren(node) {
 }
 
 async function main() {
+    console.log('start');
     if (data.children) {
         // @ts-ignore
-        const x = await extractChildren(data.children[0]);
+        const y = data.children[0];
+        // TODO: types
+        const x: any[] = [];
+        for (const child of data.children) {
+            x.push(...(await extractChildren(child)));
+        }
         console.log(
             'yooo',
             x.filter(y => y.extractDocs)
         );
-        fs.writeFileSync(
-            path.resolve(__dirname, '../data/typeDocs.json'),
-            JSON.stringify(x, null, 2)
-        );
+        const docsPath = path.resolve(__dirname, '../data/');
+
+        for (const docItem of x) {
+            if (!docItem.extractDocs) {
+                continue;
+            }
+            const packageDir = `${docsPath}/${docItem.packageName}`;
+            if (!fs.existsSync(packageDir)) {
+                fs.mkdirSync(packageDir);
+            }
+            fs.writeFileSync(
+                path.resolve(packageDir, `${docItem.name}.json`),
+                JSON.stringify(docItem, null, 2)
+            );
+        }
     }
 }
 

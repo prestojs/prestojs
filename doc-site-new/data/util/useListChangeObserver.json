@@ -1,0 +1,139 @@
+{
+  "id": 696,
+  "name": "useListChangeObserver",
+  "kind": 64,
+  "kindString": "Function",
+  "flags": {},
+  "originalName": "default",
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+      "line": 121,
+      "character": 24
+    }
+  ],
+  "signatures": [
+    {
+      "id": 697,
+      "name": "useListChangeObserver",
+      "kind": 4096,
+      "kindString": "Call signature",
+      "flags": {},
+      "comment": {
+        "shortText": "Call a function whenever values in a list change. This differs from `useChangeObserver` by\nallowing you to choose what changes you get (additions, updates, deletions) and to be passed the\nchanged items in the callback. In order to achieve this each item in the array needs to have a\nunique ID which is obtained by calling the `options.getId` function. The default implementation will\nlook for a `_key` or `id` property and return this, otherwise it return the value as is. This default\nimplementation is compatible with [ViewModel](doc:viewModelFactory) so you can pass lists of\nrecords returned from [useViewModelCache](doc:useViewModelCache).",
+        "text": "```jsx\nexport default function UserListView() {\n  const { data, revalidate, isValidating } = useEndpoint(User.endpoints.list);\n  // Refetch data whenever underlying cache changes\n  const allRecords = useViewModelCache(User, cache => cache.getAll(fieldList));\n  // NOTE: Usually you don't want multiple useListChangeObserver's on the exact same\n  // subset of data as you will trigger redundant ajax queries.\n  // if a record is updated & saved elsewhere, then useViewModelCache will return new\n  // data which triggers useListChangeObserver. We still want useListChangeObserver()\n  // to trigger the useEndpoint() revalidate because that record update may have changed the\n  // order of records or caused it to [no longer] appear in a filtered list of data.\n  // Also note that we pass false while data is being fetched from the backend\n  useListChangeObserver(!isValidating && allRecords, revalidate);\n  return <ListView records={data} />;\n}\n```\n",
+        "returns": "No return value\n",
+        "tags": [
+          {
+            "tag": "extract-docs",
+            "text": "\n"
+          }
+        ]
+      },
+      "typeParameter": [
+        {
+          "id": 698,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "type": {
+            "type": "array",
+            "elementType": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "id": 699,
+          "name": "value",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "comment": {
+            "shortText": "An array of values to monitor for changes. A falsey value can be passed to disable\nchecks. This is the same as passing `options.disabled`. This is convenient for cases where no value\nis available yet (eg. when waiting for initial response from an API endpoint)"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "intrinsic",
+                "name": "undefined"
+              },
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "literal",
+                "value": false
+              },
+              {
+                "type": "reference",
+                "id": 698,
+                "name": "T"
+              }
+            ]
+          }
+        },
+        {
+          "id": 700,
+          "name": "onChange",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "comment": {
+            "shortText": "A method that will be called on any changes. This is passed an object of changes in the form:\n\n```\n{\n    ADD: [...],\n    UPDATE: [[<prev value>, <updated value>]...],\n    DELETE: [...],\n}\n```\nEach change type (ADD, UPDATE, DELETE) will be `false` if no value has changed.\n\nThe last and next list of records are also passed.\n"
+          },
+          "type": {
+            "type": "reference",
+            "id": 1803,
+            "typeArguments": [
+              {
+                "type": "reference",
+                "id": 698,
+                "name": "T"
+              }
+            ],
+            "name": "OnChange"
+          }
+        },
+        {
+          "id": 701,
+          "name": "options",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {
+            "isOptional": true
+          },
+          "type": {
+            "type": "reference",
+            "id": 1810,
+            "typeArguments": [
+              {
+                "type": "reference",
+                "id": 698,
+                "name": "T"
+              }
+            ],
+            "name": "ListChangeObserverOptions"
+          }
+        }
+      ],
+      "type": {
+        "type": "intrinsic",
+        "name": "void"
+      }
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "default",
+  "permaLink": "util/useListChangeObserver",
+  "packageName": "util",
+  "childIds": []
+}

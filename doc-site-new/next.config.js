@@ -17,6 +17,12 @@ const nextConfig = {
         },
     },
     reactStrictMode: true,
+    webpack: (config, { isServer }) => {
+        if (!isServer) {
+            config.resolve.fallback.fs = false;
+        }
+        return config;
+    },
 };
 const withLess = require('next-with-less');
 // const withAntdLess = require('next-plugin-antd-less');

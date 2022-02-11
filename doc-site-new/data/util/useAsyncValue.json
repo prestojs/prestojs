@@ -1,0 +1,173 @@
+{
+  "id": 664,
+  "name": "useAsyncValue",
+  "kind": 64,
+  "kindString": "Function",
+  "flags": {},
+  "originalName": "default",
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/useAsyncValue.ts",
+      "line": 148,
+      "character": 24
+    }
+  ],
+  "signatures": [
+    {
+      "id": 665,
+      "name": "useAsyncValue",
+      "kind": 4096,
+      "kindString": "Call signature",
+      "flags": {},
+      "comment": {
+        "shortText": "Resolve a value from an id using an async function.",
+        "text": "For the specified `id` the `resolve` function will be called and should\nreturn the value for the specified id.\n\nIf `existingValues` is provided this will be consulted first before calling\n`resolve`. This is useful when you have a list of values that may or\nmay not have the data you care about. If it's there then the value will\nbe returned immediately.\n\nFor multiple values see documentation below.\n",
+        "tags": [
+          {
+            "tag": "extract-docs",
+            "text": "\n"
+          }
+        ]
+      },
+      "typeParameter": [
+        {
+          "id": 666,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {}
+        },
+        {
+          "id": 667,
+          "name": "U",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "type": {
+            "type": "reference",
+            "id": 54,
+            "name": "Id"
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "id": 668,
+          "name": "props",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "type": {
+            "type": "reference",
+            "id": 637,
+            "typeArguments": [
+              {
+                "type": "reference",
+                "id": 666,
+                "name": "T"
+              },
+              {
+                "type": "reference",
+                "id": 667,
+                "name": "U"
+              }
+            ],
+            "name": "UseAsyncValuePropsSingle"
+          }
+        }
+      ],
+      "type": {
+        "type": "reference",
+        "id": 653,
+        "typeArguments": [
+          {
+            "type": "reference",
+            "id": 666,
+            "name": "T"
+          }
+        ],
+        "name": "UseAsyncValueReturn"
+      }
+    },
+    {
+      "id": 669,
+      "name": "useAsyncValue",
+      "kind": 4096,
+      "kindString": "Call signature",
+      "flags": {},
+      "comment": {
+        "shortText": "Resolve values from an array of ids using an async function.",
+        "text": "For the specified array of `ids` the `resolve` function will be called\nand should return an array of the same size with each entry being the resolved\nvalue for the corresponding id.\n\nIf `existingValues` is provided this will be consulted first before calling\n`resolve`. This is useful when you have a list of values that may or\nmay not have the data you care about. If it's there then the values will\nbe returned immediately. Note that if any of the ids are missing from\n`existingValues` then it will be ignored and a call to `resolve` will be made\nrequesting values for all `ids`.\n"
+      },
+      "typeParameter": [
+        {
+          "id": 670,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {}
+        },
+        {
+          "id": 671,
+          "name": "U",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "type": {
+            "type": "reference",
+            "id": 54,
+            "name": "Id"
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "id": 672,
+          "name": "props",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "type": {
+            "type": "reference",
+            "id": 645,
+            "typeArguments": [
+              {
+                "type": "reference",
+                "id": 670,
+                "name": "T"
+              },
+              {
+                "type": "reference",
+                "id": 671,
+                "name": "U"
+              }
+            ],
+            "name": "UseAsyncValuePropsMulti"
+          }
+        }
+      ],
+      "type": {
+        "type": "reference",
+        "id": 653,
+        "typeArguments": [
+          {
+            "type": "array",
+            "elementType": {
+              "type": "reference",
+              "id": 670,
+              "name": "T"
+            }
+          }
+        ],
+        "name": "UseAsyncValueReturn"
+      }
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "default",
+  "permaLink": "util/useAsyncValue",
+  "packageName": "util",
+  "childIds": []
+}

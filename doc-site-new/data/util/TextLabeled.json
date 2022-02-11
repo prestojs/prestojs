@@ -1,0 +1,72 @@
+{
+  "id": 17,
+  "name": "TextLabeled",
+  "kind": 256,
+  "kindString": "Interface",
+  "flags": {},
+  "comment": {
+    "shortText": "Interface for items that provide a plain text label. Implementing this can save you having to pass\nexplicit functions to label an item in other parts of the system (eg. for [AsyncChoices](doc:AsyncChoices))",
+    "text": "See [isTextLabeled](doc:isTextLabeled) and [getTextLabel](doc:getTextLabel).\n",
+    "tags": [
+      {
+        "tag": "extract-docs",
+        "text": ""
+      },
+      {
+        "tag": "menu-group",
+        "text": "Labeled\n"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "title": "Methods",
+      "kind": 2048,
+      "children": [
+        18
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
+      "line": 10,
+      "character": 17
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "Labeled",
+  "permaLink": "util/TextLabeled",
+  "packageName": "util",
+  "childIds": [
+    18
+  ],
+  "children": [
+    {
+      "id": 18,
+      "name": "getLabel",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "signatures": [
+        {
+          "id": 19,
+          "name": "getLabel",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the plain text label for this item. This must return a string",
+            "text": "See [isTextLabeled](doc:isTextLabeled) to test for support and [getTextLabel](doc:getTextLabel) for easiest way\nto get the label.\n"
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          }
+        }
+      ]
+    }
+  ]
+}

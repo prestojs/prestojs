@@ -1,0 +1,480 @@
+{
+  "id": 528,
+  "name": "usePaginator",
+  "kind": 64,
+  "kindString": "Function",
+  "flags": {},
+  "originalName": "default",
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/pagination/usePaginator.ts",
+      "line": 28,
+      "character": 24
+    }
+  ],
+  "signatures": [
+    {
+      "id": 529,
+      "name": "usePaginator",
+      "kind": 4096,
+      "kindString": "Call signature",
+      "flags": {},
+      "comment": {
+        "shortText": "Hook to help manage paginator state. An instance of the specified paginator is created with provided\nstate setter or a default setter if none provided. You only need to provide a state setter if you\nwant to store the state somewhere external eg. from URL query parameters.",
+        "tags": [
+          {
+            "tag": "menu-group",
+            "text": "Pagination"
+          },
+          {
+            "tag": "extract-docs",
+            "text": "\n"
+          }
+        ]
+      },
+      "typeParameter": [
+        {
+          "id": 532,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "type": {
+            "type": "reference",
+            "id": 404,
+            "typeArguments": [
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 530,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {}
+                }
+              },
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 531,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {}
+                }
+              },
+              {
+                "type": "reference",
+                "id": 532,
+                "name": "T"
+              }
+            ],
+            "name": "PaginatorInterface"
+          }
+        },
+        {
+          "id": 533,
+          "name": "PaginatorState",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {}
+        }
+      ],
+      "parameters": [
+        {
+          "id": 534,
+          "name": "paginatorClassOrProvider",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "comment": {
+            "shortText": "Must either be an object with a `getPaginatorClass` method (eg.\n[Endpoint](doc:Endpoint)) or a [Paginator](doc:Paginator) class. This class defines how pagination is\nhandled."
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "reference",
+                "id": 442,
+                "typeArguments": [
+                  {
+                    "type": "reference",
+                    "id": 532,
+                    "name": "T"
+                  }
+                ],
+                "name": "PaginatorInterfaceClass"
+              },
+              {
+                "type": "reference",
+                "id": 524,
+                "typeArguments": [
+                  {
+                    "type": "reference",
+                    "id": 532,
+                    "name": "T"
+                  }
+                ],
+                "name": "PaginatorClassProvider"
+              }
+            ]
+          }
+        },
+        {
+          "id": 535,
+          "name": "currentStatePair",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {
+            "isOptional": true
+          },
+          "comment": {
+            "shortText": "A tuple of current state and a state setter function. If not provided state\nis handled internally in usePaginator. You can pass `useState()` to this parameter.\n"
+          },
+          "type": {
+            "type": "tuple",
+            "elements": [
+              {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "intrinsic",
+                    "name": "undefined"
+                  },
+                  {
+                    "type": "reference",
+                    "id": 533,
+                    "name": "PaginatorState"
+                  }
+                ]
+              },
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 536,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "signatures": [
+                    {
+                      "id": 537,
+                      "name": "__type",
+                      "kind": 4096,
+                      "kindString": "Call signature",
+                      "flags": {},
+                      "parameters": [
+                        {
+                          "id": 538,
+                          "name": "value",
+                          "kind": 32768,
+                          "kindString": "Parameter",
+                          "flags": {},
+                          "type": {
+                            "type": "reference",
+                            "id": 533,
+                            "name": "PaginatorState"
+                          }
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "void"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "type": {
+        "type": "reference",
+        "id": 532,
+        "name": "T"
+      }
+    },
+    {
+      "id": 539,
+      "name": "usePaginator",
+      "kind": 4096,
+      "kindString": "Call signature",
+      "flags": {},
+      "typeParameter": [
+        {
+          "id": 540,
+          "name": "PaginatorState",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {}
+        }
+      ],
+      "parameters": [
+        {
+          "id": 541,
+          "name": "paginatorClassOrProvider",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "type": {
+            "type": "literal",
+            "value": null
+          }
+        },
+        {
+          "id": 542,
+          "name": "currentStatePair",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {
+            "isOptional": true
+          },
+          "type": {
+            "type": "tuple",
+            "elements": [
+              {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "intrinsic",
+                    "name": "undefined"
+                  },
+                  {
+                    "type": "reference",
+                    "id": 540,
+                    "name": "PaginatorState"
+                  }
+                ]
+              },
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 543,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "signatures": [
+                    {
+                      "id": 544,
+                      "name": "__type",
+                      "kind": 4096,
+                      "kindString": "Call signature",
+                      "flags": {},
+                      "parameters": [
+                        {
+                          "id": 545,
+                          "name": "value",
+                          "kind": 32768,
+                          "kindString": "Parameter",
+                          "flags": {},
+                          "type": {
+                            "type": "reference",
+                            "id": 540,
+                            "name": "PaginatorState"
+                          }
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "void"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "type": {
+        "type": "literal",
+        "value": null
+      }
+    },
+    {
+      "id": 546,
+      "name": "usePaginator",
+      "kind": 4096,
+      "kindString": "Call signature",
+      "flags": {},
+      "typeParameter": [
+        {
+          "id": 549,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "type": {
+            "type": "reference",
+            "id": 404,
+            "typeArguments": [
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 547,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {}
+                }
+              },
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 548,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {}
+                }
+              },
+              {
+                "type": "reference",
+                "id": 549,
+                "name": "T"
+              }
+            ],
+            "name": "PaginatorInterface"
+          }
+        },
+        {
+          "id": 550,
+          "name": "PaginatorState",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {}
+        }
+      ],
+      "parameters": [
+        {
+          "id": 551,
+          "name": "paginatorClassOrProvider",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {},
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "reference",
+                "id": 442,
+                "typeArguments": [
+                  {
+                    "type": "reference",
+                    "id": 549,
+                    "name": "T"
+                  }
+                ],
+                "name": "PaginatorInterfaceClass"
+              },
+              {
+                "type": "reference",
+                "id": 524,
+                "typeArguments": [
+                  {
+                    "type": "reference",
+                    "id": 549,
+                    "name": "T"
+                  }
+                ],
+                "name": "PaginatorClassProvider"
+              }
+            ]
+          }
+        },
+        {
+          "id": 552,
+          "name": "currentStatePair",
+          "kind": 32768,
+          "kindString": "Parameter",
+          "flags": {
+            "isOptional": true
+          },
+          "type": {
+            "type": "tuple",
+            "elements": [
+              {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "intrinsic",
+                    "name": "undefined"
+                  },
+                  {
+                    "type": "reference",
+                    "id": 550,
+                    "name": "PaginatorState"
+                  }
+                ]
+              },
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 553,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "signatures": [
+                    {
+                      "id": 554,
+                      "name": "__type",
+                      "kind": 4096,
+                      "kindString": "Call signature",
+                      "flags": {},
+                      "parameters": [
+                        {
+                          "id": 555,
+                          "name": "value",
+                          "kind": 32768,
+                          "kindString": "Parameter",
+                          "flags": {},
+                          "type": {
+                            "type": "reference",
+                            "id": 550,
+                            "name": "PaginatorState"
+                          }
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "void"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "type": {
+        "type": "union",
+        "types": [
+          {
+            "type": "reference",
+            "id": 549,
+            "name": "T"
+          },
+          {
+            "type": "literal",
+            "value": null
+          }
+        ]
+      }
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "Pagination",
+  "permaLink": "util/pagination/usePaginator",
+  "packageName": "util",
+  "childIds": []
+}

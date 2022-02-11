@@ -1,0 +1,75 @@
+{
+  "id": 20,
+  "name": "NodeLabeled",
+  "kind": 256,
+  "kindString": "Interface",
+  "flags": {},
+  "comment": {
+    "shortText": "Interface for items that provide a React node label (anything that React can render). Implementing this can save you having to pass\nexplicit functions to label an item in other parts of the system (eg. for [AsyncChoices](doc:AsyncChoices))",
+    "text": "See [isNodeLabeled](doc:isNodeLabeled) and [getNodeLabel](doc:getNodeLabel).\n",
+    "tags": [
+      {
+        "tag": "extract-docs",
+        "text": ""
+      },
+      {
+        "tag": "menu-group",
+        "text": "Labeled\n"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "title": "Methods",
+      "kind": 2048,
+      "children": [
+        21
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
+      "line": 29,
+      "character": 17
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "Labeled",
+  "permaLink": "util/NodeLabeled",
+  "packageName": "util",
+  "childIds": [
+    21
+  ],
+  "children": [
+    {
+      "id": 21,
+      "name": "getNodeLabel",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "signatures": [
+        {
+          "id": 22,
+          "name": "getNodeLabel",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the node label for this item. This can be anything renderable by React.",
+            "text": "See [isNodeLabeled](doc:isNodeLabeled) to test for support and [getNodeLabel](doc:getNodeLabel) for easiest way\nto get the label.\n"
+          },
+          "type": {
+            "type": "reference",
+            "id": 717,
+            "qualifiedName": "React.ReactNode",
+            "package": "@types/react",
+            "name": "ReactNode"
+          }
+        }
+      ]
+    }
+  ]
+}

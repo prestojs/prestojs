@@ -1,0 +1,1466 @@
+{
+  "id": 318,
+  "name": "PageNumberPaginator",
+  "kind": 128,
+  "kindString": "Class",
+  "flags": {},
+  "comment": {
+    "shortText": "Page number based paginator",
+    "text": "Expects a `total` or `count` key and optional `pageSize` key in the response. `total` or `count` should be the total\nnumber of records available.\n\nIf your backend differs from this (for example by storing the values in different named keys or in headers instead of\nthe response body) you can handle that by extending this class and implementing `getPaginationState` or\nby passing `getPaginationState` to [usePaginator](doc:usePaginator).\n",
+    "tags": [
+      {
+        "tag": "menu-group",
+        "text": "Pagination"
+      },
+      {
+        "tag": "extract-docs",
+        "text": "\n"
+      }
+    ]
+  },
+  "originalName": "default",
+  "groups": [
+    {
+      "title": "Constructors",
+      "kind": 512,
+      "children": [
+        322
+      ]
+    },
+    {
+      "title": "Properties",
+      "kind": 1024,
+      "children": [
+        373,
+        374,
+        377,
+        381
+      ]
+    },
+    {
+      "title": "Accessors",
+      "kind": 262144,
+      "children": [
+        330,
+        332,
+        385,
+        326,
+        328
+      ]
+    },
+    {
+      "title": "Methods",
+      "kind": 2048,
+      "children": [
+        356,
+        354,
+        362,
+        371,
+        360,
+        358,
+        348,
+        346,
+        340,
+        334,
+        352,
+        350,
+        387,
+        337,
+        343,
+        365,
+        319
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+      "line": 24,
+      "character": 21
+    }
+  ],
+  "extendedTypes": [
+    {
+      "type": "reference",
+      "id": 472,
+      "typeArguments": [
+        {
+          "type": "reference",
+          "id": 311,
+          "name": "PageNumberPaginationState"
+        },
+        {
+          "type": "reference",
+          "id": 315,
+          "name": "InternalPageNumberPaginationState"
+        }
+      ],
+      "name": "default"
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "Pagination",
+  "permaLink": "util/pagination/PageNumberPaginator",
+  "packageName": "util",
+  "childIds": [
+    322,
+    373,
+    374,
+    377,
+    381,
+    330,
+    332,
+    385,
+    326,
+    328,
+    356,
+    354,
+    362,
+    371,
+    360,
+    358,
+    348,
+    346,
+    340,
+    334,
+    352,
+    350,
+    387,
+    337,
+    343,
+    365,
+    319
+  ],
+  "children": [
+    {
+      "id": 322,
+      "name": "constructor",
+      "kind": 512,
+      "kindString": "Constructor",
+      "flags": {},
+      "comment": {},
+      "signatures": [
+        {
+          "id": 323,
+          "name": "new PageNumberPaginator",
+          "kind": 16384,
+          "kindString": "Constructor signature",
+          "flags": {},
+          "comment": {
+            "tags": [
+              {
+                "tag": "see",
+                "text": "documentation for `replaceStateControllers` for what `currentStatePair` and `internalStatePair` are\n"
+              }
+            ]
+          },
+          "parameters": [
+            {
+              "id": 324,
+              "name": "currentStatePair",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "literal",
+                "value": null
+              },
+              "defaultValue": "null"
+            },
+            {
+              "id": 325,
+              "name": "internalStatePair",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "literal",
+                "value": null
+              },
+              "defaultValue": "null"
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 318,
+            "name": "default"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "id": 474,
+            "name": "default.constructor"
+          }
+        }
+      ],
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 473,
+        "name": "default.constructor"
+      }
+    },
+    {
+      "id": 373,
+      "name": "currentState",
+      "kind": 1024,
+      "kindString": "Property",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 100,
+          "character": 4
+        }
+      ],
+      "type": {
+        "type": "reference",
+        "id": 311,
+        "name": "PageNumberPaginationState"
+      },
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 481,
+        "name": "default.currentState"
+      }
+    },
+    {
+      "id": 374,
+      "name": "internalState",
+      "kind": 1024,
+      "kindString": "Property",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 101,
+          "character": 4
+        }
+      ],
+      "type": {
+        "type": "intersection",
+        "types": [
+          {
+            "type": "reference",
+            "id": 315,
+            "name": "InternalPageNumberPaginationState"
+          },
+          {
+            "type": "reflection",
+            "declaration": {
+              "id": 375,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 376,
+                  "name": "responseIsSet",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "sources": [
+                    {
+                      "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                      "line": 101,
+                      "character": 37
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  }
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [
+                    376
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 482,
+        "name": "default.internalState"
+      }
+    },
+    {
+      "id": 377,
+      "name": "setCurrentState",
+      "kind": 1024,
+      "kindString": "Property",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 102,
+          "character": 4
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 378,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 379,
+              "name": "__type",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 380,
+                  "name": "set",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 311,
+                    "name": "PageNumberPaginationState"
+                  }
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              }
+            }
+          ]
+        }
+      },
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 485,
+        "name": "default.setCurrentState"
+      }
+    },
+    {
+      "id": 381,
+      "name": "setInternalState",
+      "kind": 1024,
+      "kindString": "Property",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 103,
+          "character": 4
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 382,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 383,
+              "name": "__type",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 384,
+                  "name": "set",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 315,
+                    "name": "InternalPageNumberPaginationState"
+                  }
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              }
+            }
+          ]
+        }
+      },
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 489,
+        "name": "default.setInternalState"
+      }
+    },
+    {
+      "id": 330,
+      "name": "page",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 51,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 331,
+          "name": "page",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "The current page"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "intrinsic",
+                "name": "number"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 332,
+      "name": "pageSize",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 68,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 333,
+          "name": "pageSize",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "The current page size (if known)."
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "intrinsic",
+                "name": "number"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 385,
+      "name": "responseIsSet",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "comment": {
+        "shortText": "True once setResponse has been called and pagination state is known."
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 108,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 386,
+          "name": "responseIsSet",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "True once setResponse has been called and pagination state is known."
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Paginator.responseIsSet"
+          }
+        }
+      ],
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 493,
+        "name": "default.responseIsSet"
+      }
+    },
+    {
+      "id": 326,
+      "name": "total",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 31,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 327,
+          "name": "total",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "The total number of results available on the backend"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "intrinsic",
+                "name": "number"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 328,
+      "name": "totalPages",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 41,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 329,
+          "name": "totalPages",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "The total number of pages"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "intrinsic",
+                "name": "number"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 356,
+      "name": "first",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 171,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 357,
+          "name": "first",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Go to the first page."
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 506,
+            "name": "default.first"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 505,
+        "name": "default.first"
+      }
+    },
+    {
+      "id": 354,
+      "name": "firstState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 164,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 355,
+          "name": "firstState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the first page",
+            "text": "Does not transition state. To transition state call `first` instead.\n"
+          },
+          "type": {
+            "type": "reference",
+            "id": 311,
+            "name": "PageNumberPaginationState"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 508,
+            "name": "default.firstState"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 507,
+        "name": "default.firstState"
+      }
+    },
+    {
+      "id": 362,
+      "name": "getRequestInit",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 204,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 363,
+          "name": "getRequestInit",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Adds `page` and `pageSize` into query options passed through to the endpoint"
+          },
+          "parameters": [
+            {
+              "id": 364,
+              "name": "__namedParameters",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "Object"
+              }
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 392,
+            "name": "PaginatorRequestOptions"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 500,
+            "name": "default.getRequestInit"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 499,
+        "name": "default.getRequestInit"
+      }
+    },
+    {
+      "id": 371,
+      "name": "hasNextPage",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 235,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 372,
+          "name": "hasNextPage",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Returns true if there's more results after the current page"
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 518,
+            "name": "default.hasNextPage"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 517,
+        "name": "default.hasNextPage"
+      }
+    },
+    {
+      "id": 360,
+      "name": "last",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 194,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 361,
+          "name": "last",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Go to the last page. If the last page isn't yet known (eg. results\nhaven't yet been returned) then null will be returned.",
+            "text": "If the last page is not yet known because results haven't been returned this function\ndoes nothing.\n"
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          }
+        }
+      ]
+    },
+    {
+      "id": 358,
+      "name": "lastState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 180,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 359,
+          "name": "lastState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the first page",
+            "text": "Does not transition state. To transition state call `last` instead.\n"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "reference",
+                "id": 311,
+                "name": "PageNumberPaginationState"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 348,
+      "name": "next",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 139,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 349,
+          "name": "next",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Go to the next page."
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 510,
+            "name": "default.next"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 509,
+        "name": "default.next"
+      }
+    },
+    {
+      "id": 346,
+      "name": "nextState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 132,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 347,
+          "name": "nextState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the next page",
+            "text": "Does not transition state. To transition state call `next` instead.\n"
+          },
+          "type": {
+            "type": "reference",
+            "id": 311,
+            "name": "PageNumberPaginationState"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 512,
+            "name": "default.nextState"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 511,
+        "name": "default.nextState"
+      }
+    },
+    {
+      "id": 340,
+      "name": "pageSizeState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 100,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 341,
+          "name": "pageSizeState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the specified page size",
+            "text": "Does not transition state. To transition state call `setPageSize` instead.\n"
+          },
+          "parameters": [
+            {
+              "id": 342,
+              "name": "pageSize",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "intrinsic",
+                    "name": "number"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 311,
+            "name": "PageNumberPaginationState"
+          }
+        }
+      ]
+    },
+    {
+      "id": 334,
+      "name": "pageState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 81,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 335,
+          "name": "pageState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the specified page number",
+            "text": "Does not transition state. To transition state call `setPage` instead.\n"
+          },
+          "parameters": [
+            {
+              "id": 336,
+              "name": "page",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "number"
+              }
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 311,
+            "name": "PageNumberPaginationState"
+          }
+        }
+      ]
+    },
+    {
+      "id": 352,
+      "name": "previous",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 155,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 353,
+          "name": "previous",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Go to the previous page."
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 514,
+            "name": "default.previous"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 513,
+        "name": "default.previous"
+      }
+    },
+    {
+      "id": 350,
+      "name": "previousState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 148,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 351,
+          "name": "previousState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the previous page",
+            "text": "Does not transition state. To transition state call `previous` instead.\n"
+          },
+          "type": {
+            "type": "reference",
+            "id": 311,
+            "name": "PageNumberPaginationState"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 516,
+            "name": "default.previousState"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 515,
+        "name": "default.previousState"
+      }
+    },
+    {
+      "id": 387,
+      "name": "replaceStateControllers",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 151,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 388,
+          "name": "replaceStateControllers",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Paginator receives 2 tuples of a state and state setter pair. This is expected to\nmatch the same interface as `useState` in React. The following is a valid simple usage:",
+            "text": "```js\nconst paginator = new Paginator(useState(), useState());\n```\n\nNote that we can also pass the state controllers in via `replaceStateControllers` rather\nthan in the constructor. This is so we can memoize the `Paginator` instance which is desirable\nwhen using the paginator as a dependency to React hooks.\n\nAs state is passed in and managed external to the class be aware that any data stored\non the class instance will be lost unless written with `setCurrentState` or `setInternalState`.\nThis design is a compromise between allowing a clear interface for how paginators should\nbe defined and allowing the state to be managed externally (eg. using React state).\n"
+          },
+          "parameters": [
+            {
+              "id": 389,
+              "name": "currentStatePair",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "comment": {
+                "shortText": "The state object and setter (eg. from `useState`) that is used to store\nand transition pagination state. Using this you can do things like easily store state in the URL\n(eg. using `useUrlQueryState`) or other data sources."
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "any"
+              }
+            },
+            {
+              "id": 390,
+              "name": "internalStatePair",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "comment": {
+                "shortText": "The state object and setter that is used for internal state. Internal state\nis stored separately as it does not need to be restored (eg. if you refresh the page). It is used\nto store things like the total number of results or the current cursor. Passing `useState` here is\nfine.\n"
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "id": 496,
+            "name": "default.replaceStateControllers"
+          }
+        }
+      ],
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 495,
+        "name": "default.replaceStateControllers"
+      }
+    },
+    {
+      "id": 337,
+      "name": "setPage",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 91,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 338,
+          "name": "setPage",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Change to the specified page"
+          },
+          "parameters": [
+            {
+              "id": 339,
+              "name": "page",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "number"
+              }
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          }
+        }
+      ]
+    },
+    {
+      "id": 343,
+      "name": "setPageSize",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 123,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 344,
+          "name": "setPageSize",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Change to the specified page size"
+          },
+          "parameters": [
+            {
+              "id": 345,
+              "name": "pageSize",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "intrinsic",
+                    "name": "number"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          }
+        }
+      ]
+    },
+    {
+      "id": 365,
+      "name": "setResponse",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 225,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 366,
+          "name": "setResponse",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Sets the internal data based on response. Expects `total` and optionally `pageSize` to be in\nresponse data.",
+            "text": "See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation\ndiffers.\n"
+          },
+          "parameters": [
+            {
+              "id": 367,
+              "name": "__namedParameters",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 368,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 370,
+                      "name": "pageSize",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+                          "line": 225,
+                          "character": 54
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "number"
+                      }
+                    },
+                    {
+                      "id": 369,
+                      "name": "total",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+                          "line": 225,
+                          "character": 39
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "number"
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "kind": 1024,
+                      "children": [
+                        370,
+                        369
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 503,
+            "name": "default.setResponse"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 502,
+        "name": "default.setResponse"
+      }
+    },
+    {
+      "id": 319,
+      "name": "getPaginationState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {
+        "isStatic": true
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/PageNumberPaginator.ts",
+          "line": 250,
+          "character": 11
+        }
+      ],
+      "signatures": [
+        {
+          "id": 320,
+          "name": "getPaginationState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Expects `decodedBody` to include a key `results` which should be an array of return records and a variable\n`count` or `total` that contains the total number of records available."
+          },
+          "parameters": [
+            {
+              "id": 321,
+              "name": "requestDetails",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "comment": {
+                "shortText": "\n"
+              },
+              "type": {
+                "type": "reference",
+                "id": 397,
+                "name": "PaginationRequestDetails"
+              }
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": false
+              },
+              {
+                "type": "reference",
+                "id": 1273,
+                "typeArguments": [
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  {
+                    "type": "intrinsic",
+                    "name": "any"
+                  }
+                ],
+                "qualifiedName": "Record",
+                "package": "typescript",
+                "name": "Record"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

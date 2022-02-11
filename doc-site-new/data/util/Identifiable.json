@@ -1,0 +1,67 @@
+{
+  "id": 55,
+  "name": "Identifiable",
+  "kind": 256,
+  "kindString": "Interface",
+  "flags": {},
+  "comment": {
+    "shortText": "Interface for types that we can automatically extract a unique identifier from.",
+    "text": "To confirm to the interface provide a `_key` property or getter.\n\n[ViewModelFactory](doc:viewModelFactory) conforms to this so anything that expects an Identifiable\nwill accept a ViewModel.\n\nImplementing this can save you having to pass explicit functions to identify an item in other parts of the system\n(eg. for [AsyncChoices](doc:AsyncChoices) or [useAsyncValue](doc:useAsyncValue))\n",
+    "tags": [
+      {
+        "tag": "extract-docs",
+        "text": ""
+      },
+      {
+        "tag": "menu-group",
+        "text": "Identifiable\n"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "title": "Properties",
+      "kind": 1024,
+      "children": [
+        56
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+      "line": 19,
+      "character": 17
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "Identifiable",
+  "permaLink": "util/Identifiable",
+  "packageName": "util",
+  "childIds": [
+    56
+  ],
+  "children": [
+    {
+      "id": 56,
+      "name": "_key",
+      "kind": 1024,
+      "kindString": "Property",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+          "line": 20,
+          "character": 4
+        }
+      ],
+      "type": {
+        "type": "reference",
+        "id": 54,
+        "name": "Id"
+      }
+    }
+  ]
+}

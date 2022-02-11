@@ -1,0 +1,1359 @@
+{
+  "id": 70,
+  "name": "CursorPaginator",
+  "kind": 128,
+  "kindString": "Class",
+  "flags": {},
+  "comment": {
+    "shortText": "Cursor based paginator",
+    "text": "Expects a `nextCursor`, `previousCursor` and optional `pageSize` key in the response. See\n[getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation\ndiffers.\n",
+    "tags": [
+      {
+        "tag": "menu-group",
+        "text": "Pagination"
+      },
+      {
+        "tag": "extract-docs",
+        "text": "\n"
+      }
+    ]
+  },
+  "originalName": "default",
+  "groups": [
+    {
+      "title": "Constructors",
+      "kind": 512,
+      "children": [
+        74
+      ]
+    },
+    {
+      "title": "Properties",
+      "kind": 1024,
+      "children": [
+        116,
+        117,
+        120,
+        124
+      ]
+    },
+    {
+      "title": "Accessors",
+      "kind": 262144,
+      "children": [
+        82,
+        78,
+        84,
+        80,
+        128
+      ]
+    },
+    {
+      "title": "Methods",
+      "kind": 2048,
+      "children": [
+        94,
+        92,
+        104,
+        114,
+        98,
+        96,
+        86,
+        102,
+        100,
+        130,
+        89,
+        107,
+        71
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+      "line": 24,
+      "character": 21
+    }
+  ],
+  "extendedTypes": [
+    {
+      "type": "reference",
+      "id": 472,
+      "typeArguments": [
+        {
+          "type": "reference",
+          "id": 62,
+          "name": "CursorPaginationState"
+        },
+        {
+          "type": "reference",
+          "id": 66,
+          "name": "InternalCursorPaginatorState"
+        }
+      ],
+      "name": "default"
+    }
+  ],
+  "mdx": null,
+  "isForwardRef": false,
+  "extractDocs": true,
+  "menuGroup": "Pagination",
+  "permaLink": "util/pagination/CursorPaginator",
+  "packageName": "util",
+  "childIds": [
+    74,
+    116,
+    117,
+    120,
+    124,
+    82,
+    78,
+    84,
+    80,
+    128,
+    94,
+    92,
+    104,
+    114,
+    98,
+    96,
+    86,
+    102,
+    100,
+    130,
+    89,
+    107,
+    71
+  ],
+  "children": [
+    {
+      "id": 74,
+      "name": "constructor",
+      "kind": 512,
+      "kindString": "Constructor",
+      "flags": {},
+      "comment": {},
+      "signatures": [
+        {
+          "id": 75,
+          "name": "new CursorPaginator",
+          "kind": 16384,
+          "kindString": "Constructor signature",
+          "flags": {},
+          "comment": {
+            "tags": [
+              {
+                "tag": "see",
+                "text": "documentation for `replaceStateControllers` for what `currentStatePair` and `internalStatePair` are\n"
+              }
+            ]
+          },
+          "parameters": [
+            {
+              "id": 76,
+              "name": "currentStatePair",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "literal",
+                "value": null
+              },
+              "defaultValue": "null"
+            },
+            {
+              "id": 77,
+              "name": "internalStatePair",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "literal",
+                "value": null
+              },
+              "defaultValue": "null"
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 70,
+            "name": "default"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "id": 474,
+            "name": "default.constructor"
+          }
+        }
+      ],
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 473,
+        "name": "default.constructor"
+      }
+    },
+    {
+      "id": 116,
+      "name": "currentState",
+      "kind": 1024,
+      "kindString": "Property",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 100,
+          "character": 4
+        }
+      ],
+      "type": {
+        "type": "reference",
+        "id": 62,
+        "name": "CursorPaginationState"
+      },
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 481,
+        "name": "default.currentState"
+      }
+    },
+    {
+      "id": 117,
+      "name": "internalState",
+      "kind": 1024,
+      "kindString": "Property",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 101,
+          "character": 4
+        }
+      ],
+      "type": {
+        "type": "intersection",
+        "types": [
+          {
+            "type": "reference",
+            "id": 66,
+            "name": "InternalCursorPaginatorState"
+          },
+          {
+            "type": "reflection",
+            "declaration": {
+              "id": 118,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 119,
+                  "name": "responseIsSet",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "sources": [
+                    {
+                      "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                      "line": 101,
+                      "character": 37
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  }
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [
+                    119
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 482,
+        "name": "default.internalState"
+      }
+    },
+    {
+      "id": 120,
+      "name": "setCurrentState",
+      "kind": 1024,
+      "kindString": "Property",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 102,
+          "character": 4
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 121,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 122,
+              "name": "__type",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 123,
+                  "name": "set",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 62,
+                    "name": "CursorPaginationState"
+                  }
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              }
+            }
+          ]
+        }
+      },
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 485,
+        "name": "default.setCurrentState"
+      }
+    },
+    {
+      "id": 124,
+      "name": "setInternalState",
+      "kind": 1024,
+      "kindString": "Property",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 103,
+          "character": 4
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 125,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 126,
+              "name": "__type",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 127,
+                  "name": "set",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 66,
+                    "name": "InternalCursorPaginatorState"
+                  }
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              }
+            }
+          ]
+        }
+      },
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 489,
+        "name": "default.setInternalState"
+      }
+    },
+    {
+      "id": 82,
+      "name": "cursor",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 45,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 83,
+          "name": "cursor",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "The current cursor. This will be null before the first response is received."
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "name": "nextCursor",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 31,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 79,
+          "name": "nextCursor",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "The next cursor (if any)"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "name": "pageSize",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 52,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 85,
+          "name": "pageSize",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "The current page size, if known"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "intrinsic",
+                "name": "number"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "name": "previousCursor",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 38,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 81,
+          "name": "previousCursor",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "THe previous cursor (if any)"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 128,
+      "name": "responseIsSet",
+      "kind": 262144,
+      "kindString": "Accessor",
+      "flags": {},
+      "comment": {
+        "shortText": "True once setResponse has been called and pagination state is known."
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 108,
+          "character": 8
+        }
+      ],
+      "getSignature": [
+        {
+          "id": 129,
+          "name": "responseIsSet",
+          "kind": 524288,
+          "kindString": "Get signature",
+          "flags": {},
+          "comment": {
+            "shortText": "True once setResponse has been called and pagination state is known."
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Paginator.responseIsSet"
+          }
+        }
+      ],
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 493,
+        "name": "default.responseIsSet"
+      }
+    },
+    {
+      "id": 94,
+      "name": "first",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 102,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 95,
+          "name": "first",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Go to the first page."
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 506,
+            "name": "default.first"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 505,
+        "name": "default.first"
+      }
+    },
+    {
+      "id": 92,
+      "name": "firstState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 92,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 93,
+          "name": "firstState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the first page",
+            "text": "Does not transition state. To transition state call `first` instead.\n"
+          },
+          "type": {
+            "type": "reference",
+            "id": 62,
+            "name": "CursorPaginationState"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 508,
+            "name": "default.firstState"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 507,
+        "name": "default.firstState"
+      }
+    },
+    {
+      "id": 104,
+      "name": "getRequestInit",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 158,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 105,
+          "name": "getRequestInit",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the options to use with `Endpoint.execute` or `Endpoint.prepare`. Usually\nthis just involves setting `query` to the query string parameters for the paginator\nbut can also provide custom headers or different URL resolve arguments."
+          },
+          "parameters": [
+            {
+              "id": 106,
+              "name": "__namedParameters",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "Object"
+              }
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 392,
+            "name": "PaginatorRequestOptions"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 500,
+            "name": "default.getRequestInit"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 499,
+        "name": "default.getRequestInit"
+      }
+    },
+    {
+      "id": 114,
+      "name": "hasNextPage",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 200,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 115,
+          "name": "hasNextPage",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Returns true if there's more results after the current page"
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 518,
+            "name": "default.hasNextPage"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 517,
+        "name": "default.hasNextPage"
+      }
+    },
+    {
+      "id": 98,
+      "name": "next",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 125,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 99,
+          "name": "next",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Go to the next page.",
+            "text": "If the last next is not yet known because results haven't been returned this function\ndoes nothing.\n"
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 510,
+            "name": "default.next"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 509,
+        "name": "default.next"
+      }
+    },
+    {
+      "id": 96,
+      "name": "nextState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 112,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 97,
+          "name": "nextState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the first page. If the next page isn't yet known (eg. results\nhaven't yet been returned) then null will be returned.",
+            "text": "Does not transition state. To transition state call `next` instead.\n"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "reference",
+                "id": 62,
+                "name": "CursorPaginationState"
+              }
+            ]
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 512,
+            "name": "default.nextState"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 511,
+        "name": "default.nextState"
+      }
+    },
+    {
+      "id": 86,
+      "name": "pageSizeState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 61,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 87,
+          "name": "pageSizeState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the specified page size",
+            "text": "Does not transition state. To transition state call `setPageSize` instead.\n"
+          },
+          "parameters": [
+            {
+              "id": 88,
+              "name": "pageSize",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "intrinsic",
+                    "name": "number"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 62,
+            "name": "CursorPaginationState"
+          }
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "name": "previous",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 151,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 103,
+          "name": "previous",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Go to the previous page.",
+            "text": "If the previous page is not yet known because results haven't been returned this function\ndoes nothing.\n"
+          },
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 514,
+            "name": "default.previous"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 513,
+        "name": "default.previous"
+      }
+    },
+    {
+      "id": 100,
+      "name": "previousState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 138,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 101,
+          "name": "previousState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Return the state for the previous page. If the previous page isn't yet known (eg. results\nhaven't yet been returned) then null will be returned.",
+            "text": "Does not transition state. To transition state call `previous` instead.\n"
+          },
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "reference",
+                "id": 62,
+                "name": "CursorPaginationState"
+              }
+            ]
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 516,
+            "name": "default.previousState"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 515,
+        "name": "default.previousState"
+      }
+    },
+    {
+      "id": 130,
+      "name": "replaceStateControllers",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 151,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 131,
+          "name": "replaceStateControllers",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Paginator receives 2 tuples of a state and state setter pair. This is expected to\nmatch the same interface as `useState` in React. The following is a valid simple usage:",
+            "text": "```js\nconst paginator = new Paginator(useState(), useState());\n```\n\nNote that we can also pass the state controllers in via `replaceStateControllers` rather\nthan in the constructor. This is so we can memoize the `Paginator` instance which is desirable\nwhen using the paginator as a dependency to React hooks.\n\nAs state is passed in and managed external to the class be aware that any data stored\non the class instance will be lost unless written with `setCurrentState` or `setInternalState`.\nThis design is a compromise between allowing a clear interface for how paginators should\nbe defined and allowing the state to be managed externally (eg. using React state).\n"
+          },
+          "parameters": [
+            {
+              "id": 132,
+              "name": "currentStatePair",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "comment": {
+                "shortText": "The state object and setter (eg. from `useState`) that is used to store\nand transition pagination state. Using this you can do things like easily store state in the URL\n(eg. using `useUrlQueryState`) or other data sources."
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "any"
+              }
+            },
+            {
+              "id": 133,
+              "name": "internalStatePair",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "comment": {
+                "shortText": "The state object and setter that is used for internal state. Internal state\nis stored separately as it does not need to be restored (eg. if you refresh the page). It is used\nto store things like the total number of results or the current cursor. Passing `useState` here is\nfine.\n"
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "id": 496,
+            "name": "default.replaceStateControllers"
+          }
+        }
+      ],
+      "inheritedFrom": {
+        "type": "reference",
+        "id": 495,
+        "name": "default.replaceStateControllers"
+      }
+    },
+    {
+      "id": 89,
+      "name": "setPageSize",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 83,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 90,
+          "name": "setPageSize",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Set the page size"
+          },
+          "parameters": [
+            {
+              "id": 91,
+              "name": "pageSize",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "intrinsic",
+                    "name": "number"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          }
+        }
+      ]
+    },
+    {
+      "id": 107,
+      "name": "setResponse",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 179,
+          "character": 4
+        }
+      ],
+      "signatures": [
+        {
+          "id": 108,
+          "name": "setResponse",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Sets the internal data based on response. Expects `nextCursor`, `previousCursor` and optionally `pageSize` to be in\nresponse data.",
+            "text": "See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation\ndiffers.\n"
+          },
+          "parameters": [
+            {
+              "id": 109,
+              "name": "__namedParameters",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 110,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 111,
+                      "name": "nextCursor",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+                          "line": 184,
+                          "character": 8
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "literal",
+                            "value": null
+                          },
+                          {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "id": 113,
+                      "name": "pageSize",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+                          "line": 186,
+                          "character": 8
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "number"
+                      }
+                    },
+                    {
+                      "id": 112,
+                      "name": "previousCursor",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+                          "line": 185,
+                          "character": 8
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "literal",
+                            "value": null
+                          },
+                          {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "kind": 1024,
+                      "children": [
+                        111,
+                        113,
+                        112
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "overwrites": {
+            "type": "reference",
+            "id": 503,
+            "name": "default.setResponse"
+          }
+        }
+      ],
+      "overwrites": {
+        "type": "reference",
+        "id": 502,
+        "name": "default.setResponse"
+      }
+    },
+    {
+      "id": 71,
+      "name": "getPaginationState",
+      "kind": 2048,
+      "kindString": "Method",
+      "flags": {
+        "isStatic": true
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/CursorPaginator.ts",
+          "line": 213,
+          "character": 11
+        }
+      ],
+      "signatures": [
+        {
+          "id": 72,
+          "name": "getPaginationState",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Expected pagination state in the shape:\n{\n    next: null|'http://example.com/?cursor=abc123',\n    previous: null|'http://example.com/?cursor=abc123',\n    results: Array\n}"
+          },
+          "parameters": [
+            {
+              "id": 73,
+              "name": "requestDetails",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "comment": {
+                "shortText": "\n"
+              },
+              "type": {
+                "type": "reference",
+                "id": 397,
+                "name": "PaginationRequestDetails"
+              }
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": false
+              },
+              {
+                "type": "reference",
+                "id": 1273,
+                "typeArguments": [
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  {
+                    "type": "intrinsic",
+                    "name": "any"
+                  }
+                ],
+                "qualifiedName": "Record",
+                "package": "typescript",
+                "name": "Record"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
