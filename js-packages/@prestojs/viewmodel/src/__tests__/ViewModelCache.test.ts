@@ -4,19 +4,29 @@ import Field from '../fields/Field';
 import ListField from '../fields/ListField';
 import { ManyRelatedViewModelField, RelatedViewModelField } from '../fields/RelatedViewModelField';
 import ViewModelCache from '../ViewModelCache';
-import viewModelFactory, { isViewModelInstance, ViewModelConstructor } from '../ViewModelFactory';
-
-function F<T>(name): Field<T> {
-    return new Field<T>({ label: name });
-}
+import viewModelFactory, {
+    FieldPath,
+    isViewModelInstance,
+    ViewModelConstructor,
+} from '../ViewModelFactory';
 
 test('should cache records from record instance', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
-    class Test2 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {
+        static cache: ViewModelCache<typeof Test1> = new ViewModelCache(Test1);
+    }
+    class Test2 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {
+        static cache: ViewModelCache<typeof Test2> = new ViewModelCache(Test2);
+    }
 
     const record1 = new Test1({ id: 5 });
     // Should always get independent caches
@@ -27,14 +37,18 @@ test('should cache records from record instance', () => {
     expect(Test1.cache.get(5, ['id'])).toBe(record1);
     expect(Test1.cache.get(record1)).toBe(record1);
 
-    expect(Test2.cache.cache).toEqual(new Map());
     expect(Test2.cache.get(5, ['id'])).toBe(null);
 });
 
 test('should handle id of 0', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {
+        static cache: ViewModelCache<typeof Test1> = new ViewModelCache(Test1);
+    }
 
     const record1 = new Test1({ id: 0 });
     expect(Test1.cache.add(record1)).toBe(record1);
@@ -43,12 +57,18 @@ test('should handle id of 0', () => {
 });
 
 test('should cache records from plain object', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
-    class Test2 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1Data = { id: 5 };
 
@@ -59,17 +79,22 @@ test('should cache records from plain object', () => {
 
     expect(Test1.cache.get(5, ['id'])).toBe(record1);
 
-    expect(Test2.cache.cache).toEqual(new Map());
     expect(Test2.cache.get(5, ['id'])).toBe(null);
 });
 
 test('should throw error if caching different ViewModel', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
-    class Test2 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test1({ id: 5 });
     const record2 = new Test2({ id: 5 });
@@ -83,9 +108,9 @@ test('should throw error if caching different ViewModel', () => {
 test('should cache records with compound keys', () => {
     class Test1 extends viewModelFactory(
         {
-            id1: F('id1'),
-            id2: F('id2'),
-            name: F('name'),
+            id1: new Field(),
+            id2: new Field(),
+            name: new Field(),
         },
         { pkFieldName: ['id1', 'id2'] }
     ) {}
@@ -98,7 +123,7 @@ test('should cache records with compound keys', () => {
     // Order of keys shouldn't matter
     expect(Test1.cache.get({ id2: 6, id1: 5 }, ['id1', 'id2', 'name'])).toBe(record1);
 
-    // Adding with keys in different order sholdn't matter
+    // Adding with keys in different order shouldn't matter
     const record2 = new Test1({ id2: 6, id1: 5, name: 'two' });
     Test1.cache.add(record2);
     expect(Test1.cache.get({ id1: 5, id2: 6 }, ['id1', 'id2', 'name'])).toBe(record2);
@@ -120,9 +145,12 @@ test('should cache records with compound keys', () => {
 });
 
 test('should validate pk(s)', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     const record1 = new Test1({ id: 5 });
 
     Test1.cache.add(record1);
@@ -132,9 +160,9 @@ test('should validate pk(s)', () => {
 
     class Test2 extends viewModelFactory(
         {
-            id1: F('id1'),
-            id2: F('id2'),
-            name: F('name'),
+            id1: new Field(),
+            id2: new Field(),
+            name: new Field(),
         },
         {
             pkFieldName: ['id1', 'id2'],
@@ -159,19 +187,22 @@ test('should validate pk(s)', () => {
 test('should always use primary key in cache regardless of whether specified', () => {
     class Test1 extends viewModelFactory(
         {
-            id1: F('id1'),
-            id2: F('id2'),
-            name: F('name'),
+            id1: new Field(),
+            id2: new Field(),
+            name: new Field(),
         },
         {
             pkFieldName: ['id1', 'id2'],
         }
     ) {}
 
-    class Test2 extends viewModelFactory({
-        id: F('id'),
-        name: F('name'),
-    }) {}
+    class Test2 extends viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test1({ id1: 5, id2: 6, name: 'one' });
 
@@ -209,14 +240,14 @@ test('should support custom cache', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        class TestBad extends viewModelFactory({}) {
+        class TestBad extends viewModelFactory({ id: new Field() }, { pkFieldName: 'id' }) {
             static cache = new MyInvalidCache();
         }
     }).toThrowError('cache class must extend ViewModelCache');
 
     class MyCache<T extends ViewModelConstructor<any, any>> extends ViewModelCache<T> {}
     class MyCache2<T extends ViewModelConstructor<any, any>> extends ViewModelCache<T> {}
-    class Test1 extends viewModelFactory({}) {
+    class Test1 extends viewModelFactory({ id: new Field() }, { pkFieldName: 'id' }) {
         static cache = new MyCache<typeof Test1>(Test1);
     }
 
@@ -244,12 +275,15 @@ test('should support custom cache', () => {
 });
 
 test('updating a record should result in cache for subset of fields being updated', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     Test1.cache.add(new Test1({ id: 5, firstName: 'B' }));
     Test1.cache.add(new Test1({ id: 5, email: 'E' }));
     Test1.cache.add(new Test1({ id: 5, lastName: 'J' }));
@@ -309,12 +343,15 @@ test('updating a record should result in cache for subset of fields being update
     // This handles cases where you may try and access a cache for subset of fields that hasn't explicitly
     // been cached yet but is available as a superset of those fields. In those cases we expect the cache to
     // be populated lazily
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = new Test1({ id: 5, firstName: 'Bob', lastName: 'Jack', email: 'a@b.com' });
     Test1.cache.add(record1);
@@ -347,12 +384,15 @@ test('updating a record should result in cache for subset of fields being update
 });
 
 test('should use most recently set superset of fields', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
 
@@ -370,12 +410,15 @@ test('should use most recently set superset of fields', () => {
 });
 
 test('should support removing records from cache', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.delete(2);
@@ -396,12 +439,15 @@ test('should support removing records from cache', () => {
 });
 
 test('should support removing records from cache for only specified field names', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 2, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.delete(2, ['id', 'lastName', 'email']);
@@ -414,12 +460,17 @@ test('should support removing records from cache for only specified field names'
 });
 
 test('should support retrieving multiple records', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {
+        static cache: ViewModelCache<typeof Test1> = new ViewModelCache(Test1);
+    }
     Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
     Test1.cache.add(new Test1({ id: 3, lastName: 'Jack', email: 'jack@b.com' }));
     Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
@@ -446,12 +497,15 @@ test('should support retrieving multiple records', () => {
 });
 
 test('should support using * for all fields', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const bob = { id: 2, firstName: 'Bob', lastName: 'So', email: 'bob@b.com' };
     const jack = { id: 3, lastName: 'Jack', email: 'jack@b.com' };
@@ -472,199 +526,16 @@ test('should support using * for all fields', () => {
     expect(records2).toEqual([recordEqualTo(bob), recordEqualTo(sam)]);
 });
 
-test('should notify listeners on add, change, delete', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
-    const cb1 = jest.fn();
-    Test1.cache.addListener(2, ['id', 'firstName'], cb1);
-    Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
-    expect(cb1).toHaveBeenCalledWith(
-        null,
-        recordEqualTo({
-            id: 2,
-            firstName: 'Bob',
-        })
-    );
-    cb1.mockReset();
-    Test1.cache.add(new Test1({ id: 3, lastName: 'Jack', email: 'jack@b.com' }));
-    expect(cb1).not.toHaveBeenCalled();
-    Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
-    expect(cb1).not.toHaveBeenCalled();
-    Test1.cache.add(new Test1({ id: 2, firstName: 'Bobby', email: 'bob@b.com' }));
-    expect(cb1).toHaveBeenCalledWith(
-        recordEqualTo({
-            id: 2,
-            firstName: 'Bob',
-        }),
-        recordEqualTo({
-            id: 2,
-            firstName: 'Bobby',
-        })
-    );
-    cb1.mockReset();
-    Test1.cache.delete(2, ['id', 'firstName']);
-    expect(cb1).toHaveBeenCalledWith(
-        recordEqualTo({
-            id: 2,
-            firstName: 'Bobby',
-        }),
-        null
-    );
-    const cb2 = jest.fn();
-    Test1.cache.addListener(12, ['id', 'email'], cb2);
-    const cb3 = jest.fn();
-    Test1.cache.addListener(12, ['id', 'firstName', 'email'], cb3);
-    Test1.cache.add(new Test1({ id: 12, firstName: 'Samwise', email: 'samwise@b.com' }));
-
-    // We don't care about the addition notifications
-    cb2.mockReset();
-    cb3.mockReset();
-
-    Test1.cache.delete(12);
-    expect(cb2).toHaveBeenCalledWith(
-        recordEqualTo({
-            id: 12,
-            email: 'samwise@b.com',
-        }),
-        null
-    );
-    expect(cb3).toHaveBeenCalledWith(
-        recordEqualTo({
-            id: 12,
-            firstName: 'Samwise',
-            email: 'samwise@b.com',
-        }),
-        null
-    );
-});
-
-test('should not notify if identical record added', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
-
-    const cb1 = jest.fn();
-    Test1.cache.addListener(2, ['id', 'firstName', 'email'], cb1);
-    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
-    Test1.cache.add(record1);
-    expect(cb1).toHaveBeenCalledWith(null, record1);
-    cb1.mockReset();
-    // Adding same record should be ignored
-    Test1.cache.add(record1);
-    expect(cb1).not.toHaveBeenCalled();
-    // Adding same record even if strict equality fails should be ignored
-    Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
-    expect(cb1).not.toHaveBeenCalled();
-});
-
-test('should support listening to multiple pks', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
-    const cb1 = jest.fn();
-    const unsubscribe = Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
-    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
-    Test1.cache.add(record1);
-    expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, null, null]);
-    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
-    Test1.cache.add(record2);
-    expect(cb1).toHaveBeenCalledWith([record1, null, null], [record1, record2, null]);
-    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
-    Test1.cache.add(record3);
-    expect(cb1).toHaveBeenCalledWith([record1, record2, null], [record1, record2, record3]);
-    const record1Updated = new Test1({ id: 2, firstName: 'Bobby', email: 'bob@b.com' });
-    Test1.cache.add(record1Updated);
-    expect(cb1).toHaveBeenCalledWith(
-        [record1, record2, record3],
-        [record1Updated, record2, record3]
-    );
-
-    // Make sure unsubscribe works
-    cb1.mockReset();
-    unsubscribe();
-    Test1.cache.add(new Test1({ id: 2, firstName: 'Bobby', email: 'bobby@b.com' }));
-    expect(cb1).not.toHaveBeenCalled();
-});
-
-test('should support listening to multiple pks, batch notifications', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
-
-    const cb1 = jest.fn();
-    const cb2 = jest.fn();
-    Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
-    // Add another callback - there's internal optimisations in addListenerList that we need
-    // to ensure don't break this
-    Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb2);
-    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
-    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
-    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
-    Test1.cache.addList([record1, record2, record3]);
-    expect(cb1).toHaveBeenCalledTimes(1);
-    expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
-    expect(cb2).toHaveBeenCalledTimes(1);
-    expect(cb2).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
-});
-
-test('should support listening to multiple pks without specifying primary keys in field names', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
-
-    const cb1 = jest.fn();
-    Test1.cache.addListenerList([2, 3, 4], ['firstName', 'email'], cb1);
-    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
-    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
-    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
-    Test1.cache.addList([record1, record2, record3]);
-    expect(cb1).toHaveBeenCalledTimes(1);
-    expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
-});
-
-test('should support adding list of plain objects', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
-
-    const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
-    const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
-    const record3 = { id: 4, firstName: 'Gandalf', email: 'gandy@b.com' };
-    const result = Test1.cache.addList([record1, record2, record3]);
-
-    expect(result).toEqual([
-        recordEqualTo(record1),
-        recordEqualTo(record2),
-        recordEqualTo(record3),
-    ]);
-});
-
 test('should support adding list of via add', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
     const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
@@ -678,144 +549,80 @@ test('should support adding list of via add', () => {
     ]);
 });
 
-// Run this test both with and without listeners. Code path is different between the two (optimisation for
-// when no listeners in use)
-test.each`
-    withListeners
-    ${true}
-    ${false}
-`('Should support getting all records, listeners = $withListeners ', ({ withListeners }) => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
+test('should support adding list of plain objects', () => {
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
 
     const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
     const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
     const record3 = { id: 4, firstName: 'Gandalf', email: 'gandy@b.com' };
-    Test1.cache.add([record1, record2, record3]);
-
-    if (withListeners) {
-        Test1.cache.addListener([2, 3, 4], ['id', 'firstName', 'email'], jest.fn());
-        Test1.cache.addListener([2, 3, 4], ['id', 'firstName'], jest.fn());
-    }
-
-    let result = Test1.cache.getAll(['firstName', 'email']);
+    const result = Test1.cache.addList([record1, record2, record3]);
 
     expect(result).toEqual([
         recordEqualTo(record1),
         recordEqualTo(record2),
         recordEqualTo(record3),
     ]);
-
-    // Calling it again should return the same array (strict equality pass)
-    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
-
-    // Getting subfields should work and not break equality checks
-    let result2 = Test1.cache.getAll(['firstName']);
-
-    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
-
-    expect(result2).toEqual([
-        recordEqualTo({ id: 2, firstName: 'Bob' }),
-        recordEqualTo({ id: 3, firstName: 'Samwise' }),
-        recordEqualTo({ id: 4, firstName: 'Gandalf' }),
-    ]);
-    expect(result2).toBe(Test1.cache.getAll(['firstName']));
-
-    Test1.cache.add(record1);
-    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
-    expect(result2).toBe(Test1.cache.getAll(['firstName']));
-
-    Test1.cache.add({ ...record1, firstName: 'Bobby' });
-
-    expect(result).not.toBe(Test1.cache.getAll(['firstName', 'email']));
-    expect(result2).not.toBe(Test1.cache.getAll(['firstName']));
-
-    result = Test1.cache.getAll(['firstName', 'email']);
-    result2 = Test1.cache.getAll(['firstName']);
-
-    expect(result[0].firstName).toBe('Bobby');
-    expect(result2[0].firstName).toBe('Bobby');
-
-    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
-    expect(result2).toBe(Test1.cache.getAll(['firstName']));
-});
-
-test('should support listening all changes on a ViewModel', () => {
-    class Test1 extends viewModelFactory({
-        id: F('id'),
-        firstName: F('firstName'),
-        lastName: F('lastName'),
-        email: F('email'),
-    }) {}
-
-    const cb1 = jest.fn();
-    const cb2 = jest.fn();
-    Test1.cache.addListener(cb1);
-    Test1.cache.addListener(cb2);
-    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
-    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
-    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
-    Test1.cache.addList([record1, record2, record3]);
-    expect(cb1).toHaveBeenCalledTimes(1);
-    expect(cb2).toHaveBeenCalledTimes(1);
-
-    Test1.cache.add({ id: 6, firstName: 'Ho' });
-
-    expect(cb1).toHaveBeenCalledTimes(2);
-    expect(cb2).toHaveBeenCalledTimes(2);
-
-    Test1.cache.delete(6);
-    expect(cb1).toHaveBeenCalledTimes(3);
-    expect(cb2).toHaveBeenCalledTimes(3);
-
-    // Shouldn't call it again, record already deleted
-    Test1.cache.delete(6);
-    expect(cb1).toHaveBeenCalledTimes(3);
-    expect(cb2).toHaveBeenCalledTimes(3);
 });
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function createTestModels(circular = false, many = false) {
-    class Group extends viewModelFactory({
-        name: new Field<string>(),
-        ...(circular
-            ? {
-                  ownerId: new Field<number>(),
-                  owner: new RelatedViewModelField({
-                      // Type here isn't typeof User as it seemed to confuse typescript.. I guess
-                      // because of the circular reference
-                      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                      to: (): Promise<ViewModelConstructor<any>> => Promise.resolve(User),
-                      sourceFieldName: 'ownerId',
-                  }),
-              }
-            : {}),
-    }) {}
-    class User extends viewModelFactory({
-        name: new Field<string>(),
-        groupId: many
-            ? new ListField({ childField: new Field<number | null>() })
-            : new Field<number | null>(),
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        group: new (many ? ManyRelatedViewModelField : RelatedViewModelField)({
-            to: (): Promise<typeof Group> => Promise.resolve(Group),
-            sourceFieldName: 'groupId',
-        }),
-    }) {}
-    class Subscription extends viewModelFactory({
-        userId: new Field<number>(),
-        user: new RelatedViewModelField<typeof User>({
-            to: (): Promise<typeof User> => Promise.resolve(User),
-            sourceFieldName: 'userId',
-        }),
-    }) {}
+    class Group extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            ...(circular
+                ? {
+                      ownerId: new Field<number>(),
+                      owner: new RelatedViewModelField({
+                          // Type here isn't typeof User as it seemed to confuse typescript.. I guess
+                          // because of the circular reference
+                          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                          to: (): Promise<ViewModelConstructor<any, any>> => Promise.resolve(User),
+                          sourceFieldName: 'ownerId',
+                      }),
+                  }
+                : {}),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class User extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            groupId: many
+                ? new ListField({ childField: new Field<number | null>() })
+                : new Field<number | null>(),
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            group: new (many ? ManyRelatedViewModelField : RelatedViewModelField)({
+                to: (): Promise<typeof Group> => Promise.resolve(Group),
+                sourceFieldName: 'groupId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Subscription extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            userId: new Field<number>(),
+            user: new RelatedViewModelField({
+                to: (): Promise<typeof User> => Promise.resolve(User),
+                sourceFieldName: 'userId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     return { User, Group, Subscription };
 }
+
 test('cache should support traversing models', async () => {
     const { User, Group, Subscription } = createTestModels();
 
@@ -827,6 +634,8 @@ test('cache should support traversing models', async () => {
     });
     const r = Subscription.cache.get(1, ['userId']);
     expect(r?.userId).toBe(1);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     expect(() => r?.user).toThrow(/'user' accessed on .* but was not instantiated with it/);
     expect(() => Subscription.cache.get(1, ['user'])).toThrow(/Call .*resolveViewModel\(\) first/);
     await Subscription.fields.user.resolveViewModel();
@@ -981,6 +790,8 @@ test('caching record with nested data should populate associated caches', async 
         })
     );
     expect(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore Recursive definitions not supported in types
         User.cache.get(10, ['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']])
     ).toEqual(
         new User({
@@ -1083,6 +894,20 @@ test('should support nested paths', async () => {
     ]);
 });
 
+test('should handle nested related when related id is updated', async () => {
+    const { User } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+
+    User.cache.add({ id: 1, name: 'Bob', group: { id: 1, name: 'Staff', ownerId: 1 } });
+    expect(User.cache.get(1, ['id', 'name', ['group', 'name']])).toBeEqualToRecord(
+        new User({ id: 1, name: 'Bob', group: { id: 1, name: 'Staff' } })
+    );
+    User.cache.add({ id: 1, name: 'Bobby', groupId: 1 });
+    expect(User.cache.get(1, ['id', 'name', ['group', 'name']])).toBeEqualToRecord(
+        new User({ id: 1, name: 'Bobby', group: { id: 1, name: 'Staff' } })
+    );
+});
+
 test('should handle nullable values', async () => {
     const { User, Group, Subscription } = createTestModels(true);
     await User.fields.group.resolveViewModel();
@@ -1148,6 +973,567 @@ test('should handle nullable values', async () => {
             groupId: null,
         })
     );
+});
+
+test('getList should work across caches', async () => {
+    const { User, Group } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    Group.cache.add({ id: 1, name: 'Staff', ownerId: 1 });
+    User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
+    User.cache.add({ id: 2, name: 'Sam', groupId: null });
+    User.cache.add({ id: 3, name: 'Godfrey', groupId: 2 });
+    Group.cache.add({ id: 2, name: 'Customers', ownerId: 2 });
+    expect(User.cache.getList([1, 2, 3], ['name', ['group', 'name'], ['group', 'owner']])).toEqual([
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                    owner: {
+                        id: 1,
+                        name: 'Bob',
+                        groupId: 1,
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 2,
+                name: 'Sam',
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                group: null,
+                groupId: null,
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 3,
+                name: 'Godfrey',
+                groupId: 2,
+                group: {
+                    id: 2,
+                    name: 'Customers',
+                    ownerId: 2,
+                    owner: {
+                        id: 2,
+                        name: 'Sam',
+                        groupId: null,
+                    },
+                },
+            })
+        ),
+    ]);
+
+    expect(
+        User.cache.getList(
+            [1, 2, 3],
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore Recursive definitions not supported in types
+            ['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']]
+        )
+    ).toEqual([
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                    owner: {
+                        id: 1,
+                        name: 'Bob',
+                        groupId: 1,
+                        group: {
+                            id: 1,
+                            name: 'Staff',
+                            ownerId: 1,
+                        },
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 2,
+                name: 'Sam',
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                group: null,
+                groupId: null,
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 3,
+                name: 'Godfrey',
+                groupId: 2,
+                group: {
+                    id: 2,
+                    name: 'Customers',
+                    ownerId: 2,
+                    owner: {
+                        id: 2,
+                        name: 'Sam',
+                        groupId: null,
+                        group: null,
+                    },
+                },
+            })
+        ),
+    ]);
+});
+
+test('getAll should work across caches', async () => {
+    const { User, Group } = createTestModels(true);
+    await User.fields.group.resolveViewModel();
+    Group.cache.add({ id: 1, name: 'Staff', ownerId: 1 });
+    User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
+    User.cache.add({ id: 2, name: 'Sam', groupId: null });
+    User.cache.add({ id: 3, name: 'Godfrey', groupId: 2 });
+    Group.cache.add({ id: 2, name: 'Customers', ownerId: 2 });
+    expect(User.cache.getAll(['name', ['group', 'name'], ['group', 'owner']])).toEqual([
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                    owner: {
+                        id: 1,
+                        name: 'Bob',
+                        groupId: 1,
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 2,
+                name: 'Sam',
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                group: null,
+                groupId: null,
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 3,
+                name: 'Godfrey',
+                groupId: 2,
+                group: {
+                    id: 2,
+                    name: 'Customers',
+                    ownerId: 2,
+                    owner: {
+                        id: 2,
+                        name: 'Sam',
+                        groupId: null,
+                    },
+                },
+            })
+        ),
+    ]);
+    expect(User.cache.getAll(['name', ['group', 'name'], ['group', 'owner']])).toBe(
+        User.cache.getAll(['name', ['group', 'name'], ['group', 'owner']])
+    );
+
+    expect(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore Recursive definitions not supported in types
+        User.cache.getAll(['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']])
+    ).toEqual([
+        recordEqualTo(
+            new User({
+                id: 1,
+                name: 'Bob',
+                groupId: 1,
+                group: {
+                    id: 1,
+                    name: 'Staff',
+                    ownerId: 1,
+                    owner: {
+                        id: 1,
+                        name: 'Bob',
+                        groupId: 1,
+                        group: {
+                            id: 1,
+                            name: 'Staff',
+                            ownerId: 1,
+                        },
+                    },
+                },
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 2,
+                name: 'Sam',
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                group: null,
+                groupId: null,
+            })
+        ),
+        recordEqualTo(
+            new User({
+                id: 3,
+                name: 'Godfrey',
+                groupId: 2,
+                group: {
+                    id: 2,
+                    name: 'Customers',
+                    ownerId: 2,
+                    owner: {
+                        id: 2,
+                        name: 'Sam',
+                        groupId: null,
+                        group: null,
+                    },
+                },
+            })
+        ),
+    ]);
+});
+
+test('should validate field names', async () => {
+    const { Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    expect(() => Subscription.cache.get(1, ['userId', ['user', 'nam']])).toThrowError(
+        /Unknown field 'nam'/
+    );
+    expect(() =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        Subscription.cache.get(1, [
+            ['use', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'own'],
+        ])
+    ).toThrowError(/Unknown field 'use'/);
+
+    expect(() =>
+        Subscription.cache.getList(
+            [1],
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            [
+                ['use', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'own'],
+            ] as FieldPath<typeof Subscription>[]
+        )
+    ).toThrowError(/Unknown field 'use'/);
+
+    expect(() =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        Subscription.cache.getAll([
+            ['use', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'own'],
+        ])
+    ).toThrowError(/Unknown field 'use'/);
+});
+
+test('should notify listeners on add, change, delete', () => {
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    const cb1 = jest.fn();
+    Test1.cache.addListener(2, ['id', 'firstName'], cb1);
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
+    expect(cb1).toHaveBeenCalledWith(
+        null,
+        recordEqualTo({
+            id: 2,
+            firstName: 'Bob',
+        })
+    );
+    cb1.mockReset();
+    Test1.cache.add(new Test1({ id: 3, lastName: 'Jack', email: 'jack@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+    Test1.cache.add(new Test1({ id: 4, firstName: 'Sam', email: 'sam@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bobby', email: 'bob@b.com' }));
+    expect(cb1).toHaveBeenCalledWith(
+        recordEqualTo({
+            id: 2,
+            firstName: 'Bob',
+        }),
+        recordEqualTo({
+            id: 2,
+            firstName: 'Bobby',
+        })
+    );
+    cb1.mockReset();
+    Test1.cache.delete(2, ['id', 'firstName']);
+    expect(cb1).toHaveBeenCalledWith(
+        recordEqualTo({
+            id: 2,
+            firstName: 'Bobby',
+        }),
+        null
+    );
+    const cb2 = jest.fn();
+    Test1.cache.addListener(12, ['id', 'email'], cb2);
+    const cb3 = jest.fn();
+    Test1.cache.addListener(12, ['id', 'firstName', 'email'], cb3);
+    Test1.cache.add(new Test1({ id: 12, firstName: 'Samwise', email: 'samwise@b.com' }));
+
+    // We don't care about the addition notifications
+    cb2.mockReset();
+    cb3.mockReset();
+
+    Test1.cache.delete(12);
+    expect(cb2).toHaveBeenCalledWith(
+        recordEqualTo({
+            id: 12,
+            email: 'samwise@b.com',
+        }),
+        null
+    );
+    expect(cb3).toHaveBeenCalledWith(
+        recordEqualTo({
+            id: 12,
+            firstName: 'Samwise',
+            email: 'samwise@b.com',
+        }),
+        null
+    );
+});
+
+test('should not notify if identical record added', () => {
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    const cb1 = jest.fn();
+    Test1.cache.addListener(2, ['id', 'firstName', 'email'], cb1);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    Test1.cache.add(record1);
+    expect(cb1).toHaveBeenCalledWith(null, record1);
+    cb1.mockReset();
+    // Adding same record should be ignored
+    Test1.cache.add(record1);
+    expect(cb1).not.toHaveBeenCalled();
+    // Adding same record even if strict equality fails should be ignored
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+});
+
+test('should support listening to multiple pks', () => {
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    const cb1 = jest.fn();
+    const unsubscribe = Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    Test1.cache.add(record1);
+    expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, null, null]);
+    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
+    Test1.cache.add(record2);
+    expect(cb1).toHaveBeenCalledWith([record1, null, null], [record1, record2, null]);
+    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
+    Test1.cache.add(record3);
+    expect(cb1).toHaveBeenCalledWith([record1, record2, null], [record1, record2, record3]);
+    const record1Updated = new Test1({ id: 2, firstName: 'Bobby', email: 'bob@b.com' });
+    Test1.cache.add(record1Updated);
+    expect(cb1).toHaveBeenCalledWith(
+        [record1, record2, record3],
+        [record1Updated, record2, record3]
+    );
+
+    // Make sure unsubscribe works
+    cb1.mockReset();
+    unsubscribe();
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bobby', email: 'bobby@b.com' }));
+    expect(cb1).not.toHaveBeenCalled();
+});
+
+test('should support listening to multiple pks, batch notifications', () => {
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    const cb1 = jest.fn();
+    const cb2 = jest.fn();
+    Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb1);
+    // Add another callback - there's internal optimisations in addListenerList that we need
+    // to ensure don't break this
+    Test1.cache.addListenerList([2, 3, 4], ['id', 'firstName', 'email'], cb2);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
+    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
+    Test1.cache.addList([record1, record2, record3]);
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
+    expect(cb2).toHaveBeenCalledTimes(1);
+    expect(cb2).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
+});
+
+test('should support listening to multiple pks without specifying primary keys in field names', () => {
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    const cb1 = jest.fn();
+    Test1.cache.addListenerList([2, 3, 4], ['firstName', 'email'], cb1);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
+    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
+    Test1.cache.addList([record1, record2, record3]);
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb1).toHaveBeenCalledWith([null, null, null], [record1, record2, record3]);
+});
+
+// Run this test both with and without listeners. Code path is different between the two (optimisation for
+// when no listeners in use)
+test.each`
+    withListeners
+    ${true}
+    ${false}
+`('Should support getting all records, listeners = $withListeners ', ({ withListeners }) => {
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    const record1 = { id: 2, firstName: 'Bob', email: 'bob@b.com' };
+    const record2 = { id: 3, firstName: 'Samwise', email: 'samwise@b.com' };
+    const record3 = { id: 4, firstName: 'Gandalf', email: 'gandy@b.com' };
+    Test1.cache.add([record1, record2, record3]);
+
+    if (withListeners) {
+        Test1.cache.addListener([2, 3, 4], ['id', 'firstName', 'email'], jest.fn());
+        Test1.cache.addListener([2, 3, 4], ['id', 'firstName'], jest.fn());
+    }
+
+    let result = Test1.cache.getAll(['firstName', 'email']);
+
+    expect(result).toEqual([
+        recordEqualTo(record1),
+        recordEqualTo(record2),
+        recordEqualTo(record3),
+    ]);
+
+    // Calling it again should return the same array (strict equality pass)
+    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
+
+    // Getting subfields should work and not break equality checks
+    let result2 = Test1.cache.getAll(['firstName']);
+
+    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
+
+    expect(result2).toEqual([
+        recordEqualTo({ id: 2, firstName: 'Bob' }),
+        recordEqualTo({ id: 3, firstName: 'Samwise' }),
+        recordEqualTo({ id: 4, firstName: 'Gandalf' }),
+    ]);
+    expect(result2).toBe(Test1.cache.getAll(['firstName']));
+
+    Test1.cache.add(record1);
+    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
+    expect(result2).toBe(Test1.cache.getAll(['firstName']));
+
+    Test1.cache.add({ ...record1, firstName: 'Bobby' });
+
+    expect(result).not.toBe(Test1.cache.getAll(['firstName', 'email']));
+    expect(result2).not.toBe(Test1.cache.getAll(['firstName']));
+
+    result = Test1.cache.getAll(['firstName', 'email']);
+    result2 = Test1.cache.getAll(['firstName']);
+
+    expect(result[0].firstName).toBe('Bobby');
+    expect(result2[0].firstName).toBe('Bobby');
+
+    expect(result).toBe(Test1.cache.getAll(['firstName', 'email']));
+    expect(result2).toBe(Test1.cache.getAll(['firstName']));
+});
+
+test('should support listening all changes on a ViewModel', () => {
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    const cb1 = jest.fn();
+    const cb2 = jest.fn();
+    Test1.cache.addListener(cb1);
+    Test1.cache.addListener(cb2);
+    const record1 = new Test1({ id: 2, firstName: 'Bob', email: 'bob@b.com' });
+    const record2 = new Test1({ id: 3, firstName: 'Samwise', email: 'samwise@b.com' });
+    const record3 = new Test1({ id: 4, firstName: 'Gandalf', email: 'gandy@b.com' });
+    Test1.cache.addList([record1, record2, record3]);
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb2).toHaveBeenCalledTimes(1);
+
+    Test1.cache.add({ id: 6, firstName: 'Ho' });
+
+    expect(cb1).toHaveBeenCalledTimes(2);
+    expect(cb2).toHaveBeenCalledTimes(2);
+
+    Test1.cache.delete(6);
+    expect(cb1).toHaveBeenCalledTimes(3);
+    expect(cb2).toHaveBeenCalledTimes(3);
+
+    // Shouldn't call it again, record already deleted
+    Test1.cache.delete(6);
+    expect(cb1).toHaveBeenCalledTimes(3);
+    expect(cb2).toHaveBeenCalledTimes(3);
 });
 
 test('listeners should work across related models', async () => {
@@ -1292,7 +1678,12 @@ test('listeners should work across deeply nested related models', async () => {
         Subscription.cache.addListener(1, ['id', 'userId'], subscriptionListenerSimple),
         Subscription.cache.addListener(
             1,
-            ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+            [
+                'id',
+                ['user', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'owner', 'name'],
+            ] as FieldPath<typeof Subscription>[],
             subscriptionListenerNested
         ),
         Subscription.cache.addListener(subscriptionListenerAll),
@@ -1428,12 +1819,15 @@ test('listeners should work across deeply nested related models', async () => {
     );
     resetCbs();
     expect(subscriptionListenerNested).toHaveBeenCalledTimes(0);
+    // console.log('****************************************************************************');
     User.cache.add({
         id: 1,
         name: 'Bobby',
         groupId: 1,
     });
     expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
+    // console.log(JSON.stringify(subscriptionListenerNested.mock.calls[0][0].toJS(), null, 2));
+    // console.log(JSON.stringify(subscriptionListenerNested.mock.calls[0][1].toJS(), null, 2));
     expect(subscriptionListenerNested).toHaveBeenCalledWith(
         recordEqualTo(
             new Subscription({
@@ -1547,7 +1941,12 @@ test('getting a subset of keys should not trigger listeners', async () => {
 
     Subscription.cache.addListener(
         1,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ] as FieldPath<typeof Subscription>[],
         subscriptionListenerNested
     );
 
@@ -1557,7 +1956,7 @@ test('getting a subset of keys should not trigger listeners', async () => {
             ['user', 'name'],
             ['user', 'group', 'name'],
             ['user', 'group', 'owner', 'name'],
-        ])
+        ] as FieldPath<typeof Subscription>[])
     ).toEqual(
         new Subscription({
             id: 1,
@@ -1595,11 +1994,15 @@ test('deletes should still work if listener added after record created', async (
 
     Subscription.cache.addListener(
         1,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ] as FieldPath<typeof Subscription>[],
         subscriptionListenerNested
     );
     User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested);
-
     Group.cache.delete(1);
     expect(User.cache.get(1, ['id', 'name', 'group'])).toBeNull();
     expect(userListenerNested).toHaveBeenCalledTimes(1);
@@ -1622,7 +2025,7 @@ test('deletes should still work if listener added after record created', async (
             ['user', 'name'],
             ['user', 'group', 'name'],
             ['user', 'group', 'owner', 'name'],
-        ])
+        ] as FieldPath<typeof Subscription>[])
     ).toBeNull();
     expect(subscriptionListenerNested).toHaveBeenCalledTimes(1);
     expect(subscriptionListenerNested).toHaveBeenCalledWith(
@@ -1651,7 +2054,12 @@ test('deletes should work across deeply nested related models', async () => {
 
     Subscription.cache.addListener(
         1,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ] as FieldPath<typeof Subscription>[],
         subscriptionListenerNested
     );
     User.cache.addListener(1, ['id', 'name', 'group'], userListenerNested);
@@ -1740,34 +2148,46 @@ test('listeners should handle missing nested', async () => {
 });
 
 test('listeners should work across related models with partial fields', async () => {
-    class Group extends viewModelFactory({
-        name: new Field<string>(),
-        ownerId: new Field<number>(),
-        owner: new RelatedViewModelField({
-            // Type here isn't typeof User as it seemed to confuse typescript.. I guess
-            // because of the circular reference
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            to: (): Promise<ViewModelConstructor<any>> => Promise.resolve(User),
-            sourceFieldName: 'ownerId',
-        }),
-    }) {}
-    class User extends viewModelFactory({
-        name: new Field<string>(),
-        email: new Field<string>(),
-        groupId: new Field<number | null>(),
-        group: new RelatedViewModelField({
-            to: (): Promise<typeof Group> => Promise.resolve(Group),
-            sourceFieldName: 'groupId',
-        }),
-    }) {}
-    class Subscription extends viewModelFactory({
-        label: new Field<string>(),
-        userId: new Field<number>(),
-        user: new RelatedViewModelField<typeof User>({
-            to: (): Promise<typeof User> => Promise.resolve(User),
-            sourceFieldName: 'userId',
-        }),
-    }) {}
+    class Group extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            ownerId: new Field<number>(),
+            owner: new RelatedViewModelField({
+                // Type here isn't typeof User as it seemed to confuse typescript.. I guess
+                // because of the circular reference
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                to: (): Promise<ViewModelConstructor<any, any>> => Promise.resolve(User),
+                sourceFieldName: 'ownerId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class User extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            email: new Field<string>(),
+            groupId: new Field<number | null>(),
+            group: new RelatedViewModelField({
+                to: (): Promise<typeof Group> => Promise.resolve(Group),
+                sourceFieldName: 'groupId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Subscription extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            label: new Field<string>(),
+            userId: new Field<number>(),
+            user: new RelatedViewModelField<typeof User>({
+                to: (): Promise<typeof User> => Promise.resolve(User),
+                sourceFieldName: 'userId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
     await Subscription.fields.user.resolveViewModel();
     const subscriptionListenerNested = jest.fn();
     Subscription.cache.addListener(
@@ -1918,6 +2338,7 @@ test('listeners should work across related models with partial fields', async ()
         )
     );
 });
+
 test('list listeners should work across related models', async () => {
     const { User, Group, Subscription } = createTestModels(true);
     await Subscription.fields.user.resolveViewModel();
@@ -1935,7 +2356,12 @@ test('list listeners should work across related models', async () => {
         Subscription.cache.addListenerList([1, 2, 3], ['id', 'userId'], subscriptionListenerSimple),
         Subscription.cache.addListener(
             [1, 2, 3],
-            ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
+            [
+                'id',
+                ['user', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'owner', 'name'],
+            ] as FieldPath<typeof Subscription>[],
             subscriptionListenerNested
         ),
         Subscription.cache.addListener(subscriptionListenerAll),
@@ -2542,420 +2968,58 @@ test('should support manual nested batching', async () => {
     );
 });
 
-test('getList should work across caches', async () => {
-    const { User, Group } = createTestModels(true);
+test('many fields should work with empty list of ids', async () => {
+    const { User, Group } = createTestModels(true, true);
     await User.fields.group.resolveViewModel();
-    Group.cache.add({ id: 1, name: 'Staff', ownerId: 1 });
-    User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
-    User.cache.add({ id: 2, name: 'Sam', groupId: null });
-    User.cache.add({ id: 3, name: 'Godfrey', groupId: 2 });
-    Group.cache.add({ id: 2, name: 'Customers', ownerId: 2 });
-    expect(User.cache.getList([1, 2, 3], ['name', ['group', 'name'], ['group', 'owner']])).toEqual([
+
+    const cb = jest.fn();
+    User.cache.addListener(1, ['id', 'name', 'groupId', 'group'], cb);
+
+    User.cache.add({
+        id: 1,
+        name: 'Bob',
+        groupId: [],
+    });
+
+    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenLastCalledWith(
+        null,
         recordEqualTo(
             new User({
                 id: 1,
                 name: 'Bob',
-                groupId: 1,
-                group: {
-                    id: 1,
-                    name: 'Staff',
-                    ownerId: 1,
-                    owner: {
-                        id: 1,
-                        name: 'Bob',
-                        groupId: 1,
-                    },
-                },
+                groupId: [],
+                group: [],
             })
-        ),
-        recordEqualTo(
-            new User({
-                id: 2,
-                name: 'Sam',
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                group: null,
-                groupId: null,
-            })
-        ),
-        recordEqualTo(
-            new User({
-                id: 3,
-                name: 'Godfrey',
-                groupId: 2,
-                group: {
-                    id: 2,
-                    name: 'Customers',
-                    ownerId: 2,
-                    owner: {
-                        id: 2,
-                        name: 'Sam',
-                        groupId: null,
-                    },
-                },
-            })
-        ),
-    ]);
-
-    expect(
-        User.cache.getList(
-            [1, 2, 3],
-            ['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']]
         )
-    ).toEqual([
-        recordEqualTo(
-            new User({
-                id: 1,
-                name: 'Bob',
-                groupId: 1,
-                group: {
-                    id: 1,
-                    name: 'Staff',
-                    ownerId: 1,
-                    owner: {
-                        id: 1,
-                        name: 'Bob',
-                        groupId: 1,
-                        group: {
-                            id: 1,
-                            name: 'Staff',
-                            ownerId: 1,
-                        },
-                    },
-                },
-            })
-        ),
-        recordEqualTo(
-            new User({
-                id: 2,
-                name: 'Sam',
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                group: null,
-                groupId: null,
-            })
-        ),
-        recordEqualTo(
-            new User({
-                id: 3,
-                name: 'Godfrey',
-                groupId: 2,
-                group: {
-                    id: 2,
-                    name: 'Customers',
-                    ownerId: 2,
-                    owner: {
-                        id: 2,
-                        name: 'Sam',
-                        groupId: null,
-                        group: null,
-                    },
-                },
-            })
-        ),
-    ]);
-});
-
-test('getAll should work across caches', async () => {
-    const { User, Group } = createTestModels(true);
-    await User.fields.group.resolveViewModel();
-    Group.cache.add({ id: 1, name: 'Staff', ownerId: 1 });
-    User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
-    User.cache.add({ id: 2, name: 'Sam', groupId: null });
-    User.cache.add({ id: 3, name: 'Godfrey', groupId: 2 });
-    Group.cache.add({ id: 2, name: 'Customers', ownerId: 2 });
-    expect(User.cache.getAll(['name', ['group', 'name'], ['group', 'owner']])).toEqual([
-        recordEqualTo(
-            new User({
-                id: 1,
-                name: 'Bob',
-                groupId: 1,
-                group: {
-                    id: 1,
-                    name: 'Staff',
-                    ownerId: 1,
-                    owner: {
-                        id: 1,
-                        name: 'Bob',
-                        groupId: 1,
-                    },
-                },
-            })
-        ),
-        recordEqualTo(
-            new User({
-                id: 2,
-                name: 'Sam',
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                group: null,
-                groupId: null,
-            })
-        ),
-        recordEqualTo(
-            new User({
-                id: 3,
-                name: 'Godfrey',
-                groupId: 2,
-                group: {
-                    id: 2,
-                    name: 'Customers',
-                    ownerId: 2,
-                    owner: {
-                        id: 2,
-                        name: 'Sam',
-                        groupId: null,
-                    },
-                },
-            })
-        ),
-    ]);
-    expect(User.cache.getAll(['name', ['group', 'name'], ['group', 'owner']])).toBe(
-        User.cache.getAll(['name', ['group', 'name'], ['group', 'owner']])
     );
+    cb.mockReset();
 
-    expect(
-        User.cache.getAll(['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']])
-    ).toEqual([
+    User.cache.add({
+        id: 1,
+        name: 'Bobby',
+        groupId: [],
+    });
+
+    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenLastCalledWith(
         recordEqualTo(
             new User({
                 id: 1,
                 name: 'Bob',
-                groupId: 1,
-                group: {
-                    id: 1,
-                    name: 'Staff',
-                    ownerId: 1,
-                    owner: {
-                        id: 1,
-                        name: 'Bob',
-                        groupId: 1,
-                        group: {
-                            id: 1,
-                            name: 'Staff',
-                            ownerId: 1,
-                        },
-                    },
-                },
+                groupId: [],
+                group: [],
             })
         ),
         recordEqualTo(
             new User({
-                id: 2,
-                name: 'Sam',
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                group: null,
-                groupId: null,
+                id: 1,
+                name: 'Bobby',
+                groupId: [],
+                group: [],
             })
-        ),
-        recordEqualTo(
-            new User({
-                id: 3,
-                name: 'Godfrey',
-                groupId: 2,
-                group: {
-                    id: 2,
-                    name: 'Customers',
-                    ownerId: 2,
-                    owner: {
-                        id: 2,
-                        name: 'Sam',
-                        groupId: null,
-                        group: null,
-                    },
-                },
-            })
-        ),
-    ]);
-});
-
-test('should validate field names', async () => {
-    const { Subscription } = createTestModels(true);
-    await Subscription.fields.user.resolveViewModel();
-    expect(() => Subscription.cache.get(1, ['userId', ['user', 'nam']])).toThrowError(
-        /Invalid field\(s\) provided:/
-    );
-    expect(() =>
-        Subscription.cache.get(1, [
-            ['use', 'name'],
-            ['user', 'group', 'name'],
-            ['user', 'group', 'own'],
-        ])
-    ).toThrowError(/Invalid field\(s\) provided:/);
-
-    expect(() =>
-        Subscription.cache.getList(
-            [1],
-            [
-                ['use', 'name'],
-                ['user', 'group', 'name'],
-                ['user', 'group', 'own'],
-            ]
         )
-    ).toThrowError(/Invalid field\(s\) provided:/);
-
-    expect(() =>
-        Subscription.cache.getAll([
-            ['use', 'name'],
-            ['user', 'group', 'name'],
-            ['user', 'group', 'own'],
-        ])
-    ).toThrowError(/Invalid field\(s\) provided:/);
-});
-
-function timeBlock(run): bigint {
-    const start = process.hrtime.bigint();
-    run();
-    const end = process.hrtime.bigint();
-    return (end - start) / BigInt(1e6);
-}
-
-test('should be performant', async () => {
-    // TODO: I don't know what's good here but as a starting point:
-    // 50 nested records (so 50 subs, 50 users, 50, groups) with
-    // a listener each (3 on different permutations of nested fields = 250)
-    // and list listener on all subscriptions for 3 different permutations of
-    // nested fields (150)
-    // So total 150 records and 400 listeners
-    const { User, Group, Subscription } = createTestModels(true);
-    await Subscription.fields.user.resolveViewModel();
-    await User.fields.group.resolveViewModel();
-    const cbs: jest.Mock[] = [];
-    function nextFn(): jest.Mock {
-        const fn = jest.fn();
-        cbs.push(fn);
-        return fn;
-    }
-    const count = 50;
-    for (let i = 0; i < count; i++) {
-        Subscription.cache.addListener(i, ['id', 'userId'], nextFn());
-        Subscription.cache.addListener(
-            i,
-            ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
-            nextFn()
-        );
-        Subscription.cache.addListener(
-            i,
-            ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']],
-            nextFn()
-        );
-        Subscription.cache.addListener(
-            i,
-            [
-                'id',
-                ['user', 'name'],
-                ['user', 'group', 'name'],
-                ['user', 'group', 'owner', 'group'],
-            ],
-            nextFn()
-        );
-        User.cache.addListener(i, ['id', 'name'], nextFn());
-        User.cache.addListener(i, ['id', 'name', 'group'], nextFn());
-        Group.cache.addListener(i, ['id', 'name', 'ownerId'], nextFn());
-        Group.cache.addListener(i, ['id', 'name', 'owner'], nextFn());
-    }
-    const ids = Array.from({ length: count }, (_, i) => i);
-    Subscription.cache.addListenerList(
-        ids,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'name']],
-        jest.fn()
     );
-    Subscription.cache.addListenerList(
-        ids,
-        ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']],
-        jest.fn()
-    );
-    Subscription.cache.addListenerList(
-        ids,
-        ['id', ['user', 'name'], ['user', 'group', 'name'], ['user', 'group', 'owner', 'group']],
-        jest.fn()
-    );
-    User.cache.addListener(jest.fn());
-    Subscription.cache.addListener(jest.fn());
-    Group.cache.addListener(jest.fn());
-    expect(
-        timeBlock(() => {
-            for (let i = 0; i < count; i++) {
-                Group.cache.add({
-                    id: i,
-                    name: 'Staff',
-                    ownerId: i,
-                });
-                User.cache.add({
-                    id: i,
-                    name: 'Bob',
-                    groupId: i,
-                });
-                Subscription.cache.add({
-                    id: i,
-                    userId: i,
-                });
-            }
-            for (let i = 0; i < count; i++) {
-                Subscription.cache.delete(i);
-                User.cache.delete(i);
-                Group.cache.delete(i);
-            }
-        })
-    ).toBeLessThan(1500);
-    for (const cb of cbs) {
-        expect(cb).toHaveBeenCalledTimes(2);
-    }
-});
-
-test('relation listeners should be cleaned up', async () => {
-    const { Subscription } = createTestModels(true);
-    await Subscription.fields.user.resolveViewModel();
-    Subscription.cache.add({
-        id: 1,
-        user: {
-            id: 1,
-            name: 'Bob',
-            group: {
-                id: 1,
-                name: 'Staff',
-                ownerId: 1,
-            },
-        },
-    });
-    Subscription.cache.add({
-        id: 1,
-        user: {
-            id: 1,
-            name: 'Bob',
-        },
-    });
-    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(2);
-    Subscription.cache.delete(1, [['user', 'name']]);
-    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(1);
-    Subscription.cache.delete(1, [
-        ['user', 'name'],
-        ['user', 'group'],
-    ]);
-    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(0);
-    Subscription.cache.add({
-        id: 1,
-        user: {
-            id: 1,
-            name: 'Bob',
-            group: {
-                id: 1,
-                name: 'Staff',
-                ownerId: 1,
-            },
-        },
-    });
-    Subscription.cache.add({
-        id: 1,
-        user: {
-            id: 1,
-            name: 'Bob',
-        },
-    });
-    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(2);
-    Subscription.cache.delete(1);
-    expect(Subscription.cache.cache.get(1)?.relationListeners.get('user')?.size).toBe(0);
 });
 
 test('listeners should work across related models (many)', async () => {
@@ -3120,21 +3184,7 @@ test('listeners should work across related models (many)', async () => {
     });
 });
 
-/**
- * The skip tests below highlight some edge case bugs I haven't yet been able to solve.
- * They are related to the the order which stuff happens, whether things exist in the cache
- * already at the point of certain operations etc. It's very difficult to solve right now
- * because the implementation is so complicated and because you can currently only listen
- * on id's (if the id isn't known yet you can't add a listener.. which means you have
- * to add listeners as records with the requisite ids are added etc).
- *
- * I think we are going to have to significantly rework or completely rewrite the internals
- * of the caching to make it easier to work with and make it possible to solve these issues.
- * As it stands I have a lot of trouble trying to debug this stuff and work out where to make
- * changes and I wrote the whole thing... someone else is going to have even more trouble.
- */
-// eslint-disable-next-line no-only-tests/no-only-tests
-test.skip.each([
+test.each([
     // There's different ways the required records could end up in the cache. They
     // could be added Group first then User, User first then Group or inline in User
     // (User links to multiple groups - so it has the id's set but the Group records
@@ -3245,11 +3295,29 @@ test.skip.each([
     userListenerSimple.mockReset();
     userListenerNestedName.mockReset();
     // If we add the missing field then userListenerNestedFull should be called
-    Group.cache.add({
-        id: 3,
-        name: 'Admins',
-        ownerId: 1,
-    });
+    if (label === 'group added inline') {
+        // For inline nested records if the fields aren't the same then the intersection is used
+        // and so in this example `ownerId` won't be set anywhere for Staff - we need to add it
+        // again now.
+        Group.cache.addList([
+            {
+                id: 2,
+                name: 'Staff',
+                ownerId: 1,
+            },
+            {
+                id: 3,
+                name: 'Admins',
+                ownerId: 1,
+            },
+        ]);
+    } else {
+        Group.cache.add({
+            id: 3,
+            name: 'Admins',
+            ownerId: 1,
+        });
+    }
     expect(userListenerSimple).not.toHaveBeenCalled();
     expect(userListenerNestedName).not.toHaveBeenCalled();
     expect(userListenerNestedFull).toHaveBeenCalledWith(
@@ -3266,8 +3334,8 @@ test.skip.each([
         )
     );
 });
-// eslint-disable-next-line no-only-tests/no-only-tests
-test.skip.each([
+
+test.each([
     // There's different ways the required records could end up in the cache. They
     // could be added Group first then User, User first then Group or inline in User
     // (User links to a groups- so it has the id set but the Group record itself can
@@ -3368,4 +3436,124 @@ test.skip.each([
             })
         )
     );
+});
+
+function timeBlock(run): bigint {
+    const start = process.hrtime.bigint();
+    run();
+    const end = process.hrtime.bigint();
+    return (end - start) / BigInt(1e6);
+}
+
+test('should be performant', async () => {
+    // TODO: I don't know what's good here but as a starting point:
+    // 50 nested records (so 50 subs, 50 users, 50, groups) with
+    // a listener each (3 on different permutations of nested fields = 250)
+    // and list listener on all subscriptions for 3 different permutations of
+    // nested fields (150)
+    // So total 150 records and 400 listeners
+    const { User, Group, Subscription } = createTestModels(true);
+    await Subscription.fields.user.resolveViewModel();
+    await User.fields.group.resolveViewModel();
+    const cbs: jest.Mock[] = [];
+    function nextFn(): jest.Mock {
+        const fn = jest.fn();
+        cbs.push(fn);
+        return fn;
+    }
+    const count = 50;
+    for (let i = 0; i < count; i++) {
+        Subscription.cache.addListener(i, ['id', 'userId'], nextFn());
+        Subscription.cache.addListener(
+            i,
+            [
+                'id',
+                ['user', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'owner', 'name'],
+            ] as FieldPath<typeof Subscription>[],
+            nextFn()
+        );
+        Subscription.cache.addListener(
+            i,
+            ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']] as FieldPath<
+                typeof Subscription
+            >[],
+            nextFn()
+        );
+        Subscription.cache.addListener(
+            i,
+            [
+                'id',
+                ['user', 'name'],
+                ['user', 'group', 'name'],
+                ['user', 'group', 'owner', 'group'],
+            ] as FieldPath<typeof Subscription>[],
+            nextFn()
+        );
+        User.cache.addListener(i, ['id', 'name'], nextFn());
+        User.cache.addListener(i, ['id', 'name', 'group'], nextFn());
+        Group.cache.addListener(i, ['id', 'name', 'ownerId'], nextFn());
+        Group.cache.addListener(i, ['id', 'name', 'owner'], nextFn());
+    }
+    const ids = Array.from({ length: count }, (_, i) => i);
+    Subscription.cache.addListenerList(
+        ids,
+        // Explicit cast as recursive relations not supported by types
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'name'],
+        ] as FieldPath<typeof Subscription>[],
+        jest.fn()
+    );
+    Subscription.cache.addListenerList(
+        ids,
+        ['id', ['user', 'group', 'name'], ['user', 'group', 'owner', 'groupId']] as FieldPath<
+            typeof Subscription
+        >[],
+        jest.fn()
+    );
+    Subscription.cache.addListenerList(
+        ids,
+        [
+            'id',
+            ['user', 'name'],
+            ['user', 'group', 'name'],
+            ['user', 'group', 'owner', 'group'],
+        ] as FieldPath<typeof Subscription>[],
+        jest.fn()
+    );
+    User.cache.addListener(jest.fn());
+    Subscription.cache.addListener(jest.fn());
+    Group.cache.addListener(jest.fn());
+    expect(
+        timeBlock(() => {
+            for (let i = 0; i < count; i++) {
+                Group.cache.add({
+                    id: i,
+                    name: 'Staff',
+                    ownerId: i,
+                });
+                User.cache.add({
+                    id: i,
+                    name: 'Bob',
+                    groupId: i,
+                });
+                Subscription.cache.add({
+                    id: i,
+                    userId: i,
+                });
+            }
+            for (let i = 0; i < count; i++) {
+                Subscription.cache.delete(i);
+                User.cache.delete(i);
+                Group.cache.delete(i);
+            }
+        })
+    ).toBeLessThan(1500);
+    for (const cb of cbs) {
+        expect(cb).toHaveBeenCalledTimes(2);
+    }
 });

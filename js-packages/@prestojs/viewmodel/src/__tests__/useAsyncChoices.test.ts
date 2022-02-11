@@ -2,9 +2,10 @@ import { PageNumberPaginator, usePaginator } from '@prestojs/util';
 import { act, renderHook } from '@testing-library/react-hooks';
 import AsyncChoices from '../fields/AsyncChoices';
 import CharField from '../fields/CharField';
+import NumberField from '../fields/NumberField';
 import useAsyncChoices from '../useAsyncChoices';
 import useViewModelCache from '../useViewModelCache';
-import viewModelFactory from '../ViewModelFactory';
+import viewModelFactory, { PartialViewModel } from '../ViewModelFactory';
 
 type TestDataItem = { label: string; id: number };
 const testData: TestDataItem[] = Array.from({ length: 20 }, (_, i) => ({
@@ -99,12 +100,17 @@ test('useAsyncChoices should support basic usage', async () => {
 });
 
 test('useAsyncChoices should support hooking up to ViewModelCache easily', async () => {
-    const ItemModel = viewModelFactory({
-        label: new CharField(),
-    });
-    type ItemModelInstance = InstanceType<typeof ItemModel>;
+    const ItemModel = viewModelFactory(
+        {
+            id: new NumberField(),
+
+            label: new CharField(),
+        },
+        { pkFieldName: 'id' }
+    );
+    type ItemModelInstance = PartialViewModel<typeof ItemModel>;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const data = testData.map(item => ItemModel.cache.add(item));
+    const data = testData.map(item => ItemModel.cache.add(item)) as ItemModelInstance[];
     const list = (): Promise<ItemModelInstance[]> => Promise.resolve(data.slice(0, 10));
     const retrieve = (i: number): Promise<ItemModelInstance> => Promise.resolve(data[i]);
     const asyncChoices = new AsyncChoices({
@@ -114,17 +120,16 @@ test('useAsyncChoices should support hooking up to ViewModelCache easily', async
         getLabel,
         getValue,
         useResolveItems<T extends ItemModelInstance | ItemModelInstance[] | null>(item: T): T {
-            return useViewModelCache<typeof ItemModel, T>(
-                ItemModel,
-                (cache): T => {
-                    if (item == null) {
-                        return item;
-                    }
-                    return (Array.isArray(item)
-                        ? cache.getList(item as ItemModelInstance[])
-                        : cache.get(item as ItemModelInstance) || item) as T;
+            return useViewModelCache<typeof ItemModel, T>(ItemModel, (cache): T => {
+                if (item == null) {
+                    return item;
                 }
-            );
+                return (
+                    Array.isArray(item)
+                        ? cache.getList(item as ItemModelInstance[])
+                        : cache.get(item as ItemModelInstance) || item
+                ) as T;
+            });
         },
     });
     const { rerender, result, waitForNextUpdate } = renderHook(

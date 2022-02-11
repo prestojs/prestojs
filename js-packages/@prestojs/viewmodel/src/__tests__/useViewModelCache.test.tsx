@@ -9,12 +9,17 @@ import Field from '../fields/Field';
 import useViewModelCache from '../useViewModelCache';
 import ViewModelFactory from '../ViewModelFactory';
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const createModel = () =>
-    ViewModelFactory({
-        firstName: new Field(),
-        lastName: new Field(),
-        email: new Field(),
-    });
+    ViewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            lastName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    );
 
 test('should select initial state', () => {
     const Test1 = createModel();
@@ -130,6 +135,7 @@ test('should accept extra args', () => {
     const Test1 = createModel();
     const data1 = { id: 1, firstName: 'Bob', email: 'a@b.com' };
     Test1.cache.add(data1);
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const getAll = (cache, fieldNames) => cache.getAll(fieldNames);
     const selector = jest.fn(getAll);
 

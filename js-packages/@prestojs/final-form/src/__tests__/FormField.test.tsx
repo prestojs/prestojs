@@ -4,10 +4,14 @@ import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import Form from '../Form';
 
-class User extends viewModelFactory({
-    age: new NumberField({ label: 'Age', defaultValue: 5 }),
-    name: new NumberField({ label: 'Name', defaultValue: (): string => 'dynamic' }),
-}) {
+class User extends viewModelFactory(
+    {
+        id: new NumberField(),
+        age: new NumberField({ label: 'Age', defaultValue: 5 }),
+        name: new NumberField({ label: 'Name', defaultValue: (): string => 'dynamic' }),
+    },
+    { pkFieldName: 'id' }
+) {
     static label = 'User';
     static labelPlural = 'Users';
 }

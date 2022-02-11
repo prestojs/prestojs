@@ -1,5 +1,11 @@
 import { FieldFormatter, NumberFormatter, UiProvider } from '@prestojs/ui';
-import { BooleanField, CharField, CurrencyField, viewModelFactory } from '@prestojs/viewmodel';
+import {
+    BooleanField,
+    CharField,
+    CurrencyField,
+    NumberField,
+    viewModelFactory,
+} from '@prestojs/viewmodel';
 import React from 'react';
 // You can replace this with
 // import { getFormatterForField } from '@prestojs/ui';
@@ -18,11 +24,15 @@ function getFormatterForField(field) {
     return defaultGetFormatterForField(field);
 }
 
-class Product extends viewModelFactory({
-    name: new CharField(),
-    price: new CurrencyField(),
-    active: new BooleanField({ label: 'Active?' }),
-}) {}
+class Product extends viewModelFactory(
+    {
+        id: new NumberField(),
+        name: new CharField(),
+        price: new CurrencyField(),
+        active: new BooleanField({ label: 'Active?' }),
+    },
+    { pkFieldName: 'id' }
+) {}
 
 export default function Basic() {
     const product = new Product({

@@ -347,9 +347,13 @@ test('should call onChange with selected value', async () => {
 });
 
 test('should be able to integrate with viewmodel cache', async () => {
-    const User = viewModelFactory({
-        name: new Field(),
-    });
+    const User = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+        },
+        { pkFieldName: 'id' }
+    );
     async function wrappedResolveMulti(
         query: Record<string, any> = {},
         paginator: PageNumberPaginator
@@ -796,7 +800,7 @@ test('should support onClear', async () => {
     const list = jest.fn(resolveMulti);
     const retrieve = jest.fn(resolveSingle);
     let asyncChoices = buildAsyncChoices({ list, retrieve });
-    const { container, getByTestId, rerender } = render(
+    const { container, getByTestId } = render(
         <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}
@@ -819,7 +823,7 @@ test('should support onClear (multiple)', async () => {
     const list = jest.fn(resolveMulti);
     const retrieve = jest.fn(resolveSingle);
     let asyncChoices = buildAsyncChoices({ list, retrieve, multiple: true });
-    const { container, getByTestId, rerender } = render(
+    const { container, getByTestId } = render(
         <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices}
             input={input}

@@ -26,10 +26,8 @@ export default function Doc({ docs, extraNodes, slug, ...rest }) {
     const staticProperties = staticGroups.Properties.children
         .map(id => staticChildren[id])
         .filter(method => !method.flags.isPrivate);
-    // There's 2 type definitions here; one the indexable signature which we don't care about and one for the
-    // actual interface. Identify interface by existing of children.
-    const instanceDef = docs.ViewModelInterface.type.types.filter(t => !!t.declaration.children)[0]
-        .declaration;
+    // ViewModelInterface is an intersection of an indexable + BaseViewModel; extract docs from BaseViewModel
+    const instanceDef = docs.BaseViewModel;
     const instanceGroups = instanceDef.groups.reduce((acc, group) => {
         acc[group.title] = group;
         return acc;
@@ -38,10 +36,13 @@ export default function Doc({ docs, extraNodes, slug, ...rest }) {
         acc[child.id] = child;
         return acc;
     }, {});
-    const instanceMethods = instanceGroups.Functions.children
+    const instanceMethods = instanceGroups.Methods.children
         .map(id => instanceChildren[id])
         .filter(method => !method.flags.isPrivate);
-    const instanceProperties = instanceGroups.Variables.children
+    const instanceProperties = [
+        ...instanceGroups.Properties.children,
+        ...instanceGroups.Accessors.children,
+    ]
         .map(id => instanceChildren[id])
         .filter(method => !method.flags.isPrivate);
     return (
@@ -140,8 +141,7 @@ export default function Doc({ docs, extraNodes, slug, ...rest }) {
 export async function getStaticProps(context) {
     return defaultGetStaticProps(
         context,
-        datum =>
-            ['viewModelFactory', 'ViewModelInterface', 'ViewModelConstructor'].includes(datum.name),
+        datum => ['viewModelFactory', 'ViewModelConstructor', 'BaseViewModel'].includes(datum.name),
         items =>
             items.reduce((acc, item) => {
                 acc[item.name] = item;

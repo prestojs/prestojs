@@ -1,4 +1,4 @@
-export { default as viewModelFactory } from './ViewModelFactory';
+export { default as viewModelFactory, BaseViewModel } from './ViewModelFactory';
 export { default as ViewModelCache } from './ViewModelCache';
 export { default as Field } from './fields/Field';
 
@@ -57,6 +57,8 @@ import type {
     CompoundPrimaryKey,
     FieldDataMapping,
     FieldDataMappingRaw,
+    FieldPath,
+    FieldPaths,
     FieldsMapping,
     PartialViewModel,
     PrimaryKey,
@@ -75,6 +77,8 @@ export type {
     FieldsMapping,
     FieldDataMapping,
     FieldDataMappingRaw,
+    FieldPath,
+    FieldPaths,
     RecordBoundField,
     ChoicesGrouped,
     AsyncChoicesInterface,

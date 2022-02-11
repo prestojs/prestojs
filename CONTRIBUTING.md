@@ -79,6 +79,14 @@ Frontend tests are run using jest.
 yarn test
 ```
 
+## Typescript Tests
+
+* Test using [tsd](https://github.com/SamVerschueren/tsd)
+* Loads everything via `tsd_checks/index.test-d.ts`
+  * If you add a new file import it there
+* Run with `yarn check-types`  
+  * This checks type for whole project as well; to just run `tsd` use `yarn tsd tsd_checks`
+
 ## Build
 
 ```bash

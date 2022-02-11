@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "lint": "eslint js-packages --ext .js,.ts",
-    "check-types": "tsc -b tsconfig.lint.json",
+    "check-types": "tsc -b tsconfig.lint.json && tsd tsd_checks",
     "clean": "rm -rf /tmp/tsc-output/@prestojs && wsrun -x doc-site -x django-testbed -m clean",
     "docs": "yarn workspace doc-site run develop",
     "extract-docs": "yarn node doc-site/extract-docs",
@@ -28,10 +28,10 @@
     "postversion": "node ./bin/sync-workspace-versions.js"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.7.4",
-    "@babel/plugin-proposal-optional-chaining": "^7.7.5",
-    "@babel/plugin-transform-modules-commonjs": "^7.9.0",
-    "@babel/preset-react": "^7.8.3",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.16.0",
+    "@babel/plugin-proposal-optional-chaining": "^7.16.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.16.0",
+    "@babel/preset-react": "^7.16.0",
     "@strictsoftware/typedoc-plugin-monorepo": "^0.2.1",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
@@ -57,12 +57,13 @@
     "jest-fetch-mock": "^3.0.1",
     "lint-staged": "^9.5.0",
     "pnp-webpack-plugin": "^1.6.0",
-    "prettier": "2.0.5",
+    "prettier": "^2.4.1",
     "react-test-renderer": "^16.12.0",
     "ts-jest": "^26.5.3",
+    "tsd": "^0.18.0",
     "typedoc": "^0.15.2",
     "typedoc-neo-theme": "^1.0.4",
-    "typescript": "^4.4.4",
+    "typescript": "^4.5.4",
     "yargs": "^15.1.0"
   },
   "peerDependencies": {
@@ -70,13 +71,13 @@
     "semantic-release": "*"
   },
   "dependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.4",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/plugin-proposal-numeric-separator": "^7.8.3",
-    "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
-    "@babel/preset-env": "^7.8.4",
-    "@babel/preset-typescript": "^7.8.3",
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-class-properties": "^7.16.0",
+    "@babel/plugin-proposal-numeric-separator": "^7.16.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-typescript": "^7.16.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "wsrun": "^5.2.0"

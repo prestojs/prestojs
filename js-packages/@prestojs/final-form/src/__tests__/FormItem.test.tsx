@@ -4,7 +4,14 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import Form from '../Form';
 
-class User extends viewModelFactory({ age: new NumberField({ blank: true, label: 'Age' }) }) {}
+class User extends viewModelFactory(
+    {
+        id: new NumberField(),
+
+        age: new NumberField({ blank: true, label: 'Age' }),
+    },
+    { pkFieldName: 'id' }
+) {}
 
 function Widget({ input }): React.ReactElement {
     return <input name={input.name} placeholder={input.name} />;
