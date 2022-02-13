@@ -1,6 +1,6 @@
 {
   "name": "@prestojs/util",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "license": "MIT",
   "typings": "build/index.d.ts",
   "main": "build/cjs/index.js",

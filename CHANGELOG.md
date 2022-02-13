@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.26] - 2022-02-13
+
+### Changed
+
+* `@prestojs/final-form` now specifies `final-form` and `react-final-form` as a peer dependency rather than a dependency. This avoids
+  the case where multiple versions of these packages could be installed which causes issues with context not working. To upgrade
+  make sure these packages are installed as direct dependencies.
+
 ## [0.0.25] - 2022-02-13
 
 ### Changed
