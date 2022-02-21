@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.27] - 2022-02-21
+
+### Changed
+
+* Fix bug in caching where updating nested records could cause the cache to return incorrect results
+
 ## [0.0.26] - 2022-02-13
 
 ### Changed
