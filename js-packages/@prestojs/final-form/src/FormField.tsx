@@ -3,12 +3,12 @@ import { Field } from '@prestojs/viewmodel';
 import React from 'react';
 import { Field as FinalFormField, FieldProps } from 'react-final-form';
 
-type FormFieldPropsWithField<T> = Omit<FieldProps<any, any>, 'name'> & {
+export type FormFieldPropsWithField<T> = Omit<FieldProps<any, any>, 'name'> & {
     field: Field<T>;
     widgetProps?: Record<any, any>;
 };
 
-type FormFieldProps<T> = FieldProps<any, any> | FormFieldPropsWithField<T>;
+export type FormFieldProps<T> = FieldProps<any, any> | FormFieldPropsWithField<T>;
 
 /**
  * Wrapper around Field from react-final-form that determines the widget to use based on the field.

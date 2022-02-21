@@ -10,14 +10,14 @@ type CommonProps = {
     required?: boolean;
 };
 
-type FormItemPropsNoField = {
+export type FormItemPropsNoField = {
     field?: undefined;
     fieldProps?: undefined;
     widgetProps?: undefined;
     children: React.ReactNode;
 } & CommonProps;
 
-type FormItemPropsWithField<T> = {
+export type FormItemPropsWithField<T> = {
     name?: undefined;
     field: Field<T>;
     fieldProps?: Omit<FieldProps<any, any>, 'name'>;
@@ -25,7 +25,7 @@ type FormItemPropsWithField<T> = {
     children?: React.ReactNode;
 } & CommonProps;
 
-type FormItemProps<T> = (FormItemPropsNoField | FormItemPropsWithField<T>) & {
+export type FormItemProps<T> = (FormItemPropsNoField | FormItemPropsWithField<T>) & {
     [formItemProp: string]: any;
 };
 
