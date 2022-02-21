@@ -3557,3 +3557,235 @@ test('should be performant', async () => {
         expect(cb).toHaveBeenCalledTimes(2);
     }
 });
+
+test('nested cache updates should handle null values being filled out', () => {
+    class Business extends viewModelFactory(
+        {
+            id: new Field(),
+            title: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Customer extends viewModelFactory(
+        {
+            id: new Field(),
+            businessId: new Field(),
+            business: new RelatedViewModelField({ to: Business, sourceFieldName: 'businessId' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    class Supplier extends viewModelFactory(
+        {
+            id: new Field(),
+            title: new Field(),
+            businessId: new Field(),
+            business: new RelatedViewModelField({ to: Business, sourceFieldName: 'businessId' }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    class Booking extends viewModelFactory(
+        {
+            id: new Field(),
+            customerId: new Field(),
+            customer: new RelatedViewModelField({ to: Customer, sourceFieldName: 'customerId' }),
+            supplierIds: new ListField({ childField: new Field() }),
+            suppliers: new ManyRelatedViewModelField({
+                to: Supplier,
+                sourceFieldName: 'supplierIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    expect(Booking.cache.get(1, '*')).toBe(null);
+    Booking.cache.add({
+        id: 1,
+        customer: null,
+        customerId: null,
+        supplierIds: [],
+        suppliers: [],
+    });
+
+    expect(Booking.cache.get(1, '*')).toBeEqualToRecord(
+        new Booking({
+            id: 1,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            customer: null,
+            supplierIds: [],
+            suppliers: [],
+        })
+    );
+
+    Booking.cache.add({
+        id: 1,
+        customer: {
+            id: 1,
+            business: null,
+        },
+        supplierIds: [],
+    });
+    expect(Booking.cache.get(1, '*')).toBeEqualToRecord(
+        new Booking({
+            id: 1,
+            customer: {
+                id: 1,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                business: null,
+                businessId: null,
+            },
+            supplierIds: [],
+            suppliers: [],
+        })
+    );
+
+    Booking.cache.add({
+        id: 1,
+        customer: {
+            id: 1,
+            businessId: 1,
+            business: {
+                id: 1,
+                title: 'Business',
+            },
+        },
+        supplierIds: [],
+        suppliers: [],
+    });
+
+    expect(Booking.cache.get(1, '*')).toBeEqualToRecord(
+        new Booking({
+            id: 1,
+            customer: {
+                id: 1,
+                business: {
+                    id: 1,
+                    title: 'Business',
+                },
+            },
+            supplierIds: [],
+            suppliers: [],
+        })
+    );
+
+    Booking.cache.add({
+        id: 1,
+        customer: {
+            id: 1,
+            businessId: 1,
+            business: {
+                id: 1,
+                title: 'Business',
+            },
+        },
+        suppliers: [
+            {
+                id: 1,
+                title: 'Supplier1',
+                businessId: null,
+            },
+            {
+                id: 2,
+                title: 'Supplier2',
+                businessId: null,
+            },
+        ],
+    });
+
+    expect(Booking.cache.get(1, '*')).toBeEqualToRecord(
+        new Booking({
+            id: 1,
+            customer: {
+                id: 1,
+                business: {
+                    id: 1,
+                    title: 'Business',
+                },
+            },
+            supplierIds: [1, 2],
+            suppliers: [
+                {
+                    id: 1,
+                    title: 'Supplier1',
+                    businessId: null,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    business: null,
+                },
+                {
+                    id: 2,
+                    title: 'Supplier2',
+                    businessId: null,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    business: null,
+                },
+            ],
+        })
+    );
+
+    Booking.cache.add({
+        id: 1,
+        customer: {
+            id: 1,
+            businessId: 1,
+            business: {
+                id: 1,
+                title: 'Business',
+            },
+        },
+        suppliers: [
+            {
+                id: 1,
+                title: 'Supplier1',
+                business: {
+                    id: 2,
+                    title: 'Business2',
+                },
+            },
+            {
+                id: 2,
+                title: 'Supplier2',
+                business: {
+                    id: 3,
+                    title: 'Business3',
+                },
+            },
+        ],
+    });
+
+    expect(Booking.cache.get(1, '*')).toBeEqualToRecord(
+        new Booking({
+            id: 1,
+            customer: {
+                id: 1,
+                business: {
+                    id: 1,
+                    title: 'Business',
+                },
+            },
+            supplierIds: [1, 2],
+            suppliers: [
+                {
+                    id: 1,
+                    title: 'Supplier1',
+                    business: {
+                        id: 2,
+                        title: 'Business2',
+                    },
+                },
+                {
+                    id: 2,
+                    title: 'Supplier2',
+                    business: {
+                        id: 3,
+                        title: 'Business3',
+                    },
+                },
+            ],
+        })
+    );
+});
