@@ -506,7 +506,7 @@ export class BaseViewModel<
             throw new Error('data must be specified');
         }
         const assignedData: Record<string, any> = {};
-        const assignedFields: string[] = [];
+        const assignedFields = new Set<string>();
         const assignedFieldsDeep: FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>[] =
             [];
         const fields = this._model.fields;
@@ -579,7 +579,7 @@ export class BaseViewModel<
                     if (key in assignedData) {
                         assignedData[field.sourceFieldName] = pkOrPks ?? null;
                         if (!data[field.sourceFieldName]) {
-                            assignedFields.push(field.sourceFieldName);
+                            assignedFields.add(field.sourceFieldName);
                             assignedFieldsDeep.push(field.sourceFieldName);
                         }
                     }
@@ -588,7 +588,7 @@ export class BaseViewModel<
                         key as FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>
                     );
                 }
-                assignedFields.push(key);
+                assignedFields.add(key);
             } else {
                 // TODO: Should extra keys in data be a warning or ignored?
                 console.warn(
@@ -623,9 +623,10 @@ export class BaseViewModel<
         }
 
         // Sort fields so consistent order; primarily as it makes testing easier
-        assignedFields.sort();
+        const sortedAssignedFields = [...assignedFields];
+        sortedAssignedFields.sort();
         this._assignedFieldPaths = normalizeFields(this._model, assignedFieldsDeep);
-        this._assignedFields = assignedFields;
+        this._assignedFields = sortedAssignedFields;
         this._assignedFieldsDeep = this._assignedFieldPaths.fieldPaths;
         this._data = freezeObject(assignedData) as {
             [k in AssignedFieldNames]: FieldMappingType[k]['__fieldValueType'];
