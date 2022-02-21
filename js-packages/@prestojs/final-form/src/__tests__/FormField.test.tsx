@@ -93,8 +93,10 @@ test('FormField should use field default', () => {
     );
     rerender(<TestWrapper defaultValue={666} />);
     fireEvent.click(getByText('Submit'));
+    // Prior to final-form 4.20.2 this would change to use the updated value. Since that release
+    // this changed to not do that any longer.
     expect(onSubmit).toHaveBeenLastCalledWith(
-        { age: 666, name: 'dynamic' },
+        { age: 5, name: 'dynamic' },
         expect.any(Object),
         expect.any(Function)
     );
