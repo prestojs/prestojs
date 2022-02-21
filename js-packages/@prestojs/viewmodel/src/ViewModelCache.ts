@@ -157,6 +157,17 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
      * that contains (a,b,c)
      */
     add(record: PartialViewModel<ViewModelClassType>): void {
+        // If record contains related records we have to populate the related caches as well
+        for (const relationFieldName in record._assignedFieldPaths.relations) {
+            const relation = this.viewModel.getField(
+                relationFieldName
+            ) as BaseRelatedViewModelField<any, any, any>;
+            const relationData = record[relationFieldName];
+            if (relationData && (!Array.isArray(relationData) || relationData.length > 0)) {
+                relation.cache.add(relationData);
+            }
+        }
+
         for (const cacheKey of new Set([...this.cache.keys(), ...this.cacheListeners.keys()])) {
             // Check if subset but don't worry about nested fields (second argument). Nested fields are
             // handled in `constructWithRelatedRecords`. This makes it so a key that contains nested
@@ -168,16 +179,6 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                 if (recordWithRelations) {
                     this.setValueForKey(cacheKey, recordWithRelations);
                 }
-            }
-        }
-        // If record contains related records we have to populate the related caches as well
-        for (const relationFieldName in record._assignedFieldPaths.relations) {
-            const relation = this.viewModel.getField(
-                relationFieldName
-            ) as BaseRelatedViewModelField<any, any, any>;
-            const relationData = record[relationFieldName];
-            if (relationData && (!Array.isArray(relationData) || relationData.length > 0)) {
-                relation.cache.add(relationData);
             }
         }
         const key =
