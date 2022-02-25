@@ -1,5 +1,4 @@
 import { isEqual } from '@prestojs/util';
-import intersectionBy from 'lodash/intersectionBy';
 import startCase from 'lodash/startCase';
 import Field, { RecordBoundField } from './fields/Field';
 import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
@@ -386,7 +385,15 @@ export class BaseViewModel<
         const missingRelations: [string, string[]][] = [];
         const assignedFields: string[] = [...this._assignedFields];
         for (const [name, nestedFieldNames] of Object.entries(nestedToClone)) {
-            if (!this._assignedFields.includes(name)) {
+            const relation = this._model.fields[name] as BaseRelatedViewModelField<any, any, any>;
+            const isEmpty =
+                this._assignedFields.includes(relation.sourceFieldName) &&
+                (relation.many
+                    ? this[relation.sourceFieldName]?.length === 0
+                    : this[relation.sourceFieldName] == null);
+            if (isEmpty) {
+                data[name] = relation.many ? [] : null;
+            } else if (!this._assignedFields.includes(name)) {
                 missingFieldNames.push(name);
                 missingRelations.push([name, flattenFieldPath(nestedFieldNames)]);
             } else {
@@ -534,13 +541,12 @@ export class BaseViewModel<
                     }
                     if (field.many) {
                         if (assignedData[key].length > 0) {
-                            // If we have many records we can only take the common set of fields
-                            // Failing to do this will cause various issues with caching.
-                            const paths = intersectionBy(
-                                ...assignedData[key].map(record => record._assignedFieldsDeep),
-                                p => flattenFieldPath(p).join('|')
+                            const [first, ...rest] = assignedData[key];
+                            // These are the paths common to all records
+                            const normalizedPaths = normalizeFields(
+                                field.to,
+                                first.fieldPathIntersection(rest)
                             );
-                            const normalizedPaths = normalizeFields(field.to, paths);
                             for (const index in assignedData[key]) {
                                 // Clone any records that have extra fields so has same fields as `paths`. Without
                                 // this caching can be inconsistent. In practice this would be unusual.
@@ -550,7 +556,7 @@ export class BaseViewModel<
                                 }
                             }
 
-                            for (const path of paths) {
+                            for (const path of normalizedPaths.fieldPaths) {
                                 assignedFieldsDeep.push([
                                     key,
                                     ...(Array.isArray(path) ? path : [path]),
@@ -633,6 +639,137 @@ export class BaseViewModel<
         };
 
         return this;
+    }
+
+    /**
+     * Given `records` return the paths that are common between them.
+     *
+     * A naive solution is to just check `_assignedFieldsDeep`:
+     *
+     * ```
+     * const paths = intersectionBy(
+     *   ...assignedData[key].map(record => record._assignedFieldsDeep),
+     *   p => flattenFieldPath(p).join('|')
+     * );
+     * ```
+     *
+     * but that would fail if some records had a null value for a relation and others didn't.
+     *
+     * This function handles nested records such that a null relation is ignored. For example if you received:
+     *
+     * ```
+     * [
+     *   {
+     *     id: 1,
+     *     nestedRecordId: null,
+     *     nestedRecord: null,
+     *   },
+     *   {
+     *       id: 2,
+     *       nestedRecordId: 1,
+     *       nestedRecord: {
+     *           id: 1,
+     *           name: 'Nested Record 1',
+     *       },
+     *   },
+     *   {
+     *      id: 3,
+     *      nestedRecordId: 2,
+     *      nestedRecord: {
+     *          id: 2,
+     *          name: 'Nested Record 2',
+     *          otherField: 'Name',
+     *      },
+     *   }
+     * ]
+     * ```
+     *
+     * would result in
+     *
+     * ```
+     * ['id', 'nestedRecordId', ['nestedRecord', 'id'], ['nestedRecord', 'name']]
+     * ```
+     *
+     * Noting that the first record has no nested fields (because they are null) and so get's ignored, and the
+     * last record has 'otherField' which the second doesn't so is excluded.
+     *
+     * @param records
+     */
+    fieldPathIntersection(
+        records: ViewModelInterface<FieldMappingType, PkFieldType>[]
+    ): FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>[] {
+        type T = ViewModelConstructor<FieldMappingType, PkFieldType>;
+        const paths: FieldPath<T>[] = [];
+        for (const fieldName of this._assignedFieldPaths.nonRelationFieldNames) {
+            let match = true;
+            for (const record of records) {
+                if (!record._assignedFieldPaths.nonRelationFieldNames.includes(fieldName)) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                paths.push(fieldName as FieldPath<T>);
+            }
+        }
+        const relations: BaseRelatedViewModelField<any, any, any>[] = [];
+        for (const relationFieldName of this._model.relationFieldNames) {
+            const relation = this._model.fields[
+                relationFieldName
+            ] as unknown as BaseRelatedViewModelField<any, any, any>;
+            if (paths.includes(relation.sourceFieldName as FieldPath<T>)) {
+                let match = true;
+                for (const record of [this, ...records]) {
+                    const value = record[relation.sourceFieldName];
+                    const isEmpty = (Array.isArray(value) && value.length === 0) || value == null;
+                    if (!isEmpty && !record._assignedFieldPaths.relations[relation.name]) {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) {
+                    relations.push(relation);
+                }
+            }
+        }
+        for (const relation of relations) {
+            const relatedRecords: ViewModelInterface<any, any>[] = [this, ...records].reduce(
+                (acc: ViewModelInterface<any, any>[], record) => {
+                    const value = record[relation.sourceFieldName];
+                    if ((Array.isArray(value) && value.length === 0) || value == null) {
+                        return acc;
+                    }
+                    if (relation.many) {
+                        acc.push(...record[relation.name]);
+                    } else {
+                        acc.push(record[relation.name]);
+                    }
+                    return acc;
+                },
+                []
+            );
+            if (relatedRecords.length === 0) {
+                continue;
+            }
+            if (relation.many) {
+                console.log(relatedRecords);
+                // relatedRecords = relatedRecords[0];
+            }
+            const [first, ...rest] = relatedRecords;
+            let nestedFields: FieldPath<any>[] = [];
+            if (rest.length === 0) {
+                nestedFields = first._assignedFieldsDeep;
+            } else {
+                nestedFields = first.fieldPathIntersection(rest);
+            }
+            paths.push(
+                ...(nestedFields.map(f => [
+                    relation.name,
+                    ...(Array.isArray(f) ? f : [f]),
+                ]) as FieldPath<T>[])
+            );
+        }
+        return paths;
     }
 
     /**
