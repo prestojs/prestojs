@@ -751,10 +751,6 @@ export class BaseViewModel<
             if (relatedRecords.length === 0) {
                 continue;
             }
-            if (relation.many) {
-                console.log(relatedRecords);
-                // relatedRecords = relatedRecords[0];
-            }
             const [first, ...rest] = relatedRecords;
             let nestedFields: FieldPath<any>[] = [];
             if (rest.length === 0) {
