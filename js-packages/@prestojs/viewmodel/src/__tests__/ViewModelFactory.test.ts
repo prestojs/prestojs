@@ -1152,3 +1152,222 @@ test('getField should support traversing relations', async () => {
         )
     );
 });
+
+test('constructing nested many records should handle null relations', () => {
+    const Country = viewModelFactory(
+        {
+            id: new Field(),
+            name: new Field(),
+            code: new Field(),
+        },
+        { pkFieldName: 'id' }
+    );
+    const Company = viewModelFactory(
+        {
+            id: new Field(),
+            companyName: new Field(),
+            countryIds: new ListField({ childField: new Field() }),
+            countries: new ManyRelatedViewModelField({
+                to: Country,
+                sourceFieldName: 'countryIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    );
+
+    const Manager = viewModelFactory(
+        {
+            id: new Field(),
+            managerName: new Field(),
+            companyId: new Field(),
+            company: new RelatedViewModelField({ to: Company, sourceFieldName: 'companyId' }),
+        },
+        { pkFieldName: 'id' }
+    );
+
+    const Group = viewModelFactory(
+        {
+            id: new Field(),
+            groupName: new Field(),
+            managerId: new Field(),
+            manager: new RelatedViewModelField({ to: Manager, sourceFieldName: 'managerId' }),
+        },
+        { pkFieldName: 'id' }
+    );
+
+    const User = viewModelFactory(
+        {
+            id: new Field(),
+            groupIds: new ListField({ childField: new Field() }),
+            groups: new ManyRelatedViewModelField<typeof Group>({
+                to: Group,
+                sourceFieldName: 'groupIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    );
+
+    const user = new User({
+        id: 1,
+        groups: [
+            { id: 1, groupName: 'Group 1', managerId: null },
+            {
+                id: 2,
+                groupName: 'Group 2',
+                manager: { id: 1, managerName: 'Manager 1', companyId: null },
+            },
+            {
+                id: 3,
+                groupName: 'Group 3',
+                manager: {
+                    id: 2,
+                    managerName: 'Manager 2',
+                    company: { id: 1, companyName: 'Company 1', countryIds: [] },
+                },
+            },
+            {
+                id: 4,
+                groupName: 'Group 4',
+                manager: {
+                    id: 3,
+                    managerName: 'Manager 3',
+                    company: {
+                        id: 2,
+                        companyName: 'Company 1',
+                        countries: [
+                            { id: 1, name: 'Australia' },
+                            { id: 2, name: 'New Zealand' },
+                        ],
+                    },
+                },
+            },
+            {
+                id: 5,
+                groupName: 'Group 5',
+                manager: {
+                    id: 4,
+                    managerName: 'Manager 4',
+                    company: {
+                        id: 3,
+                        companyName: 'Company 2',
+                        countries: [
+                            // Code not common to all entries so will be ignored
+                            { id: 1, name: 'Australia', code: 'AU' },
+                            { id: 2, name: 'New Zealand', code: 'NZ' },
+                        ],
+                    },
+                },
+            },
+            {
+                id: 6,
+                groupName: 'Group 6',
+                manager: {
+                    id: 5,
+                    managerName: 'Manager 5',
+                    company: {
+                        id: 4,
+                        companyName: 'Company 3',
+                        // Construct with empty related field rather than related id field
+                        countries: [],
+                    },
+                },
+            },
+            // @ts-ignore
+            { id: 7, groupName: 'Group 7', manager: null },
+        ],
+    });
+    expect(user._assignedFieldsDeep).toEqual([
+        'groupIds',
+        ['groups', 'groupName'],
+        ['groups', 'id'],
+        ['groups', 'manager', 'company', 'companyName'],
+        ['groups', 'manager', 'company', 'countries', 'id'],
+        ['groups', 'manager', 'company', 'countries', 'name'],
+        ['groups', 'manager', 'company', 'countryIds'],
+        ['groups', 'manager', 'company', 'id'],
+        ['groups', 'manager', 'companyId'],
+        ['groups', 'manager', 'id'],
+        ['groups', 'manager', 'managerName'],
+        ['groups', 'managerId'],
+        'id',
+    ]);
+    expect(user.toJS()).toEqual({
+        id: 1,
+        groupIds: [1, 2, 3, 4, 5, 6, 7],
+        groups: [
+            { id: 1, groupName: 'Group 1', managerId: null, manager: null },
+            {
+                id: 2,
+                groupName: 'Group 2',
+                managerId: 1,
+                manager: { id: 1, managerName: 'Manager 1', companyId: null, company: null },
+            },
+            {
+                id: 3,
+                groupName: 'Group 3',
+                managerId: 2,
+                manager: {
+                    id: 2,
+                    managerName: 'Manager 2',
+                    companyId: 1,
+                    company: { id: 1, companyName: 'Company 1', countryIds: [], countries: [] },
+                },
+            },
+            {
+                id: 4,
+                groupName: 'Group 4',
+                managerId: 3,
+                manager: {
+                    id: 3,
+                    managerName: 'Manager 3',
+                    companyId: 2,
+                    company: {
+                        id: 2,
+                        companyName: 'Company 1',
+                        countryIds: [1, 2],
+                        countries: [
+                            { id: 1, name: 'Australia' },
+                            { id: 2, name: 'New Zealand' },
+                        ],
+                    },
+                },
+            },
+            {
+                id: 5,
+                groupName: 'Group 5',
+                managerId: 4,
+                manager: {
+                    id: 4,
+                    managerName: 'Manager 4',
+                    companyId: 3,
+                    company: {
+                        id: 3,
+                        companyName: 'Company 2',
+                        countryIds: [1, 2],
+                        countries: [
+                            { id: 1, name: 'Australia' },
+                            { id: 2, name: 'New Zealand' },
+                        ],
+                    },
+                },
+            },
+            {
+                id: 6,
+                groupName: 'Group 6',
+                managerId: 5,
+                manager: {
+                    id: 5,
+                    managerName: 'Manager 5',
+                    companyId: 4,
+                    company: {
+                        id: 4,
+                        companyName: 'Company 3',
+                        countryIds: [],
+                        countries: [],
+                    },
+                },
+            },
+            { id: 7, groupName: 'Group 7', manager: null, managerId: null },
+        ],
+    });
+});

@@ -1,5 +1,57 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+* Fix bug when constructing a record with nested `ManyRelatedViewModelField` data that in turn had related fields that were null
+  * <details>
+      <summary>Click here for an example</summary>
+    For example previously constructing a record with 
+
+      ```
+      {
+      relatedRecords:
+        [
+          {
+            id: 1,
+            nestedRecordId: null,
+            nestedRecord: null,
+          },
+          {
+            id: 2,
+            nestedRecordId: 1,
+            nestedRecord: {
+              id: 1,
+              name: 'Nested Record 1',
+            },
+          },
+        ]
+      }
+      ```
+
+    would result in
+
+      ```
+      {
+      relatedRecords:
+        [
+          {
+            id: 1,
+            nestedRecordId: null,
+          },
+          {
+            id: 2,
+            nestedRecordId: 1,
+          },
+        ]
+      }
+      ```
+
+    which lost the nested record due to one of the records having a `null` value. This is now resolved.
+
+    </details>
+    
 ## [0.0.27] - 2022-02-21
 
 ### Changed

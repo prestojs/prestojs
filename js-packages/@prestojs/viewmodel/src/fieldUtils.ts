@@ -20,6 +20,7 @@ function expandStarFields<T extends ViewModelConstructor<any, any>>(
     fieldPaths = modelClass.allFieldNames.filter(
         subFieldName => !modelClass.relationFieldNames.includes(subFieldName)
     ) as FieldPath<T>[];
+    expandedFields.set(modelClass, fieldPaths);
     if (includeRelations) {
         for (const fieldName of modelClass.relationFieldNames) {
             fieldPaths.push(
@@ -30,7 +31,6 @@ function expandStarFields<T extends ViewModelConstructor<any, any>>(
             );
         }
     }
-    expandedFields.set(modelClass, fieldPaths);
     return fieldPaths;
 }
 
