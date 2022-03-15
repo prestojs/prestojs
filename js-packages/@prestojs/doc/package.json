@@ -19,13 +19,19 @@
     "clean": "rm -rf ./build && rm -rf tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
+    "react": "*",
+    "react-dom": "*",
+    "typedoc": "^0.22.13",
     "tailwindcss": "*"
   },
   "dependencies": {
     "lodash": "^4.17.15"
   },
   "devDependencies": {
+    "react": "*",
+    "react-dom": "*",
     "tailwindcss": "*",
+    "typedoc": "^0.22.13",
     "typescript": "^4.5.4"
   }
 }

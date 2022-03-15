@@ -1,118 +1,123 @@
 {
-  "id": 46,
-  "name": "isSameById",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
-      "line": 89,
-      "character": 16
-    }
-  ],
-  "signatures": [
-    {
-      "id": 47,
-      "name": "isSameById",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Check if two objects share the same ID.",
-        "text": "NOTE: Doesn't compare objects for equality; only their id\n",
-        "tags": [
+  "node": {
+    "id": 46,
+    "name": "isSameById",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+        "line": 89,
+        "character": 16
+      }
+    ],
+    "signatures": [
+      {
+        "id": 47,
+        "name": "isSameById",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Check if two objects share the same ID.",
+          "text": "NOTE: Doesn't compare objects for equality; only their id\n",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": ""
+            },
+            {
+              "tag": "menu-group",
+              "text": "Identifiable\n"
+            }
+          ]
+        },
+        "parameters": [
           {
-            "tag": "extract-docs",
-            "text": ""
+            "id": 48,
+            "name": "item1",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
           },
           {
-            "tag": "menu-group",
-            "text": "Identifiable\n"
-          }
-        ]
-      },
-      "parameters": [
-        {
-          "id": 48,
-          "name": "item1",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "intrinsic",
-            "name": "any"
-          }
-        },
-        {
-          "id": 49,
-          "name": "item2",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "intrinsic",
-            "name": "any"
-          }
-        },
-        {
-          "id": 50,
-          "name": "fallbackGetId",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {
-            "isOptional": true
+            "id": 49,
+            "name": "item2",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
           },
-          "type": {
-            "type": "reflection",
-            "declaration": {
-              "id": 51,
-              "name": "__type",
-              "kind": 65536,
-              "kindString": "Type literal",
-              "flags": {},
-              "signatures": [
-                {
-                  "id": 52,
-                  "name": "__type",
-                  "kind": 4096,
-                  "kindString": "Call signature",
-                  "flags": {},
-                  "parameters": [
-                    {
-                      "id": 53,
-                      "name": "item",
-                      "kind": 32768,
-                      "kindString": "Parameter",
-                      "flags": {},
-                      "type": {
-                        "type": "intrinsic",
-                        "name": "any"
+          {
+            "id": 50,
+            "name": "fallbackGetId",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {
+              "isOptional": true
+            },
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 51,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "signatures": [
+                  {
+                    "id": 52,
+                    "name": "__type",
+                    "kind": 4096,
+                    "kindString": "Call signature",
+                    "flags": {},
+                    "parameters": [
+                      {
+                        "id": 53,
+                        "name": "item",
+                        "kind": 32768,
+                        "kindString": "Parameter",
+                        "flags": {},
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
                       }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "id": 54,
+                      "name": "Id"
                     }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "id": 54,
-                    "name": "Id"
                   }
-                }
-              ]
+                ]
+              }
             }
           }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "boolean"
         }
-      ],
-      "type": {
-        "type": "intrinsic",
-        "name": "boolean"
       }
+    ],
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Identifiable"
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "Identifiable",
-  "permaLink": "util/isSameById",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/isSameById",
+    "menuGroup": "Identifiable"
+  }
 }

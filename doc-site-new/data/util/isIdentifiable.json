@@ -1,66 +1,71 @@
 {
-  "id": 33,
-  "name": "isIdentifiable",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
-      "line": 29,
-      "character": 16
-    }
-  ],
-  "signatures": [
-    {
-      "id": 34,
-      "name": "isIdentifiable",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Check if a value conforms to Identifiable",
-        "tags": [
+  "node": {
+    "id": 33,
+    "name": "isIdentifiable",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+        "line": 29,
+        "character": 16
+      }
+    ],
+    "signatures": [
+      {
+        "id": 34,
+        "name": "isIdentifiable",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Check if a value conforms to Identifiable",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": ""
+            },
+            {
+              "tag": "menu-group",
+              "text": "Identifiable\n"
+            }
+          ]
+        },
+        "parameters": [
           {
-            "tag": "extract-docs",
-            "text": ""
-          },
-          {
-            "tag": "menu-group",
-            "text": "Identifiable\n"
+            "id": 35,
+            "name": "item",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
           }
-        ]
-      },
-      "parameters": [
-        {
-          "id": 35,
+        ],
+        "type": {
+          "type": "predicate",
           "name": "item",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "intrinsic",
-            "name": "any"
+          "asserts": false,
+          "targetType": {
+            "type": "reference",
+            "id": 55,
+            "name": "Identifiable"
           }
-        }
-      ],
-      "type": {
-        "type": "predicate",
-        "name": "item",
-        "asserts": false,
-        "targetType": {
-          "type": "reference",
-          "id": 55,
-          "name": "Identifiable"
         }
       }
+    ],
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Identifiable"
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "Identifiable",
-  "permaLink": "util/isIdentifiable",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/isIdentifiable",
+    "menuGroup": "Identifiable"
+  }
 }

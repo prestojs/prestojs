@@ -1,61 +1,66 @@
 {
-  "id": 14,
-  "name": "getTextLabel",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
-      "line": 103,
-      "character": 16
-    }
-  ],
-  "signatures": [
-    {
-      "id": 15,
-      "name": "getTextLabel",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Get a plain text label from an item",
-        "text": "If does not implement TextLabeled an error is thrown. To conditional call this check if labeled first\nwith `isTextLabeled`.\n",
-        "tags": [
-          {
-            "tag": "extract-docs",
-            "text": ""
-          },
-          {
-            "tag": "menu-group",
-            "text": "Labeled\n"
-          }
-        ]
-      },
-      "parameters": [
-        {
-          "id": 16,
-          "name": "item",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "intrinsic",
-            "name": "any"
-          }
-        }
-      ],
-      "type": {
-        "type": "intrinsic",
-        "name": "string"
+  "node": {
+    "id": 14,
+    "name": "getTextLabel",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
+        "line": 103,
+        "character": 16
       }
+    ],
+    "signatures": [
+      {
+        "id": 15,
+        "name": "getTextLabel",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Get a plain text label from an item",
+          "text": "If does not implement TextLabeled an error is thrown. To conditional call this check if labeled first\nwith `isTextLabeled`.\n",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": ""
+            },
+            {
+              "tag": "menu-group",
+              "text": "Labeled\n"
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "id": 16,
+            "name": "item",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "string"
+        }
+      }
+    ],
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Labeled"
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "Labeled",
-  "permaLink": "util/getTextLabel",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/getTextLabel",
+    "menuGroup": "Labeled"
+  }
 }

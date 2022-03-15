@@ -1,66 +1,71 @@
 {
-  "id": 5,
-  "name": "isNodeLabeled",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
-      "line": 55,
-      "character": 16
-    }
-  ],
-  "signatures": [
-    {
-      "id": 6,
-      "name": "isNodeLabeled",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Check if a value conforms to NodeLabeled",
-        "tags": [
+  "node": {
+    "id": 5,
+    "name": "isNodeLabeled",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
+        "line": 55,
+        "character": 16
+      }
+    ],
+    "signatures": [
+      {
+        "id": 6,
+        "name": "isNodeLabeled",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Check if a value conforms to NodeLabeled",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": ""
+            },
+            {
+              "tag": "menu-group",
+              "text": "Labeled\n"
+            }
+          ]
+        },
+        "parameters": [
           {
-            "tag": "extract-docs",
-            "text": ""
-          },
-          {
-            "tag": "menu-group",
-            "text": "Labeled\n"
+            "id": 7,
+            "name": "item",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
           }
-        ]
-      },
-      "parameters": [
-        {
-          "id": 7,
+        ],
+        "type": {
+          "type": "predicate",
           "name": "item",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "intrinsic",
-            "name": "any"
+          "asserts": false,
+          "targetType": {
+            "type": "reference",
+            "id": 20,
+            "name": "NodeLabeled"
           }
-        }
-      ],
-      "type": {
-        "type": "predicate",
-        "name": "item",
-        "asserts": false,
-        "targetType": {
-          "type": "reference",
-          "id": 20,
-          "name": "NodeLabeled"
         }
       }
+    ],
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Labeled"
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "Labeled",
-  "permaLink": "util/isNodeLabeled",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/isNodeLabeled",
+    "menuGroup": "Labeled"
+  }
 }

@@ -1,76 +1,81 @@
 {
-  "id": 8,
-  "name": "isLabeled",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
-      "line": 67,
-      "character": 16
-    }
-  ],
-  "signatures": [
-    {
-      "id": 9,
-      "name": "isLabeled",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Check if item supports either text or React node labels",
-        "tags": [
-          {
-            "tag": "extract-docs",
-            "text": ""
-          },
-          {
-            "tag": "menu-group",
-            "text": "Labeled\n"
-          }
-        ]
-      },
-      "parameters": [
-        {
-          "id": 10,
-          "name": "item",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "intrinsic",
-            "name": "any"
-          }
-        }
-      ],
-      "type": {
-        "type": "predicate",
-        "name": "item",
-        "asserts": false,
-        "targetType": {
-          "type": "union",
-          "types": [
+  "node": {
+    "id": 8,
+    "name": "isLabeled",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/Labeled.ts",
+        "line": 67,
+        "character": 16
+      }
+    ],
+    "signatures": [
+      {
+        "id": 9,
+        "name": "isLabeled",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Check if item supports either text or React node labels",
+          "tags": [
             {
-              "type": "reference",
-              "id": 17,
-              "name": "TextLabeled"
+              "tag": "extract-docs",
+              "text": ""
             },
             {
-              "type": "reference",
-              "id": 20,
-              "name": "NodeLabeled"
+              "tag": "menu-group",
+              "text": "Labeled\n"
             }
           ]
+        },
+        "parameters": [
+          {
+            "id": 10,
+            "name": "item",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          }
+        ],
+        "type": {
+          "type": "predicate",
+          "name": "item",
+          "asserts": false,
+          "targetType": {
+            "type": "union",
+            "types": [
+              {
+                "type": "reference",
+                "id": 17,
+                "name": "TextLabeled"
+              },
+              {
+                "type": "reference",
+                "id": 20,
+                "name": "NodeLabeled"
+              }
+            ]
+          }
         }
       }
+    ],
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Labeled"
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "Labeled",
-  "permaLink": "util/isLabeled",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/isLabeled",
+    "menuGroup": "Labeled"
+  }
 }

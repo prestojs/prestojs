@@ -1,3 +1,4 @@
+import { AugmentedDeclarationReflection } from '@prestojs/doc';
 import fs from 'fs';
 import path from 'path';
 import { JSONOutput } from 'typedoc';
@@ -9,19 +10,15 @@ data.children?.[0].kindString === '';
 
 const root = path.resolve(__dirname, '../../');
 
-async function extractChildren(node: JSONOutput.DeclarationReflection) {
-    const { children, ...rest } = node;
-    let extractDocs = false;
-    let menuGroup;
-
-    let { comment } = rest;
-    if (rest.kindString === 'Function' && rest.signatures && rest.signatures.length > 0) {
-        comment = rest.signatures[0].comment;
+async function extractChildren(
+    node: JSONOutput.DeclarationReflection
+): Promise<AugmentedDeclarationReflection[]> {
+    let comment = node.comment;
+    if (node.kindString === 'Function' && node.signatures && node.signatures.length > 0) {
+        comment = node.signatures[0].comment;
     }
     const paramTags = {};
     let returnTagText;
-    let docClass;
-    let isForwardRef = false;
     let tagsByName: Record<string, any> = {};
     if (comment && comment.tags) {
         tagsByName = comment.tags.reduce((acc, tag) => {
@@ -34,81 +31,19 @@ async function extractChildren(node: JSONOutput.DeclarationReflection) {
             }
             return acc;
         }, {});
-        extractDocs = 'extract-docs' in tagsByName;
-        docClass = tagsByName['doc-class'];
-        menuGroup = tagsByName['menu-group'] || 'default';
-        isForwardRef = 'forward-ref' in tagsByName;
-        // const dir = root + '/' + node.sources[0].fileName.split('/').slice(0, -1).join('/') + '/';
-        // if (comment.shortText && comment.shortText.includes('codesandbox=')) {
-        //     console.log(
-        //         'wow',
-        //         comment.text,
-        //         comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`)
-        //     );
-        //     comment.shortText = comment.shortText.replace(/codesandbox=/g, `codesandbox=${dir}`);
-        // }
-        // if (comment.text && comment.text.includes('codesandbox=')) {
-        //     console.log(
-        //         'wow',
-        //         comment.text,
-        //         comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`)
-        //     );
-        //     comment.text = comment.text.replace(/codesandbox=/g, `codesandbox=${dir}`);
-        // }
     }
-    let mdx: string | null = null;
-    // Hacky workaround to get param descriptions for function type aliases
-    if (
-        Object.keys(paramTags).length > 0 &&
-        rest.kindString === 'Type alias' &&
-        rest.type?.type === 'reflection' &&
-        rest.type.declaration &&
-        rest.type.declaration.signatures
-    ) {
-        rest.type.declaration.signatures[0].parameters?.forEach(param => {
-            if (paramTags[param.name]) {
-                param.comment = {
-                    text: paramTags[param.name],
-                };
-            }
-        });
-        rest.type.declaration.signatures[0].comment =
-            rest.type.declaration.signatures[0].comment || {};
-        if (returnTagText) {
-            rest.type.declaration.signatures[0].comment.returns = returnTagText;
-        }
-    }
-    if (!rest.sources) {
+    if (!node.sources) {
         // TODO: But why
         return [];
     }
-    const { fileName } = rest.sources[0];
-    const importPath = fileName.replace('js-packages/', '').replace('src/', '').split('.')[0];
-    const slug = [...importPath.split('/').slice(0, -1), rest.name].join('/');
-    const permaLink = slug.split('/').slice(1).join('/');
-    const [, packageName, ...names] = slug.split('/');
-    const exampleKey = importPath.replace('@prestojs/', '');
-    // const examples = exampleFiles[exampleKey];
-    // if (examples) {
-    //     pickedExamples.push(exampleKey);
-    //     rest.examples = examples;
-    // }
-    const docItem = {
-        ...rest,
-        mdx,
-        isForwardRef,
-        docClass,
-        extractDocs,
-        menuGroup,
-        permaLink,
-        packageName,
-        childIds: children ? children.map(child => child.id) : [],
-        children,
+    const docItem: AugmentedDeclarationReflection = {
+        ...node,
+        tagsByName,
     };
     if (!node.children) {
         return [docItem];
     }
-    const extractedChildren = [docItem];
+    const extractedChildren: AugmentedDeclarationReflection[] = [docItem];
     for (const child of node.children) {
         if (child.kindString === 'Namespace') {
             // This is specifically for the typedoc-plugin-missing-exports plugin which adds internal types into
@@ -120,33 +55,101 @@ async function extractChildren(node: JSONOutput.DeclarationReflection) {
     return extractedChildren;
 }
 
+function traverse(obj, fn, visitedTracker = new Map()) {
+    if (!obj || typeof obj !== 'object') {
+        return obj;
+    }
+    if (visitedTracker.has(obj)) {
+        return obj;
+    }
+    visitedTracker.set(obj, true);
+
+    if (fn(obj)) {
+        return obj;
+    }
+    for (const value of Object.values(obj)) {
+        if (Array.isArray(value)) {
+            for (const v of value) {
+                if (value && typeof value == 'object') {
+                    traverse(v, fn, visitedTracker);
+                }
+            }
+        } else if (value && typeof value == 'object') {
+            traverse(value, fn, visitedTracker);
+        }
+    }
+    return obj;
+}
+
 async function main() {
-    console.log('start');
     if (data.children) {
         // @ts-ignore
         const y = data.children[0];
-        // TODO: types
-        const x: any[] = [];
+        const x: AugmentedDeclarationReflection[] = [];
         for (const child of data.children) {
             x.push(...(await extractChildren(child)));
         }
-        console.log(
-            'yooo',
-            x.filter(y => y.extractDocs)
-        );
         const docsPath = path.resolve(__dirname, '../data/');
 
+        fs.writeFileSync(path.resolve(docsPath, `all.json`), JSON.stringify(x, null, 2));
+
+        const byId = {};
         for (const docItem of x) {
-            if (!docItem.extractDocs) {
+            byId[docItem.id] = docItem;
+        }
+        const visitedTracker = new Map();
+        for (const docItem of x) {
+            const { tagsByName = {} } = docItem;
+            const extractDocs = 'extract-docs' in tagsByName;
+            if (!extractDocs) {
                 continue;
             }
-            const packageDir = `${docsPath}/${docItem.packageName}`;
+            const menuGroup = tagsByName['menu-group'] || 'default';
+            const references = {};
+            if (docItem.name === 'useAsync') {
+                const fn = obj => {
+                    const { comment } = obj;
+                    if (comment && comment.tags) {
+                        for (const tag of comment.tags) {
+                            const text = tag.text.trim();
+                            if (tag.tag === 'deprecated') {
+                                obj.deprecated = text || true;
+                            }
+                        }
+                    }
+                    if (obj.type === 'reference' && byId[obj.id]) {
+                        references[obj.id] = traverse([byId[obj.id]], fn, visitedTracker);
+                    }
+                };
+                traverse(docItem, fn, visitedTracker);
+            }
+            const { fileName = '' } = docItem.sources?.[0] || {};
+            const importPath = fileName
+                .replace('js-packages/', '')
+                .replace('src/', '')
+                .split('.')[0];
+            const slug = [...importPath.split('/').slice(0, -1), docItem.name].join('/');
+            const permaLink = slug.split('/').slice(1).join('/');
+            const [, packageName] = slug.split('/');
+            const packageDir = `${docsPath}/${packageName}`;
             if (!fs.existsSync(packageDir)) {
                 fs.mkdirSync(packageDir);
             }
             fs.writeFileSync(
                 path.resolve(packageDir, `${docItem.name}.json`),
-                JSON.stringify(docItem, null, 2)
+                JSON.stringify(
+                    {
+                        node: docItem,
+                        references,
+                        meta: {
+                            packageName,
+                            permaLink,
+                            menuGroup,
+                        },
+                    },
+                    null,
+                    2
+                )
             );
         }
     }

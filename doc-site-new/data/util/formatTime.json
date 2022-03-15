@@ -1,86 +1,91 @@
 {
-  "id": 560,
-  "name": "formatTime",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/time.ts",
-      "line": 116,
-      "character": 16
-    }
-  ],
-  "signatures": [
-    {
-      "id": 561,
-      "name": "formatTime",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Format the parts of a time - as returned by [parseTime](doc:parseTime) - as a string using\n[toLocaleString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString#using_options).",
-        "text": "Note that while you can pass through `options.timeZone` this may be inaccurate if `parts.timezoneOffset` isn't\nsupplied.\n",
-        "tags": [
-          {
-            "tag": "extract-docs",
-            "text": ""
-          },
-          {
-            "tag": "menu-group",
-            "text": "Time\n"
-          }
-        ]
-      },
-      "parameters": [
-        {
-          "id": 562,
-          "name": "parts",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "union",
-            "types": [
-              {
-                "type": "reference",
-                "qualifiedName": "Date",
-                "package": "typescript",
-                "name": "Date"
-              },
-              {
-                "type": "reference",
-                "id": 1700,
-                "name": "TimeParts"
-              }
-            ]
-          }
-        },
-        {
-          "id": 563,
-          "name": "options",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "reference",
-            "id": 1707,
-            "name": "TimeFormatOptions"
-          },
-          "defaultValue": "{}"
-        }
-      ],
-      "type": {
-        "type": "intrinsic",
-        "name": "string"
+  "node": {
+    "id": 560,
+    "name": "formatTime",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/time.ts",
+        "line": 116,
+        "character": 16
       }
+    ],
+    "signatures": [
+      {
+        "id": 561,
+        "name": "formatTime",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Format the parts of a time - as returned by [parseTime](doc:parseTime) - as a string using\n[toLocaleString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString#using_options).",
+          "text": "Note that while you can pass through `options.timeZone` this may be inaccurate if `parts.timezoneOffset` isn't\nsupplied.\n",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": ""
+            },
+            {
+              "tag": "menu-group",
+              "text": "Time\n"
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "id": 562,
+            "name": "parts",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "union",
+              "types": [
+                {
+                  "type": "reference",
+                  "qualifiedName": "Date",
+                  "package": "typescript",
+                  "name": "Date"
+                },
+                {
+                  "type": "reference",
+                  "id": 1700,
+                  "name": "TimeParts"
+                }
+              ]
+            }
+          },
+          {
+            "id": 563,
+            "name": "options",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "reference",
+              "id": 1707,
+              "name": "TimeFormatOptions"
+            },
+            "defaultValue": "{}"
+          }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "string"
+        }
+      }
+    ],
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Time"
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "Time",
-  "permaLink": "util/formatTime",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/formatTime",
+    "menuGroup": "Time"
+  }
 }

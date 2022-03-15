@@ -1,90 +1,94 @@
 {
-  "id": 632,
-  "name": "useAsyncListing",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "originalName": "default",
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-      "line": 135,
-      "character": 24
-    }
-  ],
-  "signatures": [
-    {
-      "id": 633,
-      "name": "useAsyncListing",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Execute an asynchronous call and return the value which can optionally be paginated.",
-        "text": "If the result is paginated you can pass `paginator`. Whenever the paginator state\nis changed the function will be called unless `trigger` is `MANUAL`. You can pass\n`accumulatePages` to accumulate results for sequential pages returned from `execute`.\nThis is useful to implement things like infinite scroll. If a non-sequential page\nis accessed or `query` changes then accumulated results will be cleared.\n",
-        "tags": [
+  "node": {
+    "id": 632,
+    "name": "useAsyncListing",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "originalName": "default",
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+        "line": 135,
+        "character": 24
+      }
+    ],
+    "signatures": [
+      {
+        "id": 633,
+        "name": "useAsyncListing",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Execute an asynchronous call and return the value which can optionally be paginated.",
+          "text": "If the result is paginated you can pass `paginator`. Whenever the paginator state\nis changed the function will be called unless `trigger` is `MANUAL`. You can pass\n`accumulatePages` to accumulate results for sequential pages returned from `execute`.\nThis is useful to implement things like infinite scroll. If a non-sequential page\nis accessed or `query` changes then accumulated results will be cleared.\n",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": "\n"
+            }
+          ]
+        },
+        "typeParameter": [
           {
-            "tag": "extract-docs",
-            "text": "\n"
-          }
-        ]
-      },
-      "typeParameter": [
-        {
-          "id": 634,
-          "name": "T",
-          "kind": 131072,
-          "kindString": "Type parameter",
-          "flags": {},
-          "type": {
-            "type": "array",
-            "elementType": {
-              "type": "intrinsic",
-              "name": "any"
+            "id": 634,
+            "name": "T",
+            "kind": 131072,
+            "kindString": "Type parameter",
+            "flags": {},
+            "type": {
+              "type": "array",
+              "elementType": {
+                "type": "intrinsic",
+                "name": "any"
+              }
             }
           }
-        }
-      ],
-      "parameters": [
-        {
-          "id": 635,
-          "name": "props",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "reference",
-            "id": 611,
-            "typeArguments": [
-              {
-                "type": "reference",
-                "id": 634,
-                "name": "T"
-              }
-            ],
-            "name": "UseAsyncListingProps"
-          }
-        }
-      ],
-      "type": {
-        "type": "reference",
-        "id": 621,
-        "typeArguments": [
+        ],
+        "parameters": [
           {
-            "type": "reference",
-            "id": 634,
-            "name": "T"
+            "id": 635,
+            "name": "props",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "reference",
+              "id": 611,
+              "typeArguments": [
+                {
+                  "type": "reference",
+                  "id": 634,
+                  "name": "T"
+                }
+              ],
+              "name": "UseAsyncListingProps"
+            }
           }
         ],
-        "name": "UseAsyncListingReturn"
+        "type": {
+          "type": "reference",
+          "id": 621,
+          "typeArguments": [
+            {
+              "type": "reference",
+              "id": 634,
+              "name": "T"
+            }
+          ],
+          "name": "UseAsyncListingReturn"
+        }
       }
+    ],
+    "tagsByName": {
+      "extract-docs": ""
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "default",
-  "permaLink": "util/useAsyncListing",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/useAsyncListing",
+    "menuGroup": "default"
+  }
 }

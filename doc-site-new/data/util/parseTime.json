@@ -1,76 +1,81 @@
 {
-  "id": 557,
-  "name": "parseTime",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/time.ts",
-      "line": 49,
-      "character": 16
-    }
-  ],
-  "signatures": [
-    {
-      "id": 558,
-      "name": "parseTime",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Parse a string into its constituent time parts",
-        "text": "Returns an object containing the `hour`, `minute`, `second`, `millisecond` and optional `timezone` values.\n\nAccepts input of the form `H:MM[:SS[:.mmm:[+TZ]]]` where `H` is hours, `MM` is minutes, `SS` is seconds, `mmm` is\nmilliseconds and `+TZ` is the timezone (eg. +10:00).\n\nSeconds & milliseconds are optional and will default to 0 if not in the string, timezone is optional and will be\nleft as undefined if not specified.\n\nNOTE: If you pass a `Date` object then the timezone offset will always be whatever the local browser/env timezone\nis (ie. it's not possible to have a javascript `Date` object in another timezone).\n\n```js\nparseTime(\"3:55\")\n// { hour: 3, minute: 55, seconds: 0, milliseconds: 0 }\nparseTime(\"03:55:20\")\n// { hour: 3, minute: 55, seconds: 20, milliseconds: 0 }\nparseTime(\"03:55:20.600\")\n// { hour: 3, minute: 55, seconds: 20, milliseconds: 600 }\nparseTime(\"03:55:20.600+10:00\")\n// { hour: 3, minute: 55, seconds: 20, milliseconds: 600, timezoneOffset: -600 }\n```\n",
-        "tags": [
-          {
-            "tag": "extract-docs",
-            "text": ""
-          },
-          {
-            "tag": "menu-group",
-            "text": "Time\n"
-          }
-        ]
-      },
-      "parameters": [
-        {
-          "id": 559,
-          "name": "value",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "comment": {
-            "shortText": "The string value to parse\n"
-          },
-          "type": {
-            "type": "union",
-            "types": [
-              {
-                "type": "intrinsic",
-                "name": "string"
-              },
-              {
-                "type": "reference",
-                "qualifiedName": "Date",
-                "package": "typescript",
-                "name": "Date"
-              }
-            ]
-          }
-        }
-      ],
-      "type": {
-        "type": "reference",
-        "id": 1700,
-        "name": "TimeParts"
+  "node": {
+    "id": 557,
+    "name": "parseTime",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/time.ts",
+        "line": 49,
+        "character": 16
       }
+    ],
+    "signatures": [
+      {
+        "id": 558,
+        "name": "parseTime",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Parse a string into its constituent time parts",
+          "text": "Returns an object containing the `hour`, `minute`, `second`, `millisecond` and optional `timezone` values.\n\nAccepts input of the form `H:MM[:SS[:.mmm:[+TZ]]]` where `H` is hours, `MM` is minutes, `SS` is seconds, `mmm` is\nmilliseconds and `+TZ` is the timezone (eg. +10:00).\n\nSeconds & milliseconds are optional and will default to 0 if not in the string, timezone is optional and will be\nleft as undefined if not specified.\n\nNOTE: If you pass a `Date` object then the timezone offset will always be whatever the local browser/env timezone\nis (ie. it's not possible to have a javascript `Date` object in another timezone).\n\n```js\nparseTime(\"3:55\")\n// { hour: 3, minute: 55, seconds: 0, milliseconds: 0 }\nparseTime(\"03:55:20\")\n// { hour: 3, minute: 55, seconds: 20, milliseconds: 0 }\nparseTime(\"03:55:20.600\")\n// { hour: 3, minute: 55, seconds: 20, milliseconds: 600 }\nparseTime(\"03:55:20.600+10:00\")\n// { hour: 3, minute: 55, seconds: 20, milliseconds: 600, timezoneOffset: -600 }\n```\n",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": ""
+            },
+            {
+              "tag": "menu-group",
+              "text": "Time\n"
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "id": 559,
+            "name": "value",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "comment": {
+              "shortText": "The string value to parse\n"
+            },
+            "type": {
+              "type": "union",
+              "types": [
+                {
+                  "type": "intrinsic",
+                  "name": "string"
+                },
+                {
+                  "type": "reference",
+                  "qualifiedName": "Date",
+                  "package": "typescript",
+                  "name": "Date"
+                }
+              ]
+            }
+          }
+        ],
+        "type": {
+          "type": "reference",
+          "id": 1700,
+          "name": "TimeParts"
+        }
+      }
+    ],
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Time"
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "Time",
-  "permaLink": "util/parseTime",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/parseTime",
+    "menuGroup": "Time"
+  }
 }

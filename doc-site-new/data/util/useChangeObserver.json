@@ -1,152 +1,156 @@
 {
-  "id": 682,
-  "name": "useChangeObserver",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "originalName": "default",
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
-      "line": 57,
-      "character": 24
-    }
-  ],
-  "signatures": [
-    {
-      "id": 683,
-      "name": "useChangeObserver",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Call a function whenever a value changes.",
-        "text": "This works by monitoring a value passed in and tracking it's last value. Whenever\nthe value changes the provided callback will be called with the last and current\nvalue.\n\n```jsx\nexport default function Example() {\n  const [count, setCount] = useState(0);\n  useChangeObserver(count, () => {\n    console.log(`Changed from ${prev} to ${next}.`));\n  }\n  return <>\n    Count: {count}\n    <button onClick={() => setCount(c => c+1)}>+1</button>\n  </>;\n}\n```\n",
-        "returns": "Has no return value\n",
-        "tags": [
-          {
-            "tag": "extract-docs",
-            "text": "\n"
-          }
-        ]
-      },
-      "typeParameter": [
-        {
-          "id": 684,
-          "name": "T",
-          "kind": 131072,
-          "kindString": "Type parameter",
-          "flags": {}
-        }
-      ],
-      "parameters": [
-        {
-          "id": 685,
-          "name": "value",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "comment": {
-            "shortText": "The value to monitor for changes. This can be any type but for complex\ntypes you will need to provide your own `isEqual` function. For simple shallow\ncomparisons the default function will suffice (eg. it will compare each element in\nan array or each value on an object 1 level deep)."
-          },
-          "type": {
-            "type": "reference",
-            "id": 684,
-            "name": "T"
-          }
+  "node": {
+    "id": 682,
+    "name": "useChangeObserver",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "originalName": "default",
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
+        "line": 57,
+        "character": 24
+      }
+    ],
+    "signatures": [
+      {
+        "id": 683,
+        "name": "useChangeObserver",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Call a function whenever a value changes.",
+          "text": "This works by monitoring a value passed in and tracking it's last value. Whenever\nthe value changes the provided callback will be called with the last and current\nvalue.\n\n```jsx\nexport default function Example() {\n  const [count, setCount] = useState(0);\n  useChangeObserver(count, () => {\n    console.log(`Changed from ${prev} to ${next}.`));\n  }\n  return <>\n    Count: {count}\n    <button onClick={() => setCount(c => c+1)}>+1</button>\n  </>;\n}\n```\n",
+          "returns": "Has no return value\n",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": "\n"
+            }
+          ]
         },
-        {
-          "id": 686,
-          "name": "onChange",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "comment": {
-            "shortText": "The function to call when `value` changes. This is passed the previous\nvalue and the current value.\n"
+        "typeParameter": [
+          {
+            "id": 684,
+            "name": "T",
+            "kind": 131072,
+            "kindString": "Type parameter",
+            "flags": {}
+          }
+        ],
+        "parameters": [
+          {
+            "id": 685,
+            "name": "value",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "comment": {
+              "shortText": "The value to monitor for changes. This can be any type but for complex\ntypes you will need to provide your own `isEqual` function. For simple shallow\ncomparisons the default function will suffice (eg. it will compare each element in\nan array or each value on an object 1 level deep)."
+            },
+            "type": {
+              "type": "reference",
+              "id": 684,
+              "name": "T"
+            }
           },
-          "type": {
-            "type": "reflection",
-            "declaration": {
-              "id": 687,
-              "name": "__type",
-              "kind": 65536,
-              "kindString": "Type literal",
-              "flags": {},
-              "signatures": [
-                {
-                  "id": 688,
-                  "name": "__type",
-                  "kind": 4096,
-                  "kindString": "Call signature",
-                  "flags": {},
-                  "parameters": [
-                    {
-                      "id": 689,
-                      "name": "lastValue",
-                      "kind": 32768,
-                      "kindString": "Parameter",
-                      "flags": {},
-                      "type": {
-                        "type": "reference",
-                        "id": 684,
-                        "name": "T"
+          {
+            "id": 686,
+            "name": "onChange",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "comment": {
+              "shortText": "The function to call when `value` changes. This is passed the previous\nvalue and the current value.\n"
+            },
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 687,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "signatures": [
+                  {
+                    "id": 688,
+                    "name": "__type",
+                    "kind": 4096,
+                    "kindString": "Call signature",
+                    "flags": {},
+                    "parameters": [
+                      {
+                        "id": 689,
+                        "name": "lastValue",
+                        "kind": 32768,
+                        "kindString": "Parameter",
+                        "flags": {},
+                        "type": {
+                          "type": "reference",
+                          "id": 684,
+                          "name": "T"
+                        }
+                      },
+                      {
+                        "id": 690,
+                        "name": "nextValue",
+                        "kind": 32768,
+                        "kindString": "Parameter",
+                        "flags": {},
+                        "type": {
+                          "type": "reference",
+                          "id": 684,
+                          "name": "T"
+                        }
                       }
-                    },
-                    {
-                      "id": 690,
-                      "name": "nextValue",
-                      "kind": 32768,
-                      "kindString": "Parameter",
-                      "flags": {},
-                      "type": {
-                        "type": "reference",
-                        "id": 684,
-                        "name": "T"
-                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "void"
                     }
-                  ],
-                  "type": {
-                    "type": "intrinsic",
-                    "name": "void"
                   }
+                ]
+              }
+            }
+          },
+          {
+            "id": 691,
+            "name": "options",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {
+              "isOptional": true
+            },
+            "type": {
+              "type": "reference",
+              "id": 674,
+              "typeArguments": [
+                {
+                  "type": "reference",
+                  "id": 684,
+                  "name": "T"
                 }
-              ]
+              ],
+              "name": "ChangeObserverOptions"
             }
           }
-        },
-        {
-          "id": 691,
-          "name": "options",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {
-            "isOptional": true
-          },
-          "type": {
-            "type": "reference",
-            "id": 674,
-            "typeArguments": [
-              {
-                "type": "reference",
-                "id": 684,
-                "name": "T"
-              }
-            ],
-            "name": "ChangeObserverOptions"
-          }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "void"
         }
-      ],
-      "type": {
-        "type": "intrinsic",
-        "name": "void"
       }
+    ],
+    "tagsByName": {
+      "extract-docs": ""
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "default",
-  "permaLink": "util/useChangeObserver",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/useChangeObserver",
+    "menuGroup": "default"
+  }
 }

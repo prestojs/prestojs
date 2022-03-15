@@ -1,113 +1,118 @@
 {
-  "id": 36,
-  "name": "getId",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
-      "line": 45,
-      "character": 16
-    }
-  ],
-  "signatures": [
-    {
-      "id": 37,
-      "name": "getId",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Get the id for an object. If object doesn't implement Identifiable then `fallbackGetId`\nmust be provided or an error will be thrown.",
-        "tags": [
-          {
-            "tag": "extract-docs",
-            "text": ""
-          },
-          {
-            "tag": "menu-group",
-            "text": "Identifiable\n"
-          }
-        ]
-      },
-      "parameters": [
-        {
-          "id": 38,
-          "name": "item",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "comment": {
-            "shortText": "Any value to get ID for"
-          },
-          "type": {
-            "type": "intrinsic",
-            "name": "any"
-          }
+  "node": {
+    "id": 36,
+    "name": "getId",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+        "line": 45,
+        "character": 16
+      }
+    ],
+    "signatures": [
+      {
+        "id": 37,
+        "name": "getId",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Get the id for an object. If object doesn't implement Identifiable then `fallbackGetId`\nmust be provided or an error will be thrown.",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": ""
+            },
+            {
+              "tag": "menu-group",
+              "text": "Identifiable\n"
+            }
+          ]
         },
-        {
-          "id": 39,
-          "name": "fallbackGetId",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {
-            "isOptional": true
+        "parameters": [
+          {
+            "id": 38,
+            "name": "item",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "comment": {
+              "shortText": "Any value to get ID for"
+            },
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
           },
-          "comment": {
-            "shortText": "Function to return id for `item` if it doesn't implement Identifiable\n"
-          },
-          "type": {
-            "type": "reflection",
-            "declaration": {
-              "id": 40,
-              "name": "__type",
-              "kind": 65536,
-              "kindString": "Type literal",
-              "flags": {},
-              "signatures": [
-                {
-                  "id": 41,
-                  "name": "__type",
-                  "kind": 4096,
-                  "kindString": "Call signature",
-                  "flags": {},
-                  "parameters": [
-                    {
-                      "id": 42,
-                      "name": "item",
-                      "kind": 32768,
-                      "kindString": "Parameter",
-                      "flags": {},
-                      "type": {
-                        "type": "intrinsic",
-                        "name": "any"
+          {
+            "id": 39,
+            "name": "fallbackGetId",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {
+              "isOptional": true
+            },
+            "comment": {
+              "shortText": "Function to return id for `item` if it doesn't implement Identifiable\n"
+            },
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 40,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "signatures": [
+                  {
+                    "id": 41,
+                    "name": "__type",
+                    "kind": 4096,
+                    "kindString": "Call signature",
+                    "flags": {},
+                    "parameters": [
+                      {
+                        "id": 42,
+                        "name": "item",
+                        "kind": 32768,
+                        "kindString": "Parameter",
+                        "flags": {},
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
                       }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "id": 54,
+                      "name": "Id"
                     }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "id": 54,
-                    "name": "Id"
                   }
-                }
-              ]
+                ]
+              }
             }
           }
+        ],
+        "type": {
+          "type": "reference",
+          "id": 54,
+          "name": "Id"
         }
-      ],
-      "type": {
-        "type": "reference",
-        "id": 54,
-        "name": "Id"
       }
+    ],
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Identifiable"
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "Identifiable",
-  "permaLink": "util/getId",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/getId",
+    "menuGroup": "Identifiable"
+  }
 }

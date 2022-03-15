@@ -7,6 +7,7 @@ console.log(compile);
 export default function Page({ code }) {
     const [mdxModule, setMdxModule] = useState<any>();
     const Content = mdxModule ? mdxModule.default : Fragment;
+    console.log(code);
 
     useEffect(() => {
         (async () => {
@@ -18,7 +19,6 @@ export default function Page({ code }) {
 }
 
 export async function getStaticProps() {
-    console.log(compile);
     const code = String(
         await compile('# hi', { outputFormat: 'function-body' /* …otherOptions */ })
     );

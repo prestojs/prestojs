@@ -17,6 +17,11 @@
     "strictNullChecks": true,
     "incremental": true
   },
+  "references": [
+    {
+      "path": "../js-packages/@prestojs/doc/tsconfig.json"
+    }
+  ],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }

@@ -1,61 +1,66 @@
 {
-  "id": 43,
-  "name": "hashId",
-  "kind": 64,
-  "kindString": "Function",
-  "flags": {},
-  "sources": [
-    {
-      "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
-      "line": 64,
-      "character": 16
-    }
-  ],
-  "signatures": [
-    {
-      "id": 44,
-      "name": "hashId",
-      "kind": 4096,
-      "kindString": "Call signature",
-      "flags": {},
-      "comment": {
-        "shortText": "Create string representation of ID suitable for strict equality\nchecking or as a key into an object / map.",
-        "tags": [
-          {
-            "tag": "extract-docs",
-            "text": ""
-          },
-          {
-            "tag": "menu-group",
-            "text": "Identifiable\n"
-          }
-        ]
-      },
-      "parameters": [
-        {
-          "id": 45,
-          "name": "id",
-          "kind": 32768,
-          "kindString": "Parameter",
-          "flags": {},
-          "type": {
-            "type": "reference",
-            "id": 54,
-            "name": "Id"
-          }
-        }
-      ],
-      "type": {
-        "type": "intrinsic",
-        "name": "string"
+  "node": {
+    "id": 43,
+    "name": "hashId",
+    "kind": 64,
+    "kindString": "Function",
+    "flags": {},
+    "sources": [
+      {
+        "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+        "line": 64,
+        "character": 16
       }
+    ],
+    "signatures": [
+      {
+        "id": 44,
+        "name": "hashId",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {},
+        "comment": {
+          "shortText": "Create string representation of ID suitable for strict equality\nchecking or as a key into an object / map.",
+          "tags": [
+            {
+              "tag": "extract-docs",
+              "text": ""
+            },
+            {
+              "tag": "menu-group",
+              "text": "Identifiable\n"
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "id": 45,
+            "name": "id",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {},
+            "type": {
+              "type": "reference",
+              "id": 54,
+              "name": "Id"
+            }
+          }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "string"
+        }
+      }
+    ],
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Identifiable"
     }
-  ],
-  "mdx": null,
-  "isForwardRef": false,
-  "extractDocs": true,
-  "menuGroup": "Identifiable",
-  "permaLink": "util/hashId",
-  "packageName": "util",
-  "childIds": []
+  },
+  "references": {},
+  "meta": {
+    "packageName": "util",
+    "permaLink": "util/hashId",
+    "menuGroup": "Identifiable"
+  }
 }
