@@ -29,7 +29,10 @@
               "tag": "extract-docs",
               "text": "\n"
             }
-          ]
+          ],
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Call a function whenever a value changes.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+          "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      pre: \"pre\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsx(_components.p, {\n        children: \"This works by monitoring a value passed in and tracking it's last value. Whenever\\nthe value changes the provided callback will be called with the last and current\\nvalue.\"\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-jsx\",\n          children: \"export default function Example() {\\n  const [count, setCount] = useState(0);\\n  useChangeObserver(count, () => {\\n    console.log(`Changed from ${prev} to ${next}.`));\\n  }\\n  return <>\\n    Count: {count}\\n    <button onClick={() => setCount(c => c+1)}>+1</button>\\n  </>;\\n}\\n\"\n        })\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+          "returnsMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Has no return value\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
         },
         "typeParameter": [
           {
@@ -37,7 +40,9 @@
             "name": "T",
             "kind": 131072,
             "kindString": "Type parameter",
-            "flags": {}
+            "flags": {},
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "parameters": [
@@ -48,13 +53,16 @@
             "kindString": "Parameter",
             "flags": {},
             "comment": {
-              "shortText": "The value to monitor for changes. This can be any type but for complex\ntypes you will need to provide your own `isEqual` function. For simple shallow\ncomparisons the default function will suffice (eg. it will compare each element in\nan array or each value on an object 1 level deep)."
+              "shortText": "The value to monitor for changes. This can be any type but for complex\ntypes you will need to provide your own `isEqual` function. For simple shallow\ncomparisons the default function will suffice (eg. it will compare each element in\nan array or each value on an object 1 level deep).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The value to monitor for changes. This can be any type but for complex\\ntypes you will need to provide your own \", _jsx(_components.code, {\n        children: \"isEqual\"\n      }), \" function. For simple shallow\\ncomparisons the default function will suffice (eg. it will compare each element in\\nan array or each value on an object 1 level deep).\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "reference",
               "id": 684,
               "name": "T"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 686,
@@ -63,7 +71,8 @@
             "kindString": "Parameter",
             "flags": {},
             "comment": {
-              "shortText": "The function to call when `value` changes. This is passed the previous\nvalue and the current value.\n"
+              "shortText": "The function to call when `value` changes. This is passed the previous\nvalue and the current value.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The function to call when \", _jsx(_components.code, {\n        children: \"value\"\n      }), \" changes. This is passed the previous\\nvalue and the current value.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "reflection",
@@ -91,7 +100,9 @@
                           "type": "reference",
                           "id": 684,
                           "name": "T"
-                        }
+                        },
+                        "docFlags": {},
+                        "tagsByName": {}
                       },
                       {
                         "id": 690,
@@ -103,17 +114,25 @@
                           "type": "reference",
                           "id": 684,
                           "name": "T"
-                        }
+                        },
+                        "docFlags": {},
+                        "tagsByName": {}
                       }
                     ],
                     "type": {
                       "type": "intrinsic",
                       "name": "void"
-                    }
+                    },
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
-                ]
+                ],
+                "docFlags": {},
+                "tagsByName": {}
               }
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 691,
@@ -134,20 +153,191 @@
                 }
               ],
               "name": "ChangeObserverOptions"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
           "type": "intrinsic",
           "name": "void"
+        },
+        "docFlags": {},
+        "tagsByName": {
+          "extract-docs": ""
         }
       }
     ],
-    "tagsByName": {
-      "extract-docs": ""
+    "docFlags": {},
+    "tagsByName": {}
+  },
+  "references": {
+    "674": {
+      "id": 674,
+      "name": "ChangeObserverOptions",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "expand-properties",
+            "text": "\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
+          "line": 7,
+          "character": 12
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 681,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 675,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 680,
+              "name": "disabled",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "If true then no changes will be detected. When this changes from true to false the\ncallback won't be called until the next change in value. This is useful for disabling\nthe callback when no value is yet available eg. when waiting for first response from an\nAPI.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"If true then no changes will be detected. When this changes from true to false the\\ncallback won't be called until the next change in value. This is useful for disabling\\nthe callback when no value is yet available eg. when waiting for first response from an\\nAPI.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
+                  "line": 21,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 676,
+              "name": "isEqual",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
+                  "line": 14,
+                  "character": 4
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 677,
+                  "name": "isEqual",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Function to determine equality between items. If not provided the default will do shallow\nequality checks with specific support for an `isEqual` function on objects (eg. if an object\nimplements `isEqual` it will be called instead of doing any other comparisons. This is\nsupported by [ViewModel](doc:viewModelFactory).",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Function to determine equality between items. If not provided the default will do shallow\\nequality checks with specific support for an \", _jsx(_components.code, {\n        children: \"isEqual\"\n      }), \" function on objects (eg. if an object\\nimplements \", _jsx(_components.code, {\n        children: \"isEqual\"\n      }), \" it will be called instead of doing any other comparisons. This is\\nsupported by \", _jsx(_components.a, {\n        href: \"doc:viewModelFactory\",\n        children: \"ViewModel\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "parameters": [
+                    {
+                      "id": 678,
+                      "name": "a",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "id": 681,
+                        "name": "T"
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    },
+                    {
+                      "id": 679,
+                      "name": "b",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "id": 681,
+                        "name": "T"
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [680]
+            },
+            {
+              "title": "Methods",
+              "kind": 2048,
+              "children": [676]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
+              "line": 7,
+              "character": 39
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {
+        "expandProperties": true
+      },
+      "tagsByName": {
+        "expand-properties": ""
+      }
     }
   },
-  "references": {},
   "meta": {
     "packageName": "util",
     "permaLink": "util/useChangeObserver",

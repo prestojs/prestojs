@@ -1,0 +1,51 @@
+{
+  "node": {
+    "id": 724,
+    "name": "type",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 149,
+        "character": 8
+      }
+    ],
+    "type": {
+      "type": "union",
+      "types": [
+        {
+          "type": "intrinsic",
+          "name": "string"
+        },
+        {
+          "type": "reference",
+          "id": 966,
+          "typeArguments": [
+            {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          ],
+          "qualifiedName": "React.JSXElementConstructor",
+          "package": "@types/react",
+          "name": "JSXElementConstructor"
+        }
+      ]
+    },
+    "inheritedFrom": {
+      "type": "reference",
+      "id": 727,
+      "name": "ReactElement.type"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/type",
+    "menuGroup": "default"
+  }
+}

@@ -11,18 +11,25 @@ export default function Table<T>({
     columns,
     data,
     rowKey,
+    title,
 }: {
     columns: Column<T>[];
     data: T[];
     rowKey: string;
+    title?: React.ReactNode;
 }): React.ReactElement {
     return (
         <table className="w-full text-left table-collapse mt-5 mb-5 z-10 relative">
             <thead>
+                {title && (
+                    <tr>
+                        <th colSpan={columns.length}>{title}</th>
+                    </tr>
+                )}
                 <tr>
                     {columns.map(column => (
                         <th
-                            className="text-sm font-semibold text-gray-700 p-2 bg-gray-100"
+                            className="text-sm font-semibold text-gray-700 p-2 bg-gray-100 align-top"
                             key={column.key}
                         >
                             {column.title}

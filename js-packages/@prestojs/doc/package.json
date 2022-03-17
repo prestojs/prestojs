@@ -22,12 +22,15 @@
     "react": "*",
     "react-dom": "*",
     "typedoc": "^0.22.13",
+    "@mdx-js/mdx": "^2.0.0",
     "tailwindcss": "*"
   },
   "dependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "react-syntax-highlighter": "^15.5.0"
   },
   "devDependencies": {
+    "@mdx-js/mdx": "^2.0.0",
     "react": "*",
     "react-dom": "*",
     "tailwindcss": "*",

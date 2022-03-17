@@ -1,0 +1,170 @@
+{
+  "node": {
+    "id": 721,
+    "name": "ReactPortal",
+    "kind": 256,
+    "kindString": "Interface",
+    "flags": {
+      "isExternal": true
+    },
+    "children": [
+      {
+        "id": 723,
+        "name": "children",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 195,
+            "character": 8
+          }
+        ],
+        "type": {
+          "type": "reference",
+          "id": 717,
+          "qualifiedName": "React.ReactNode",
+          "package": "@types/react",
+          "name": "ReactNode"
+        }
+      },
+      {
+        "id": 722,
+        "name": "key",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 194,
+            "character": 8
+          }
+        ],
+        "type": {
+          "type": "union",
+          "types": [
+            {
+              "type": "literal",
+              "value": null
+            },
+            {
+              "type": "reference",
+              "id": 965,
+              "qualifiedName": "React.Key",
+              "package": "@types/react",
+              "name": "Key"
+            }
+          ]
+        },
+        "overwrites": {
+          "type": "reference",
+          "id": 729,
+          "name": "ReactElement.key"
+        }
+      },
+      {
+        "id": 725,
+        "name": "props",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 150,
+            "character": 8
+          }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "any"
+        },
+        "inheritedFrom": {
+          "type": "reference",
+          "id": 728,
+          "name": "ReactElement.props"
+        }
+      },
+      {
+        "id": 724,
+        "name": "type",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 149,
+            "character": 8
+          }
+        ],
+        "type": {
+          "type": "union",
+          "types": [
+            {
+              "type": "intrinsic",
+              "name": "string"
+            },
+            {
+              "type": "reference",
+              "id": 966,
+              "typeArguments": [
+                {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              ],
+              "qualifiedName": "React.JSXElementConstructor",
+              "package": "@types/react",
+              "name": "JSXElementConstructor"
+            }
+          ]
+        },
+        "inheritedFrom": {
+          "type": "reference",
+          "id": 727,
+          "name": "ReactElement.type"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "title": "Properties",
+        "kind": 1024,
+        "children": [723, 722, 725, 724]
+      }
+    ],
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 193,
+        "character": 14
+      }
+    ],
+    "extendedTypes": [
+      {
+        "type": "reference",
+        "id": 726,
+        "qualifiedName": "React.ReactElement",
+        "package": "@types/react",
+        "name": "ReactElement"
+      }
+    ]
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/ReactPortal",
+    "menuGroup": "default"
+  }
+}

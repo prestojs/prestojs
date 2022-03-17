@@ -1,0 +1,29 @@
+{
+  "node": {
+    "id": 1172,
+    "name": "stack",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true,
+      "isOptional": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+        "line": 1024,
+        "character": 4
+      }
+    ],
+    "type": {
+      "type": "intrinsic",
+      "name": "string"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "typescript",
+    "permaLink": "typescript/lib/stack",
+    "menuGroup": "default"
+  }
+}

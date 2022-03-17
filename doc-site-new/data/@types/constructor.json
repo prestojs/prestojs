@@ -1,0 +1,306 @@
+{
+  "node": {
+    "id": 989,
+    "name": "constructor",
+    "kind": 512,
+    "kindString": "Constructor",
+    "flags": {
+      "isExternal": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 488,
+        "character": 8
+      }
+    ],
+    "signatures": [
+      {
+        "id": 990,
+        "name": "new Component",
+        "kind": 16384,
+        "kindString": "Constructor signature",
+        "flags": {
+          "isExternal": true
+        },
+        "typeParameter": [
+          {
+            "id": 992,
+            "name": "P",
+            "kind": 131072,
+            "kindString": "Type parameter",
+            "flags": {
+              "isExternal": true
+            },
+            "default": {
+              "type": "reflection",
+              "declaration": {
+                "id": 991,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {
+                  "isExternal": true
+                }
+              }
+            }
+          },
+          {
+            "id": 994,
+            "name": "S",
+            "kind": 131072,
+            "kindString": "Type parameter",
+            "flags": {
+              "isExternal": true
+            },
+            "default": {
+              "type": "reflection",
+              "declaration": {
+                "id": 993,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {
+                  "isExternal": true
+                }
+              }
+            }
+          },
+          {
+            "id": 995,
+            "name": "SS",
+            "kind": 131072,
+            "kindString": "Type parameter",
+            "flags": {
+              "isExternal": true
+            },
+            "default": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "id": 996,
+            "name": "props",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {
+              "isExternal": true
+            },
+            "type": {
+              "type": "reference",
+              "id": 1159,
+              "typeArguments": [
+                {
+                  "type": "reference",
+                  "id": 992,
+                  "qualifiedName": "React.Component.P",
+                  "package": "@types/react",
+                  "name": "P"
+                }
+              ],
+              "qualifiedName": "Readonly",
+              "package": "typescript",
+              "name": "Readonly"
+            }
+          }
+        ],
+        "type": {
+          "type": "reference",
+          "id": 987,
+          "typeArguments": [
+            {
+              "type": "reference",
+              "id": 992,
+              "qualifiedName": "React.Component.P",
+              "package": "@types/react",
+              "name": "P"
+            },
+            {
+              "type": "reference",
+              "id": 994,
+              "qualifiedName": "React.Component.S",
+              "package": "@types/react",
+              "name": "S"
+            },
+            {
+              "type": "reference",
+              "id": 995,
+              "qualifiedName": "React.Component.SS",
+              "package": "@types/react",
+              "name": "SS"
+            }
+          ],
+          "qualifiedName": "React.Component",
+          "package": "@types/react",
+          "name": "Component"
+        },
+        "inheritedFrom": {
+          "type": "reference",
+          "name": "ComponentLifecycle<P, S, SS>.constructor"
+        }
+      },
+      {
+        "id": 997,
+        "name": "new Component",
+        "kind": 16384,
+        "kindString": "Constructor signature",
+        "flags": {
+          "isExternal": true
+        },
+        "comment": {
+          "tags": [
+            {
+              "tag": "deprecated",
+              "text": ""
+            },
+            {
+              "tag": "see",
+              "text": "https://reactjs.org/docs/legacy-context.html\n"
+            }
+          ]
+        },
+        "typeParameter": [
+          {
+            "id": 999,
+            "name": "P",
+            "kind": 131072,
+            "kindString": "Type parameter",
+            "flags": {
+              "isExternal": true
+            },
+            "default": {
+              "type": "reflection",
+              "declaration": {
+                "id": 998,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {
+                  "isExternal": true
+                }
+              }
+            }
+          },
+          {
+            "id": 1001,
+            "name": "S",
+            "kind": 131072,
+            "kindString": "Type parameter",
+            "flags": {
+              "isExternal": true
+            },
+            "default": {
+              "type": "reflection",
+              "declaration": {
+                "id": 1000,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {
+                  "isExternal": true
+                }
+              }
+            }
+          },
+          {
+            "id": 1002,
+            "name": "SS",
+            "kind": 131072,
+            "kindString": "Type parameter",
+            "flags": {
+              "isExternal": true
+            },
+            "default": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "id": 1003,
+            "name": "props",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {
+              "isExternal": true
+            },
+            "type": {
+              "type": "reference",
+              "id": 992,
+              "qualifiedName": "React.Component.P",
+              "package": "@types/react",
+              "name": "P"
+            }
+          },
+          {
+            "id": 1004,
+            "name": "context",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {
+              "isExternal": true,
+              "isOptional": true
+            },
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          }
+        ],
+        "type": {
+          "type": "reference",
+          "id": 987,
+          "typeArguments": [
+            {
+              "type": "reference",
+              "id": 992,
+              "qualifiedName": "React.Component.P",
+              "package": "@types/react",
+              "name": "P"
+            },
+            {
+              "type": "reference",
+              "id": 994,
+              "qualifiedName": "React.Component.S",
+              "package": "@types/react",
+              "name": "S"
+            },
+            {
+              "type": "reference",
+              "id": 995,
+              "qualifiedName": "React.Component.SS",
+              "package": "@types/react",
+              "name": "SS"
+            }
+          ],
+          "qualifiedName": "React.Component",
+          "package": "@types/react",
+          "name": "Component"
+        },
+        "inheritedFrom": {
+          "type": "reference",
+          "name": "ComponentLifecycle<P, S, SS>.constructor"
+        },
+        "deprecated": true,
+        "tagsByName": {
+          "deprecated": "",
+          "see": "https://reactjs.org/docs/legacy-context.html"
+        }
+      }
+    ],
+    "inheritedFrom": {
+      "type": "reference",
+      "name": "ComponentLifecycle<P, S, SS>.constructor"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/constructor",
+    "menuGroup": "default"
+  }
+}

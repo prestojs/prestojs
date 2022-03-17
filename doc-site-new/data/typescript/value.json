@@ -1,0 +1,31 @@
+{
+  "node": {
+    "id": 1215,
+    "name": "value",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+        "line": 33,
+        "character": 4
+      }
+    ],
+    "type": {
+      "type": "reference",
+      "id": 1216,
+      "qualifiedName": "IteratorYieldResult.TYield",
+      "package": "typescript",
+      "name": "TYield"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "typescript",
+    "permaLink": "typescript/lib/value",
+    "menuGroup": "default"
+  }
+}

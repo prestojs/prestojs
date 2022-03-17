@@ -31,7 +31,9 @@
               "tag": "menu-group",
               "text": "Time\n"
             }
-          ]
+          ],
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Format the parts of a time - as returned by \", _jsx(_components.a, {\n        href: \"doc:parseTime\",\n        children: \"parseTime\"\n      }), \" - as a string using\\n\", _jsx(_components.a, {\n        href: \"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString#using_options\",\n        children: \"toLocaleString\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+          "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Note that while you can pass through \", _jsx(_components.code, {\n        children: \"options.timeZone\"\n      }), \" this may be inaccurate if \", _jsx(_components.code, {\n        children: \"parts.timezoneOffset\"\n      }), \" isn't\\nsupplied.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
         },
         "parameters": [
           {
@@ -55,7 +57,9 @@
                   "name": "TimeParts"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 563,
@@ -68,24 +72,832 @@
               "id": 1707,
               "name": "TimeFormatOptions"
             },
-            "defaultValue": "{}"
+            "defaultValue": "{}",
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
           "type": "intrinsic",
           "name": "string"
+        },
+        "docFlags": {},
+        "tagsByName": {
+          "extract-docs": "",
+          "menu-group": "Time"
         }
       }
     ],
-    "tagsByName": {
-      "extract-docs": "",
-      "menu-group": "Time"
+    "docFlags": {},
+    "tagsByName": {}
+  },
+  "references": {
+    "1700": {
+      "id": 1700,
+      "name": "TimeParts",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "expand-properties",
+            "text": "\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/time.ts",
+          "line": 6,
+          "character": 5
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 1701,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 1702,
+              "name": "hour",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/time.ts",
+                  "line": 7,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "number"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1705,
+              "name": "millisecond",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/time.ts",
+                  "line": 10,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "number"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1703,
+              "name": "minute",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/time.ts",
+                  "line": 8,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "number"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1704,
+              "name": "second",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/time.ts",
+                  "line": 9,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "number"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1706,
+              "name": "timezoneOffset",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The difference in minutes between a date as evaluated in the UTC time zone and the same date in the local time zone.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The difference in minutes between a date as evaluated in the UTC time zone and the same date in the local time zone.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/time.ts",
+                  "line": 14,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "number"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [1702, 1705, 1703, 1704, 1706]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/time.ts",
+              "line": 6,
+              "character": 17
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {
+        "expandProperties": true
+      },
+      "tagsByName": {
+        "expand-properties": ""
+      }
+    },
+    "1707": {
+      "id": 1707,
+      "name": "TimeFormatOptions",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "expand-properties",
+            "text": "\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/time.ts",
+          "line": 92,
+          "character": 5
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 1708,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 1710,
+              "name": "localeOptions",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Options to pass through to [toLocaleString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString#using_options)",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Options to pass through to \", _jsx(_components.a, {\n        href: \"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString#using_options\",\n        children: \"toLocaleString\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/time.ts",
+                  "line": 100,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intersection",
+                "types": [
+                  {
+                    "type": "reference",
+                    "id": 1740,
+                    "qualifiedName": "Intl.DateTimeFormatOptions",
+                    "package": "typescript",
+                    "name": "Intl.DateTimeFormatOptions"
+                  },
+                  {
+                    "type": "reflection",
+                    "declaration": {
+                      "id": 1711,
+                      "name": "__type",
+                      "kind": 65536,
+                      "kindString": "Type literal",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 1712,
+                          "name": "timeStyle",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "js-packages/@prestojs/util/src/time.ts",
+                              "line": 102,
+                              "character": 8
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "literal",
+                                "value": "full"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "long"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "medium"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "short"
+                              }
+                            ]
+                          },
+                          "docFlags": {},
+                          "tagsByName": {}
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [1712]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/time.ts",
+                          "line": 100,
+                          "character": 49
+                        }
+                      ],
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1709,
+              "name": "locales",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Optional locales to use. See [using locales](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString#using_locales) for more information.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Optional locales to use. See \", _jsx(_components.a, {\n        href: \"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString#using_locales\",\n        children: \"using locales\"\n      }), \" for more information.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/time.ts",
+                  "line": 96,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  {
+                    "type": "array",
+                    "elementType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [1710, 1709]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/time.ts",
+              "line": 92,
+              "character": 25
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {
+        "expandProperties": true
+      },
+      "tagsByName": {
+        "expand-properties": ""
+      }
+    },
+    "1740": {
+      "id": 1740,
+      "name": "DateTimeFormatOptions",
+      "kind": 256,
+      "kindString": "Interface",
+      "flags": {
+        "isExternal": true
+      },
+      "children": [
+        {
+          "id": 1746,
+          "name": "day",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4418,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "numeric"
+              },
+              {
+                "type": "literal",
+                "value": "2-digit"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1743,
+          "name": "era",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4415,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "long"
+              },
+              {
+                "type": "literal",
+                "value": "short"
+              },
+              {
+                "type": "literal",
+                "value": "narrow"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1751,
+          "name": "formatMatcher",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4423,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "basic"
+              },
+              {
+                "type": "literal",
+                "value": "best fit"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1747,
+          "name": "hour",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4419,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "numeric"
+              },
+              {
+                "type": "literal",
+                "value": "2-digit"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1752,
+          "name": "hour12",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4424,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1741,
+          "name": "localeMatcher",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4413,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "best fit"
+              },
+              {
+                "type": "literal",
+                "value": "lookup"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1748,
+          "name": "minute",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4420,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "numeric"
+              },
+              {
+                "type": "literal",
+                "value": "2-digit"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1745,
+          "name": "month",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4417,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "long"
+              },
+              {
+                "type": "literal",
+                "value": "short"
+              },
+              {
+                "type": "literal",
+                "value": "narrow"
+              },
+              {
+                "type": "literal",
+                "value": "numeric"
+              },
+              {
+                "type": "literal",
+                "value": "2-digit"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1749,
+          "name": "second",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4421,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "numeric"
+              },
+              {
+                "type": "literal",
+                "value": "2-digit"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1753,
+          "name": "timeZone",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4425,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1750,
+          "name": "timeZoneName",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4422,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "long"
+              },
+              {
+                "type": "literal",
+                "value": "short"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1742,
+          "name": "weekday",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4414,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "long"
+              },
+              {
+                "type": "literal",
+                "value": "short"
+              },
+              {
+                "type": "literal",
+                "value": "narrow"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1744,
+          "name": "year",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 4416,
+              "character": 8
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": "numeric"
+              },
+              {
+                "type": "literal",
+                "value": "2-digit"
+              }
+            ]
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "groups": [
+        {
+          "title": "Properties",
+          "kind": 1024,
+          "children": [1746, 1743, 1751, 1747, 1752, 1741, 1748, 1745, 1749, 1753, 1750, 1742, 1744]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+          "line": 4412,
+          "character": 14
+        }
+      ],
+      "docFlags": {},
+      "tagsByName": {}
     }
   },
-  "references": {},
   "meta": {
     "packageName": "util",
     "permaLink": "util/formatTime",
-    "menuGroup": "Time"
+    "menuGroup": "default"
   }
 }

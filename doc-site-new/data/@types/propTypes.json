@@ -1,0 +1,41 @@
+{
+  "node": {
+    "id": 1226,
+    "name": "propTypes",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true,
+      "isOptional": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 371,
+        "character": 8
+      }
+    ],
+    "type": {
+      "type": "reference",
+      "id": 1247,
+      "typeArguments": [
+        {
+          "type": "reference",
+          "id": 1228,
+          "qualifiedName": "React.ProviderExoticComponent.P",
+          "package": "@types/react",
+          "name": "P"
+        }
+      ],
+      "qualifiedName": "React.WeakValidationMap",
+      "package": "@types/react",
+      "name": "WeakValidationMap"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/propTypes",
+    "menuGroup": "default"
+  }
+}

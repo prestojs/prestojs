@@ -1,0 +1,85 @@
+{
+  "node": {
+    "id": 1161,
+    "name": "IteratorResult",
+    "kind": 4194304,
+    "kindString": "Type alias",
+    "flags": {
+      "isExternal": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+        "line": 41,
+        "character": 5
+      }
+    ],
+    "typeParameter": [
+      {
+        "id": 1162,
+        "name": "T",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        }
+      },
+      {
+        "id": 1163,
+        "name": "TReturn",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        },
+        "default": {
+          "type": "intrinsic",
+          "name": "any"
+        }
+      }
+    ],
+    "type": {
+      "type": "union",
+      "types": [
+        {
+          "type": "reference",
+          "id": 1213,
+          "typeArguments": [
+            {
+              "type": "reference",
+              "id": 1162,
+              "qualifiedName": "T",
+              "package": "typescript",
+              "name": "T"
+            }
+          ],
+          "qualifiedName": "IteratorYieldResult",
+          "package": "typescript",
+          "name": "IteratorYieldResult"
+        },
+        {
+          "type": "reference",
+          "id": 1217,
+          "typeArguments": [
+            {
+              "type": "reference",
+              "id": 1163,
+              "qualifiedName": "TReturn",
+              "package": "typescript",
+              "name": "TReturn"
+            }
+          ],
+          "qualifiedName": "IteratorReturnResult",
+          "package": "typescript",
+          "name": "IteratorReturnResult"
+        }
+      ]
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "typescript",
+    "permaLink": "typescript/lib/IteratorResult",
+    "menuGroup": "default"
+  }
+}

@@ -30,7 +30,8 @@
               "tag": "menu-group",
               "text": "Identifiable\n"
             }
-          ]
+          ],
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Get the id for an object. If object doesn't implement Identifiable then \", _jsx(_components.code, {\n        children: \"fallbackGetId\"\n      }), \"\\nmust be provided or an error will be thrown.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
         },
         "parameters": [
           {
@@ -40,12 +41,15 @@
             "kindString": "Parameter",
             "flags": {},
             "comment": {
-              "shortText": "Any value to get ID for"
+              "shortText": "Any value to get ID for",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Any value to get ID for\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
               "name": "any"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 39,
@@ -56,7 +60,8 @@
               "isOptional": true
             },
             "comment": {
-              "shortText": "Function to return id for `item` if it doesn't implement Identifiable\n"
+              "shortText": "Function to return id for `item` if it doesn't implement Identifiable\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Function to return id for \", _jsx(_components.code, {\n        children: \"item\"\n      }), \" if it doesn't implement Identifiable\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "reflection",
@@ -83,36 +88,79 @@
                         "type": {
                           "type": "intrinsic",
                           "name": "any"
-                        }
+                        },
+                        "docFlags": {},
+                        "tagsByName": {}
                       }
                     ],
                     "type": {
                       "type": "reference",
                       "id": 54,
                       "name": "Id"
-                    }
+                    },
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
-                ]
+                ],
+                "docFlags": {},
+                "tagsByName": {}
               }
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
           "type": "reference",
           "id": 54,
           "name": "Id"
+        },
+        "docFlags": {},
+        "tagsByName": {
+          "extract-docs": "",
+          "menu-group": "Identifiable"
         }
       }
     ],
-    "tagsByName": {
-      "extract-docs": "",
-      "menu-group": "Identifiable"
+    "docFlags": {},
+    "tagsByName": {}
+  },
+  "references": {
+    "54": {
+      "id": 54,
+      "name": "Id",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+          "line": 3,
+          "character": 12
+        }
+      ],
+      "type": {
+        "type": "union",
+        "types": [
+          {
+            "type": "reference",
+            "id": 1266,
+            "name": "SingleId"
+          },
+          {
+            "type": "reference",
+            "id": 1267,
+            "name": "CompoundId"
+          }
+        ]
+      },
+      "docFlags": {},
+      "tagsByName": {}
     }
   },
-  "references": {},
   "meta": {
     "packageName": "util",
     "permaLink": "util/getId",
-    "menuGroup": "Identifiable"
+    "menuGroup": "default"
   }
 }

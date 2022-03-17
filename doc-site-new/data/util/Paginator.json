@@ -18,7 +18,8 @@
           "tag": "extract-docs",
           "text": "\n"
         }
-      ]
+      ],
+      "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Base class for a paginator.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
     },
     "originalName": "default",
     "children": [
@@ -64,9 +65,13 @@
                     "name": "__type",
                     "kind": 65536,
                     "kindString": "Type literal",
-                    "flags": {}
+                    "flags": {},
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               },
               {
                 "id": 478,
@@ -81,9 +86,13 @@
                     "name": "__type",
                     "kind": 65536,
                     "kindString": "Type literal",
-                    "flags": {}
+                    "flags": {},
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "parameters": [
@@ -97,7 +106,9 @@
                   "type": "literal",
                   "value": null
                 },
-                "defaultValue": "null"
+                "defaultValue": "null",
+                "docFlags": {},
+                "tagsByName": {}
               },
               {
                 "id": 480,
@@ -109,7 +120,9 @@
                   "type": "literal",
                   "value": null
                 },
-                "defaultValue": "null"
+                "defaultValue": "null",
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -128,9 +141,15 @@
                 }
               ],
               "name": "default"
+            },
+            "docFlags": {},
+            "tagsByName": {
+              "see": "documentation for `replaceStateControllers` for what `currentStatePair` and `internalStatePair` are"
             }
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 481,
@@ -154,7 +173,9 @@
           "type": "reference",
           "id": 405,
           "name": "PaginatorInterface.currentState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 482,
@@ -204,18 +225,20 @@
                     "type": {
                       "type": "intrinsic",
                       "name": "boolean"
-                    }
+                    },
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 ],
                 "groups": [
                   {
                     "title": "Properties",
                     "kind": 1024,
-                    "children": [
-                      484
-                    ]
+                    "children": [484]
                   }
-                ]
+                ],
+                "docFlags": {},
+                "tagsByName": {}
               }
             }
           ]
@@ -224,7 +247,9 @@
           "type": "reference",
           "id": 406,
           "name": "PaginatorInterface.internalState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 485,
@@ -265,22 +290,30 @@
                       "type": "reference",
                       "id": 476,
                       "name": "State"
-                    }
+                    },
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 ],
                 "type": {
                   "type": "intrinsic",
                   "name": "void"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
-            ]
+            ],
+            "docFlags": {},
+            "tagsByName": {}
           }
         },
         "implementationOf": {
           "type": "reference",
           "id": 407,
           "name": "PaginatorInterface.setCurrentState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 489,
@@ -321,22 +354,30 @@
                       "type": "reference",
                       "id": 478,
                       "name": "InternalState"
-                    }
+                    },
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 ],
                 "type": {
                   "type": "intrinsic",
                   "name": "void"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
-            ]
+            ],
+            "docFlags": {},
+            "tagsByName": {}
           }
         },
         "implementationOf": {
           "type": "reference",
           "id": 410,
           "name": "PaginatorInterface.setInternalState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 493,
@@ -359,7 +400,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "True once setResponse has been called and pagination state is known."
+              "shortText": "True once setResponse has been called and pagination state is known.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"True once setResponse has been called and pagination state is known.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
@@ -369,14 +411,18 @@
               "type": "reference",
               "id": 413,
               "name": "PaginatorInterface.responseIsSet"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 413,
           "name": "PaginatorInterface.responseIsSet"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 505,
@@ -399,7 +445,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "Go to the first page."
+              "shortText": "Go to the first page.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Go to the first page.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
@@ -409,14 +456,18 @@
               "type": "reference",
               "id": 417,
               "name": "PaginatorInterface.first"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 416,
           "name": "PaginatorInterface.first"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 507,
@@ -440,7 +491,9 @@
             "flags": {},
             "comment": {
               "shortText": "Return the state for the first page",
-              "text": "Does not transition state. To transition state call `first` instead.\n"
+              "text": "Does not transition state. To transition state call `first` instead.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Return the state for the first page\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Does not transition state. To transition state call \", _jsx(_components.code, {\n        children: \"first\"\n      }), \" instead.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "reference",
@@ -451,14 +504,18 @@
               "type": "reference",
               "id": 419,
               "name": "PaginatorInterface.firstState"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 418,
           "name": "PaginatorInterface.firstState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 499,
@@ -481,7 +538,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "Return the options to use with `Endpoint.execute` or `Endpoint.prepare`. Usually\nthis just involves setting `query` to the query string parameters for the paginator\nbut can also provide custom headers or different URL resolve arguments."
+              "shortText": "Return the options to use with `Endpoint.execute` or `Endpoint.prepare`. Usually\nthis just involves setting `query` to the query string parameters for the paginator\nbut can also provide custom headers or different URL resolve arguments.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Return the options to use with \", _jsx(_components.code, {\n        children: \"Endpoint.execute\"\n      }), \" or \", _jsx(_components.code, {\n        children: \"Endpoint.prepare\"\n      }), \". Usually\\nthis just involves setting \", _jsx(_components.code, {\n        children: \"query\"\n      }), \" to the query string parameters for the paginator\\nbut can also provide custom headers or different URL resolve arguments.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -491,13 +549,16 @@
                 "kindString": "Parameter",
                 "flags": {},
                 "comment": {
-                  "shortText": "The existing options for the endpoint\n"
+                  "shortText": "The existing options for the endpoint\n",
+                  "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The existing options for the endpoint\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
                 },
                 "type": {
                   "type": "reference",
                   "id": 392,
                   "name": "PaginatorRequestOptions"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -509,14 +570,18 @@
               "type": "reference",
               "id": 429,
               "name": "PaginatorInterface.getRequestInit"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 428,
           "name": "PaginatorInterface.getRequestInit"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 517,
@@ -539,7 +604,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "Returns true if there's more results after the current page"
+              "shortText": "Returns true if there's more results after the current page",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Returns true if there's more results after the current page\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
@@ -549,14 +615,18 @@
               "type": "reference",
               "id": 415,
               "name": "PaginatorInterface.hasNextPage"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 414,
           "name": "PaginatorInterface.hasNextPage"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 509,
@@ -579,7 +649,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "Go to the next page."
+              "shortText": "Go to the next page.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Go to the next page.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
@@ -589,14 +660,18 @@
               "type": "reference",
               "id": 421,
               "name": "PaginatorInterface.next"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 420,
           "name": "PaginatorInterface.next"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 511,
@@ -620,7 +695,9 @@
             "flags": {},
             "comment": {
               "shortText": "Return the state for the next page",
-              "text": "Does not transition state. To transition state call `next` instead.\n"
+              "text": "Does not transition state. To transition state call `next` instead.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Return the state for the next page\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Does not transition state. To transition state call \", _jsx(_components.code, {\n        children: \"next\"\n      }), \" instead.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -640,14 +717,18 @@
               "type": "reference",
               "id": 423,
               "name": "PaginatorInterface.nextState"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 422,
           "name": "PaginatorInterface.nextState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 513,
@@ -670,7 +751,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "Go to the previous page."
+              "shortText": "Go to the previous page.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Go to the previous page.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
@@ -680,14 +762,18 @@
               "type": "reference",
               "id": 425,
               "name": "PaginatorInterface.previous"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 424,
           "name": "PaginatorInterface.previous"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 515,
@@ -711,7 +797,9 @@
             "flags": {},
             "comment": {
               "shortText": "Return the state for the previous page",
-              "text": "Does not transition state. To transition state call `previous` instead.\n"
+              "text": "Does not transition state. To transition state call `previous` instead.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Return the state for the previous page\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Does not transition state. To transition state call \", _jsx(_components.code, {\n        children: \"previous\"\n      }), \" instead.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -731,14 +819,18 @@
               "type": "reference",
               "id": 427,
               "name": "PaginatorInterface.previousState"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 426,
           "name": "PaginatorInterface.previousState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 495,
@@ -762,7 +854,9 @@
             "flags": {},
             "comment": {
               "shortText": "Paginator receives 2 tuples of a state and state setter pair. This is expected to\nmatch the same interface as `useState` in React. The following is a valid simple usage:",
-              "text": "```js\nconst paginator = new Paginator(useState(), useState());\n```\n\nNote that we can also pass the state controllers in via `replaceStateControllers` rather\nthan in the constructor. This is so we can memoize the `Paginator` instance which is desirable\nwhen using the paginator as a dependency to React hooks.\n\nAs state is passed in and managed external to the class be aware that any data stored\non the class instance will be lost unless written with `setCurrentState` or `setInternalState`.\nThis design is a compromise between allowing a clear interface for how paginators should\nbe defined and allowing the state to be managed externally (eg. using React state).\n"
+              "text": "```js\nconst paginator = new Paginator(useState(), useState());\n```\n\nNote that we can also pass the state controllers in via `replaceStateControllers` rather\nthan in the constructor. This is so we can memoize the `Paginator` instance which is desirable\nwhen using the paginator as a dependency to React hooks.\n\nAs state is passed in and managed external to the class be aware that any data stored\non the class instance will be lost unless written with `setCurrentState` or `setInternalState`.\nThis design is a compromise between allowing a clear interface for how paginators should\nbe defined and allowing the state to be managed externally (eg. using React state).\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Paginator receives 2 tuples of a state and state setter pair. This is expected to\\nmatch the same interface as \", _jsx(_components.code, {\n        children: \"useState\"\n      }), \" in React. The following is a valid simple usage:\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      pre: \"pre\",\n      code: \"code\",\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-js\",\n          children: \"const paginator = new Paginator(useState(), useState());\\n\"\n        })\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"Note that we can also pass the state controllers in via \", _jsx(_components.code, {\n          children: \"replaceStateControllers\"\n        }), \" rather\\nthan in the constructor. This is so we can memoize the \", _jsx(_components.code, {\n          children: \"Paginator\"\n        }), \" instance which is desirable\\nwhen using the paginator as a dependency to React hooks.\"]\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"As state is passed in and managed external to the class be aware that any data stored\\non the class instance will be lost unless written with \", _jsx(_components.code, {\n          children: \"setCurrentState\"\n        }), \" or \", _jsx(_components.code, {\n          children: \"setInternalState\"\n        }), \".\\nThis design is a compromise between allowing a clear interface for how paginators should\\nbe defined and allowing the state to be managed externally (eg. using React state).\"]\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -772,12 +866,15 @@
                 "kindString": "Parameter",
                 "flags": {},
                 "comment": {
-                  "shortText": "The state object and setter (eg. from `useState`) that is used to store\nand transition pagination state. Using this you can do things like easily store state in the URL\n(eg. using `useUrlQueryState`) or other data sources."
+                  "shortText": "The state object and setter (eg. from `useState`) that is used to store\nand transition pagination state. Using this you can do things like easily store state in the URL\n(eg. using `useUrlQueryState`) or other data sources.",
+                  "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The state object and setter (eg. from \", _jsx(_components.code, {\n        children: \"useState\"\n      }), \") that is used to store\\nand transition pagination state. Using this you can do things like easily store state in the URL\\n(eg. using \", _jsx(_components.code, {\n        children: \"useUrlQueryState\"\n      }), \") or other data sources.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
                 },
                 "type": {
                   "type": "intrinsic",
                   "name": "any"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               },
               {
                 "id": 498,
@@ -786,12 +883,15 @@
                 "kindString": "Parameter",
                 "flags": {},
                 "comment": {
-                  "shortText": "The state object and setter that is used for internal state. Internal state\nis stored separately as it does not need to be restored (eg. if you refresh the page). It is used\nto store things like the total number of results or the current cursor. Passing `useState` here is\nfine.\n"
+                  "shortText": "The state object and setter that is used for internal state. Internal state\nis stored separately as it does not need to be restored (eg. if you refresh the page). It is used\nto store things like the total number of results or the current cursor. Passing `useState` here is\nfine.\n",
+                  "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The state object and setter that is used for internal state. Internal state\\nis stored separately as it does not need to be restored (eg. if you refresh the page). It is used\\nto store things like the total number of results or the current cursor. Passing \", _jsx(_components.code, {\n        children: \"useState\"\n      }), \" here is\\nfine.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
                 },
                 "type": {
                   "type": "intrinsic",
                   "name": "any"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -802,14 +902,18 @@
               "type": "reference",
               "id": 435,
               "name": "PaginatorInterface.replaceStateControllers"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 434,
           "name": "PaginatorInterface.replaceStateControllers"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 502,
@@ -832,7 +936,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "This is called when an `Endpoint` has resolved and is passed the response from the\nendpoint. This is used to update the relevant paginator state  - eg. the total\nnumber of records, next & previous cursors etc."
+              "shortText": "This is called when an `Endpoint` has resolved and is passed the response from the\nendpoint. This is used to update the relevant paginator state  - eg. the total\nnumber of records, next & previous cursors etc.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"This is called when an \", _jsx(_components.code, {\n        children: \"Endpoint\"\n      }), \" has resolved and is passed the response from the\\nendpoint. This is used to update the relevant paginator state  - eg. the total\\nnumber of records, next & previous cursors etc.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -842,7 +947,8 @@
                 "kindString": "Parameter",
                 "flags": {},
                 "comment": {
-                  "shortText": "The response as returned by the endpoint this paginator is used with.\n"
+                  "shortText": "The response as returned by the endpoint this paginator is used with.\n",
+                  "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The response as returned by the endpoint this paginator is used with.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
                 },
                 "type": {
                   "type": "reference",
@@ -860,7 +966,9 @@
                   "qualifiedName": "Record",
                   "package": "typescript",
                   "name": "Record"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -871,56 +979,40 @@
               "type": "reference",
               "id": 432,
               "name": "PaginatorInterface.setResponse"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 431,
           "name": "PaginatorInterface.setResponse"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       }
     ],
     "groups": [
       {
         "title": "Constructors",
         "kind": 512,
-        "children": [
-          473
-        ]
+        "children": [473]
       },
       {
         "title": "Properties",
         "kind": 1024,
-        "children": [
-          481,
-          482,
-          485,
-          489
-        ]
+        "children": [481, 482, 485, 489]
       },
       {
         "title": "Accessors",
         "kind": 262144,
-        "children": [
-          493
-        ]
+        "children": [493]
       },
       {
         "title": "Methods",
         "kind": 2048,
-        "children": [
-          505,
-          507,
-          499,
-          517,
-          509,
-          511,
-          513,
-          515,
-          495,
-          502
-        ]
+        "children": [505, 507, 499, 517, 509, 511, 513, 515, 495, 502]
       }
     ],
     "sources": [
@@ -951,9 +1043,13 @@
                 "line": 98,
                 "character": 54
               }
-            ]
+            ],
+            "docFlags": {},
+            "tagsByName": {}
           }
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 522,
@@ -975,9 +1071,13 @@
                 "line": 98,
                 "character": 80
               }
-            ]
+            ],
+            "docFlags": {},
+            "tagsByName": {}
           }
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       }
     ],
     "extendedBy": [
@@ -1016,6 +1116,7 @@
         "name": "PaginatorInterface"
       }
     ],
+    "docFlags": {},
     "tagsByName": {
       "menu-group": "Pagination",
       "extract-docs": ""

@@ -1,0 +1,29 @@
+{
+  "node": {
+    "id": 1157,
+    "name": "displayName",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true,
+      "isOptional": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 383,
+        "character": 8
+      }
+    ],
+    "type": {
+      "type": "intrinsic",
+      "name": "string"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/displayName",
+    "menuGroup": "default"
+  }
+}

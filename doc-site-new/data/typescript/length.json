@@ -1,0 +1,36 @@
+{
+  "node": {
+    "id": 734,
+    "name": "length",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true
+    },
+    "comment": {
+      "shortText": "Gets or sets the length of the array. This is a number one higher than the highest index in the array.",
+      "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Gets or sets the length of the array. This is a number one higher than the highest index in the array.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+        "line": 1273,
+        "character": 4
+      }
+    ],
+    "type": {
+      "type": "intrinsic",
+      "name": "number"
+    },
+    "inheritedFrom": {
+      "type": "reference",
+      "name": "Array.length"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "typescript",
+    "permaLink": "typescript/lib/length",
+    "menuGroup": "default"
+  }
+}

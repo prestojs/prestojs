@@ -31,7 +31,8 @@
               "tag": "extract-docs",
               "text": "\n"
             }
-          ]
+          ],
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Hook to help manage paginator state. An instance of the specified paginator is created with provided\\nstate setter or a default setter if none provided. You only need to provide a state setter if you\\nwant to store the state somewhere external eg. from URL query parameters.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
         },
         "typeParameter": [
           {
@@ -51,7 +52,9 @@
                     "name": "__type",
                     "kind": 65536,
                     "kindString": "Type literal",
-                    "flags": {}
+                    "flags": {},
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 },
                 {
@@ -61,7 +64,9 @@
                     "name": "__type",
                     "kind": 65536,
                     "kindString": "Type literal",
-                    "flags": {}
+                    "flags": {},
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 },
                 {
@@ -71,14 +76,18 @@
                 }
               ],
               "name": "PaginatorInterface"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 533,
             "name": "PaginatorState",
             "kind": 131072,
             "kindString": "Type parameter",
-            "flags": {}
+            "flags": {},
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "parameters": [
@@ -89,7 +98,8 @@
             "kindString": "Parameter",
             "flags": {},
             "comment": {
-              "shortText": "Must either be an object with a `getPaginatorClass` method (eg.\n[Endpoint](doc:Endpoint)) or a [Paginator](doc:Paginator) class. This class defines how pagination is\nhandled."
+              "shortText": "Must either be an object with a `getPaginatorClass` method (eg.\n[Endpoint](doc:Endpoint)) or a [Paginator](doc:Paginator) class. This class defines how pagination is\nhandled.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Must either be an object with a \", _jsx(_components.code, {\n        children: \"getPaginatorClass\"\n      }), \" method (eg.\\n\", _jsx(_components.a, {\n        href: \"doc:Endpoint\",\n        children: \"Endpoint\"\n      }), \") or a \", _jsx(_components.a, {\n        href: \"doc:Paginator\",\n        children: \"Paginator\"\n      }), \" class. This class defines how pagination is\\nhandled.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -119,7 +129,9 @@
                   "name": "PaginatorClassProvider"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 535,
@@ -130,7 +142,8 @@
               "isOptional": true
             },
             "comment": {
-              "shortText": "A tuple of current state and a state setter function. If not provided state\nis handled internally in usePaginator. You can pass `useState()` to this parameter.\n"
+              "shortText": "A tuple of current state and a state setter function. If not provided state\nis handled internally in usePaginator. You can pass `useState()` to this parameter.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"A tuple of current state and a state setter function. If not provided state\\nis handled internally in usePaginator. You can pass \", _jsx(_components.code, {\n        children: \"useState()\"\n      }), \" to this parameter.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "tuple",
@@ -175,25 +188,38 @@
                               "type": "reference",
                               "id": 533,
                               "name": "PaginatorState"
-                            }
+                            },
+                            "docFlags": {},
+                            "tagsByName": {}
                           }
                         ],
                         "type": {
                           "type": "intrinsic",
                           "name": "void"
-                        }
+                        },
+                        "docFlags": {},
+                        "tagsByName": {}
                       }
-                    ]
+                    ],
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
           "type": "reference",
           "id": 532,
           "name": "T"
+        },
+        "docFlags": {},
+        "tagsByName": {
+          "menu-group": "Pagination",
+          "extract-docs": ""
         }
       },
       {
@@ -208,7 +234,9 @@
             "name": "PaginatorState",
             "kind": 131072,
             "kindString": "Type parameter",
-            "flags": {}
+            "flags": {},
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "parameters": [
@@ -221,7 +249,9 @@
             "type": {
               "type": "literal",
               "value": null
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 542,
@@ -274,25 +304,35 @@
                               "type": "reference",
                               "id": 540,
                               "name": "PaginatorState"
-                            }
+                            },
+                            "docFlags": {},
+                            "tagsByName": {}
                           }
                         ],
                         "type": {
                           "type": "intrinsic",
                           "name": "void"
-                        }
+                        },
+                        "docFlags": {},
+                        "tagsByName": {}
                       }
-                    ]
+                    ],
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
           "type": "literal",
           "value": null
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 546,
@@ -318,7 +358,9 @@
                     "name": "__type",
                     "kind": 65536,
                     "kindString": "Type literal",
-                    "flags": {}
+                    "flags": {},
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 },
                 {
@@ -328,7 +370,9 @@
                     "name": "__type",
                     "kind": 65536,
                     "kindString": "Type literal",
-                    "flags": {}
+                    "flags": {},
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 },
                 {
@@ -338,14 +382,18 @@
                 }
               ],
               "name": "PaginatorInterface"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 550,
             "name": "PaginatorState",
             "kind": 131072,
             "kindString": "Type parameter",
-            "flags": {}
+            "flags": {},
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "parameters": [
@@ -387,7 +435,9 @@
                   "name": "PaginatorClassProvider"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 552,
@@ -440,19 +490,27 @@
                               "type": "reference",
                               "id": 550,
                               "name": "PaginatorState"
-                            }
+                            },
+                            "docFlags": {},
+                            "tagsByName": {}
                           }
                         ],
                         "type": {
                           "type": "intrinsic",
                           "name": "void"
-                        }
+                        },
+                        "docFlags": {},
+                        "tagsByName": {}
                       }
-                    ]
+                    ],
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
@@ -468,18 +526,1669 @@
               "value": null
             }
           ]
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       }
     ],
-    "tagsByName": {
-      "menu-group": "Pagination",
-      "extract-docs": ""
+    "docFlags": {},
+    "tagsByName": {}
+  },
+  "references": {
+    "397": {
+      "id": 397,
+      "name": "PaginationRequestDetails",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "expand-properties",
+            "text": "eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 20,
+          "character": 12
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 398,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 403,
+              "name": "decodedBody",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The value returned by `decodedBody`. See [Endpoint.execute](doc:Endpoint#method-execute).",
+                "text": "This may be a sub-key of the data returned by `Endpoint.execute`, eg. if the `path` option is used in\n[paginationMiddleware](doc:paginationMiddleware). eg. If `decodedBody` from the `Endpoint` was\n\n```json\n{\n    users: {\n        count: 10,\n        results: [...],\n    }\n    extraDetails: {...}\n}\n```\n\nand `paginationMiddleware` was used with `path: 'users'` then `decodedBody` would be:\n\n```json\n{\n    count: 10,\n    results: [...]\n}\n```\n",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The value returned by \", _jsx(_components.code, {\n        children: \"decodedBody\"\n      }), \". See \", _jsx(_components.a, {\n        href: \"doc:Endpoint#method-execute\",\n        children: \"Endpoint.execute\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+                "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\",\n      pre: \"pre\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"This may be a sub-key of the data returned by \", _jsx(_components.code, {\n          children: \"Endpoint.execute\"\n        }), \", eg. if the \", _jsx(_components.code, {\n          children: \"path\"\n        }), \" option is used in\\n\", _jsx(_components.a, {\n          href: \"doc:paginationMiddleware\",\n          children: \"paginationMiddleware\"\n        }), \". eg. If \", _jsx(_components.code, {\n          children: \"decodedBody\"\n        }), \" from the \", _jsx(_components.code, {\n          children: \"Endpoint\"\n        }), \" was\"]\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-json\",\n          children: \"{\\n    users: {\\n        count: 10,\\n        results: [...],\\n    }\\n    extraDetails: {...}\\n}\\n\"\n        })\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"and \", _jsx(_components.code, {\n          children: \"paginationMiddleware\"\n        }), \" was used with \", _jsx(_components.code, {\n          children: \"path: 'users'\"\n        }), \" then \", _jsx(_components.code, {\n          children: \"decodedBody\"\n        }), \" would be:\"]\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-json\",\n          children: \"{\\n    count: 10,\\n    results: [...]\\n}\\n\"\n        })\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                  "line": 62,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "any"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 399,
+              "name": "query",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Any query string parameters",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Any query string parameters\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                  "line": 24,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 1273,
+                "typeArguments": [
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "literal",
+                        "value": null
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "number"
+                      }
+                    ]
+                  }
+                ],
+                "qualifiedName": "Record",
+                "package": "typescript",
+                "name": "Record"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 402,
+              "name": "response",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The `Response` object, if available",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The \", _jsx(_components.code, {\n        children: \"Response\"\n      }), \" object, if available\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                  "line": 36,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 1295,
+                "qualifiedName": "Response",
+                "package": "typescript",
+                "name": "Response"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 401,
+              "name": "url",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "comment": {
+                "shortText": "Resolved URL",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Resolved URL\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                  "line": 32,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 400,
+              "name": "urlArgs",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Any arguments used to resolve URL",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Any arguments used to resolve URL\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                  "line": 28,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 1273,
+                "typeArguments": [
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  {
+                    "type": "intrinsic",
+                    "name": "any"
+                  }
+                ],
+                "qualifiedName": "Record",
+                "package": "typescript",
+                "name": "Record"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [403, 399, 402, 401, 400]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 20,
+              "character": 39
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {
+        "expandProperties": true
+      },
+      "tagsByName": {
+        "expand-properties": "eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)"
+      }
+    },
+    "404": {
+      "id": 404,
+      "name": "PaginatorInterface",
+      "kind": 256,
+      "kindString": "Interface",
+      "flags": {},
+      "children": [
+        {
+          "id": 405,
+          "name": "currentState",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 66,
+              "character": 4
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 439,
+            "name": "State"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 406,
+          "name": "internalState",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 67,
+              "character": 4
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 441,
+            "name": "InternalState"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 413,
+          "name": "responseIsSet",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 70,
+              "character": 4
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 416,
+          "name": "first",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 417,
+              "name": "first",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 418,
+          "name": "firstState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 419,
+              "name": "firstState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 439,
+                    "name": "State"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 428,
+          "name": "getRequestInit",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 429,
+              "name": "getRequestInit",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 430,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 392,
+                    "name": "PaginatorRequestOptions"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 392,
+                "name": "PaginatorRequestOptions"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 414,
+          "name": "hasNextPage",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 415,
+              "name": "hasNextPage",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 420,
+          "name": "next",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 421,
+              "name": "next",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 422,
+          "name": "nextState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 423,
+              "name": "nextState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 439,
+                    "name": "State"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 424,
+          "name": "previous",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 425,
+              "name": "previous",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 426,
+          "name": "previousState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 427,
+              "name": "previousState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 439,
+                    "name": "State"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 434,
+          "name": "replaceStateControllers",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 435,
+              "name": "replaceStateControllers",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 436,
+                  "name": "currentStatePair",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "any"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 437,
+                  "name": "internalStatePair",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "any"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 407,
+          "name": "setCurrentState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 68,
+              "character": 4
+            }
+          ],
+          "signatures": [
+            {
+              "id": 408,
+              "name": "setCurrentState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 409,
+                  "name": "set",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 439,
+                    "name": "State"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 410,
+          "name": "setInternalState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 69,
+              "character": 4
+            }
+          ],
+          "signatures": [
+            {
+              "id": 411,
+              "name": "setInternalState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 412,
+                  "name": "set",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 441,
+                    "name": "InternalState"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 431,
+          "name": "setResponse",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 432,
+              "name": "setResponse",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 433,
+                  "name": "response",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 1273,
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "groups": [
+        {
+          "title": "Properties",
+          "kind": 1024,
+          "children": [405, 406, 413]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [416, 418, 428, 414, 420, 422, 424, 426, 434, 407, 410, 431]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 65,
+          "character": 17
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 439,
+          "name": "State",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "default": {
+            "type": "reflection",
+            "declaration": {
+              "id": 438,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                  "line": 65,
+                  "character": 44
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 441,
+          "name": "InternalState",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "default": {
+            "type": "reflection",
+            "declaration": {
+              "id": 440,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                  "line": 65,
+                  "character": 64
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "implementedBy": [
+        {
+          "type": "reference",
+          "id": 136,
+          "name": "InferredPaginator"
+        },
+        {
+          "type": "reference",
+          "id": 472,
+          "name": "Paginator"
+        }
+      ],
+      "docFlags": {},
+      "tagsByName": {}
+    },
+    "442": {
+      "id": 442,
+      "name": "PaginatorInterfaceClass",
+      "kind": 256,
+      "kindString": "Interface",
+      "flags": {},
+      "children": [
+        {
+          "id": 469,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 470,
+              "name": "new PaginatorInterfaceClass",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 471,
+                  "name": "args",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isRest": true
+                  },
+                  "type": {
+                    "type": "array",
+                    "elementType": {
+                      "type": "intrinsic",
+                      "name": "any"
+                    }
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 468,
+                "name": "T"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Function.constructor"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.constructor"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 462,
+          "name": "arguments",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 304,
+              "character": 4
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "any"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.arguments"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 463,
+          "name": "caller",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 305,
+              "character": 4
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "qualifiedName": "Function",
+            "package": "typescript",
+            "name": "Function"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.caller"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 461,
+          "name": "length",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isReadonly": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 301,
+              "character": 13
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "number"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.length"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 464,
+          "name": "name",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true,
+            "isReadonly": true
+          },
+          "comment": {
+            "shortText": "Returns the name of the function. Function names are read-only and can not be changed.",
+            "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Returns the name of the function. Function names are read-only and can not be changed.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es2015.core.d.ts",
+              "line": 97,
+              "character": 13
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.name"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 460,
+          "name": "prototype",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExternal": true
+          },
+          "sources": [
+            {
+              "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+              "line": 300,
+              "character": 4
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "any"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.prototype"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 465,
+          "name": "[hasInstance]",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExternal": true
+          },
+          "signatures": [
+            {
+              "id": 466,
+              "name": "[hasInstance]",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {
+                "isExternal": true
+              },
+              "comment": {
+                "shortText": "Determines whether the given value inherits from this function if this function was used\nas a constructor function.",
+                "text": "A constructor function can control which objects are recognized as its instances by\n'instanceof' by overriding this method.\n",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Determines whether the given value inherits from this function if this function was used\\nas a constructor function.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+                "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"A constructor function can control which objects are recognized as its instances by\\n'instanceof' by overriding this method.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "parameters": [
+                {
+                  "id": 467,
+                  "name": "value",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isExternal": true
+                  },
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "any"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Function.__@hasInstance@71"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.__@hasInstance@71"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 446,
+          "name": "apply",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExternal": true
+          },
+          "signatures": [
+            {
+              "id": 447,
+              "name": "apply",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {
+                "isExternal": true
+              },
+              "comment": {
+                "shortText": "Calls the function, substituting the specified object for the this value of the function, and the specified array for the arguments of the function.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Calls the function, substituting the specified object for the this value of the function, and the specified array for the arguments of the function.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "parameters": [
+                {
+                  "id": 448,
+                  "name": "thisArg",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isExternal": true
+                  },
+                  "comment": {
+                    "shortText": "The object to be used as the this object.",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The object to be used as the this object.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "any"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 449,
+                  "name": "argArray",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isExternal": true,
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "A set of arguments to be passed to the function.\n",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"A set of arguments to be passed to the function.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "any"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "any"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Function.apply"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.apply"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 454,
+          "name": "bind",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExternal": true
+          },
+          "signatures": [
+            {
+              "id": 455,
+              "name": "bind",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {
+                "isExternal": true
+              },
+              "comment": {
+                "shortText": "For a given function, creates a bound function that has the same body as the original function.\nThe this object of the bound function is associated with the specified object, and has the specified initial parameters.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"For a given function, creates a bound function that has the same body as the original function.\\nThe this object of the bound function is associated with the specified object, and has the specified initial parameters.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "parameters": [
+                {
+                  "id": 456,
+                  "name": "thisArg",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isExternal": true
+                  },
+                  "comment": {
+                    "shortText": "An object to which the this keyword can refer inside the new function.",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"An object to which the this keyword can refer inside the new function.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "any"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 457,
+                  "name": "argArray",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isExternal": true,
+                    "isRest": true
+                  },
+                  "comment": {
+                    "shortText": "A list of arguments to be passed to the new function.\n",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"A list of arguments to be passed to the new function.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "array",
+                    "elementType": {
+                      "type": "intrinsic",
+                      "name": "any"
+                    }
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "any"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Function.bind"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.bind"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 450,
+          "name": "call",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExternal": true
+          },
+          "signatures": [
+            {
+              "id": 451,
+              "name": "call",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {
+                "isExternal": true
+              },
+              "comment": {
+                "shortText": "Calls a method of an object, substituting another object for the current object.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Calls a method of an object, substituting another object for the current object.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "parameters": [
+                {
+                  "id": 452,
+                  "name": "thisArg",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isExternal": true
+                  },
+                  "comment": {
+                    "shortText": "The object to be used as the current object.",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The object to be used as the current object.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "any"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 453,
+                  "name": "argArray",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isExternal": true,
+                    "isRest": true
+                  },
+                  "comment": {
+                    "shortText": "A list of arguments to be passed to the method.\n",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"A list of arguments to be passed to the method.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "array",
+                    "elementType": {
+                      "type": "intrinsic",
+                      "name": "any"
+                    }
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "any"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Function.call"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.call"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 443,
+          "name": "getPaginationState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 444,
+              "name": "getPaginationState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 445,
+                  "name": "requestDetails",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 397,
+                    "name": "PaginationRequestDetails"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": false
+                  },
+                  {
+                    "type": "reference",
+                    "id": 1273,
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 458,
+          "name": "toString",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExternal": true
+          },
+          "signatures": [
+            {
+              "id": 459,
+              "name": "toString",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {
+                "isExternal": true
+              },
+              "comment": {
+                "shortText": "Returns a string representation of a function.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Returns a string representation of a function.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Function.toString"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Function.toString"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [469]
+        },
+        {
+          "title": "Properties",
+          "kind": 1024,
+          "children": [462, 463, 461, 464, 460]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [465, 446, 454, 450, 443, 458]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 85,
+          "character": 17
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 468,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "type": {
+            "type": "reference",
+            "id": 404,
+            "name": "PaginatorInterface"
+          },
+          "default": {
+            "type": "reference",
+            "id": 404,
+            "name": "PaginatorInterface"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "extendedTypes": [
+        {
+          "type": "reference",
+          "qualifiedName": "Function",
+          "package": "typescript",
+          "name": "Function"
+        }
+      ],
+      "docFlags": {},
+      "tagsByName": {}
+    },
+    "524": {
+      "id": 524,
+      "name": "PaginatorClassProvider",
+      "kind": 256,
+      "kindString": "Interface",
+      "flags": {},
+      "children": [
+        {
+          "id": 525,
+          "name": "getPaginatorClass",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 526,
+              "name": "getPaginatorClass",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 442,
+                    "typeArguments": [
+                      {
+                        "type": "reference",
+                        "id": 527,
+                        "name": "T"
+                      }
+                    ],
+                    "name": "PaginatorInterfaceClass"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [525]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/usePaginator.ts",
+          "line": 4,
+          "character": 17
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 527,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "type": {
+            "type": "reference",
+            "id": 404,
+            "name": "PaginatorInterface"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "docFlags": {},
+      "tagsByName": {}
+    },
+    "1273": {
+      "id": 1273,
+      "name": "Record",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {
+        "isExternal": true
+      },
+      "comment": {
+        "shortText": "Construct a type with a set of properties K of type T",
+        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Construct a type with a set of properties K of type T\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+      },
+      "sources": [
+        {
+          "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+          "line": 1559,
+          "character": 5
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 1274,
+          "name": "K",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {
+            "isExternal": true
+          },
+          "type": {
+            "type": "typeOperator",
+            "operator": "keyof",
+            "target": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1275,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {
+            "isExternal": true
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "mapped",
+        "parameter": "P",
+        "parameterType": {
+          "type": "reference",
+          "id": 1274,
+          "qualifiedName": "K",
+          "package": "typescript",
+          "name": "K"
+        },
+        "templateType": {
+          "type": "reference",
+          "id": 1275,
+          "qualifiedName": "T",
+          "package": "typescript",
+          "name": "T"
+        }
+      },
+      "docFlags": {},
+      "tagsByName": {}
     }
   },
-  "references": {},
   "meta": {
     "packageName": "util",
     "permaLink": "util/pagination/usePaginator",
-    "menuGroup": "Pagination"
+    "menuGroup": "default"
   }
 }

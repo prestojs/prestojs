@@ -1,0 +1,88 @@
+{
+  "node": {
+    "id": 1213,
+    "name": "IteratorYieldResult",
+    "kind": 256,
+    "kindString": "Interface",
+    "flags": {
+      "isExternal": true
+    },
+    "children": [
+      {
+        "id": 1214,
+        "name": "done",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+            "line": 32,
+            "character": 4
+          }
+        ],
+        "type": {
+          "type": "literal",
+          "value": false
+        }
+      },
+      {
+        "id": 1215,
+        "name": "value",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+            "line": 33,
+            "character": 4
+          }
+        ],
+        "type": {
+          "type": "reference",
+          "id": 1216,
+          "qualifiedName": "IteratorYieldResult.TYield",
+          "package": "typescript",
+          "name": "TYield"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "title": "Properties",
+        "kind": 1024,
+        "children": [1214, 1215]
+      }
+    ],
+    "sources": [
+      {
+        "fileName": "node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+        "line": 31,
+        "character": 10
+      }
+    ],
+    "typeParameter": [
+      {
+        "id": 1216,
+        "name": "TYield",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        }
+      }
+    ]
+  },
+  "references": {},
+  "meta": {
+    "packageName": "typescript",
+    "permaLink": "typescript/lib/IteratorYieldResult",
+    "menuGroup": "default"
+  }
+}

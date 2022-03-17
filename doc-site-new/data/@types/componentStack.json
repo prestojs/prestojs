@@ -1,0 +1,32 @@
+{
+  "node": {
+    "id": 1174,
+    "name": "componentStack",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true
+    },
+    "comment": {
+      "shortText": "Captures which component contained the exception, and its ancestors.",
+      "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Captures which component contained the exception, and its ancestors.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 2897,
+        "character": 8
+      }
+    ],
+    "type": {
+      "type": "intrinsic",
+      "name": "string"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/componentStack",
+    "menuGroup": "default"
+  }
+}

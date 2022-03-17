@@ -31,7 +31,9 @@
               "tag": "menu-group",
               "text": "Labeled\n"
             }
-          ]
+          ],
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Get a React node label from an item\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+          "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"If item implements \", _jsx(_components.code, {\n          children: \"getNodeLabel\"\n        }), \" that will be used otherwise \", _jsx(_components.code, {\n          children: \"getLabel\"\n        }), \" will be used.\"]\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"If neither are defined an error is thrown. To conditional call this check if labeled first\\nwith \", _jsx(_components.code, {\n          children: \"isLabeled\"\n        }), \".\"]\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
         },
         "parameters": [
           {
@@ -43,7 +45,9 @@
             "type": {
               "type": "intrinsic",
               "name": "any"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
@@ -52,18 +56,78 @@
           "qualifiedName": "React.ReactNode",
           "package": "@types/react",
           "name": "React.ReactNode"
+        },
+        "docFlags": {},
+        "tagsByName": {
+          "extract-docs": "",
+          "menu-group": "Labeled"
         }
       }
     ],
-    "tagsByName": {
-      "extract-docs": "",
-      "menu-group": "Labeled"
+    "docFlags": {},
+    "tagsByName": {}
+  },
+  "references": {
+    "717": {
+      "id": 717,
+      "name": "ReactNode",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {
+        "isExternal": true
+      },
+      "sources": [
+        {
+          "fileName": "node_modules/@types/react/index.d.ts",
+          "line": 241,
+          "character": 9
+        }
+      ],
+      "type": {
+        "type": "union",
+        "types": [
+          {
+            "type": "reference",
+            "id": 718,
+            "qualifiedName": "React.ReactChild",
+            "package": "@types/react",
+            "name": "ReactChild"
+          },
+          {
+            "type": "reference",
+            "id": 719,
+            "qualifiedName": "React.ReactFragment",
+            "package": "@types/react",
+            "name": "ReactFragment"
+          },
+          {
+            "type": "reference",
+            "id": 721,
+            "qualifiedName": "React.ReactPortal",
+            "package": "@types/react",
+            "name": "ReactPortal"
+          },
+          {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          {
+            "type": "literal",
+            "value": null
+          },
+          {
+            "type": "intrinsic",
+            "name": "undefined"
+          }
+        ]
+      },
+      "docFlags": {},
+      "tagsByName": {}
     }
   },
-  "references": {},
   "meta": {
     "packageName": "util",
     "permaLink": "util/getNodeLabel",
-    "menuGroup": "Labeled"
+    "menuGroup": "default"
   }
 }

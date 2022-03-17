@@ -17,7 +17,9 @@
           "tag": "extract-docs",
           "text": "\n"
         }
-      ]
+      ],
+      "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Class that infers the specific type of pagination based on the response.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+      "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\",\n      ul: \"ul\",\n      li: \"li\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"Supports \", _jsx(_components.a, {\n          href: \"doc:PageNumberPaginator\",\n          children: \"PageNumberPaginator\"\n        }), \", \", _jsx(_components.a, {\n          href: \"LimitOffsetPaginator\",\n          children: \"LimitOffsetPaginator\"\n        }), \" and\\n\", _jsx(_components.a, {\n          href: \"doc:CursorPaginator\",\n          children: \"CursorPaginator\"\n        }), \" with the following rules based on the response data:\"]\n      }), \"\\n\", _jsxs(_components.ul, {\n        children: [\"\\n\", _jsxs(_components.li, {\n          children: [\"If response contains \", _jsx(_components.code, {\n            children: \"nextCursor\"\n          }), \" or \", _jsx(_components.code, {\n            children: \"previousCursor\"\n          }), \" value paginator is set to \", _jsx(_components.a, {\n            href: \"doc:CursorPaginator\",\n            children: \"CursorPaginator\"\n          })]\n        }), \"\\n\", _jsxs(_components.li, {\n          children: [\"If response contains \", _jsx(_components.code, {\n            children: \"limit\"\n          }), \" then paginator is set to  \", _jsx(_components.a, {\n            href: \"LimitOffsetPaginator\",\n            children: \"LimitOffsetPaginator\"\n          })]\n        }), \"\\n\", _jsxs(_components.li, {\n          children: [\"If response contains \", _jsx(_components.code, {\n            children: \"total\"\n          }), \" then paginator is set to \", _jsx(_components.a, {\n            href: \"doc:PageNumberPaginator\",\n            children: \"PageNumberPaginator\"\n          })]\n        }), \"\\n\"]\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
     },
     "originalName": "default",
     "children": [
@@ -59,7 +61,9 @@
                 "type": {
                   "type": "intrinsic",
                   "name": "any"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               },
               {
                 "id": 143,
@@ -70,16 +74,24 @@
                 "type": {
                   "type": "intrinsic",
                   "name": "any"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
               "type": "reference",
               "id": 136,
               "name": "default"
+            },
+            "docFlags": {},
+            "tagsByName": {
+              "see": "documentation for `replaceStateControllers` for what `currentStatePair` and `internalStatePair` are"
             }
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 144,
@@ -115,7 +127,9 @@
               "name": "default"
             }
           ]
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 169,
@@ -139,7 +153,9 @@
           "type": "reference",
           "id": 405,
           "name": "PaginatorInterface.currentState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 170,
@@ -175,7 +191,9 @@
           "type": "reference",
           "id": 406,
           "name": "PaginatorInterface.internalState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 171,
@@ -216,22 +234,30 @@
                       "type": "reference",
                       "id": 135,
                       "name": "PaginatorState"
-                    }
+                    },
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 ],
                 "type": {
                   "type": "intrinsic",
                   "name": "void"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
-            ]
+            ],
+            "docFlags": {},
+            "tagsByName": {}
           }
         },
         "implementationOf": {
           "type": "reference",
           "id": 407,
           "name": "PaginatorInterface.setCurrentState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 175,
@@ -306,7 +332,9 @@
                                   "qualifiedName": "Record",
                                   "package": "typescript",
                                   "name": "Record"
-                                }
+                                },
+                                "docFlags": {},
+                                "tagsByName": {}
                               }
                             ],
                             "type": {
@@ -325,26 +353,38 @@
                               "qualifiedName": "Record",
                               "package": "typescript",
                               "name": "Record"
-                            }
+                            },
+                            "docFlags": {},
+                            "tagsByName": {}
                           }
-                        ]
+                        ],
+                        "docFlags": {},
+                        "tagsByName": {}
                       }
-                    }
+                    },
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
                 ],
                 "type": {
                   "type": "intrinsic",
                   "name": "void"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
-            ]
+            ],
+            "docFlags": {},
+            "tagsByName": {}
           }
         },
         "implementationOf": {
           "type": "reference",
           "id": 410,
           "name": "PaginatorInterface.setInternalState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 163,
@@ -367,7 +407,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The current cursor. Only valid if inferred paginator is [CursorPaginator](doc:CursorPaginator)."
+              "shortText": "The current cursor. Only valid if inferred paginator is [CursorPaginator](doc:CursorPaginator).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The current cursor. Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:CursorPaginator\",\n        children: \"CursorPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -381,9 +422,13 @@
                   "name": "string"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 155,
@@ -406,7 +451,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The current limit. Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator)."
+              "shortText": "The current limit. Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The current limit. Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator\",\n        children: \"LimitOffsetPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -420,9 +466,13 @@
                   "name": "number"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 159,
@@ -445,7 +495,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The next cursor. Only valid if inferred paginator is [CursorPaginator](doc:CursorPaginator)."
+              "shortText": "The next cursor. Only valid if inferred paginator is [CursorPaginator](doc:CursorPaginator).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The next cursor. Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:CursorPaginator\",\n        children: \"CursorPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -459,9 +510,13 @@
                   "name": "string"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 157,
@@ -484,7 +539,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The current offset. Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator)."
+              "shortText": "The current offset. Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The current offset. Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator\",\n        children: \"LimitOffsetPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -498,9 +554,13 @@
                   "name": "number"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 165,
@@ -523,7 +583,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The current page number. Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator)."
+              "shortText": "The current page number. Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The current page number. Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator\",\n        children: \"PageNumberPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -537,9 +598,13 @@
                   "name": "number"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 167,
@@ -562,7 +627,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The current page size. Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator)."
+              "shortText": "The current page size. Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The current page size. Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator\",\n        children: \"PageNumberPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -576,9 +642,13 @@
                   "name": "number"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 147,
@@ -601,7 +671,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The underlying inferred paginator instance (if known). Only available after `setResponse` has been called."
+              "shortText": "The underlying inferred paginator instance (if known). Only available after `setResponse` has been called.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The underlying inferred paginator instance (if known). Only available after \", _jsx(_components.code, {\n        children: \"setResponse\"\n      }), \" has been called.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -626,7 +697,9 @@
                   "name": "default"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "setSignature": [
@@ -637,7 +710,8 @@
             "kindString": "Set signature",
             "flags": {},
             "comment": {
-              "shortText": "The underlying inferred paginator instance (if known). Only available after `setResponse` has been called."
+              "shortText": "The underlying inferred paginator instance (if known). Only available after `setResponse` has been called.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The underlying inferred paginator instance (if known). Only available after \", _jsx(_components.code, {\n        children: \"setResponse\"\n      }), \" has been called.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -669,15 +743,21 @@
                       "name": "default"
                     }
                   ]
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
               "type": "intrinsic",
               "name": "void"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 161,
@@ -700,7 +780,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The previous cursor. Only valid if inferred paginator is [CursorPaginator](doc:CursorPaginator)."
+              "shortText": "The previous cursor. Only valid if inferred paginator is [CursorPaginator](doc:CursorPaginator).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The previous cursor. Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:CursorPaginator\",\n        children: \"CursorPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -714,9 +795,13 @@
                   "name": "string"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 145,
@@ -746,14 +831,18 @@
               "type": "reference",
               "id": 413,
               "name": "PaginatorInterface.responseIsSet"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 413,
           "name": "PaginatorInterface.responseIsSet"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 151,
@@ -776,7 +865,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The total number of records available. Not valid if inferred paginator is [CursorPaginator](doc:CursorPaginator)."
+              "shortText": "The total number of records available. Not valid if inferred paginator is [CursorPaginator](doc:CursorPaginator).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The total number of records available. Not valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:CursorPaginator\",\n        children: \"CursorPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -790,9 +880,13 @@
                   "name": "number"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 153,
@@ -815,7 +909,8 @@
             "kindString": "Get signature",
             "flags": {},
             "comment": {
-              "shortText": "The total number of records available. Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator)."
+              "shortText": "The total number of records available. Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The total number of records available. Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator\",\n        children: \"PageNumberPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -829,9 +924,13 @@
                   "name": "number"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 220,
@@ -854,7 +953,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "Go to the first page."
+              "shortText": "Go to the first page.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Go to the first page.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
@@ -864,14 +964,18 @@
               "type": "reference",
               "id": 417,
               "name": "PaginatorInterface.first"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 416,
           "name": "PaginatorInterface.first"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 218,
@@ -895,7 +999,9 @@
             "flags": {},
             "comment": {
               "shortText": "Return the state for the first page",
-              "text": "Does not transition state. To transition state call `first` instead.\n"
+              "text": "Does not transition state. To transition state call `first` instead.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Return the state for the first page\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Does not transition state. To transition state call \", _jsx(_components.code, {\n        children: \"first\"\n      }), \" instead.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -925,14 +1031,18 @@
               "type": "reference",
               "id": 419,
               "name": "PaginatorInterface.firstState"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 418,
           "name": "PaginatorInterface.firstState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 228,
@@ -964,7 +1074,9 @@
                 "type": {
                   "type": "intrinsic",
                   "name": "any"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -976,14 +1088,18 @@
               "type": "reference",
               "id": 429,
               "name": "PaginatorInterface.getRequestInit"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 428,
           "name": "PaginatorInterface.getRequestInit"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 226,
@@ -1006,7 +1122,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "Returns true if there's more results after the current page"
+              "shortText": "Returns true if there's more results after the current page",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Returns true if there's more results after the current page\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
@@ -1016,14 +1133,18 @@
               "type": "reference",
               "id": 415,
               "name": "PaginatorInterface.hasNextPage"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 414,
           "name": "PaginatorInterface.hasNextPage"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 224,
@@ -1047,14 +1168,20 @@
             "flags": {},
             "comment": {
               "shortText": "Go to the last page. If the last page isn't yet known (eg. results\nhaven't yet been returned) then null will be returned.",
-              "text": "If the last page is not yet known because results haven't been returned this function\ndoes nothing.\nNot valid for [CursorPaginator](doc:CursorPaginator)\n"
+              "text": "If the last page is not yet known because results haven't been returned this function\ndoes nothing.\nNot valid for [CursorPaginator](doc:CursorPaginator)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Go to the last page. If the last page isn't yet known (eg. results\\nhaven't yet been returned) then null will be returned.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"If the last page is not yet known because results haven't been returned this function\\ndoes nothing.\\nNot valid for \", _jsx(_components.a, {\n        href: \"doc:CursorPaginator\",\n        children: \"CursorPaginator\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
               "name": "void"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 222,
@@ -1078,7 +1205,9 @@
             "flags": {},
             "comment": {
               "shortText": "Return the state for the first page",
-              "text": "Does not transition state. To transition state call `last` instead.\n\nNot valid for [CursorPaginator](doc:CursorPaginator)\n"
+              "text": "Does not transition state. To transition state call `last` instead.\n\nNot valid for [CursorPaginator](doc:CursorPaginator)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Return the state for the first page\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"Does not transition state. To transition state call \", _jsx(_components.code, {\n          children: \"last\"\n        }), \" instead.\"]\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"Not valid for \", _jsx(_components.a, {\n          href: \"doc:CursorPaginator\",\n          children: \"CursorPaginator\"\n        })]\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -1098,9 +1227,13 @@
                   "name": "LimitOffsetPaginationState"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 198,
@@ -1124,7 +1257,9 @@
             "flags": {},
             "comment": {
               "shortText": "Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).",
-              "text": "See [LimitOffsetPaginator.limitState](doc:LimitOffsetPaginator#method-limitState)\n"
+              "text": "See [LimitOffsetPaginator.limitState](doc:LimitOffsetPaginator#method-limitState)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator\",\n        children: \"LimitOffsetPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator#method-limitState\",\n        children: \"LimitOffsetPaginator.limitState\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -1145,7 +1280,9 @@
                       "name": "number"
                     }
                   ]
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -1161,9 +1298,13 @@
                   "name": "LimitOffsetPaginationState"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 212,
@@ -1186,7 +1327,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "Go to the next page."
+              "shortText": "Go to the next page.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Go to the next page.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
@@ -1196,14 +1338,18 @@
               "type": "reference",
               "id": 421,
               "name": "PaginatorInterface.next"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 420,
           "name": "PaginatorInterface.next"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 210,
@@ -1227,7 +1373,9 @@
             "flags": {},
             "comment": {
               "shortText": "Return the state for the next page",
-              "text": "Does not transition state. To transition state call `next` instead.\n"
+              "text": "Does not transition state. To transition state call `next` instead.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Return the state for the next page\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Does not transition state. To transition state call \", _jsx(_components.code, {\n        children: \"next\"\n      }), \" instead.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -1257,14 +1405,18 @@
               "type": "reference",
               "id": 423,
               "name": "PaginatorInterface.nextState"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 422,
           "name": "PaginatorInterface.nextState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 204,
@@ -1288,7 +1440,9 @@
             "flags": {},
             "comment": {
               "shortText": "Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).",
-              "text": "See [LimitOffsetPaginator.offsetState](doc:LimitOffsetPaginator#method-offsetState)\n"
+              "text": "See [LimitOffsetPaginator.offsetState](doc:LimitOffsetPaginator#method-offsetState)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator\",\n        children: \"LimitOffsetPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator#method-offsetState\",\n        children: \"LimitOffsetPaginator.offsetState\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -1309,7 +1463,9 @@
                       "name": "number"
                     }
                   ]
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -1325,9 +1481,13 @@
                   "name": "LimitOffsetPaginationState"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 192,
@@ -1351,7 +1511,9 @@
             "flags": {},
             "comment": {
               "shortText": "Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).",
-              "text": "See [PageNumberPaginator.pageSizeState](doc:PageNumberPaginator#method-pageSizeState)\n"
+              "text": "See [PageNumberPaginator.pageSizeState](doc:PageNumberPaginator#method-pageSizeState)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator\",\n        children: \"PageNumberPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator#method-pageSizeState\",\n        children: \"PageNumberPaginator.pageSizeState\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -1372,7 +1534,9 @@
                       "name": "number"
                     }
                   ]
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -1393,9 +1557,13 @@
                   "name": "PageNumberPaginationState"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 186,
@@ -1419,7 +1587,9 @@
             "flags": {},
             "comment": {
               "shortText": "Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).",
-              "text": "See [PageNumberPaginator.pageState](doc:PageNumberPaginator#method-pageState)\n"
+              "text": "See [PageNumberPaginator.pageState](doc:PageNumberPaginator#method-pageState)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator\",\n        children: \"PageNumberPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator#method-pageState\",\n        children: \"PageNumberPaginator.pageState\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -1431,7 +1601,9 @@
                 "type": {
                   "type": "intrinsic",
                   "name": "number"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -1447,9 +1619,13 @@
                   "name": "PageNumberPaginationState"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 216,
@@ -1472,7 +1648,8 @@
             "kindString": "Call signature",
             "flags": {},
             "comment": {
-              "shortText": "Go to the previous page."
+              "shortText": "Go to the previous page.",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Go to the previous page.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
@@ -1482,14 +1659,18 @@
               "type": "reference",
               "id": 425,
               "name": "PaginatorInterface.previous"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 424,
           "name": "PaginatorInterface.previous"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 214,
@@ -1513,7 +1694,9 @@
             "flags": {},
             "comment": {
               "shortText": "Return the state for the previous page",
-              "text": "Does not transition state. To transition state call `previous` instead.\n"
+              "text": "Does not transition state. To transition state call `previous` instead.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Return the state for the previous page\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Does not transition state. To transition state call \", _jsx(_components.code, {\n        children: \"previous\"\n      }), \" instead.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -1543,14 +1726,18 @@
               "type": "reference",
               "id": 427,
               "name": "PaginatorInterface.previousState"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 426,
           "name": "PaginatorInterface.previousState"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 182,
@@ -1599,7 +1786,9 @@
                       "name": "any"
                     }
                   ]
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               },
               {
                 "id": 185,
@@ -1619,7 +1808,9 @@
                       "name": "any"
                     }
                   ]
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -1630,6 +1821,10 @@
               "type": "reference",
               "id": 435,
               "name": "PaginatorInterface.replaceStateControllers"
+            },
+            "docFlags": {},
+            "tagsByName": {
+              "see": "`Paginator.replaceStateControllers`"
             }
           }
         ],
@@ -1637,7 +1832,9 @@
           "type": "reference",
           "id": 434,
           "name": "PaginatorInterface.replaceStateControllers"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 201,
@@ -1661,7 +1858,9 @@
             "flags": {},
             "comment": {
               "shortText": "Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).",
-              "text": "See [LimitOffsetPaginator.setLimit](doc:LimitOffsetPaginator#method-setLimit)\n"
+              "text": "See [LimitOffsetPaginator.setLimit](doc:LimitOffsetPaginator#method-setLimit)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator\",\n        children: \"LimitOffsetPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator#method-setLimit\",\n        children: \"LimitOffsetPaginator.setLimit\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -1682,15 +1881,21 @@
                       "name": "number"
                     }
                   ]
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
               "type": "intrinsic",
               "name": "void"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 207,
@@ -1714,7 +1919,9 @@
             "flags": {},
             "comment": {
               "shortText": "Only valid if inferred paginator is [LimitOffsetPaginator](doc:LimitOffsetPaginator).",
-              "text": "See [LimitOffsetPaginator.setOffset](doc:LimitOffsetPaginator#method-setOffset)\n"
+              "text": "See [LimitOffsetPaginator.setOffset](doc:LimitOffsetPaginator#method-setOffset)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator\",\n        children: \"LimitOffsetPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:LimitOffsetPaginator#method-setOffset\",\n        children: \"LimitOffsetPaginator.setOffset\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -1735,15 +1942,21 @@
                       "name": "number"
                     }
                   ]
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
               "type": "intrinsic",
               "name": "void"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 189,
@@ -1767,7 +1980,9 @@
             "flags": {},
             "comment": {
               "shortText": "Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).",
-              "text": "See [PageNumberPaginator.setPage](doc:PageNumberPaginator#method-setPage)\n"
+              "text": "See [PageNumberPaginator.setPage](doc:PageNumberPaginator#method-setPage)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator\",\n        children: \"PageNumberPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator#method-setPage\",\n        children: \"PageNumberPaginator.setPage\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -1779,15 +1994,21 @@
                 "type": {
                   "type": "intrinsic",
                   "name": "number"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
               "type": "intrinsic",
               "name": "void"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 195,
@@ -1811,7 +2032,9 @@
             "flags": {},
             "comment": {
               "shortText": "Only valid if inferred paginator is [PageNumberPaginator](doc:PageNumberPaginator).",
-              "text": "See [PageNumberPaginator.setPageSize](doc:PageNumberPaginator#method-setPageSize)\n"
+              "text": "See [PageNumberPaginator.setPageSize](doc:PageNumberPaginator#method-setPageSize)\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Only valid if inferred paginator is \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator\",\n        children: \"PageNumberPaginator\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:PageNumberPaginator#method-setPageSize\",\n        children: \"PageNumberPaginator.setPageSize\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -1832,15 +2055,21 @@
                       "name": "number"
                     }
                   ]
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
               "type": "intrinsic",
               "name": "void"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 231,
@@ -1864,7 +2093,9 @@
             "flags": {},
             "comment": {
               "shortText": "Sets the internal data based on response. This is where the paginator is inferred based on values in the\n`response`.",
-              "text": "See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation\ndiffers.\n"
+              "text": "See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation\ndiffers.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Sets the internal data based on response. This is where the paginator is inferred based on values in the\\n\", _jsx(_components.code, {\n        children: \"response\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:getPaginationState\",\n        children: \"getPaginationState\"\n      }), \" for how to customise this if your backend implementation\\ndiffers.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "parameters": [
               {
@@ -1889,7 +2120,9 @@
                   "qualifiedName": "Record",
                   "package": "typescript",
                   "name": "Record"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -1900,14 +2133,18 @@
               "type": "reference",
               "id": 432,
               "name": "PaginatorInterface.setResponse"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "implementationOf": {
           "type": "reference",
           "id": 431,
           "name": "PaginatorInterface.setResponse"
-        }
+        },
+        "docFlags": {},
+        "tagsByName": {}
       },
       {
         "id": 137,
@@ -1942,7 +2179,9 @@
                   "type": "reference",
                   "id": 397,
                   "name": "PaginationRequestDetails"
-                }
+                },
+                "docFlags": {},
+                "tagsByName": {}
               }
             ],
             "type": {
@@ -1970,72 +2209,37 @@
                   "name": "Record"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       }
     ],
     "groups": [
       {
         "title": "Constructors",
         "kind": 512,
-        "children": [
-          140
-        ]
+        "children": [140]
       },
       {
         "title": "Properties",
         "kind": 1024,
-        "children": [
-          144,
-          169,
-          170,
-          171,
-          175
-        ]
+        "children": [144, 169, 170, 171, 175]
       },
       {
         "title": "Accessors",
         "kind": 262144,
-        "children": [
-          163,
-          155,
-          159,
-          157,
-          165,
-          167,
-          147,
-          161,
-          145,
-          151,
-          153
-        ]
+        "children": [163, 155, 159, 157, 165, 167, 147, 161, 145, 151, 153]
       },
       {
         "title": "Methods",
         "kind": 2048,
         "children": [
-          220,
-          218,
-          228,
-          226,
-          224,
-          222,
-          198,
-          212,
-          210,
-          204,
-          192,
-          186,
-          216,
-          214,
-          182,
-          201,
-          207,
-          189,
-          195,
-          231,
-          137
+          220, 218, 228, 226, 224, 222, 198, 212, 210, 204, 192, 186, 216, 214, 182, 201, 207, 189,
+          195, 231, 137
         ]
       }
     ],
@@ -2077,6 +2281,7 @@
         "name": "PaginatorInterface"
       }
     ],
+    "docFlags": {},
     "tagsByName": {
       "menu-group": "Pagination",
       "extract-docs": ""

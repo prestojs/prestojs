@@ -1,0 +1,37 @@
+{
+  "node": {
+    "id": 965,
+    "name": "Key",
+    "kind": 4194304,
+    "kindString": "Type alias",
+    "flags": {
+      "isExternal": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 132,
+        "character": 9
+      }
+    ],
+    "type": {
+      "type": "union",
+      "types": [
+        {
+          "type": "intrinsic",
+          "name": "string"
+        },
+        {
+          "type": "intrinsic",
+          "name": "number"
+        }
+      ]
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/Key",
+    "menuGroup": "default"
+  }
+}

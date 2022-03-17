@@ -1,0 +1,78 @@
+{
+  "node": {
+    "id": 1017,
+    "name": "forceUpdate",
+    "kind": 2048,
+    "kindString": "Method",
+    "flags": {
+      "isExternal": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 503,
+        "character": 8
+      }
+    ],
+    "signatures": [
+      {
+        "id": 1018,
+        "name": "forceUpdate",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {
+          "isExternal": true
+        },
+        "parameters": [
+          {
+            "id": 1019,
+            "name": "callback",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {
+              "isExternal": true,
+              "isOptional": true
+            },
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 1020,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {
+                  "isExternal": true
+                },
+                "signatures": [
+                  {
+                    "id": 1021,
+                    "name": "__type",
+                    "kind": 4096,
+                    "kindString": "Call signature",
+                    "flags": {
+                      "isExternal": true
+                    },
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "void"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "void"
+        }
+      }
+    ]
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/forceUpdate",
+    "menuGroup": "default"
+  }
+}

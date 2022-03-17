@@ -135,6 +135,16 @@ export type UseAsyncReturnObject<ResultT, ErrorT> = {
      * Set to the rejected value of the promise. Only one of `error` and `result` can be set. If
      * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
      * when you want the UI to show the previous value until the next value is ready.
+     *
+     * ROFL
+     *
+     * ```tsx
+     * export default function MyComponent() {
+     *  // HEHE
+     *  const y = 5 + 5;
+     *  return <div>test</div>
+     * }
+     * ```
      */
     error: ErrorT | null;
     /**
@@ -300,61 +310,65 @@ function useAsync<ResultT, ErrorT = Error>(
     // Note that this function is never recreated - it's cached once with
     // useCallback and from that point on should have consistent identity.
     // It either gets passed the arguments or reads then from a ref at call time.
-    const execute = useCallback((
-        executeFn,
-        executeArgs,
-        // When execute is called read the current value for onSuccess and
-        // onError. This allows for nicer ergonomics by allowing inline
-        // arrow functions to be passed without triggering the function
-        // when trigger is not MANUAL. Without doing it this way it would
-        // need to be a dependency on the initial fetch useEffect below and
-        // as such would trigger a re-execute whenever it changed.
-        executeOnSuccess = lastValues.current.onSuccess,
-        executeOnError = lastValues.current.onError
-    ): [Promise<any>, () => void] => {
-        let isCurrent = true;
-        const currentCallId = callId.current;
-        callId.current += 1;
-        // Avoid possibility of overflow
-        if (callId.current > 100000) {
-            callId.current = 0;
-        }
-        dispatch({ type: 'start', id: currentCallId });
-        const promise = executeFn(...executeArgs);
-        if (!isPromise(promise)) {
-            const message = 'useAsync can only be used with functions that return a Promise. Got: ';
-            // eslint-disable-next-line no-console
-            console.error(message, promise);
-            throw new Error(message);
-        }
-        promise.then(
-            result => {
-                if (!isCurrent) {
-                    return;
-                }
-                dispatch({ type: 'success', payload: result });
-                if (executeOnSuccess) {
-                    executeOnSuccess(result);
-                }
-            },
-            e => {
-                if (!isCurrent) {
-                    return;
-                }
-                dispatch({ type: 'error', payload: e });
-                if (executeOnError) {
-                    executeOnError(e);
-                }
+    const execute = useCallback(
+        (
+            executeFn,
+            executeArgs,
+            // When execute is called read the current value for onSuccess and
+            // onError. This allows for nicer ergonomics by allowing inline
+            // arrow functions to be passed without triggering the function
+            // when trigger is not MANUAL. Without doing it this way it would
+            // need to be a dependency on the initial fetch useEffect below and
+            // as such would trigger a re-execute whenever it changed.
+            executeOnSuccess = lastValues.current.onSuccess,
+            executeOnError = lastValues.current.onError
+        ): [Promise<any>, () => void] => {
+            let isCurrent = true;
+            const currentCallId = callId.current;
+            callId.current += 1;
+            // Avoid possibility of overflow
+            if (callId.current > 100000) {
+                callId.current = 0;
             }
-        );
-        return [
-            promise,
-            (): void => {
-                dispatch({ type: 'abort', id: currentCallId });
-                isCurrent = false;
-            },
-        ];
-    }, []);
+            dispatch({ type: 'start', id: currentCallId });
+            const promise = executeFn(...executeArgs);
+            if (!isPromise(promise)) {
+                const message =
+                    'useAsync can only be used with functions that return a Promise. Got: ';
+                // eslint-disable-next-line no-console
+                console.error(message, promise);
+                throw new Error(message);
+            }
+            promise.then(
+                result => {
+                    if (!isCurrent) {
+                        return;
+                    }
+                    dispatch({ type: 'success', payload: result });
+                    if (executeOnSuccess) {
+                        executeOnSuccess(result);
+                    }
+                },
+                e => {
+                    if (!isCurrent) {
+                        return;
+                    }
+                    dispatch({ type: 'error', payload: e });
+                    if (executeOnError) {
+                        executeOnError(e);
+                    }
+                }
+            );
+            return [
+                promise,
+                (): void => {
+                    dispatch({ type: 'abort', id: currentCallId });
+                    isCurrent = false;
+                },
+            ];
+        },
+        []
+    );
     // =========================================================================
 
     // abortRef is used by execute to store an abort function so that if the

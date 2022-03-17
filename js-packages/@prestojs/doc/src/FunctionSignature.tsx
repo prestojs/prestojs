@@ -4,24 +4,26 @@ import TypeName from './TypeName';
 
 type Props = {
     signature: JSONOutput.SignatureReflection;
+    showReturn?: boolean;
+    className?: string;
 };
 
-export default function FunctionSignature({ signature }: Props) {
+export default function FunctionSignature({ signature, showReturn = false, className }: Props) {
     const { parameters = [] } = signature;
     return (
-        <div>
+        <div className={className}>
             <span className="font-bold">{signature.name}</span>(
             {parameters.map((param, i) => (
                 <React.Fragment key={param.name}>
-                    <span className="text-gray-600">
+                    <span className="text-gray-500">
                         {param.flags?.isOptional && '?'}
                         {param.name}
                     </span>
-                    {i < parameters.length - 1 && <span className="text-gray-400 mr-1">,</span>}
+                    {i < parameters.length - 1 && <span className="text-gray-300 mr-1">,</span>}
                 </React.Fragment>
             ))}
             )
-            {signature.type && (
+            {showReturn && signature.type && (
                 <>
                     {' '}
                     {'=>'}

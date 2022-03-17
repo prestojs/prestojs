@@ -1,7 +1,9 @@
-import { AugmentedDeclarationReflection } from '@prestojs/doc';
 import React from 'react';
 import { JSONOutput } from 'typedoc';
+import { useDocContext } from './DocProvider';
+import PrecompiledMarkdown from './PrecompiledMarkdown';
 import Table from './Table';
+import { DeclarationReflection } from './types';
 
 type Props = {
     type:
@@ -11,19 +13,25 @@ type Props = {
         | JSONOutput.NamedTupleMemberType;
 };
 
-function ObjectProperties(props: {
-    properties: AugmentedDeclarationReflection[];
-}): React.ReactElement {
+function Kind({ declaration }: { declaration: DeclarationReflection }) {
+    if (declaration.kindString === 'Method') {
+        console.log(declaration);
+        return <span className="text-orange-400">Method</span>;
+    }
+    return <>{declaration.name}</>;
+}
+
+function ObjectProperties(props: { properties: DeclarationReflection[] }): React.ReactElement {
     return (
-        <Table<AugmentedDeclarationReflection>
+        <Table<DeclarationReflection>
             columns={[
                 {
                     title: 'Property',
                     key: 'name',
-                    className(property: AugmentedDeclarationReflection): string {
+                    className(property: DeclarationReflection): string {
                         let className =
                             'font-semibold border-gray-300 font-mono text-xs text-purple-700 whitespace-nowrap';
-                        if (property.deprecated) {
+                        if (property.docFlags.deprecated) {
                             className += ' line-through';
                         }
                         return className;
@@ -37,22 +45,34 @@ function ObjectProperties(props: {
                             // eslint-disable-next-line @typescript-eslint/no-use-before-define
                             return <TypeName type={type} />;
                         }
-                        return property.kindString;
+                        return <Kind declaration={property} />;
                     },
                 },
                 {
                     title: 'Description',
                     key: 'description',
-                    className: 'border-gray-300 font-mono text-xs text-blue-700 align-top',
+                    className:
+                        'border-gray-300 font-mono text-xs text-blue-700 align-top td-type-desc',
                     render: (type, property): React.ReactNode => {
                         return (
                             <>
-                                TODO
-                                {property.deprecated && (
+                                {property.comment?.shortTextMdx && (
+                                    <PrecompiledMarkdown code={property.comment?.shortTextMdx} />
+                                )}
+                                {property.comment?.textMdx && (
+                                    <PrecompiledMarkdown code={property.comment?.textMdx} />
+                                )}
+                                {property.docFlags.deprecated && (
                                     <div className="text-red-400">
                                         Deprecated
-                                        {typeof property.deprecated == 'string' &&
-                                            `: ${property.deprecated}`}
+                                        {typeof property.docFlags.deprecated == 'string' && (
+                                            <>
+                                                :{' '}
+                                                <PrecompiledMarkdown
+                                                    code={property.docFlags.deprecated}
+                                                />
+                                            </>
+                                        )}
                                     </div>
                                 )}
                             </>
@@ -62,8 +82,18 @@ function ObjectProperties(props: {
             ]}
             data={props.properties}
             rowKey="id"
+            title={<strong>An object with these properties:</strong>}
         />
     );
+}
+
+function ReferencedType({ type }: { type: JSONOutput.ReferenceType }): React.ReactElement {
+    const docContext = useDocContext();
+    if (type.id && docContext && docContext.referencedTypes[type.id]) {
+        const referencedType = docContext.referencedTypes[type.id];
+        console.log('TODO', { referencedType });
+    }
+    return <span className="text-blue-400">{type.name}</span>;
 }
 
 export default function TypeName({ type }: Props): React.ReactElement {
@@ -119,6 +149,8 @@ export default function TypeName({ type }: Props): React.ReactElement {
                 }
             }
             return <>{type.type}</>;
+        case 'reference':
+            return <ReferencedType type={type} />;
         case 'conditional':
         case 'indexedAccess':
         case 'mapped':
@@ -127,7 +159,6 @@ export default function TypeName({ type }: Props): React.ReactElement {
         case 'optional':
         case 'predicate':
         case 'query':
-        case 'reference':
         case 'rest':
         case 'template-literal':
         case 'tuple':

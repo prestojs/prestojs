@@ -28,7 +28,9 @@
               "tag": "extract-docs",
               "text": "\n"
             }
-          ]
+          ],
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Execute an asynchronous call and return the value which can optionally be paginated.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+          "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"If the result is paginated you can pass \", _jsx(_components.code, {\n        children: \"paginator\"\n      }), \". Whenever the paginator state\\nis changed the function will be called unless \", _jsx(_components.code, {\n        children: \"trigger\"\n      }), \" is \", _jsx(_components.code, {\n        children: \"MANUAL\"\n      }), \". You can pass\\n\", _jsx(_components.code, {\n        children: \"accumulatePages\"\n      }), \" to accumulate results for sequential pages returned from \", _jsx(_components.code, {\n        children: \"execute\"\n      }), \".\\nThis is useful to implement things like infinite scroll. If a non-sequential page\\nis accessed or \", _jsx(_components.code, {\n        children: \"query\"\n      }), \" changes then accumulated results will be cleared.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
         },
         "typeParameter": [
           {
@@ -43,7 +45,9 @@
                 "type": "intrinsic",
                 "name": "any"
               }
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "parameters": [
@@ -64,7 +68,9 @@
                 }
               ],
               "name": "UseAsyncListingProps"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
@@ -78,14 +84,1691 @@
             }
           ],
           "name": "UseAsyncListingReturn"
+        },
+        "docFlags": {},
+        "tagsByName": {
+          "extract-docs": ""
         }
       }
     ],
-    "tagsByName": {
-      "extract-docs": ""
+    "docFlags": {},
+    "tagsByName": {}
+  },
+  "references": {
+    "404": {
+      "id": 404,
+      "name": "PaginatorInterface",
+      "kind": 256,
+      "kindString": "Interface",
+      "flags": {},
+      "children": [
+        {
+          "id": 405,
+          "name": "currentState",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 66,
+              "character": 4
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 439,
+            "name": "State"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 406,
+          "name": "internalState",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 67,
+              "character": 4
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 441,
+            "name": "InternalState"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 413,
+          "name": "responseIsSet",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 70,
+              "character": 4
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 416,
+          "name": "first",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 417,
+              "name": "first",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 418,
+          "name": "firstState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 419,
+              "name": "firstState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 439,
+                    "name": "State"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 428,
+          "name": "getRequestInit",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 429,
+              "name": "getRequestInit",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 430,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 392,
+                    "name": "PaginatorRequestOptions"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 392,
+                "name": "PaginatorRequestOptions"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 414,
+          "name": "hasNextPage",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 415,
+              "name": "hasNextPage",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 420,
+          "name": "next",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 421,
+              "name": "next",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 422,
+          "name": "nextState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 423,
+              "name": "nextState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 439,
+                    "name": "State"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 424,
+          "name": "previous",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 425,
+              "name": "previous",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 426,
+          "name": "previousState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 427,
+              "name": "previousState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 439,
+                    "name": "State"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 434,
+          "name": "replaceStateControllers",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 435,
+              "name": "replaceStateControllers",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 436,
+                  "name": "currentStatePair",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "any"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 437,
+                  "name": "internalStatePair",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "any"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 407,
+          "name": "setCurrentState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 68,
+              "character": 4
+            }
+          ],
+          "signatures": [
+            {
+              "id": 408,
+              "name": "setCurrentState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 409,
+                  "name": "set",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 439,
+                    "name": "State"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 410,
+          "name": "setInternalState",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+              "line": 69,
+              "character": 4
+            }
+          ],
+          "signatures": [
+            {
+              "id": 411,
+              "name": "setInternalState",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 412,
+                  "name": "set",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 441,
+                    "name": "InternalState"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 431,
+          "name": "setResponse",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 432,
+              "name": "setResponse",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 433,
+                  "name": "response",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "id": 1273,
+                    "typeArguments": [
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    ],
+                    "qualifiedName": "Record",
+                    "package": "typescript",
+                    "name": "Record"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "groups": [
+        {
+          "title": "Properties",
+          "kind": 1024,
+          "children": [405, 406, 413]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [416, 418, 428, 414, 420, 422, 424, 426, 434, 407, 410, 431]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+          "line": 65,
+          "character": 17
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 439,
+          "name": "State",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "default": {
+            "type": "reflection",
+            "declaration": {
+              "id": 438,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                  "line": 65,
+                  "character": 44
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 441,
+          "name": "InternalState",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "default": {
+            "type": "reflection",
+            "declaration": {
+              "id": 440,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
+                  "line": 65,
+                  "character": 64
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "implementedBy": [
+        {
+          "type": "reference",
+          "id": 136,
+          "name": "InferredPaginator"
+        },
+        {
+          "type": "reference",
+          "id": 472,
+          "name": "Paginator"
+        }
+      ],
+      "docFlags": {},
+      "tagsByName": {}
+    },
+    "611": {
+      "id": 611,
+      "name": "UseAsyncListingProps",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "expand-properties",
+            "text": "\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+          "line": 23,
+          "character": 12
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 620,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 612,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 615,
+              "name": "accumulatePages",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Whether to accumulate pages as more results are fetched. For example\nif the first page of results is returned, then the next page is fetched\nthen the combined results for the first two pages will be resolved.",
+                "text": "This resets whenever `query` changes or if pagination state changes\nto anything other than the next page.\n\nIf this is true you must specify `paginator`.\n",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Whether to accumulate pages as more results are fetched. For example\\nif the first page of results is returned, then the next page is fetched\\nthen the combined results for the first two pages will be resolved.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+                "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"This resets whenever \", _jsx(_components.code, {\n          children: \"query\"\n        }), \" changes or if pagination state changes\\nto anything other than the next page.\"]\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"If this is true you must specify \", _jsx(_components.code, {\n          children: \"paginator\"\n        }), \".\"]\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 49,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 616,
+              "name": "paginator",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Optional paginator if result is paginated. This will be monitored for\nany state changes which will trigger a call to `execute`.",
+                "text": "Required if `accumulatePages` is true.\n",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Optional paginator if result is paginated. This will be monitored for\\nany state changes which will trigger a call to \", _jsx(_components.code, {\n        children: \"execute\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+                "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Required if \", _jsx(_components.code, {\n        children: \"accumulatePages\"\n      }), \" is true.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 56,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "reference",
+                    "id": 404,
+                    "name": "PaginatorInterface"
+                  },
+                  {
+                    "type": "literal",
+                    "value": null
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 614,
+              "name": "query",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Any query string parameters for the request",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Any query string parameters for the request\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 38,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 1273,
+                "typeArguments": [
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "literal",
+                        "value": null
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "number"
+                      }
+                    ]
+                  }
+                ],
+                "qualifiedName": "Record",
+                "package": "typescript",
+                "name": "Record"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 613,
+              "name": "trigger",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "When to trigger the fetch. Defaults to `DEEP` which means whenever a deep\nequality check on `query` or `paginator` state fails it will refetch.",
+                "text": "If set to `MANUAL` nothing will happen until it changes to `DEEP` or you\ncall the returned `run` function. You can use this to defer execution until\nthe value is required.\n\nDefaults to 'DEEP'.\n",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"When to trigger the fetch. Defaults to \", _jsx(_components.code, {\n        children: \"DEEP\"\n      }), \" which means whenever a deep\\nequality check on \", _jsx(_components.code, {\n        children: \"query\"\n      }), \" or \", _jsx(_components.code, {\n        children: \"paginator\"\n      }), \" state fails it will refetch.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+                "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"If set to \", _jsx(_components.code, {\n          children: \"MANUAL\"\n        }), \" nothing will happen until it changes to \", _jsx(_components.code, {\n          children: \"DEEP\"\n        }), \" or you\\ncall the returned \", _jsx(_components.code, {\n          children: \"run\"\n        }), \" function. You can use this to defer execution until\\nthe value is required.\"]\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"Defaults to 'DEEP'.\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 34,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": "MANUAL"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "DEEP"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 617,
+              "name": "execute",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 65,
+                  "character": 4
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 618,
+                  "name": "execute",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Asynchronous function that returns the result for the query. Passed an\nobject with `query` and `paginator` keys.",
+                    "text": "Note that when `trigger` is `DEEP` changes to this function will cause it\nto be called again so you must memoize it (eg. with `useCallback`) if it's\ndefined in your component or hook.\n",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Asynchronous function that returns the result for the query. Passed an\\nobject with \", _jsx(_components.code, {\n        children: \"query\"\n      }), \" and \", _jsx(_components.code, {\n        children: \"paginator\"\n      }), \" keys.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+                    "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Note that when \", _jsx(_components.code, {\n        children: \"trigger\"\n      }), \" is \", _jsx(_components.code, {\n        children: \"DEEP\"\n      }), \" changes to this function will cause it\\nto be called again so you must memoize it (eg. with \", _jsx(_components.code, {\n        children: \"useCallback\"\n      }), \") if it's\\ndefined in your component or hook.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "parameters": [
+                    {
+                      "id": 619,
+                      "name": "props",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "id": 1782,
+                        "name": "UseAsyncListingExecuteProps"
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "reference",
+                        "id": 620,
+                        "name": "T"
+                      }
+                    ],
+                    "qualifiedName": "Promise",
+                    "package": "typescript",
+                    "name": "Promise"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [615, 616, 614, 613]
+            },
+            {
+              "title": "Methods",
+              "kind": 2048,
+              "children": [617]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+              "line": 23,
+              "character": 38
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {
+        "expandProperties": true
+      },
+      "tagsByName": {
+        "expand-properties": ""
+      }
+    },
+    "621": {
+      "id": 621,
+      "name": "UseAsyncListingReturn",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+          "line": 93,
+          "character": 12
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 631,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "union",
+        "types": [
+          {
+            "type": "intersection",
+            "types": [
+              {
+                "type": "reference",
+                "id": 1772,
+                "typeArguments": [
+                  {
+                    "type": "reference",
+                    "id": 631,
+                    "name": "T"
+                  }
+                ],
+                "name": "UseAsyncListingReturnCommon"
+              },
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 622,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 623,
+                      "name": "error",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "Until first call has resolved neither error nor result will be set",
+                        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Until first call has resolved neither error nor result will be set\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                      },
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                          "line": 98,
+                          "character": 10
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    },
+                    {
+                      "id": 624,
+                      "name": "result",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                          "line": 99,
+                          "character": 10
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "kind": 1024,
+                      "children": [623, 624]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                      "line": 94,
+                      "character": 40
+                    }
+                  ],
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              }
+            ]
+          },
+          {
+            "type": "intersection",
+            "types": [
+              {
+                "type": "reference",
+                "id": 1772,
+                "typeArguments": [
+                  {
+                    "type": "reference",
+                    "id": 631,
+                    "name": "T"
+                  }
+                ],
+                "name": "UseAsyncListingReturnCommon"
+              },
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 625,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 626,
+                      "name": "error",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "Set to the rejected value of the promise. Only one of `error` and `result` can be set. If\n`isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful\nwhen you want the UI to show the previous value until the next value is ready.",
+                        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      em: \"em\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Set to the rejected value of the promise. Only one of \", _jsx(_components.code, {\n        children: \"error\"\n      }), \" and \", _jsx(_components.code, {\n        children: \"result\"\n      }), \" can be set. If\\n\", _jsx(_components.code, {\n        children: \"isLoading\"\n      }), \" is true consider this stale (ie. based on \", _jsx(_components.em, {\n        children: \"previous\"\n      }), \" props). This can be useful\\nwhen you want the UI to show the previous value until the next value is ready.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                      },
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                          "line": 107,
+                          "character": 10
+                        }
+                      ],
+                      "type": {
+                        "type": "reference",
+                        "id": 1168,
+                        "qualifiedName": "Error",
+                        "package": "typescript",
+                        "name": "Error"
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    },
+                    {
+                      "id": 627,
+                      "name": "result",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "Result will not be set when error is set",
+                        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Result will not be set when error is set\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                      },
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                          "line": 111,
+                          "character": 10
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "kind": 1024,
+                      "children": [626, 627]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                      "line": 101,
+                      "character": 40
+                    }
+                  ],
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              }
+            ]
+          },
+          {
+            "type": "intersection",
+            "types": [
+              {
+                "type": "reference",
+                "id": 1772,
+                "typeArguments": [
+                  {
+                    "type": "reference",
+                    "id": 631,
+                    "name": "T"
+                  }
+                ],
+                "name": "UseAsyncListingReturnCommon"
+              },
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 628,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 629,
+                      "name": "error",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "Error will not be set when result is set",
+                        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Error will not be set when result is set\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                      },
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                          "line": 117,
+                          "character": 10
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    },
+                    {
+                      "id": 630,
+                      "name": "result",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "The value returned from execute",
+                        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The value returned from execute\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                      },
+                      "sources": [
+                        {
+                          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                          "line": 121,
+                          "character": 10
+                        }
+                      ],
+                      "type": {
+                        "type": "reference",
+                        "id": 631,
+                        "name": "T"
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "kind": 1024,
+                      "children": [629, 630]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                      "line": 113,
+                      "character": 40
+                    }
+                  ],
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "docFlags": {},
+      "tagsByName": {}
+    },
+    "1168": {
+      "id": 1168,
+      "name": "Error",
+      "kind": 32,
+      "kindString": "Variable",
+      "flags": {
+        "isExternal": true
+      },
+      "sources": [
+        {
+          "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+          "line": 1033,
+          "character": 12
+        }
+      ],
+      "type": {
+        "type": "reference",
+        "qualifiedName": "ErrorConstructor",
+        "package": "typescript",
+        "name": "ErrorConstructor"
+      },
+      "extendedBy": [
+        {
+          "type": "reference",
+          "id": 564,
+          "name": "InvalidTimeError"
+        }
+      ],
+      "docFlags": {},
+      "tagsByName": {}
+    },
+    "1273": {
+      "id": 1273,
+      "name": "Record",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {
+        "isExternal": true
+      },
+      "comment": {
+        "shortText": "Construct a type with a set of properties K of type T",
+        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Construct a type with a set of properties K of type T\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+      },
+      "sources": [
+        {
+          "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+          "line": 1559,
+          "character": 5
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 1274,
+          "name": "K",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {
+            "isExternal": true
+          },
+          "type": {
+            "type": "typeOperator",
+            "operator": "keyof",
+            "target": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        },
+        {
+          "id": 1275,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {
+            "isExternal": true
+          },
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "mapped",
+        "parameter": "P",
+        "parameterType": {
+          "type": "reference",
+          "id": 1274,
+          "qualifiedName": "K",
+          "package": "typescript",
+          "name": "K"
+        },
+        "templateType": {
+          "type": "reference",
+          "id": 1275,
+          "qualifiedName": "T",
+          "package": "typescript",
+          "name": "T"
+        }
+      },
+      "docFlags": {},
+      "tagsByName": {}
+    },
+    "1772": {
+      "id": 1772,
+      "name": "UseAsyncListingReturnCommon",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+          "line": 68,
+          "character": 5
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 1781,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 1773,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 1774,
+              "name": "isLoading",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "comment": {
+                "shortText": "True while `execute` call is in progress.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"True while \", _jsx(_components.code, {\n        children: \"execute\"\n      }), \" call is in progress.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 72,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1775,
+              "name": "paginator",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "comment": {
+                "shortText": "The same `paginator` passed in to `useAsyncListing`",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The same \", _jsx(_components.code, {\n        children: \"paginator\"\n      }), \" passed in to \", _jsx(_components.code, {\n        children: \"useAsyncListing\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 76,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 404,
+                    "name": "PaginatorInterface"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1779,
+              "name": "reset",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 91,
+                  "character": 4
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 1780,
+                  "name": "reset",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "When called will set both result and error to null. Will not immediately trigger\na call to the action but subsequent changes to query or paginator will according\nto the value of `trigger`.",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"When called will set both result and error to null. Will not immediately trigger\\na call to the action but subsequent changes to query or paginator will according\\nto the value of \", _jsx(_components.code, {\n        children: \"trigger\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "void"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1776,
+              "name": "run",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 85,
+                  "character": 4
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 1777,
+                  "name": "run",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "A function to manually trigger the action. If `options.trigger` is `MANUAL`\ncalling this function is the only way to trigger the action.",
+                    "text": "This function will return a promise that resolves/rejects to same value\nreturned by `execute`. If `accumulatePages` is set the value returned is\nthe accumulated value.\n",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"A function to manually trigger the action. If \", _jsx(_components.code, {\n        children: \"options.trigger\"\n      }), \" is \", _jsx(_components.code, {\n        children: \"MANUAL\"\n      }), \"\\ncalling this function is the only way to trigger the action.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+                    "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"This function will return a promise that resolves/rejects to same value\\nreturned by \", _jsx(_components.code, {\n        children: \"execute\"\n      }), \". If \", _jsx(_components.code, {\n        children: \"accumulatePages\"\n      }), \" is set the value returned is\\nthe accumulated value.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "parameters": [
+                    {
+                      "id": 1778,
+                      "name": "args",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isRest": true
+                      },
+                      "type": {
+                        "type": "array",
+                        "elementType": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "reference",
+                        "id": 1781,
+                        "name": "T"
+                      }
+                    ],
+                    "qualifiedName": "Promise",
+                    "package": "typescript",
+                    "name": "Promise"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [1774, 1775]
+            },
+            {
+              "title": "Methods",
+              "kind": 2048,
+              "children": [1779, 1776]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+              "line": 68,
+              "character": 38
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {},
+      "tagsByName": {}
+    },
+    "1782": {
+      "id": 1782,
+      "name": "UseAsyncListingExecuteProps",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "expand-properties",
+            "text": "\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+          "line": 9,
+          "character": 5
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 1783,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 1785,
+              "name": "paginator",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The paginator instance, if any",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The paginator instance, if any\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 17,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 404,
+                    "name": "PaginatorInterface"
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1784,
+              "name": "query",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Any query parameters",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Any query parameters\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 13,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 1273,
+                "typeArguments": [
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "literal",
+                        "value": null
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "number"
+                      }
+                    ]
+                  }
+                ],
+                "qualifiedName": "Record",
+                "package": "typescript",
+                "name": "Record"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [1785, 1784]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+              "line": 9,
+              "character": 35
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {
+        "expandProperties": true
+      },
+      "tagsByName": {
+        "expand-properties": ""
+      }
     }
   },
-  "references": {},
   "meta": {
     "packageName": "util",
     "permaLink": "util/useAsyncListing",

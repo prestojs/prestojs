@@ -17,7 +17,9 @@
           "tag": "menu-group",
           "text": "Labeled\n"
         }
-      ]
+      ],
+      "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Interface for items that provide a plain text label. Implementing this can save you having to pass\\nexplicit functions to label an item in other parts of the system (eg. for \", _jsx(_components.a, {\n        href: \"doc:AsyncChoices\",\n        children: \"AsyncChoices\"\n      }), \")\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+      "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:isTextLabeled\",\n        children: \"isTextLabeled\"\n      }), \" and \", _jsx(_components.a, {\n        href: \"doc:getTextLabel\",\n        children: \"getTextLabel\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
     },
     "children": [
       {
@@ -35,23 +37,27 @@
             "flags": {},
             "comment": {
               "shortText": "Return the plain text label for this item. This must return a string",
-              "text": "See [isTextLabeled](doc:isTextLabeled) to test for support and [getTextLabel](doc:getTextLabel) for easiest way\nto get the label.\n"
+              "text": "See [isTextLabeled](doc:isTextLabeled) to test for support and [getTextLabel](doc:getTextLabel) for easiest way\nto get the label.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Return the plain text label for this item. This must return a string\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"See \", _jsx(_components.a, {\n        href: \"doc:isTextLabeled\",\n        children: \"isTextLabeled\"\n      }), \" to test for support and \", _jsx(_components.a, {\n        href: \"doc:getTextLabel\",\n        children: \"getTextLabel\"\n      }), \" for easiest way\\nto get the label.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "intrinsic",
               "name": "string"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
-        ]
+        ],
+        "docFlags": {},
+        "tagsByName": {}
       }
     ],
     "groups": [
       {
         "title": "Methods",
         "kind": 2048,
-        "children": [
-          18
-        ]
+        "children": [18]
       }
     ],
     "sources": [
@@ -61,6 +67,7 @@
         "character": 17
       }
     ],
+    "docFlags": {},
     "tagsByName": {
       "extract-docs": "",
       "menu-group": "Labeled"

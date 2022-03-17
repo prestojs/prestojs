@@ -31,7 +31,9 @@
               "tag": "menu-group",
               "text": "Identifiable\n"
             }
-          ]
+          ],
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Check if two objects share the same ID.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+          "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"NOTE: Doesn't compare objects for equality; only their id\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
         },
         "parameters": [
           {
@@ -43,7 +45,9 @@
             "type": {
               "type": "intrinsic",
               "name": "any"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 49,
@@ -54,7 +58,9 @@
             "type": {
               "type": "intrinsic",
               "name": "any"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 50,
@@ -89,35 +95,78 @@
                         "type": {
                           "type": "intrinsic",
                           "name": "any"
-                        }
+                        },
+                        "docFlags": {},
+                        "tagsByName": {}
                       }
                     ],
                     "type": {
                       "type": "reference",
                       "id": 54,
                       "name": "Id"
-                    }
+                    },
+                    "docFlags": {},
+                    "tagsByName": {}
                   }
-                ]
+                ],
+                "docFlags": {},
+                "tagsByName": {}
               }
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
           "type": "intrinsic",
           "name": "boolean"
+        },
+        "docFlags": {},
+        "tagsByName": {
+          "extract-docs": "",
+          "menu-group": "Identifiable"
         }
       }
     ],
-    "tagsByName": {
-      "extract-docs": "",
-      "menu-group": "Identifiable"
+    "docFlags": {},
+    "tagsByName": {}
+  },
+  "references": {
+    "54": {
+      "id": 54,
+      "name": "Id",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+          "line": 3,
+          "character": 12
+        }
+      ],
+      "type": {
+        "type": "union",
+        "types": [
+          {
+            "type": "reference",
+            "id": 1266,
+            "name": "SingleId"
+          },
+          {
+            "type": "reference",
+            "id": 1267,
+            "name": "CompoundId"
+          }
+        ]
+      },
+      "docFlags": {},
+      "tagsByName": {}
     }
   },
-  "references": {},
   "meta": {
     "packageName": "util",
     "permaLink": "util/isSameById",
-    "menuGroup": "Identifiable"
+    "menuGroup": "default"
   }
 }

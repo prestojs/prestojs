@@ -1,0 +1,69 @@
+{
+  "node": {
+    "id": 1252,
+    "name": "[nominalTypeHack]",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true,
+      "isOptional": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/prop-types/index.d.ts",
+        "line": 42,
+        "character": 4
+      }
+    ],
+    "type": {
+      "type": "reflection",
+      "declaration": {
+        "id": 1253,
+        "name": "__type",
+        "kind": 65536,
+        "kindString": "Type literal",
+        "flags": {
+          "isExternal": true
+        },
+        "children": [
+          {
+            "id": 1254,
+            "name": "type",
+            "kind": 1024,
+            "kindString": "Property",
+            "flags": {
+              "isExternal": true
+            },
+            "sources": [
+              {
+                "fileName": "node_modules/@types/prop-types/index.d.ts",
+                "line": 43,
+                "character": 8
+              }
+            ],
+            "type": {
+              "type": "reference",
+              "id": 1255,
+              "qualifiedName": "Validator.T",
+              "package": "@types/prop-types",
+              "name": "T"
+            }
+          }
+        ],
+        "groups": [
+          {
+            "title": "Properties",
+            "kind": 1024,
+            "children": [1254]
+          }
+        ]
+      }
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/prop-types/[nominalTypeHack]",
+    "menuGroup": "default"
+  }
+}

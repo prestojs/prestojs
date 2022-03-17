@@ -29,7 +29,10 @@
               "tag": "extract-docs",
               "text": "\n"
             }
-          ]
+          ],
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Call a function whenever values in a list change. This differs from \", _jsx(_components.code, {\n        children: \"useChangeObserver\"\n      }), \" by\\nallowing you to choose what changes you get (additions, updates, deletions) and to be passed the\\nchanged items in the callback. In order to achieve this each item in the array needs to have a\\nunique ID which is obtained by calling the \", _jsx(_components.code, {\n        children: \"options.getId\"\n      }), \" function. The default implementation will\\nlook for a \", _jsx(_components.code, {\n        children: \"_key\"\n      }), \" or \", _jsx(_components.code, {\n        children: \"id\"\n      }), \" property and return this, otherwise it return the value as is. This default\\nimplementation is compatible with \", _jsx(_components.a, {\n        href: \"doc:viewModelFactory\",\n        children: \"ViewModel\"\n      }), \" so you can pass lists of\\nrecords returned from \", _jsx(_components.a, {\n        href: \"doc:useViewModelCache\",\n        children: \"useViewModelCache\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+          "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      pre: \"pre\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.pre, {\n      children: _jsx(_components.code, {\n        className: \"language-jsx\",\n        children: \"export default function UserListView() {\\n  const { data, revalidate, isValidating } = useEndpoint(User.endpoints.list);\\n  // Refetch data whenever underlying cache changes\\n  const allRecords = useViewModelCache(User, cache => cache.getAll(fieldList));\\n  // NOTE: Usually you don't want multiple useListChangeObserver's on the exact same\\n  // subset of data as you will trigger redundant ajax queries.\\n  // if a record is updated & saved elsewhere, then useViewModelCache will return new\\n  // data which triggers useListChangeObserver. We still want useListChangeObserver()\\n  // to trigger the useEndpoint() revalidate because that record update may have changed the\\n  // order of records or caused it to [no longer] appear in a filtered list of data.\\n  // Also note that we pass false while data is being fetched from the backend\\n  useListChangeObserver(!isValidating && allRecords, revalidate);\\n  return <ListView records={data} />;\\n}\\n\"\n      })\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+          "returnsMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"No return value\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
         },
         "typeParameter": [
           {
@@ -44,7 +47,9 @@
                 "type": "intrinsic",
                 "name": "any"
               }
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "parameters": [
@@ -55,7 +60,8 @@
             "kindString": "Parameter",
             "flags": {},
             "comment": {
-              "shortText": "An array of values to monitor for changes. A falsey value can be passed to disable\nchecks. This is the same as passing `options.disabled`. This is convenient for cases where no value\nis available yet (eg. when waiting for initial response from an API endpoint)"
+              "shortText": "An array of values to monitor for changes. A falsey value can be passed to disable\nchecks. This is the same as passing `options.disabled`. This is convenient for cases where no value\nis available yet (eg. when waiting for initial response from an API endpoint)",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"An array of values to monitor for changes. A falsey value can be passed to disable\\nchecks. This is the same as passing \", _jsx(_components.code, {\n        children: \"options.disabled\"\n      }), \". This is convenient for cases where no value\\nis available yet (eg. when waiting for initial response from an API endpoint)\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "union",
@@ -78,7 +84,9 @@
                   "name": "T"
                 }
               ]
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 700,
@@ -87,7 +95,8 @@
             "kindString": "Parameter",
             "flags": {},
             "comment": {
-              "shortText": "A method that will be called on any changes. This is passed an object of changes in the form:\n\n```\n{\n    ADD: [...],\n    UPDATE: [[<prev value>, <updated value>]...],\n    DELETE: [...],\n}\n```\nEach change type (ADD, UPDATE, DELETE) will be `false` if no value has changed.\n\nThe last and next list of records are also passed.\n"
+              "shortText": "A method that will be called on any changes. This is passed an object of changes in the form:\n\n```\n{\n    ADD: [...],\n    UPDATE: [[<prev value>, <updated value>]...],\n    DELETE: [...],\n}\n```\nEach change type (ADD, UPDATE, DELETE) will be `false` if no value has changed.\n\nThe last and next list of records are also passed.\n",
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      pre: \"pre\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsx(_components.p, {\n        children: \"A method that will be called on any changes. This is passed an object of changes in the form:\"\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          children: \"{\\n    ADD: [...],\\n    UPDATE: [[<prev value>, <updated value>]...],\\n    DELETE: [...],\\n}\\n\"\n        })\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"Each change type (ADD, UPDATE, DELETE) will be \", _jsx(_components.code, {\n          children: \"false\"\n        }), \" if no value has changed.\"]\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"The last and next list of records are also passed.\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
             "type": {
               "type": "reference",
@@ -100,7 +109,9 @@
                 }
               ],
               "name": "OnChange"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           },
           {
             "id": 701,
@@ -121,20 +132,714 @@
                 }
               ],
               "name": "ListChangeObserverOptions"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
           "type": "intrinsic",
           "name": "void"
+        },
+        "docFlags": {},
+        "tagsByName": {
+          "extract-docs": ""
         }
       }
     ],
-    "tagsByName": {
-      "extract-docs": ""
+    "docFlags": {},
+    "tagsByName": {}
+  },
+  "references": {
+    "674": {
+      "id": 674,
+      "name": "ChangeObserverOptions",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "expand-properties",
+            "text": "\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
+          "line": 7,
+          "character": 12
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 681,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 675,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 680,
+              "name": "disabled",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "If true then no changes will be detected. When this changes from true to false the\ncallback won't be called until the next change in value. This is useful for disabling\nthe callback when no value is yet available eg. when waiting for first response from an\nAPI.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"If true then no changes will be detected. When this changes from true to false the\\ncallback won't be called until the next change in value. This is useful for disabling\\nthe callback when no value is yet available eg. when waiting for first response from an\\nAPI.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
+                  "line": 21,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 676,
+              "name": "isEqual",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
+                  "line": 14,
+                  "character": 4
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 677,
+                  "name": "isEqual",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "Function to determine equality between items. If not provided the default will do shallow\nequality checks with specific support for an `isEqual` function on objects (eg. if an object\nimplements `isEqual` it will be called instead of doing any other comparisons. This is\nsupported by [ViewModel](doc:viewModelFactory).",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Function to determine equality between items. If not provided the default will do shallow\\nequality checks with specific support for an \", _jsx(_components.code, {\n        children: \"isEqual\"\n      }), \" function on objects (eg. if an object\\nimplements \", _jsx(_components.code, {\n        children: \"isEqual\"\n      }), \" it will be called instead of doing any other comparisons. This is\\nsupported by \", _jsx(_components.a, {\n        href: \"doc:viewModelFactory\",\n        children: \"ViewModel\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "parameters": [
+                    {
+                      "id": 678,
+                      "name": "a",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "id": 681,
+                        "name": "T"
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    },
+                    {
+                      "id": 679,
+                      "name": "b",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "id": 681,
+                        "name": "T"
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [680]
+            },
+            {
+              "title": "Methods",
+              "kind": 2048,
+              "children": [676]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/useChangeObserver.ts",
+              "line": 7,
+              "character": 39
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {
+        "expandProperties": true
+      },
+      "tagsByName": {
+        "expand-properties": ""
+      }
+    },
+    "1803": {
+      "id": 1803,
+      "name": "OnChange",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+          "line": 73,
+          "character": 5
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 1809,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 1804,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+              "line": 73,
+              "character": 19
+            }
+          ],
+          "signatures": [
+            {
+              "id": 1805,
+              "name": "__type",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "returns": "No return value\n",
+                "returnsMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"No return value\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "parameters": [
+                {
+                  "id": 1806,
+                  "name": "change",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "An object listing changes. Any additions will be included as an array under `ADD`, any updates\nas an array of [before, after] tuples under `UPDATE`, and any deletions as an array under `DELETE`.",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"An object listing changes. Any additions will be included as an array under \", _jsx(_components.code, {\n        children: \"ADD\"\n      }), \", any updates\\nas an array of [before, after] tuples under \", _jsx(_components.code, {\n        children: \"UPDATE\"\n      }), \", and any deletions as an array under \", _jsx(_components.code, {\n        children: \"DELETE\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "reference",
+                    "id": 1819,
+                    "typeArguments": [
+                      {
+                        "type": "reference",
+                        "id": 1809,
+                        "name": "T"
+                      }
+                    ],
+                    "name": "Change"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 1807,
+                  "name": "lastValue",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The value before this change",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The value before this change\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "reference",
+                    "id": 1809,
+                    "name": "T"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 1808,
+                  "name": "nextValue",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "The value after this change\n",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The value after this change\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "reference",
+                    "id": 1809,
+                    "name": "T"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {},
+      "tagsByName": {}
+    },
+    "1810": {
+      "id": 1810,
+      "name": "ListChangeObserverOptions",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "expand-properties",
+            "text": "\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+          "line": 11,
+          "character": 5
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 1818,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "intersection",
+        "types": [
+          {
+            "type": "reference",
+            "id": 674,
+            "typeArguments": [
+              {
+                "type": "reference",
+                "id": 1818,
+                "name": "T"
+              }
+            ],
+            "name": "ChangeObserverOptions"
+          },
+          {
+            "type": "reflection",
+            "declaration": {
+              "id": 1811,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 1812,
+                  "name": "runOnAdd",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "If true then when any items are added it will call `onChange` with 'ADD'\nas the first parameter. Only applicable if value is an array.",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"If true then when any items are added it will call \", _jsx(_components.code, {\n        children: \"onChange\"\n      }), \" with 'ADD'\\nas the first parameter. Only applicable if value is an array.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "sources": [
+                    {
+                      "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+                      "line": 16,
+                      "character": 4
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 1813,
+                  "name": "runOnDelete",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "If true then when any records are deleted it will call `onChange` with 'DELETE'\nas the first parameter. Only applicable if value is an array.",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"If true then when any records are deleted it will call \", _jsx(_components.code, {\n        children: \"onChange\"\n      }), \" with 'DELETE'\\nas the first parameter. Only applicable if value is an array.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "sources": [
+                    {
+                      "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+                      "line": 21,
+                      "character": 4
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 1814,
+                  "name": "runOnUpdate",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "If true then when any records are updated it will call `onChange` with 'UPDATE'\nas the first parameter. Only applicable if value is an array.",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"If true then when any records are updated it will call \", _jsx(_components.code, {\n        children: \"onChange\"\n      }), \" with 'UPDATE'\\nas the first parameter. Only applicable if value is an array.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "sources": [
+                    {
+                      "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+                      "line": 26,
+                      "character": 4
+                    }
+                  ],
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "docFlags": {},
+                  "tagsByName": {}
+                },
+                {
+                  "id": 1815,
+                  "name": "getId",
+                  "kind": 2048,
+                  "kindString": "Method",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "sources": [
+                    {
+                      "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+                      "line": 35,
+                      "character": 4
+                    }
+                  ],
+                  "signatures": [
+                    {
+                      "id": 1816,
+                      "name": "getId",
+                      "kind": 4096,
+                      "kindString": "Call signature",
+                      "flags": {},
+                      "comment": {
+                        "shortText": "Function to get unique ID for an item. This is used to detect modifications to\nthe list. Without this it's unknown whether an item was removed from the list of\njust changed position.",
+                        "text": "Support for [ViewModel](doc:viewModelFactory) is provided out of the box by checking\nfor the existence of a _key property on any object passed in.\n",
+                        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Function to get unique ID for an item. This is used to detect modifications to\\nthe list. Without this it's unknown whether an item was removed from the list of\\njust changed position.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+                        "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Support for \", _jsx(_components.a, {\n        href: \"doc:viewModelFactory\",\n        children: \"ViewModel\"\n      }), \" is provided out of the box by checking\\nfor the existence of a _key property on any object passed in.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                      },
+                      "parameters": [
+                        {
+                          "id": 1817,
+                          "name": "item",
+                          "kind": 32768,
+                          "kindString": "Parameter",
+                          "flags": {},
+                          "type": {
+                            "type": "reference",
+                            "id": 1818,
+                            "name": "T"
+                          },
+                          "docFlags": {},
+                          "tagsByName": {}
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          {
+                            "type": "intrinsic",
+                            "name": "number"
+                          }
+                        ]
+                      },
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  ],
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [1812, 1813, 1814]
+                },
+                {
+                  "title": "Methods",
+                  "kind": 2048,
+                  "children": [1815]
+                }
+              ],
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+                  "line": 11,
+                  "character": 63
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          }
+        ]
+      },
+      "docFlags": {
+        "expandProperties": true
+      },
+      "tagsByName": {
+        "expand-properties": ""
+      }
+    },
+    "1819": {
+      "id": 1819,
+      "name": "Change",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+          "line": 59,
+          "character": 5
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 1824,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 1820,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 1821,
+              "name": "ADD",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+                  "line": 60,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": false
+                  },
+                  {
+                    "type": "array",
+                    "elementType": {
+                      "type": "reference",
+                      "id": 1824,
+                      "name": "T"
+                    }
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1823,
+              "name": "DELETE",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+                  "line": 62,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": false
+                  },
+                  {
+                    "type": "array",
+                    "elementType": {
+                      "type": "reference",
+                      "id": 1824,
+                      "name": "T"
+                    }
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 1822,
+              "name": "UPDATE",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+                  "line": 61,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": false
+                  },
+                  {
+                    "type": "array",
+                    "elementType": {
+                      "type": "tuple",
+                      "elements": [
+                        {
+                          "type": "reference",
+                          "id": 1824,
+                          "name": "T"
+                        },
+                        {
+                          "type": "reference",
+                          "id": 1824,
+                          "name": "T"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [1821, 1823, 1822]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/useListChangeObserver.ts",
+              "line": 59,
+              "character": 17
+            }
+          ],
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {},
+      "tagsByName": {}
     }
   },
-  "references": {},
   "meta": {
     "packageName": "util",
     "permaLink": "util/useListChangeObserver",

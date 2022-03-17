@@ -1,0 +1,570 @@
+{
+  "node": {
+    "id": 1188,
+    "name": "DeprecatedLifecycle",
+    "kind": 256,
+    "kindString": "Interface",
+    "flags": {
+      "isExternal": true
+    },
+    "children": [
+      {
+        "id": 1191,
+        "name": "UNSAFE_componentWillMount",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "signatures": [
+          {
+            "id": 1192,
+            "name": "UNSAFE_componentWillMount",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "comment": {
+              "shortText": "Called immediately before mounting occurs, and before `Component#render`.\nAvoid introducing any side-effects or subscriptions in this method.",
+              "text": "This method will not stop working in React 17.\n\nNote: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\nprevents this from being invoked.\n",
+              "tags": [
+                {
+                  "tag": "deprecated",
+                  "text": "16.3, use componentDidMount or the constructor instead"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path\n"
+                }
+              ],
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Called immediately before mounting occurs, and before \", _jsx(_components.code, {\n        children: \"Component#render\"\n      }), \".\\nAvoid introducing any side-effects or subscriptions in this method.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsx(_components.p, {\n        children: \"This method will not stop working in React 17.\"\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\\nprevents this from being invoked.\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+            },
+            "type": {
+              "type": "intrinsic",
+              "name": "void"
+            },
+            "deprecated": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"16.3, use componentDidMount or the constructor instead\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+            "tagsByName": {
+              "deprecated": "16.3, use componentDidMount or the constructor instead",
+              "see": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path"
+            }
+          }
+        ]
+      },
+      {
+        "id": 1197,
+        "name": "UNSAFE_componentWillReceiveProps",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "signatures": [
+          {
+            "id": 1198,
+            "name": "UNSAFE_componentWillReceiveProps",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "comment": {
+              "shortText": "Called when the component may be receiving new props.\nReact may call this even if props have not changed, so be sure to compare new and existing\nprops if you only want to handle changes.",
+              "text": "Calling `Component#setState` generally does not trigger this method.\n\nThis method will not stop working in React 17.\n\nNote: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\nprevents this from being invoked.\n",
+              "tags": [
+                {
+                  "tag": "deprecated",
+                  "text": "16.3, use static getDerivedStateFromProps instead"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path\n"
+                }
+              ],
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Called when the component may be receiving new props.\\nReact may call this even if props have not changed, so be sure to compare new and existing\\nprops if you only want to handle changes.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"Calling \", _jsx(_components.code, {\n          children: \"Component#setState\"\n        }), \" generally does not trigger this method.\"]\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"This method will not stop working in React 17.\"\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\\nprevents this from being invoked.\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+            },
+            "parameters": [
+              {
+                "id": 1199,
+                "name": "nextProps",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "reference",
+                  "id": 1159,
+                  "typeArguments": [
+                    {
+                      "type": "reference",
+                      "id": 1211,
+                      "qualifiedName": "React.DeprecatedLifecycle.P",
+                      "package": "@types/react",
+                      "name": "P"
+                    }
+                  ],
+                  "qualifiedName": "Readonly",
+                  "package": "typescript",
+                  "name": "Readonly"
+                }
+              },
+              {
+                "id": 1200,
+                "name": "nextContext",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              }
+            ],
+            "type": {
+              "type": "intrinsic",
+              "name": "void"
+            },
+            "deprecated": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"16.3, use static getDerivedStateFromProps instead\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+            "tagsByName": {
+              "deprecated": "16.3, use static getDerivedStateFromProps instead",
+              "see": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path"
+            }
+          }
+        ]
+      },
+      {
+        "id": 1206,
+        "name": "UNSAFE_componentWillUpdate",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "signatures": [
+          {
+            "id": 1207,
+            "name": "UNSAFE_componentWillUpdate",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "comment": {
+              "shortText": "Called immediately before rendering when new props or state is received. Not called for the initial render.",
+              "text": "Note: You cannot call `Component#setState` here.\n\nThis method will not stop working in React 17.\n\nNote: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\nprevents this from being invoked.\n",
+              "tags": [
+                {
+                  "tag": "deprecated",
+                  "text": "16.3, use getSnapshotBeforeUpdate instead"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path\n"
+                }
+              ],
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Called immediately before rendering when new props or state is received. Not called for the initial render.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"Note: You cannot call \", _jsx(_components.code, {\n          children: \"Component#setState\"\n        }), \" here.\"]\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"This method will not stop working in React 17.\"\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\\nprevents this from being invoked.\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+            },
+            "parameters": [
+              {
+                "id": 1208,
+                "name": "nextProps",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "reference",
+                  "id": 1159,
+                  "typeArguments": [
+                    {
+                      "type": "reference",
+                      "id": 1211,
+                      "qualifiedName": "React.DeprecatedLifecycle.P",
+                      "package": "@types/react",
+                      "name": "P"
+                    }
+                  ],
+                  "qualifiedName": "Readonly",
+                  "package": "typescript",
+                  "name": "Readonly"
+                }
+              },
+              {
+                "id": 1209,
+                "name": "nextState",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "reference",
+                  "id": 1159,
+                  "typeArguments": [
+                    {
+                      "type": "reference",
+                      "id": 1212,
+                      "qualifiedName": "React.DeprecatedLifecycle.S",
+                      "package": "@types/react",
+                      "name": "S"
+                    }
+                  ],
+                  "qualifiedName": "Readonly",
+                  "package": "typescript",
+                  "name": "Readonly"
+                }
+              },
+              {
+                "id": 1210,
+                "name": "nextContext",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              }
+            ],
+            "type": {
+              "type": "intrinsic",
+              "name": "void"
+            },
+            "deprecated": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"16.3, use getSnapshotBeforeUpdate instead\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+            "tagsByName": {
+              "deprecated": "16.3, use getSnapshotBeforeUpdate instead",
+              "see": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path"
+            }
+          }
+        ]
+      },
+      {
+        "id": 1189,
+        "name": "componentWillMount",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "signatures": [
+          {
+            "id": 1190,
+            "name": "componentWillMount",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "comment": {
+              "shortText": "Called immediately before mounting occurs, and before `Component#render`.\nAvoid introducing any side-effects or subscriptions in this method.",
+              "text": "Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\nprevents this from being invoked.\n",
+              "tags": [
+                {
+                  "tag": "deprecated",
+                  "text": "16.3, use componentDidMount or the constructor instead; will stop working in React 17"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#initializing-state"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path\n"
+                }
+              ],
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Called immediately before mounting occurs, and before \", _jsx(_components.code, {\n        children: \"Component#render\"\n      }), \".\\nAvoid introducing any side-effects or subscriptions in this method.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\\nprevents this from being invoked.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+            },
+            "type": {
+              "type": "intrinsic",
+              "name": "void"
+            },
+            "deprecated": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"16.3, use componentDidMount or the constructor instead; will stop working in React 17\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+            "tagsByName": {
+              "deprecated": "16.3, use componentDidMount or the constructor instead; will stop working in React 17",
+              "see": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path"
+            }
+          }
+        ]
+      },
+      {
+        "id": 1193,
+        "name": "componentWillReceiveProps",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "signatures": [
+          {
+            "id": 1194,
+            "name": "componentWillReceiveProps",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "comment": {
+              "shortText": "Called when the component may be receiving new props.\nReact may call this even if props have not changed, so be sure to compare new and existing\nprops if you only want to handle changes.",
+              "text": "Calling `Component#setState` generally does not trigger this method.\n\nNote: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\nprevents this from being invoked.\n",
+              "tags": [
+                {
+                  "tag": "deprecated",
+                  "text": "16.3, use static getDerivedStateFromProps instead; will stop working in React 17"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#updating-state-based-on-props"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path\n"
+                }
+              ],
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Called when the component may be receiving new props.\\nReact may call this even if props have not changed, so be sure to compare new and existing\\nprops if you only want to handle changes.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"Calling \", _jsx(_components.code, {\n          children: \"Component#setState\"\n        }), \" generally does not trigger this method.\"]\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\\nprevents this from being invoked.\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+            },
+            "parameters": [
+              {
+                "id": 1195,
+                "name": "nextProps",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "reference",
+                  "id": 1159,
+                  "typeArguments": [
+                    {
+                      "type": "reference",
+                      "id": 1211,
+                      "qualifiedName": "React.DeprecatedLifecycle.P",
+                      "package": "@types/react",
+                      "name": "P"
+                    }
+                  ],
+                  "qualifiedName": "Readonly",
+                  "package": "typescript",
+                  "name": "Readonly"
+                }
+              },
+              {
+                "id": 1196,
+                "name": "nextContext",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              }
+            ],
+            "type": {
+              "type": "intrinsic",
+              "name": "void"
+            },
+            "deprecated": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"16.3, use static getDerivedStateFromProps instead; will stop working in React 17\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+            "tagsByName": {
+              "deprecated": "16.3, use static getDerivedStateFromProps instead; will stop working in React 17",
+              "see": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path"
+            }
+          }
+        ]
+      },
+      {
+        "id": 1201,
+        "name": "componentWillUpdate",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "signatures": [
+          {
+            "id": 1202,
+            "name": "componentWillUpdate",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "comment": {
+              "shortText": "Called immediately before rendering when new props or state is received. Not called for the initial render.",
+              "text": "Note: You cannot call `Component#setState` here.\n\nNote: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\nprevents this from being invoked.\n",
+              "tags": [
+                {
+                  "tag": "deprecated",
+                  "text": "16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#reading-dom-properties-before-an-update"
+                },
+                {
+                  "tag": "see",
+                  "text": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path\n"
+                }
+              ],
+              "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Called immediately before rendering when new props or state is received. Not called for the initial render.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+              "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"Note: You cannot call \", _jsx(_components.code, {\n          children: \"Component#setState\"\n        }), \" here.\"]\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"Note: the presence of getSnapshotBeforeUpdate or getDerivedStateFromProps\\nprevents this from being invoked.\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+            },
+            "parameters": [
+              {
+                "id": 1203,
+                "name": "nextProps",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "reference",
+                  "id": 1159,
+                  "typeArguments": [
+                    {
+                      "type": "reference",
+                      "id": 1211,
+                      "qualifiedName": "React.DeprecatedLifecycle.P",
+                      "package": "@types/react",
+                      "name": "P"
+                    }
+                  ],
+                  "qualifiedName": "Readonly",
+                  "package": "typescript",
+                  "name": "Readonly"
+                }
+              },
+              {
+                "id": 1204,
+                "name": "nextState",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "reference",
+                  "id": 1159,
+                  "typeArguments": [
+                    {
+                      "type": "reference",
+                      "id": 1212,
+                      "qualifiedName": "React.DeprecatedLifecycle.S",
+                      "package": "@types/react",
+                      "name": "S"
+                    }
+                  ],
+                  "qualifiedName": "Readonly",
+                  "package": "typescript",
+                  "name": "Readonly"
+                }
+              },
+              {
+                "id": 1205,
+                "name": "nextContext",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              }
+            ],
+            "type": {
+              "type": "intrinsic",
+              "name": "void"
+            },
+            "deprecated": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+            "tagsByName": {
+              "deprecated": "16.3, use getSnapshotBeforeUpdate instead; will stop working in React 17",
+              "see": "https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path"
+            }
+          }
+        ]
+      }
+    ],
+    "groups": [
+      {
+        "title": "Methods",
+        "kind": 2048,
+        "children": [1191, 1197, 1206, 1189, 1193, 1201]
+      }
+    ],
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 686,
+        "character": 14
+      }
+    ],
+    "typeParameter": [
+      {
+        "id": 1211,
+        "name": "P",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        }
+      },
+      {
+        "id": 1212,
+        "name": "S",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        }
+      }
+    ],
+    "extendedBy": [
+      {
+        "type": "reference",
+        "id": 1106,
+        "name": "ComponentLifecycle"
+      }
+    ]
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/DeprecatedLifecycle",
+    "menuGroup": "default"
+  }
+}

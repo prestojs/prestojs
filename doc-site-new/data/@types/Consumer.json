@@ -1,0 +1,60 @@
+{
+  "node": {
+    "id": 1223,
+    "name": "Consumer",
+    "kind": 4194304,
+    "kindString": "Type alias",
+    "flags": {
+      "isExternal": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 379,
+        "character": 9
+      }
+    ],
+    "typeParameter": [
+      {
+        "id": 1224,
+        "name": "T",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        }
+      }
+    ],
+    "type": {
+      "type": "reference",
+      "id": 1235,
+      "typeArguments": [
+        {
+          "type": "reference",
+          "id": 1241,
+          "typeArguments": [
+            {
+              "type": "reference",
+              "id": 1224,
+              "qualifiedName": "T",
+              "package": "@types/react",
+              "name": "T"
+            }
+          ],
+          "qualifiedName": "React.ConsumerProps",
+          "package": "@types/react",
+          "name": "ConsumerProps"
+        }
+      ],
+      "qualifiedName": "React.ExoticComponent",
+      "package": "@types/react",
+      "name": "ExoticComponent"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/Consumer",
+    "menuGroup": "default"
+  }
+}

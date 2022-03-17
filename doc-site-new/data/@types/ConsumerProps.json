@@ -1,0 +1,122 @@
+{
+  "node": {
+    "id": 1241,
+    "name": "ConsumerProps",
+    "kind": 256,
+    "kindString": "Interface",
+    "flags": {
+      "isExternal": true
+    },
+    "children": [
+      {
+        "id": 1245,
+        "name": "unstable_observedBits",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 345,
+            "character": 8
+          }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "number"
+        }
+      },
+      {
+        "id": 1242,
+        "name": "children",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 344,
+            "character": 8
+          }
+        ],
+        "signatures": [
+          {
+            "id": 1243,
+            "name": "children",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "parameters": [
+              {
+                "id": 1244,
+                "name": "value",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true
+                },
+                "type": {
+                  "type": "reference",
+                  "id": 1246,
+                  "qualifiedName": "React.ConsumerProps.T",
+                  "package": "@types/react",
+                  "name": "T"
+                }
+              }
+            ],
+            "type": {
+              "type": "reference",
+              "id": 717,
+              "qualifiedName": "React.ReactNode",
+              "package": "@types/react",
+              "name": "ReactNode"
+            }
+          }
+        ]
+      }
+    ],
+    "groups": [
+      {
+        "title": "Properties",
+        "kind": 1024,
+        "children": [1245]
+      },
+      {
+        "title": "Methods",
+        "kind": 2048,
+        "children": [1242]
+      }
+    ],
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 343,
+        "character": 14
+      }
+    ],
+    "typeParameter": [
+      {
+        "id": 1246,
+        "name": "T",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        }
+      }
+    ]
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/ConsumerProps",
+    "menuGroup": "default"
+  }
+}

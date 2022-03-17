@@ -1,0 +1,129 @@
+{
+  "node": {
+    "id": 1154,
+    "name": "Context",
+    "kind": 256,
+    "kindString": "Interface",
+    "flags": {
+      "isExternal": true
+    },
+    "children": [
+      {
+        "id": 1156,
+        "name": "Consumer",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 382,
+            "character": 8
+          }
+        ],
+        "type": {
+          "type": "reference",
+          "id": 1223,
+          "typeArguments": [
+            {
+              "type": "reference",
+              "id": 1158,
+              "qualifiedName": "React.Context.T",
+              "package": "@types/react",
+              "name": "T"
+            }
+          ],
+          "qualifiedName": "React.Consumer",
+          "package": "@types/react",
+          "name": "Consumer"
+        }
+      },
+      {
+        "id": 1155,
+        "name": "Provider",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 381,
+            "character": 8
+          }
+        ],
+        "type": {
+          "type": "reference",
+          "id": 1221,
+          "typeArguments": [
+            {
+              "type": "reference",
+              "id": 1158,
+              "qualifiedName": "React.Context.T",
+              "package": "@types/react",
+              "name": "T"
+            }
+          ],
+          "qualifiedName": "React.Provider",
+          "package": "@types/react",
+          "name": "Provider"
+        }
+      },
+      {
+        "id": 1157,
+        "name": "displayName",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 383,
+            "character": 8
+          }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "string"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "title": "Properties",
+        "kind": 1024,
+        "children": [1156, 1155, 1157]
+      }
+    ],
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 380,
+        "character": 14
+      }
+    ],
+    "typeParameter": [
+      {
+        "id": 1158,
+        "name": "T",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        }
+      }
+    ]
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/Context",
+    "menuGroup": "default"
+  }
+}

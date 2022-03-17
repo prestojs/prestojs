@@ -1,131 +1,19 @@
-@import './docs.css';
-
 @tailwind base;
-
-h1 {
-    @apply text-2xl;
-}
-h2 {
-    @apply text-xl;
-}
-h3 {
-    @apply text-lg;
-}
-
-html {
-    @apply bg-white antialiased;
-}
-
 @tailwind components;
-
-.btn {
-    @apply font-bold py-2 px-4 rounded;
-}
-.btn-blue {
-    @apply btn bg-blue-500 text-white;
-}
-.btn-blue:hover {
-    @apply bg-blue-700;
-}
-.btn-blue:disabled {
-    @apply bg-blue-300;
-}
-
-.anchor-link {
-    position: relative;
-    margin-left: -1em;
-    padding-left: 1em;
-}
-.anchor-link::before {
-    display: block;
-    height: 5rem;
-    margin-top: -5rem;
-    visibility: hidden;
-    content: '';
-}
-.anchor-link-a {
-    top: 5rem;
-    left: 0;
-}
-.anchor-link:hover .anchor-link-a {
-    display: block;
-}
-.anchor-link h3, .anchor-link h4, .anchor-link h2 {
-    font-size: inherit;
-}
-
-.table-mdx p {
-    margin: 0;
-}
-.mdx a {
-    @apply text-blue-800;
-    @apply underline;
-}
-
-.mdx a:hover {
-    @apply text-blue-900;
-}
-.mdx code {
-    background-color: rgba(255, 230, 100, 0.2);
-}
-.mdx ul {
-    @apply m-5;
-}
-.mdx li {
-    @apply my-1 list-disc;
-}
-.mdx h3 {
-    @apply mt-5;
-}
-.mdx h1 {
-    @apply text-4xl;
-}
-.mdx h1, .mdx h2, .mdx h3, .mdx h4 {
-    font-weight: normal;
-}
-
-.code-editor-compiler input[type="text"] {
-    @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight;
-}
-.code-editor-compiler input[type="text"]:focus {
-    @apply outline-none ring;
-}
-.code-editor-compiler .ant-form-item {
-    @apply py-2;
-}
-.code-editor-compiler .ant-form-item label {
-    @apply block text-gray-700 text-sm font-bold mb-2;
-}
-.code-editor-compiler .ant-radio-wrapper {
-    @apply px-1;
-}
-.code-editor-compiler .ant-radio {
-   @apply mr-1;
-}
-
-
 @tailwind utilities;
 
-.max-w-screen-2xl {
-    max-width: 1600px;
+html {
+   @apply bg-white antialiased;
 }
 
-[aria-current="page"] {
-    font-weight: bold;
+.td-type-desc p:last-child {
+   margin-bottom: 0;
 }
-.algolia-autocomplete {
-    width: 100%;
-}
-
 
 .tooltip {
-    @apply invisible absolute w-full;
+   @apply invisible absolute w-80;
 }
 
 .tooltip-container:hover .tooltip {
-    @apply visible z-50 p-2 rounded border border-gray-200 bg-white  shadow-lg ml-4 text-sm;
-}
-
-.code-examples code {
-    background-color: rgba(255, 230, 100, 0.2);
+   @apply visible z-50 p-2 rounded border border-gray-200 bg-white  shadow-lg ml-4 text-sm;
 }

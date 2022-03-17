@@ -1,0 +1,28 @@
+{
+  "node": {
+    "id": 1170,
+    "name": "name",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+        "line": 1022,
+        "character": 4
+      }
+    ],
+    "type": {
+      "type": "intrinsic",
+      "name": "string"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "typescript",
+    "permaLink": "typescript/lib/name",
+    "menuGroup": "default"
+  }
+}

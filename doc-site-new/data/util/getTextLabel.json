@@ -31,7 +31,9 @@
               "tag": "menu-group",
               "text": "Labeled\n"
             }
-          ]
+          ],
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Get a plain text label from an item\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+          "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"If does not implement TextLabeled an error is thrown. To conditional call this check if labeled first\\nwith \", _jsx(_components.code, {\n        children: \"isTextLabeled\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
         },
         "parameters": [
           {
@@ -43,24 +45,29 @@
             "type": {
               "type": "intrinsic",
               "name": "any"
-            }
+            },
+            "docFlags": {},
+            "tagsByName": {}
           }
         ],
         "type": {
           "type": "intrinsic",
           "name": "string"
+        },
+        "docFlags": {},
+        "tagsByName": {
+          "extract-docs": "",
+          "menu-group": "Labeled"
         }
       }
     ],
-    "tagsByName": {
-      "extract-docs": "",
-      "menu-group": "Labeled"
-    }
+    "docFlags": {},
+    "tagsByName": {}
   },
   "references": {},
   "meta": {
     "packageName": "util",
     "permaLink": "util/getTextLabel",
-    "menuGroup": "Labeled"
+    "menuGroup": "default"
   }
 }

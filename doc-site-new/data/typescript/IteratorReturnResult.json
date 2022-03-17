@@ -1,0 +1,87 @@
+{
+  "node": {
+    "id": 1217,
+    "name": "IteratorReturnResult",
+    "kind": 256,
+    "kindString": "Interface",
+    "flags": {
+      "isExternal": true
+    },
+    "children": [
+      {
+        "id": 1218,
+        "name": "done",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+            "line": 37,
+            "character": 4
+          }
+        ],
+        "type": {
+          "type": "literal",
+          "value": true
+        }
+      },
+      {
+        "id": 1219,
+        "name": "value",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+            "line": 38,
+            "character": 4
+          }
+        ],
+        "type": {
+          "type": "reference",
+          "id": 1220,
+          "qualifiedName": "IteratorReturnResult.TReturn",
+          "package": "typescript",
+          "name": "TReturn"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "title": "Properties",
+        "kind": 1024,
+        "children": [1218, 1219]
+      }
+    ],
+    "sources": [
+      {
+        "fileName": "node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+        "line": 36,
+        "character": 10
+      }
+    ],
+    "typeParameter": [
+      {
+        "id": 1220,
+        "name": "TReturn",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        }
+      }
+    ]
+  },
+  "references": {},
+  "meta": {
+    "packageName": "typescript",
+    "permaLink": "typescript/lib/IteratorReturnResult",
+    "menuGroup": "default"
+  }
+}

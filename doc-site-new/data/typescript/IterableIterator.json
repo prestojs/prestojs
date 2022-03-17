@@ -1,0 +1,311 @@
+{
+  "node": {
+    "id": 974,
+    "name": "IterableIterator",
+    "kind": 256,
+    "kindString": "Interface",
+    "flags": {
+      "isExternal": true
+    },
+    "children": [
+      {
+        "id": 975,
+        "name": "[iterator]",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true
+        },
+        "signatures": [
+          {
+            "id": 976,
+            "name": "[iterator]",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "type": {
+              "type": "reference",
+              "id": 974,
+              "typeArguments": [
+                {
+                  "type": "reference",
+                  "id": 986,
+                  "qualifiedName": "IterableIterator.T",
+                  "package": "typescript",
+                  "name": "T"
+                }
+              ],
+              "qualifiedName": "IterableIterator",
+              "package": "typescript",
+              "name": "IterableIterator"
+            }
+          }
+        ]
+      },
+      {
+        "id": 977,
+        "name": "next",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true
+        },
+        "signatures": [
+          {
+            "id": 978,
+            "name": "next",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "parameters": [
+              {
+                "id": 979,
+                "name": "args",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true,
+                  "isRest": true
+                },
+                "type": {
+                  "type": "union",
+                  "types": [
+                    {
+                      "type": "tuple"
+                    },
+                    {
+                      "type": "tuple",
+                      "elements": [
+                        {
+                          "type": "intrinsic",
+                          "name": "undefined"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "type": {
+              "type": "reference",
+              "id": 1161,
+              "typeArguments": [
+                {
+                  "type": "reference",
+                  "id": 986,
+                  "qualifiedName": "IterableIterator.T",
+                  "package": "typescript",
+                  "name": "T"
+                },
+                {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              ],
+              "qualifiedName": "IteratorResult",
+              "package": "typescript",
+              "name": "IteratorResult"
+            },
+            "inheritedFrom": {
+              "type": "reference",
+              "id": 1095,
+              "name": "Iterator.next"
+            }
+          }
+        ],
+        "inheritedFrom": {
+          "type": "reference",
+          "id": 1094,
+          "name": "Iterator.next"
+        }
+      },
+      {
+        "id": 980,
+        "name": "return",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "signatures": [
+          {
+            "id": 981,
+            "name": "return",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "parameters": [
+              {
+                "id": 982,
+                "name": "value",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true,
+                  "isOptional": true
+                },
+                "type": {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              }
+            ],
+            "type": {
+              "type": "reference",
+              "id": 1161,
+              "typeArguments": [
+                {
+                  "type": "reference",
+                  "id": 986,
+                  "qualifiedName": "IterableIterator.T",
+                  "package": "typescript",
+                  "name": "T"
+                },
+                {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              ],
+              "qualifiedName": "IteratorResult",
+              "package": "typescript",
+              "name": "IteratorResult"
+            },
+            "inheritedFrom": {
+              "type": "reference",
+              "id": 1098,
+              "name": "Iterator.return"
+            }
+          }
+        ],
+        "inheritedFrom": {
+          "type": "reference",
+          "id": 1097,
+          "name": "Iterator.return"
+        }
+      },
+      {
+        "id": 983,
+        "name": "throw",
+        "kind": 2048,
+        "kindString": "Method",
+        "flags": {
+          "isExternal": true,
+          "isOptional": true
+        },
+        "signatures": [
+          {
+            "id": 984,
+            "name": "throw",
+            "kind": 4096,
+            "kindString": "Call signature",
+            "flags": {
+              "isExternal": true
+            },
+            "parameters": [
+              {
+                "id": 985,
+                "name": "e",
+                "kind": 32768,
+                "kindString": "Parameter",
+                "flags": {
+                  "isExternal": true,
+                  "isOptional": true
+                },
+                "type": {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              }
+            ],
+            "type": {
+              "type": "reference",
+              "id": 1161,
+              "typeArguments": [
+                {
+                  "type": "reference",
+                  "id": 986,
+                  "qualifiedName": "IterableIterator.T",
+                  "package": "typescript",
+                  "name": "T"
+                },
+                {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              ],
+              "qualifiedName": "IteratorResult",
+              "package": "typescript",
+              "name": "IteratorResult"
+            },
+            "inheritedFrom": {
+              "type": "reference",
+              "id": 1101,
+              "name": "Iterator.throw"
+            }
+          }
+        ],
+        "inheritedFrom": {
+          "type": "reference",
+          "id": 1100,
+          "name": "Iterator.throw"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "title": "Methods",
+        "kind": 2048,
+        "children": [975, 977, 980, 983]
+      }
+    ],
+    "sources": [
+      {
+        "fileName": "node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+        "line": 54,
+        "character": 10
+      }
+    ],
+    "typeParameter": [
+      {
+        "id": 986,
+        "name": "T",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        }
+      }
+    ],
+    "extendedTypes": [
+      {
+        "type": "reference",
+        "id": 1093,
+        "typeArguments": [
+          {
+            "type": "reference",
+            "id": 986,
+            "qualifiedName": "IterableIterator.T",
+            "package": "typescript",
+            "name": "T"
+          }
+        ],
+        "qualifiedName": "Iterator",
+        "package": "typescript",
+        "name": "Iterator"
+      }
+    ]
+  },
+  "references": {},
+  "meta": {
+    "packageName": "typescript",
+    "permaLink": "typescript/lib/IterableIterator",
+    "menuGroup": "default"
+  }
+}

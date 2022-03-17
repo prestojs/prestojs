@@ -1,0 +1,168 @@
+{
+  "node": {
+    "id": 1235,
+    "name": "ExoticComponent",
+    "kind": 256,
+    "kindString": "Interface",
+    "flags": {
+      "isExternal": true
+    },
+    "children": [
+      {
+        "id": 1236,
+        "name": "$$typeof",
+        "kind": 1024,
+        "kindString": "Property",
+        "flags": {
+          "isExternal": true,
+          "isReadonly": true
+        },
+        "sources": [
+          {
+            "fileName": "node_modules/@types/react/index.d.ts",
+            "line": 363,
+            "character": 17
+          }
+        ],
+        "type": {
+          "type": "intrinsic",
+          "name": "symbol"
+        }
+      }
+    ],
+    "groups": [
+      {
+        "title": "Properties",
+        "kind": 1024,
+        "children": [1236]
+      }
+    ],
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 358,
+        "character": 14
+      }
+    ],
+    "typeParameter": [
+      {
+        "id": 1238,
+        "name": "P",
+        "kind": 131072,
+        "kindString": "Type parameter",
+        "flags": {
+          "isExternal": true
+        },
+        "default": {
+          "type": "reflection",
+          "declaration": {
+            "id": 1237,
+            "name": "__type",
+            "kind": 65536,
+            "kindString": "Type literal",
+            "flags": {
+              "isExternal": true
+            },
+            "sources": [
+              {
+                "fileName": "node_modules/@types/react/index.d.ts",
+                "line": 358,
+                "character": 34
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "signatures": [
+      {
+        "id": 1239,
+        "name": "ExoticComponent",
+        "kind": 4096,
+        "kindString": "Call signature",
+        "flags": {
+          "isExternal": true
+        },
+        "comment": {
+          "shortText": "**NOTE**: Exotic components are not callable.",
+          "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      strong: \"strong\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [_jsx(_components.strong, {\n        children: \"NOTE\"\n      }), \": Exotic components are not callable.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+        },
+        "parameters": [
+          {
+            "id": 1240,
+            "name": "props",
+            "kind": 32768,
+            "kindString": "Parameter",
+            "flags": {
+              "isExternal": true
+            },
+            "type": {
+              "type": "reference",
+              "id": 1238,
+              "qualifiedName": "React.ExoticComponent.P",
+              "package": "@types/react",
+              "name": "P"
+            }
+          }
+        ],
+        "type": {
+          "type": "union",
+          "types": [
+            {
+              "type": "literal",
+              "value": null
+            },
+            {
+              "type": "reference",
+              "id": 726,
+              "typeArguments": [
+                {
+                  "type": "intrinsic",
+                  "name": "any"
+                },
+                {
+                  "type": "union",
+                  "types": [
+                    {
+                      "type": "intrinsic",
+                      "name": "string"
+                    },
+                    {
+                      "type": "reference",
+                      "id": 966,
+                      "typeArguments": [
+                        {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
+                      ],
+                      "qualifiedName": "React.JSXElementConstructor",
+                      "package": "@types/react",
+                      "name": "JSXElementConstructor"
+                    }
+                  ]
+                }
+              ],
+              "qualifiedName": "React.ReactElement",
+              "package": "@types/react",
+              "name": "ReactElement"
+            }
+          ]
+        }
+      }
+    ],
+    "extendedBy": [
+      {
+        "type": "reference",
+        "id": 1225,
+        "name": "ProviderExoticComponent"
+      }
+    ]
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/ExoticComponent",
+    "menuGroup": "default"
+  }
+}

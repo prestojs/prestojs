@@ -1,0 +1,34 @@
+{
+  "node": {
+    "id": 1227,
+    "name": "$$typeof",
+    "kind": 1024,
+    "kindString": "Property",
+    "flags": {
+      "isExternal": true,
+      "isReadonly": true
+    },
+    "sources": [
+      {
+        "fileName": "node_modules/@types/react/index.d.ts",
+        "line": 363,
+        "character": 17
+      }
+    ],
+    "type": {
+      "type": "intrinsic",
+      "name": "symbol"
+    },
+    "inheritedFrom": {
+      "type": "reference",
+      "id": 1236,
+      "name": "ExoticComponent.$$typeof"
+    }
+  },
+  "references": {},
+  "meta": {
+    "packageName": "@types",
+    "permaLink": "@types/react/$$typeof",
+    "menuGroup": "default"
+  }
+}
