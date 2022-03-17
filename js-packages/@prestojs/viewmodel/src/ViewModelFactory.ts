@@ -579,6 +579,12 @@ export class BaseViewModel<
                                 ...(Array.isArray(path) ? path : [path]),
                             ] as FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>);
                         }
+                    } else if (key in assignedData) {
+                        // If the related field was present but `null` still keep it in the field list. without
+                        // this we'd lose the related field (eg. customer) and only have the id (eg. customerId).
+                        assignedFieldsDeep.push(
+                            key as FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>
+                        );
                     }
                     // Key could be set but the value is null. In that case we want the sourceFieldName to be set to
                     // null as well.
@@ -749,6 +755,21 @@ export class BaseViewModel<
                 []
             );
             if (relatedRecords.length === 0) {
+                // If there are no related records we still want to keep the field paths if they were specified so
+                // that we know they were requested (eg. from the cache). Without this the record could be instantiated
+                // without the related field value at all which causes an exception when you try to access it (rather
+                // we want it to be kept as null if it was originally supplied).
+                // This only applies when there are no relatedRecords (ie. the relation isnull). Otherwise if there
+                // are related records we will instead apply the logic below which takes the intersection of fields
+                // across all records (which in most cases should be the same but this guarantees it).
+                if (this._assignedFieldPaths.relations[relation.name]) {
+                    paths.push(
+                        ...(this._assignedFieldPaths.relations[relation.name].map(f => [
+                            relation.name,
+                            ...(Array.isArray(f) ? f : [f]),
+                        ]) as FieldPath<T>[])
+                    );
+                }
                 continue;
             }
             const [first, ...rest] = relatedRecords;

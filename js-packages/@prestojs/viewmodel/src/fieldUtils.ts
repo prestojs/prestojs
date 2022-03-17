@@ -1,7 +1,10 @@
 import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
 import { FieldPath, FieldPaths, InvalidFieldError, ViewModelConstructor } from './ViewModelFactory';
 
+// Used when `includeRelations` is false
 const expandedFields = new Map<ViewModelConstructor<any, any>, FieldPath<any>[]>();
+// Used when `includeRelations` is true
+const expandedFieldsWithRelations = new Map<ViewModelConstructor<any, any>, FieldPath<any>[]>();
 
 /**
  * For a model expand the fields according to the rules for the '*' specification.
@@ -13,14 +16,15 @@ function expandStarFields<T extends ViewModelConstructor<any, any>>(
     modelClass: T,
     includeRelations = true
 ): FieldPath<T>[] {
-    let fieldPaths = expandedFields.get(modelClass) as FieldPath<T>[];
+    const mapping = includeRelations ? expandedFieldsWithRelations : expandedFields;
+    let fieldPaths = mapping.get(modelClass) as FieldPath<T>[];
     if (fieldPaths) {
         return fieldPaths;
     }
     fieldPaths = modelClass.allFieldNames.filter(
         subFieldName => !modelClass.relationFieldNames.includes(subFieldName)
     ) as FieldPath<T>[];
-    expandedFields.set(modelClass, fieldPaths);
+    mapping.set(modelClass, fieldPaths);
     if (includeRelations) {
         for (const fieldName of modelClass.relationFieldNames) {
             fieldPaths.push(
@@ -185,7 +189,14 @@ class ViewModelFieldPathsCache<T extends ViewModelConstructor<any, any>> {
                         // that models non-relation fields
                         resolvedFieldNames.add(field.sourceFieldName);
                         expandStarFields(field.to, false).forEach(subFieldName => {
-                            resolvedFieldNames.add([fieldPath, subFieldName].join('.'));
+                            resolvedFieldNames.add(
+                                [
+                                    fieldPath,
+                                    ...(Array.isArray(subFieldName)
+                                        ? subFieldName
+                                        : [subFieldName]),
+                                ].join('.')
+                            );
                         });
                     } else {
                         resolvedFieldNames.add(fieldPath);
