@@ -3789,3 +3789,178 @@ test('nested cache updates should handle null values being filled out', () => {
         })
     );
 });
+
+test('cache should handle many related with some null values', () => {
+    // This test case handles edge cases around Many fields where some null values for nested relations
+    // on only some of the records could cause issues
+    class Owner extends viewModelFactory(
+        {
+            id: new Field(),
+            title: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Business extends viewModelFactory(
+        {
+            id: new Field(),
+            title: new Field(),
+            ownerId: new Field(),
+            owner: new RelatedViewModelField({
+                to: Owner,
+                sourceFieldName: 'ownerId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    class Supplier extends viewModelFactory(
+        {
+            id: new Field(),
+            title: new Field(),
+            businessId: new Field(),
+            business: new RelatedViewModelField({ to: Business, sourceFieldName: 'businessId' }),
+            parentId: new Field(),
+            parent: new RelatedViewModelField<any>({
+                to: (): any => Supplier,
+                sourceFieldName: 'parentId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    class Booking extends viewModelFactory(
+        {
+            id: new Field(),
+            supplierIds: new ListField({ childField: new Field() }),
+            suppliers: new ManyRelatedViewModelField({
+                to: Supplier,
+                sourceFieldName: 'supplierIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    Booking.cache.add({
+        id: 1,
+        suppliers: [
+            {
+                id: 1,
+                title: 'Supplier 1',
+                businessId: null,
+                business: null,
+                parentId: 2,
+            },
+            {
+                id: 2,
+                title: 'Supplier 2',
+                businessId: null,
+                business: null,
+                parentId: null,
+            },
+        ],
+    });
+
+    let booking = Booking.cache.get(1, '*');
+    expect(booking).not.toBeNull();
+    if (booking) {
+        expect(booking.suppliers[0].business).toBe(null);
+        expect(booking.suppliers[1].business).toBe(null);
+        expect(booking.suppliers[1].parent).toBe(null);
+        expect(booking.suppliers[0].parent).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Supplier 2',
+                businessId: null,
+                business: null,
+                parentId: null,
+            })
+        );
+    }
+    Booking.cache.add({
+        id: 2,
+        suppliers: [
+            {
+                id: 1,
+                title: 'Supplier 1',
+                business: null,
+                parentId: null,
+            },
+            {
+                id: 2,
+                title: 'Supplier 2',
+                business: {
+                    id: 1,
+                    title: 'Business',
+                    owner: {
+                        id: 1,
+                        title: 'Yes',
+                    },
+                },
+                parentId: null,
+            },
+        ],
+    });
+    booking = Booking.cache.get(2, '*');
+    expect(booking).not.toBeNull();
+    if (booking) {
+        expect(booking.suppliers[0].business).toBe(null);
+        expect(booking.suppliers[1].business).toEqual(
+            recordEqualTo({
+                id: 1,
+                title: 'Business',
+                ownerId: 1,
+                owner: {
+                    id: 1,
+                    title: 'Yes',
+                },
+            })
+        );
+        expect(booking.suppliers[1].parent).toBe(null);
+        expect(booking.suppliers[0].parent).toBe(null);
+    }
+
+    // Same as above but the suppliers are in reverse order
+    Booking.cache.add({
+        id: 3,
+        suppliers: [
+            {
+                id: 3,
+                title: 'Supplier 2',
+                business: {
+                    id: 2,
+                    title: 'Business',
+                    owner: {
+                        id: 2,
+                        title: 'Yes',
+                    },
+                },
+                parentId: null,
+            },
+            {
+                id: 4,
+                title: 'Supplier 1',
+                business: null,
+                businessId: null,
+                parentId: null,
+            },
+        ],
+    });
+    booking = Booking.cache.get(3, '*');
+    expect(booking).not.toBeNull();
+    if (booking) {
+        expect(booking.suppliers[1].business).toBe(null);
+        expect(booking.suppliers[0].business).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Business',
+                ownerId: 2,
+                owner: {
+                    id: 2,
+                    title: 'Yes',
+                },
+            })
+        );
+        expect(booking.suppliers[0].parent).toBe(null);
+        expect(booking.suppliers[1].parent).toBe(null);
+    }
+});

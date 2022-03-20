@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+* Fix bugs that could occur when using `ManyRelatedViewModelField` with recursive relations (ie. a model has a direct or indirect relation to itself)
+
 ## [0.0.28] - 2022-03-08
 
 ### Changed
