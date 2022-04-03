@@ -1,3 +1,6 @@
+/**
+ * See the [fetch init](https://developer.mozilla.org/en-US/docs/Web/API/fetch#parameters) argument for more details
+ */
 export type PaginatorRequestOptions = Omit<RequestInit, 'headers'> & {
     /**
      * Any headers to add to the request. You can unset default headers that might be specified in the default
@@ -96,7 +99,8 @@ export interface PaginatorInterfaceClass<T extends PaginatorInterface = Paginato
  * @extract-docs
  */
 export default abstract class Paginator<State extends {}, InternalState extends {}>
-    implements PaginatorInterface<State, InternalState> {
+    implements PaginatorInterface<State, InternalState>
+{
     currentState: State;
     internalState: InternalState & { responseIsSet?: boolean };
     setCurrentState: (set: State) => void;

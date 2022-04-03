@@ -1,9 +1,28 @@
-import React from 'react';
+import Modal from '@prestojs/doc/Modal';
+import React, { ReactNode, useContext } from 'react';
 import { JSONOutput } from 'typedoc';
+import DeclarationsTable, { resolveChildrenFromType } from './DeclarationsTable';
 import { useDocContext } from './DocProvider';
-import PrecompiledMarkdown from './PrecompiledMarkdown';
-import Table from './Table';
-import { DeclarationReflection } from './types';
+import FunctionDescription from './FunctionDescription';
+import KindDescription from './KindDescription';
+
+type TypeNameContext = {
+    mode: 'COMPACT' | 'EXPANDED';
+};
+
+const context = React.createContext<TypeNameContext>({ mode: 'COMPACT' });
+
+export function useTypeNameContext(): TypeNameContext {
+    return useContext(context);
+}
+
+export function TypeNameProvider({
+    children,
+    ...options
+}: Partial<TypeNameContext> & { children: ReactNode }) {
+    const defaults = useTypeNameContext();
+    return <context.Provider value={{ ...defaults, ...options }}>{children}</context.Provider>;
+}
 
 type Props = {
     type:
@@ -13,87 +32,105 @@ type Props = {
         | JSONOutput.NamedTupleMemberType;
 };
 
-function Kind({ declaration }: { declaration: DeclarationReflection }) {
-    if (declaration.kindString === 'Method') {
-        console.log(declaration);
-        return <span className="text-orange-400">Method</span>;
+function ReferencedType({ type }: { type: JSONOutput.ReferenceType }): React.ReactElement {
+    const docContext = useDocContext();
+    if (
+        type.id &&
+        docContext &&
+        docContext.referencedTypes[type.id] &&
+        type.package !== 'typescript'
+    ) {
+        const referencedType = docContext.referencedTypes[type.id];
+        if (referencedType.type) {
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            return <TypeName type={referencedType.type} />;
+        }
+        if (
+            referencedType.kindString === 'Interface' &&
+            referencedType.signatures?.length &&
+            referencedType.signatures[0].name === referencedType.name
+        ) {
+            return <FunctionDescription signatures={referencedType.signatures} />;
+        }
     }
-    return <>{declaration.name}</>;
+    return <span className="text-blue-400">{type.name}</span>;
 }
 
-function ObjectProperties(props: { properties: DeclarationReflection[] }): React.ReactElement {
+function ExpandableDescription({ title, expandedContent }) {
+    const [showModal, setShowModal] = React.useState(false);
+    const { mode } = useTypeNameContext();
+    if (mode === 'EXPANDED') {
+        return expandedContent;
+    }
     return (
-        <Table<DeclarationReflection>
-            columns={[
-                {
-                    title: 'Property',
-                    key: 'name',
-                    className(property: DeclarationReflection): string {
-                        let className =
-                            'font-semibold border-gray-300 font-mono text-xs text-purple-700 whitespace-nowrap';
-                        if (property.docFlags.deprecated) {
-                            className += ' line-through';
-                        }
-                        return className;
-                    },
-                },
-                {
-                    title: 'Type',
-                    key: 'type',
-                    render: (type, property): React.ReactNode => {
-                        if (type) {
-                            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                            return <TypeName type={type} />;
-                        }
-                        return <Kind declaration={property} />;
-                    },
-                },
-                {
-                    title: 'Description',
-                    key: 'description',
-                    className:
-                        'border-gray-300 font-mono text-xs text-blue-700 align-top td-type-desc',
-                    render: (type, property): React.ReactNode => {
-                        return (
-                            <>
-                                {property.comment?.shortTextMdx && (
-                                    <PrecompiledMarkdown code={property.comment?.shortTextMdx} />
-                                )}
-                                {property.comment?.textMdx && (
-                                    <PrecompiledMarkdown code={property.comment?.textMdx} />
-                                )}
-                                {property.docFlags.deprecated && (
-                                    <div className="text-red-400">
-                                        Deprecated
-                                        {typeof property.docFlags.deprecated == 'string' && (
-                                            <>
-                                                :{' '}
-                                                <PrecompiledMarkdown
-                                                    code={property.docFlags.deprecated}
-                                                />
-                                            </>
-                                        )}
-                                    </div>
-                                )}
-                            </>
-                        );
-                    },
-                },
-            ]}
-            data={props.properties}
-            rowKey="id"
-            title={<strong>An object with these properties:</strong>}
-        />
+        <>
+            <button
+                className="underline text-orange-400 hover:text-orange-600"
+                onClick={() => setShowModal(true)}
+            >
+                {title}
+            </button>
+            <Modal isVisible={showModal} onClose={() => setShowModal(false)}>
+                {expandedContent}
+            </Modal>
+        </>
     );
 }
 
-function ReferencedType({ type }: { type: JSONOutput.ReferenceType }): React.ReactElement {
-    const docContext = useDocContext();
-    if (type.id && docContext && docContext.referencedTypes[type.id]) {
-        const referencedType = docContext.referencedTypes[type.id];
-        console.log('TODO', { referencedType });
+function IntersectionType(props: { type: JSONOutput.IntersectionType }) {
+    const context = useDocContext();
+    if (!context) {
+        return <>TODO: intersection</>;
     }
-    return <span className="text-blue-400">{type.name}</span>;
+    const children = resolveChildrenFromType(props.type, context.referencedTypes);
+    if (children) {
+        // TODO: Sometimes need to show full thing
+        const content = (
+            <DeclarationsTable
+                declarations={children}
+                title={<strong>An object with these properties:</strong>}
+                showRequiredColumn
+            />
+        );
+        return <ExpandableDescription expandedContent={content} title="Details" />;
+    }
+    return <>TODO: intersection</>;
+    // const declaration = mergeDeclarations(
+    //     ...(props.type.types
+    //         .map(t => resolveType(t, context.referencedTypes)[1])
+    //         .filter(Boolean) as DeclarationReflection[])
+    // );
+    //
+    // console.log(
+    //     'INTESRECT',
+    //     declaration,
+    //     props.type,
+    //     props.type.types.map(t => resolveType(t, context.referencedTypes)[1])
+    // );
+    // if (!declaration.type) {
+    //     return <>{declaration.name}</>;
+    // }
+    // // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    // return <TypeName type={declaration.type} />;
+}
+
+function TupleType({ type }: { type: JSONOutput.TupleType }) {
+    if (type.elements) {
+        const length = type.elements.length;
+        return (
+            <span className="text-blue-400">
+                [
+                {type.elements.map((t, i) => (
+                    <React.Fragment key={i}>
+                        <TypeName type={t} />
+                        {i < length - 1 && ', '}
+                    </React.Fragment>
+                ))}
+                ]
+            </span>
+        );
+    }
+    return <span className="text-blue-400">Tuple</span>;
 }
 
 export default function TypeName({ type }: Props): React.ReactElement {
@@ -137,32 +174,51 @@ export default function TypeName({ type }: Props): React.ReactElement {
                 </>
             );
         case 'intersection':
-            return <>TODO: intersection</>;
+            return <IntersectionType type={type} />;
         case 'typeOperator':
             return <>TODO: typeOperator</>;
         case 'reflection':
             if (type.declaration) {
                 if (type.declaration.children) {
-                    return <ObjectProperties properties={type.declaration.children} />;
+                    const content = (
+                        <DeclarationsTable
+                            declarations={type.declaration.children}
+                            title={<strong>An object with these properties:</strong>}
+                            showRequiredColumn
+                        />
+                    );
+                    return (
+                        <ExpandableDescription
+                            expandedContent={content}
+                            title={type.declaration.name}
+                        />
+                    );
                 } else {
-                    return <>TODO: reflection {type.declaration.kindString}</>;
+                    return <KindDescription declaration={type.declaration} />;
                 }
             }
             return <>{type.type}</>;
         case 'reference':
             return <ReferencedType type={type} />;
+        case 'query':
+            return <ReferencedType type={type.queryType} />;
+        case 'mapped':
+            console.log('MAPPED', {
+                type,
+            });
+            return <>TODO MAPPED</>;
+        case 'tuple':
+            return <TupleType type={type} />;
         case 'conditional':
         case 'indexedAccess':
-        case 'mapped':
         case 'named-tuple-member':
         case 'inferred':
         case 'optional':
         case 'predicate':
-        case 'query':
         case 'rest':
         case 'template-literal':
-        case 'tuple':
         case 'unknown':
+            console.log(type);
             return <>TODO: {type.type}</>;
         default:
             // will be a type error if missing a case above

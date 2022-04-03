@@ -74,9 +74,15 @@ const DEEP = 'DEEP';
 // and so wouldn't re-call the function). As such we've decided not to include it.
 
 /**
+ * I do havestuff
+ *
+ * ```js
+ * const a = 5;
+ * ```
+ *
  * @expand-properties
  */
-export type UseAsyncOptions = {
+export interface UseAsyncOptions {
     /**
      * Determines when the function is called. Defaults to `MANUAL`.
      *
@@ -115,14 +121,33 @@ export type UseAsyncOptions = {
      * method to be called regardless then attach your own callbacks to the
      * promise when you call `run` or in the async function definition itself.
      */
-    onSuccess?: (result: {}) => void;
+    onSuccess?: OnSuccess;
     /**
      * Called when action errors. Passed the error returned from async action.
      *
      * See note above on `onSuccess` for behaviour when component has unmounted.
      */
-    onError?: (error: Error) => void;
-};
+    onError?: OnError;
+}
+
+/**
+ * Booyah
+ */
+interface OnSuccess {
+    /**
+     * Haha whatver
+     * @param result Stuff etc
+     */
+    (result: {}): void;
+}
+
+interface OnError {
+    /**
+     * Haha yeah cool man
+     * @param error DO stuff `ya know maen`
+     */
+    (error: Error): void;
+}
 
 const validOptionKeys = ['trigger', 'args', 'onSuccess', 'onError'];
 
@@ -242,6 +267,8 @@ const comparisonByTrigger = {
  * in your component or hook. To help detect runaway effects caused by this automatically
  * consider using [stop-runaway-react-effects](https://github.com/kentcdodds/stop-runaway-react-effects).
  *
+ * @typeParam ResultT The type of the result returned by `fn`.
+ * @typeParam ErrorT The type of the error in the case the promise returned by `fn` rejects
  *
  * @extract-docs
  */

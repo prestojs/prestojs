@@ -4,7 +4,7 @@ const ModuleFlags = TypeScript.SymbolFlags.ValueModule | TypeScript.SymbolFlags.
 
 /** @param {{ application: import("typedoc").Application }} param0 */
 exports.load = function (application) {
-    let includeTag = 'exposeInDocs';
+    let includeTag = 'extract-docs';
 
     application.options.addDeclaration({
         name: 'includeTag',
@@ -30,7 +30,7 @@ exports.load = function (application) {
 
         /** @type {TypeScript.Symbol | undefined} */
         const moduleSymbol =
-            context.checker.getSymbolAtLocation(node) ?? /** @type {any} */ (node).symbol;
+            context.checker.getSymbolAtLocation(node) || /** @type {any} */ (node).symbol;
 
         if (!moduleSymbol) {
             // Global file, no point in doing anything here. TypeDoc will already
@@ -51,7 +51,6 @@ exports.load = function (application) {
 
         for (const symbol of symbols) {
             if (symbol.getJsDocTags().some(tag => tag.name.toLocaleLowerCase() === includeTag)) {
-                console.log('yooooooo', symbol.name);
                 context.converter.convertSymbol(context, symbol);
             }
         }

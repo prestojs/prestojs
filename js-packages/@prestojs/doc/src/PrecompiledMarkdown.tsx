@@ -36,9 +36,17 @@ export default function PrecompiledMarkdown({ code }): React.ReactElement {
 
     useEffect(() => {
         (async (): Promise<void> => {
-            setMdxModule(await run(code, { ...runtime, useMDXComponents }));
+            try {
+                setMdxModule(await run(code, { ...runtime, useMDXComponents }));
+            } catch (e) {
+                console.log('Error generating mdx', code);
+            }
         })();
     }, [code]);
 
-    return <Content />;
+    return (
+        <span className="mdx">
+            <Content />
+        </span>
+    );
 }

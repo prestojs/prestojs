@@ -4,6 +4,7 @@ declare module 'typedoc/dist/lib/serialization/schema' {
     interface Comment {
         textMdx?: string;
         shortTextMdx?: string;
+        returnsMdx?: string;
     }
     interface Reflection {
         tagsByName: Record<string, any>;
@@ -11,6 +12,7 @@ declare module 'typedoc/dist/lib/serialization/schema' {
             deprecated?: string | boolean;
             expandProperties?: boolean;
         };
+        anchorId: string;
     }
 }
 

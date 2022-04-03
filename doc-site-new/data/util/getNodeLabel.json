@@ -1,5 +1,5 @@
 {
-  "node": {
+  "declaration": {
     "id": 11,
     "name": "getNodeLabel",
     "kind": 64,
@@ -46,17 +46,18 @@
               "type": "intrinsic",
               "name": "any"
             },
+            "anchorId": "item",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "type": {
           "type": "reference",
-          "id": 717,
           "qualifiedName": "React.ReactNode",
           "package": "@types/react",
           "name": "React.ReactNode"
         },
+        "anchorId": "getNodeLabel",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -65,69 +66,16 @@
       }
     ],
     "docFlags": {},
-    "tagsByName": {}
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Labeled"
+    },
+    "slug": "util/getNodeLabel"
   },
-  "references": {
-    "717": {
-      "id": 717,
-      "name": "ReactNode",
-      "kind": 4194304,
-      "kindString": "Type alias",
-      "flags": {
-        "isExternal": true
-      },
-      "sources": [
-        {
-          "fileName": "node_modules/@types/react/index.d.ts",
-          "line": 241,
-          "character": 9
-        }
-      ],
-      "type": {
-        "type": "union",
-        "types": [
-          {
-            "type": "reference",
-            "id": 718,
-            "qualifiedName": "React.ReactChild",
-            "package": "@types/react",
-            "name": "ReactChild"
-          },
-          {
-            "type": "reference",
-            "id": 719,
-            "qualifiedName": "React.ReactFragment",
-            "package": "@types/react",
-            "name": "ReactFragment"
-          },
-          {
-            "type": "reference",
-            "id": 721,
-            "qualifiedName": "React.ReactPortal",
-            "package": "@types/react",
-            "name": "ReactPortal"
-          },
-          {
-            "type": "intrinsic",
-            "name": "boolean"
-          },
-          {
-            "type": "literal",
-            "value": null
-          },
-          {
-            "type": "intrinsic",
-            "name": "undefined"
-          }
-        ]
-      },
-      "docFlags": {},
-      "tagsByName": {}
-    }
-  },
+  "references": {},
   "meta": {
     "packageName": "util",
-    "permaLink": "util/getNodeLabel",
-    "menuGroup": "default"
+    "permaLink": "getNodeLabel",
+    "menuGroup": "Labeled"
   }
 }

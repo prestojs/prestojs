@@ -1,3 +1,4 @@
+import TypeParameters from '@prestojs/doc/TypeParameters';
 import React, { useEffect, useState } from 'react';
 import SourceLink from './SourceLink';
 import Tooltip from './Tooltip';
@@ -84,6 +85,9 @@ export default function DocHeader({
             <header className="flex justify-between items-center">
                 <h1 className="text-3xl flex justify-between items-center relative">
                     {declaration.name}
+                    {declaration.typeParameter && (
+                        <TypeParameters typeParameter={declaration.typeParameter} />
+                    )}
                     {isComponent && (
                         <Tooltip content="This is a React component">
                             <svg

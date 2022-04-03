@@ -309,6 +309,916 @@ export const Reflection: ComponentStory<typeof TypeName> = () => (
     </DocProvider>
 );
 
+export const IntersectionOmit: ComponentStory<typeof TypeName> = () => (
+    <DocProvider
+        referencedTypes={{
+            '392': {
+                id: 392,
+                name: 'PaginatorRequestOptions',
+                kind: 4194304,
+                kindString: 'Type alias',
+                flags: {},
+                sources: [
+                    {
+                        fileName: 'js-packages/@prestojs/util/src/pagination/Paginator.ts',
+                        line: 1,
+                        character: 12,
+                    },
+                ],
+                type: {
+                    type: 'intersection',
+                    types: [
+                        {
+                            type: 'reference',
+                            id: 1271,
+                            typeArguments: [
+                                {
+                                    type: 'reference',
+                                    id: 1274,
+                                    qualifiedName: 'RequestInit',
+                                    package: 'typescript',
+                                    name: 'RequestInit',
+                                },
+                                {
+                                    type: 'union',
+                                    types: [
+                                        {
+                                            type: 'literal',
+                                            value: 'headers',
+                                        },
+                                        {
+                                            type: 'literal',
+                                            value: 'cache',
+                                        },
+                                    ],
+                                },
+                            ],
+                            qualifiedName: 'Omit',
+                            package: 'typescript',
+                            name: 'Omit',
+                        },
+                        {
+                            type: 'reflection',
+                            declaration: {
+                                id: 393,
+                                name: '__type',
+                                kind: 65536,
+                                kindString: 'Type literal',
+                                flags: {},
+                                children: [
+                                    {
+                                        id: 394,
+                                        name: 'headers',
+                                        kind: 1024,
+                                        kindString: 'Property',
+                                        flags: {
+                                            isOptional: true,
+                                        },
+                                        comment: {
+                                            shortText:
+                                                'Any headers to add to the request. You can unset default headers that might be specified in the default\n`Endpoint.defaultConfig.requestInit` by setting the value to `undefined`.',
+                                            shortTextMdx:
+                                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p",\n      code: "code"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: ["Any headers to add to the request. You can unset default headers that might be specified in the default\\n", _jsx(_components.code, {\n        children: "Endpoint.defaultConfig.requestInit"\n      }), " by setting the value to ", _jsx(_components.code, {\n        children: "undefined"\n      }), "."]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                                        },
+                                        sources: [
+                                            {
+                                                fileName:
+                                                    'js-packages/@prestojs/util/src/pagination/Paginator.ts',
+                                                line: 6,
+                                                character: 4,
+                                            },
+                                        ],
+                                        type: {
+                                            type: 'union',
+                                            types: [
+                                                {
+                                                    type: 'reference',
+                                                    id: 1288,
+                                                    qualifiedName: 'HeadersInit',
+                                                    package: 'typescript',
+                                                    name: 'HeadersInit',
+                                                },
+                                                {
+                                                    type: 'reference',
+                                                    id: 1267,
+                                                    typeArguments: [
+                                                        {
+                                                            type: 'intrinsic',
+                                                            name: 'string',
+                                                        },
+                                                        {
+                                                            type: 'union',
+                                                            types: [
+                                                                {
+                                                                    type: 'intrinsic',
+                                                                    name: 'undefined',
+                                                                },
+                                                                {
+                                                                    type: 'intrinsic',
+                                                                    name: 'string',
+                                                                },
+                                                            ],
+                                                        },
+                                                    ],
+                                                    qualifiedName: 'Record',
+                                                    package: 'typescript',
+                                                    name: 'Record',
+                                                },
+                                            ],
+                                        },
+                                        anchorId: 'Properties-headers',
+                                        docFlags: {},
+                                        tagsByName: {},
+                                    },
+                                    {
+                                        id: 396,
+                                        name: 'query',
+                                        kind: 1024,
+                                        kindString: 'Property',
+                                        flags: {
+                                            isOptional: true,
+                                        },
+                                        comment: {
+                                            shortText: 'Any query request parameters',
+                                            shortTextMdx:
+                                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "Any query request parameters"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                                        },
+                                        sources: [
+                                            {
+                                                fileName:
+                                                    'js-packages/@prestojs/util/src/pagination/Paginator.ts',
+                                                line: 14,
+                                                character: 4,
+                                            },
+                                        ],
+                                        type: {
+                                            type: 'reference',
+                                            id: 1267,
+                                            typeArguments: [
+                                                {
+                                                    type: 'intrinsic',
+                                                    name: 'string',
+                                                },
+                                                {
+                                                    type: 'union',
+                                                    types: [
+                                                        {
+                                                            type: 'intrinsic',
+                                                            name: 'boolean',
+                                                        },
+                                                        {
+                                                            type: 'intrinsic',
+                                                            name: 'string',
+                                                        },
+                                                        {
+                                                            type: 'literal',
+                                                            value: null,
+                                                        },
+                                                        {
+                                                            type: 'intrinsic',
+                                                            name: 'number',
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                            qualifiedName: 'Record',
+                                            package: 'typescript',
+                                            name: 'Record',
+                                        },
+                                        anchorId: 'Properties-query',
+                                        docFlags: {},
+                                        tagsByName: {},
+                                    },
+                                    {
+                                        id: 395,
+                                        name: 'urlArgs',
+                                        kind: 1024,
+                                        kindString: 'Property',
+                                        flags: {
+                                            isOptional: true,
+                                        },
+                                        comment: {
+                                            shortText:
+                                                'Any arguments for the [URL](doc:UrlPattern)',
+                                            shortTextMdx:
+                                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p",\n      a: "a"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: ["Any arguments for the ", _jsx(_components.a, {\n        href: "doc:UrlPattern",\n        children: "URL"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                                        },
+                                        sources: [
+                                            {
+                                                fileName:
+                                                    'js-packages/@prestojs/util/src/pagination/Paginator.ts',
+                                                line: 10,
+                                                character: 4,
+                                            },
+                                        ],
+                                        type: {
+                                            type: 'reference',
+                                            id: 1267,
+                                            typeArguments: [
+                                                {
+                                                    type: 'intrinsic',
+                                                    name: 'string',
+                                                },
+                                                {
+                                                    type: 'intrinsic',
+                                                    name: 'any',
+                                                },
+                                            ],
+                                            qualifiedName: 'Record',
+                                            package: 'typescript',
+                                            name: 'Record',
+                                        },
+                                        anchorId: 'Properties-urlArgs',
+                                        docFlags: {},
+                                        tagsByName: {},
+                                    },
+                                ],
+                                groups: [
+                                    {
+                                        title: 'Properties',
+                                        kind: 1024,
+                                        children: [394, 396, 395],
+                                    },
+                                ],
+                                sources: [
+                                    {
+                                        fileName:
+                                            'js-packages/@prestojs/util/src/pagination/Paginator.ts',
+                                        line: 1,
+                                        character: 69,
+                                    },
+                                ],
+                                anchorId: '__type',
+                                docFlags: {},
+                                tagsByName: {},
+                            },
+                        },
+                    ],
+                },
+                docFlags: {},
+                tagsByName: {},
+                anchorId: 'PaginatorRequestOptions',
+            },
+            '1271': {
+                id: 1271,
+                name: 'Omit',
+                kind: 4194304,
+                kindString: 'Type alias',
+                flags: {
+                    isExternal: true,
+                },
+                comment: {
+                    shortText:
+                        'Construct a type with the properties of T except for those in type K.',
+                    shortTextMdx:
+                        '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "Construct a type with the properties of T except for those in type K."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                },
+                sources: [
+                    {
+                        fileName: 'node_modules/typescript/lib/lib.es5.d.ts',
+                        line: 1576,
+                        character: 5,
+                    },
+                ],
+                typeParameter: [
+                    {
+                        id: 1272,
+                        name: 'T',
+                        kind: 131072,
+                        kindString: 'Type parameter',
+                        flags: {
+                            isExternal: true,
+                        },
+                        anchorId: 'T',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1273,
+                        name: 'K',
+                        kind: 131072,
+                        kindString: 'Type parameter',
+                        flags: {
+                            isExternal: true,
+                        },
+                        type: {
+                            type: 'typeOperator',
+                            operator: 'keyof',
+                            target: {
+                                type: 'intrinsic',
+                                name: 'any',
+                            },
+                        },
+                        anchorId: 'K',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                ],
+                type: {
+                    type: 'reference',
+                    id: 1158,
+                    typeArguments: [
+                        {
+                            type: 'reference',
+                            id: 1272,
+                            qualifiedName: 'T',
+                            package: 'typescript',
+                            name: 'T',
+                        },
+                        {
+                            type: 'reference',
+                            id: 1320,
+                            typeArguments: [
+                                {
+                                    type: 'typeOperator',
+                                    operator: 'keyof',
+                                    target: {
+                                        type: 'reference',
+                                        id: 1272,
+                                        qualifiedName: 'T',
+                                        package: 'typescript',
+                                        name: 'T',
+                                    },
+                                },
+                                {
+                                    type: 'reference',
+                                    id: 1273,
+                                    qualifiedName: 'K',
+                                    package: 'typescript',
+                                    name: 'K',
+                                },
+                            ],
+                            qualifiedName: 'Exclude',
+                            package: 'typescript',
+                            name: 'Exclude',
+                        },
+                    ],
+                    qualifiedName: 'Pick',
+                    package: 'typescript',
+                    name: 'Pick',
+                },
+                docFlags: {},
+                tagsByName: {},
+                anchorId: 'Omit',
+            },
+            '1158': {
+                id: 1158,
+                name: 'Pick',
+                kind: 4194304,
+                kindString: 'Type alias',
+                flags: {
+                    isExternal: true,
+                },
+                comment: {
+                    shortText: 'From T, pick a set of properties whose keys are in the union K',
+                    shortTextMdx:
+                        '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "From T, pick a set of properties whose keys are in the union K"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                },
+                sources: [
+                    {
+                        fileName: 'node_modules/typescript/lib/lib.es5.d.ts',
+                        line: 1552,
+                        character: 5,
+                    },
+                ],
+                typeParameter: [
+                    {
+                        id: 1159,
+                        name: 'T',
+                        kind: 131072,
+                        kindString: 'Type parameter',
+                        flags: {
+                            isExternal: true,
+                        },
+                        anchorId: 'T',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1160,
+                        name: 'K',
+                        kind: 131072,
+                        kindString: 'Type parameter',
+                        flags: {
+                            isExternal: true,
+                        },
+                        type: {
+                            type: 'typeOperator',
+                            operator: 'keyof',
+                            target: {
+                                type: 'reference',
+                                id: 1159,
+                                qualifiedName: 'T',
+                                package: 'typescript',
+                                name: 'T',
+                            },
+                        },
+                        anchorId: 'K',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                ],
+                type: {
+                    type: 'mapped',
+                    parameter: 'P',
+                    parameterType: {
+                        type: 'reference',
+                        id: 1160,
+                        qualifiedName: 'K',
+                        package: 'typescript',
+                        name: 'K',
+                    },
+                    templateType: {
+                        type: 'indexedAccess',
+                        indexType: {
+                            type: 'reference',
+                            qualifiedName: 'P',
+                            package: 'typescript',
+                            name: 'P',
+                        },
+                        objectType: {
+                            type: 'reference',
+                            id: 1159,
+                            qualifiedName: 'T',
+                            package: 'typescript',
+                            name: 'T',
+                        },
+                    },
+                },
+                docFlags: {},
+                tagsByName: {},
+                anchorId: 'Pick',
+            },
+            '1274': {
+                id: 1274,
+                name: 'RequestInit',
+                kind: 256,
+                kindString: 'Interface',
+                flags: {
+                    isExternal: true,
+                },
+                children: [
+                    {
+                        id: 1275,
+                        name: 'body',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText: "A BodyInit object or null to set request's body.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A BodyInit object or null to set request\'s body."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1468,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'union',
+                            types: [
+                                {
+                                    type: 'literal',
+                                    value: null,
+                                },
+                                {
+                                    type: 'reference',
+                                    id: 1336,
+                                    qualifiedName: 'BodyInit',
+                                    package: 'typescript',
+                                    name: 'BodyInit',
+                                },
+                            ],
+                        },
+                        anchorId: 'Properties-body',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1276,
+                        name: 'cache',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText:
+                                "A string indicating how the request will interact with the browser's cache to set request's cache.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A string indicating how the request will interact with the browser\'s cache to set request\'s cache."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1470,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'reference',
+                            id: 1337,
+                            qualifiedName: 'RequestCache',
+                            package: 'typescript',
+                            name: 'RequestCache',
+                        },
+                        anchorId: 'Properties-cache',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1277,
+                        name: 'credentials',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText:
+                                "A string indicating whether credentials will be sent with the request always, never, or only when sent to a same-origin URL. Sets request's credentials.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A string indicating whether credentials will be sent with the request always, never, or only when sent to a same-origin URL. Sets request\'s credentials."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1472,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'reference',
+                            id: 1338,
+                            qualifiedName: 'RequestCredentials',
+                            package: 'typescript',
+                            name: 'RequestCredentials',
+                        },
+                        anchorId: 'Properties-credentials',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1278,
+                        name: 'headers',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText:
+                                "A Headers object, an object literal, or an array of two-item arrays to set request's headers.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A Headers object, an object literal, or an array of two-item arrays to set request\'s headers."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1474,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'reference',
+                            id: 1288,
+                            qualifiedName: 'HeadersInit',
+                            package: 'typescript',
+                            name: 'HeadersInit',
+                        },
+                        anchorId: 'Properties-headers',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1279,
+                        name: 'integrity',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText:
+                                "A cryptographic hash of the resource to be fetched by request. Sets request's integrity.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A cryptographic hash of the resource to be fetched by request. Sets request\'s integrity."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1476,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'intrinsic',
+                            name: 'string',
+                        },
+                        anchorId: 'Properties-integrity',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1280,
+                        name: 'keepalive',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText: "A boolean to set request's keepalive.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A boolean to set request\'s keepalive."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1478,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'intrinsic',
+                            name: 'boolean',
+                        },
+                        anchorId: 'Properties-keepalive',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1281,
+                        name: 'method',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText: "A string to set request's method.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A string to set request\'s method."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1480,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'intrinsic',
+                            name: 'string',
+                        },
+                        anchorId: 'Properties-method',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1282,
+                        name: 'mode',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText:
+                                "A string to indicate whether the request will use CORS, or will be restricted to same-origin URLs. Sets request's mode.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A string to indicate whether the request will use CORS, or will be restricted to same-origin URLs. Sets request\'s mode."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1482,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'reference',
+                            id: 1339,
+                            qualifiedName: 'RequestMode',
+                            package: 'typescript',
+                            name: 'RequestMode',
+                        },
+                        anchorId: 'Properties-mode',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1283,
+                        name: 'redirect',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText:
+                                "A string indicating whether request follows redirects, results in an error upon encountering a redirect, or returns the redirect (in an opaque fashion). Sets request's redirect.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A string indicating whether request follows redirects, results in an error upon encountering a redirect, or returns the redirect (in an opaque fashion). Sets request\'s redirect."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1484,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'reference',
+                            id: 1340,
+                            qualifiedName: 'RequestRedirect',
+                            package: 'typescript',
+                            name: 'RequestRedirect',
+                        },
+                        anchorId: 'Properties-redirect',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1284,
+                        name: 'referrer',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText:
+                                'A string whose value is a same-origin URL, "about:client", or the empty string, to set request\'s referrer.',
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A string whose value is a same-origin URL, \\"about:client\\", or the empty string, to set request\'s referrer."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1486,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'intrinsic',
+                            name: 'string',
+                        },
+                        anchorId: 'Properties-referrer',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1285,
+                        name: 'referrerPolicy',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText: "A referrer policy to set request's referrerPolicy.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "A referrer policy to set request\'s referrerPolicy."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1488,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'reference',
+                            id: 1341,
+                            qualifiedName: 'ReferrerPolicy',
+                            package: 'typescript',
+                            name: 'ReferrerPolicy',
+                        },
+                        anchorId: 'Properties-referrerPolicy',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1286,
+                        name: 'signal',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText: "An AbortSignal to set request's signal.",
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "An AbortSignal to set request\'s signal."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1490,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'union',
+                            types: [
+                                {
+                                    type: 'literal',
+                                    value: null,
+                                },
+                                {
+                                    type: 'reference',
+                                    id: 1342,
+                                    qualifiedName: 'AbortSignal',
+                                    package: 'typescript',
+                                    name: 'AbortSignal',
+                                },
+                            ],
+                        },
+                        anchorId: 'Properties-signal',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                    {
+                        id: 1287,
+                        name: 'window',
+                        kind: 1024,
+                        kindString: 'Property',
+                        flags: {
+                            isExternal: true,
+                            isOptional: true,
+                        },
+                        comment: {
+                            shortText:
+                                'Can only be null. Used to disassociate request from any Window.',
+                            shortTextMdx:
+                                '/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: "p"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: "Can only be null. Used to disassociate request from any Window."\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n',
+                        },
+                        sources: [
+                            {
+                                fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                                line: 1492,
+                                character: 4,
+                            },
+                        ],
+                        type: {
+                            type: 'literal',
+                            value: null,
+                        },
+                        anchorId: 'Properties-window',
+                        docFlags: {},
+                        tagsByName: {},
+                    },
+                ],
+                groups: [
+                    {
+                        title: 'Properties',
+                        kind: 1024,
+                        children: [
+                            1275, 1276, 1277, 1278, 1279, 1280, 1281, 1282, 1283, 1284, 1285, 1286,
+                            1287,
+                        ],
+                    },
+                ],
+                sources: [
+                    {
+                        fileName: 'node_modules/typescript/lib/lib.dom.d.ts',
+                        line: 1466,
+                        character: 10,
+                    },
+                ],
+                docFlags: {},
+                tagsByName: {},
+                anchorId: 'RequestInit',
+            },
+        }}
+    >
+        <TypeName
+            type={{
+                type: 'reference',
+                id: 392,
+                name: 'PaginatorRequestOptions',
+            }}
+        />
+    </DocProvider>
+);
+
 const types = [
     {
         type: 'array',

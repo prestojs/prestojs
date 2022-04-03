@@ -1,5 +1,5 @@
 {
-  "node": {
+  "declaration": {
     "id": 33,
     "name": "isIdentifiable",
     "kind": 64,
@@ -44,6 +44,7 @@
               "type": "intrinsic",
               "name": "any"
             },
+            "anchorId": "item",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -58,6 +59,7 @@
             "name": "Identifiable"
           }
         },
+        "anchorId": "isIdentifiable",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -66,7 +68,11 @@
       }
     ],
     "docFlags": {},
-    "tagsByName": {}
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Identifiable"
+    },
+    "slug": "util/isIdentifiable"
   },
   "references": {
     "55": {
@@ -89,7 +95,7 @@
           }
         ],
         "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Interface for types that we can automatically extract a unique identifier from.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
-        "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"To confirm to the interface provide a \", _jsx(_components.code, {\n          children: \"_key\"\n        }), \" property or getter.\"]\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [_jsx(_components.a, {\n          href: \"doc:viewModelFactory\",\n          children: \"ViewModelFactory\"\n        }), \" conforms to this so anything that expects an Identifiable\\nwill accept a ViewModel.\"]\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"Implementing this can save you having to pass explicit functions to identify an item in other parts of the system\\n(eg. for \", _jsx(_components.a, {\n          href: \"doc:AsyncChoices\",\n          children: \"AsyncChoices\"\n        }), \" or \", _jsx(_components.a, {\n          href: \"doc:useAsyncValue\",\n          children: \"useAsyncValue\"\n        }), \")\"]\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+        "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"To confirm to the interface provide a \", _jsx(_components.code, {\n          children: \"_key\"\n        }), \" property or getter.\"]\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [_jsx(_components.a, {\n          href: \"/docs/viewmodel/viewModelFactory\",\n          children: \"ViewModelFactory\"\n        }), \" conforms to this so anything that expects an Identifiable\\nwill accept a ViewModel.\"]\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"Implementing this can save you having to pass explicit functions to identify an item in other parts of the system\\n(eg. for \", _jsx(_components.a, {\n          href: \"/docs/viewmodel/fields/AsyncChoices\",\n          children: \"AsyncChoices\"\n        }), \" or \", _jsx(_components.a, {\n          href: \"/docs/util/useAsyncValue\",\n          children: \"useAsyncValue\"\n        }), \")\"]\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
       },
       "children": [
         {
@@ -110,6 +116,7 @@
             "id": 54,
             "name": "Id"
           },
+          "anchorId": "Properties-_key",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -118,7 +125,9 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [56]
+          "children": [
+            56
+          ]
         }
       ],
       "sources": [
@@ -132,12 +141,14 @@
       "tagsByName": {
         "extract-docs": "",
         "menu-group": "Identifiable"
-      }
+      },
+      "slug": "util/Identifiable",
+      "anchorId": "Identifiable"
     }
   },
   "meta": {
     "packageName": "util",
-    "permaLink": "util/isIdentifiable",
-    "menuGroup": "default"
+    "permaLink": "isIdentifiable",
+    "menuGroup": "Identifiable"
   }
 }

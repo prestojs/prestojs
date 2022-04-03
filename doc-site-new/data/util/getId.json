@@ -1,5 +1,5 @@
 {
-  "node": {
+  "declaration": {
     "id": 36,
     "name": "getId",
     "kind": 64,
@@ -48,6 +48,7 @@
               "type": "intrinsic",
               "name": "any"
             },
+            "anchorId": "item",
             "docFlags": {},
             "tagsByName": {}
           },
@@ -67,14 +68,14 @@
               "type": "reflection",
               "declaration": {
                 "id": 40,
-                "name": "__type",
+                "name": "fallbackGetId",
                 "kind": 65536,
                 "kindString": "Type literal",
                 "flags": {},
                 "signatures": [
                   {
                     "id": 41,
-                    "name": "__type",
+                    "name": "fallbackGetId",
                     "kind": 4096,
                     "kindString": "Call signature",
                     "flags": {},
@@ -89,6 +90,7 @@
                           "type": "intrinsic",
                           "name": "any"
                         },
+                        "anchorId": "item",
                         "docFlags": {},
                         "tagsByName": {}
                       }
@@ -98,6 +100,7 @@
                       "id": 54,
                       "name": "Id"
                     },
+                    "anchorId": "fallbackGetId",
                     "docFlags": {},
                     "tagsByName": {}
                   }
@@ -106,6 +109,7 @@
                 "tagsByName": {}
               }
             },
+            "anchorId": "fallbackGetId",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -115,6 +119,7 @@
           "id": 54,
           "name": "Id"
         },
+        "anchorId": "getId",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -123,7 +128,11 @@
       }
     ],
     "docFlags": {},
-    "tagsByName": {}
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Identifiable"
+    },
+    "slug": "util/getId"
   },
   "references": {
     "54": {
@@ -144,23 +153,23 @@
         "types": [
           {
             "type": "reference",
-            "id": 1266,
             "name": "SingleId"
           },
           {
             "type": "reference",
-            "id": 1267,
             "name": "CompoundId"
           }
         ]
       },
       "docFlags": {},
-      "tagsByName": {}
+      "tagsByName": {},
+      "slug": "util/Id",
+      "anchorId": "Id"
     }
   },
   "meta": {
     "packageName": "util",
-    "permaLink": "util/getId",
-    "menuGroup": "default"
+    "permaLink": "getId",
+    "menuGroup": "Identifiable"
   }
 }

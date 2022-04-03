@@ -81,7 +81,7 @@ export default function Modal({ children, title, isVisible, onClose }: Props) {
                                 {title}
                             </h3>
                         )}
-                        <div className="font-light">{children}</div>
+                        <div className="font-light overflow-y-auto max-h-[90vh]">{children}</div>
                     </div>
                 </div>
             </div>

@@ -1,10 +1,12 @@
 import React from 'react';
 
-type Column<T> = {
+export type Column<T> = {
     title: React.ReactNode;
     key: string;
     className?: string | ((record: T) => string | undefined);
     render?: (value: any, record: T) => React.ReactNode;
+    shouldExclude?: (record: T) => boolean;
+    colSpan?: (record: T) => number;
 };
 
 export default function Table<T>({
@@ -13,21 +15,22 @@ export default function Table<T>({
     rowKey,
     title,
 }: {
-    columns: Column<T>[];
+    columns: (Column<T> | null | undefined | false)[];
     data: T[];
     rowKey: string;
     title?: React.ReactNode;
 }): React.ReactElement {
+    const resolvedColumns: Column<T>[] = columns.filter(Boolean);
     return (
-        <table className="w-full text-left table-collapse mt-5 mb-5 z-10 relative">
+        <table className="w-full text-left table-collapse mb-5 z-10 relative">
             <thead>
                 {title && (
                     <tr>
-                        <th colSpan={columns.length}>{title}</th>
+                        <th colSpan={resolvedColumns.length}>{title}</th>
                     </tr>
                 )}
                 <tr>
-                    {columns.map(column => (
+                    {resolvedColumns.map((column: Column<T>) => (
                         <th
                             className="text-sm font-semibold text-gray-700 p-2 bg-gray-100 align-top"
                             key={column.key}
@@ -40,21 +43,24 @@ export default function Table<T>({
             <tbody>
                 {data.map(datum => (
                     <tr key={datum[rowKey]}>
-                        {columns.map(column => {
-                            const value = datum[column.key];
-                            let className = column.className;
-                            if (typeof className === 'function') {
-                                className = className(datum);
-                            }
-                            return (
-                                <td
-                                    className={`p-2 border-t align-top ${className || ''}`}
-                                    key={column.key}
-                                >
-                                    {column.render ? column.render(value, datum) : value}
-                                </td>
-                            );
-                        })}
+                        {resolvedColumns
+                            .filter(column => !column.shouldExclude?.(datum))
+                            .map(column => {
+                                const value = datum[column.key];
+                                let className = column.className;
+                                if (typeof className === 'function') {
+                                    className = className(datum);
+                                }
+                                return (
+                                    <td
+                                        className={`p-2 border-t align-top ${className || ''}`}
+                                        key={column.key}
+                                        colSpan={column.colSpan?.(datum) || 1}
+                                    >
+                                        {column.render ? column.render(value, datum) : value}
+                                    </td>
+                                );
+                            })}
                     </tr>
                 ))}
             </tbody>

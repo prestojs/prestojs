@@ -1,5 +1,5 @@
 {
-  "node": {
+  "declaration": {
     "id": 46,
     "name": "isSameById",
     "kind": 64,
@@ -46,6 +46,7 @@
               "type": "intrinsic",
               "name": "any"
             },
+            "anchorId": "item1",
             "docFlags": {},
             "tagsByName": {}
           },
@@ -59,6 +60,7 @@
               "type": "intrinsic",
               "name": "any"
             },
+            "anchorId": "item2",
             "docFlags": {},
             "tagsByName": {}
           },
@@ -74,14 +76,14 @@
               "type": "reflection",
               "declaration": {
                 "id": 51,
-                "name": "__type",
+                "name": "fallbackGetId",
                 "kind": 65536,
                 "kindString": "Type literal",
                 "flags": {},
                 "signatures": [
                   {
                     "id": 52,
-                    "name": "__type",
+                    "name": "fallbackGetId",
                     "kind": 4096,
                     "kindString": "Call signature",
                     "flags": {},
@@ -96,6 +98,7 @@
                           "type": "intrinsic",
                           "name": "any"
                         },
+                        "anchorId": "item",
                         "docFlags": {},
                         "tagsByName": {}
                       }
@@ -105,6 +108,7 @@
                       "id": 54,
                       "name": "Id"
                     },
+                    "anchorId": "fallbackGetId",
                     "docFlags": {},
                     "tagsByName": {}
                   }
@@ -113,6 +117,7 @@
                 "tagsByName": {}
               }
             },
+            "anchorId": "fallbackGetId",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -121,6 +126,7 @@
           "type": "intrinsic",
           "name": "boolean"
         },
+        "anchorId": "isSameById",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -129,7 +135,11 @@
       }
     ],
     "docFlags": {},
-    "tagsByName": {}
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Identifiable"
+    },
+    "slug": "util/isSameById"
   },
   "references": {
     "54": {
@@ -150,23 +160,23 @@
         "types": [
           {
             "type": "reference",
-            "id": 1266,
             "name": "SingleId"
           },
           {
             "type": "reference",
-            "id": 1267,
             "name": "CompoundId"
           }
         ]
       },
       "docFlags": {},
-      "tagsByName": {}
+      "tagsByName": {},
+      "slug": "util/Id",
+      "anchorId": "Id"
     }
   },
   "meta": {
     "packageName": "util",
-    "permaLink": "util/isSameById",
-    "menuGroup": "default"
+    "permaLink": "isSameById",
+    "menuGroup": "Identifiable"
   }
 }

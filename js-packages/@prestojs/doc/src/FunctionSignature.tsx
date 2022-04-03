@@ -1,6 +1,7 @@
 import React from 'react';
 import { JSONOutput } from 'typedoc';
 import TypeName from './TypeName';
+import TypeParameters from './TypeParameters';
 
 type Props = {
     signature: JSONOutput.SignatureReflection;
@@ -9,14 +10,16 @@ type Props = {
 };
 
 export default function FunctionSignature({ signature, showReturn = false, className }: Props) {
-    const { parameters = [] } = signature;
+    const { parameters = [], typeParameter } = signature;
     return (
         <div className={className}>
-            <span className="font-bold">{signature.name}</span>(
+            <span className="font-bold">{signature.name}</span>
+            {typeParameter && <TypeParameters typeParameter={typeParameter} />}(
             {parameters.map((param, i) => (
                 <React.Fragment key={param.name}>
                     <span className="text-gray-500">
                         {param.flags?.isOptional && '?'}
+                        {param.flags?.isRest && '...'}
                         {param.name}
                     </span>
                     {i < parameters.length - 1 && <span className="text-gray-300 mr-1">,</span>}

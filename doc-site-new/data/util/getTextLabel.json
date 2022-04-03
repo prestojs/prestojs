@@ -1,5 +1,5 @@
 {
-  "node": {
+  "declaration": {
     "id": 14,
     "name": "getTextLabel",
     "kind": 64,
@@ -46,6 +46,7 @@
               "type": "intrinsic",
               "name": "any"
             },
+            "anchorId": "item",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -54,6 +55,7 @@
           "type": "intrinsic",
           "name": "string"
         },
+        "anchorId": "getTextLabel",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -62,12 +64,16 @@
       }
     ],
     "docFlags": {},
-    "tagsByName": {}
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Labeled"
+    },
+    "slug": "util/getTextLabel"
   },
   "references": {},
   "meta": {
     "packageName": "util",
-    "permaLink": "util/getTextLabel",
-    "menuGroup": "default"
+    "permaLink": "getTextLabel",
+    "menuGroup": "Labeled"
   }
 }

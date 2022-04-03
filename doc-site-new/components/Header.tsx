@@ -1,7 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
-import SearchIcon from '../assets/search.svg';
 
 function SearchBar() {
     const inputRef = useRef<null | HTMLInputElement>(null);
@@ -50,7 +49,7 @@ function SearchBar() {
                     href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css"
                 />
             </Head>
-            <div className="w-full lg:px-6 xl:w-3/4 xl:px-12">
+            <div className="w-full lg:px-6 xl:w-3/4 xl:px-12 px-4">
                 <div className="relative">
                     <input
                         disabled={!searchEnabled}
@@ -66,8 +65,19 @@ function SearchBar() {
                         aria-expanded="false"
                         aria-label="search input"
                     />
-                    <div className="pointer-events-none absolute inset-y-0 left-0 pl-4 flex items-center">
-                        <SearchIcon className="fill-current pointer-events-none text-gray-600 w-4 h-4" />
+                    <div className="pointer-events-none absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -75,14 +85,30 @@ function SearchBar() {
     );
 }
 
-export default function Header() {
+export default function Header({ onToggleMenu }) {
     return (
-        <div className="flex bg-gray-800 fixed top-0 inset-x-0 z-30 h-16 items-center">
+        <div className="flex bg-gray-800 sticky top-0 inset-x-0 z-30 h-16 items-center">
             <div className="w-full max-w-screen-xl relative mx-auto px-6">
                 <div className="flex items-center -mx-6">
                     <div className="lg:w-1/4 xl:w-1/5 pl-6 pr-6 lg:pr-8">
-                        <div className="flex items-center">
-                            <a href="/" className="block lg:mr-4 text-xl text-white">
+                        <div className="flex items-center text-white">
+                            <button className="mr-2 lg:hidden" onClick={() => onToggleMenu()}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M4 6h16M4 12h16M4 18h16"
+                                    />
+                                </svg>
+                            </button>
+                            <a href="/" className="block lg:mr-4 text-xl">
                                 Presto
                             </a>
                         </div>

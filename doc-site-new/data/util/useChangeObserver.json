@@ -1,6 +1,6 @@
 {
-  "node": {
-    "id": 682,
+  "declaration": {
+    "id": 690,
     "name": "useChangeObserver",
     "kind": 64,
     "kindString": "Function",
@@ -15,7 +15,7 @@
     ],
     "signatures": [
       {
-        "id": 683,
+        "id": 691,
         "name": "useChangeObserver",
         "kind": 4096,
         "kindString": "Call signature",
@@ -36,18 +36,19 @@
         },
         "typeParameter": [
           {
-            "id": 684,
+            "id": 692,
             "name": "T",
             "kind": 131072,
             "kindString": "Type parameter",
             "flags": {},
+            "anchorId": "T",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "parameters": [
           {
-            "id": 685,
+            "id": 693,
             "name": "value",
             "kind": 32768,
             "kindString": "Parameter",
@@ -58,14 +59,15 @@
             },
             "type": {
               "type": "reference",
-              "id": 684,
+              "id": 692,
               "name": "T"
             },
+            "anchorId": "value",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 686,
+            "id": 694,
             "name": "onChange",
             "kind": 32768,
             "kindString": "Parameter",
@@ -77,44 +79,46 @@
             "type": {
               "type": "reflection",
               "declaration": {
-                "id": 687,
-                "name": "__type",
+                "id": 695,
+                "name": "onChange",
                 "kind": 65536,
                 "kindString": "Type literal",
                 "flags": {},
                 "signatures": [
                   {
-                    "id": 688,
-                    "name": "__type",
+                    "id": 696,
+                    "name": "onChange",
                     "kind": 4096,
                     "kindString": "Call signature",
                     "flags": {},
                     "parameters": [
                       {
-                        "id": 689,
+                        "id": 697,
                         "name": "lastValue",
                         "kind": 32768,
                         "kindString": "Parameter",
                         "flags": {},
                         "type": {
                           "type": "reference",
-                          "id": 684,
+                          "id": 692,
                           "name": "T"
                         },
+                        "anchorId": "lastValue",
                         "docFlags": {},
                         "tagsByName": {}
                       },
                       {
-                        "id": 690,
+                        "id": 698,
                         "name": "nextValue",
                         "kind": 32768,
                         "kindString": "Parameter",
                         "flags": {},
                         "type": {
                           "type": "reference",
-                          "id": 684,
+                          "id": 692,
                           "name": "T"
                         },
+                        "anchorId": "nextValue",
                         "docFlags": {},
                         "tagsByName": {}
                       }
@@ -123,6 +127,7 @@
                       "type": "intrinsic",
                       "name": "void"
                     },
+                    "anchorId": "onChange",
                     "docFlags": {},
                     "tagsByName": {}
                   }
@@ -131,11 +136,12 @@
                 "tagsByName": {}
               }
             },
+            "anchorId": "onChange",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 691,
+            "id": 699,
             "name": "options",
             "kind": 32768,
             "kindString": "Parameter",
@@ -144,16 +150,17 @@
             },
             "type": {
               "type": "reference",
-              "id": 674,
+              "id": 682,
               "typeArguments": [
                 {
                   "type": "reference",
-                  "id": 684,
+                  "id": 692,
                   "name": "T"
                 }
               ],
               "name": "ChangeObserverOptions"
             },
+            "anchorId": "options",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -162,6 +169,7 @@
           "type": "intrinsic",
           "name": "void"
         },
+        "anchorId": "useChangeObserver",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": ""
@@ -169,11 +177,14 @@
       }
     ],
     "docFlags": {},
-    "tagsByName": {}
+    "tagsByName": {
+      "extract-docs": ""
+    },
+    "slug": "util/useChangeObserver"
   },
   "references": {
-    "674": {
-      "id": 674,
+    "682": {
+      "id": 682,
       "name": "ChangeObserverOptions",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -195,11 +206,12 @@
       ],
       "typeParameter": [
         {
-          "id": 681,
+          "id": 689,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
+          "anchorId": "T",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -207,14 +219,14 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 675,
-          "name": "__type",
+          "id": 683,
+          "name": "ChangeObserverOptions",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 680,
+              "id": 688,
               "name": "disabled",
               "kind": 1024,
               "kindString": "Property",
@@ -236,11 +248,12 @@
                 "type": "intrinsic",
                 "name": "boolean"
               },
+              "anchorId": "Properties-disabled",
               "docFlags": {},
               "tagsByName": {}
             },
             {
-              "id": 676,
+              "id": 684,
               "name": "isEqual",
               "kind": 2048,
               "kindString": "Method",
@@ -256,41 +269,43 @@
               ],
               "signatures": [
                 {
-                  "id": 677,
+                  "id": 685,
                   "name": "isEqual",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
                     "shortText": "Function to determine equality between items. If not provided the default will do shallow\nequality checks with specific support for an `isEqual` function on objects (eg. if an object\nimplements `isEqual` it will be called instead of doing any other comparisons. This is\nsupported by [ViewModel](doc:viewModelFactory).",
-                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Function to determine equality between items. If not provided the default will do shallow\\nequality checks with specific support for an \", _jsx(_components.code, {\n        children: \"isEqual\"\n      }), \" function on objects (eg. if an object\\nimplements \", _jsx(_components.code, {\n        children: \"isEqual\"\n      }), \" it will be called instead of doing any other comparisons. This is\\nsupported by \", _jsx(_components.a, {\n        href: \"doc:viewModelFactory\",\n        children: \"ViewModel\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Function to determine equality between items. If not provided the default will do shallow\\nequality checks with specific support for an \", _jsx(_components.code, {\n        children: \"isEqual\"\n      }), \" function on objects (eg. if an object\\nimplements \", _jsx(_components.code, {\n        children: \"isEqual\"\n      }), \" it will be called instead of doing any other comparisons. This is\\nsupported by \", _jsx(_components.a, {\n        href: \"/docs/viewmodel/viewModelFactory\",\n        children: \"ViewModel\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
                   },
                   "parameters": [
                     {
-                      "id": 678,
+                      "id": 686,
                       "name": "a",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 681,
+                        "id": 689,
                         "name": "T"
                       },
+                      "anchorId": "a",
                       "docFlags": {},
                       "tagsByName": {}
                     },
                     {
-                      "id": 679,
+                      "id": 687,
                       "name": "b",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 681,
+                        "id": 689,
                         "name": "T"
                       },
+                      "anchorId": "b",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -299,6 +314,7 @@
                     "type": "intrinsic",
                     "name": "boolean"
                   },
+                  "anchorId": "isEqual",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -311,12 +327,16 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [680]
+              "children": [
+                688
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [676]
+              "children": [
+                684
+              ]
             }
           ],
           "sources": [
@@ -326,6 +346,7 @@
               "character": 39
             }
           ],
+          "anchorId": "ChangeObserverOptions",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -335,12 +356,14 @@
       },
       "tagsByName": {
         "expand-properties": ""
-      }
+      },
+      "slug": "util/ChangeObserverOptions",
+      "anchorId": "ChangeObserverOptions"
     }
   },
   "meta": {
     "packageName": "util",
-    "permaLink": "util/useChangeObserver",
+    "permaLink": "useChangeObserver",
     "menuGroup": "default"
   }
 }

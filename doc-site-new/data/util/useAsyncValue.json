@@ -1,6 +1,6 @@
 {
-  "node": {
-    "id": 664,
+  "declaration": {
+    "id": 672,
     "name": "useAsyncValue",
     "kind": 64,
     "kindString": "Function",
@@ -15,7 +15,7 @@
     ],
     "signatures": [
       {
-        "id": 665,
+        "id": 673,
         "name": "useAsyncValue",
         "kind": 4096,
         "kindString": "Call signature",
@@ -34,16 +34,17 @@
         },
         "typeParameter": [
           {
-            "id": 666,
+            "id": 674,
             "name": "T",
             "kind": 131072,
             "kindString": "Type parameter",
             "flags": {},
+            "anchorId": "T",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 667,
+            "id": 675,
             "name": "U",
             "kind": 131072,
             "kindString": "Type parameter",
@@ -53,57 +54,60 @@
               "id": 54,
               "name": "Id"
             },
+            "anchorId": "U",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "parameters": [
           {
-            "id": 668,
+            "id": 676,
             "name": "props",
             "kind": 32768,
             "kindString": "Parameter",
             "flags": {},
             "type": {
               "type": "reference",
-              "id": 637,
+              "id": 645,
               "typeArguments": [
                 {
                   "type": "reference",
-                  "id": 666,
+                  "id": 674,
                   "name": "T"
                 },
                 {
                   "type": "reference",
-                  "id": 667,
+                  "id": 675,
                   "name": "U"
                 }
               ],
               "name": "UseAsyncValuePropsSingle"
             },
+            "anchorId": "props",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "type": {
           "type": "reference",
-          "id": 653,
+          "id": 661,
           "typeArguments": [
             {
               "type": "reference",
-              "id": 666,
+              "id": 674,
               "name": "T"
             }
           ],
           "name": "UseAsyncValueReturn"
         },
+        "anchorId": "useAsyncValue",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": ""
         }
       },
       {
-        "id": 669,
+        "id": 677,
         "name": "useAsyncValue",
         "kind": 4096,
         "kindString": "Call signature",
@@ -116,16 +120,17 @@
         },
         "typeParameter": [
           {
-            "id": 670,
+            "id": 678,
             "name": "T",
             "kind": 131072,
             "kindString": "Type parameter",
             "flags": {},
+            "anchorId": "T",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 671,
+            "id": 679,
             "name": "U",
             "kind": 131072,
             "kindString": "Type parameter",
@@ -135,59 +140,65 @@
               "id": 54,
               "name": "Id"
             },
+            "anchorId": "U",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "parameters": [
           {
-            "id": 672,
+            "id": 680,
             "name": "props",
             "kind": 32768,
             "kindString": "Parameter",
             "flags": {},
             "type": {
               "type": "reference",
-              "id": 645,
+              "id": 653,
               "typeArguments": [
                 {
                   "type": "reference",
-                  "id": 670,
+                  "id": 678,
                   "name": "T"
                 },
                 {
                   "type": "reference",
-                  "id": 671,
+                  "id": 679,
                   "name": "U"
                 }
               ],
               "name": "UseAsyncValuePropsMulti"
             },
+            "anchorId": "props",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "type": {
           "type": "reference",
-          "id": 653,
+          "id": 661,
           "typeArguments": [
             {
               "type": "array",
               "elementType": {
                 "type": "reference",
-                "id": 670,
+                "id": 678,
                 "name": "T"
               }
             }
           ],
           "name": "UseAsyncValueReturn"
         },
+        "anchorId": "useAsyncValue",
         "docFlags": {},
         "tagsByName": {}
       }
     ],
     "docFlags": {},
-    "tagsByName": {}
+    "tagsByName": {
+      "extract-docs": ""
+    },
+    "slug": "util/useAsyncValue"
   },
   "references": {
     "54": {
@@ -208,21 +219,21 @@
         "types": [
           {
             "type": "reference",
-            "id": 1266,
             "name": "SingleId"
           },
           {
             "type": "reference",
-            "id": 1267,
             "name": "CompoundId"
           }
         ]
       },
       "docFlags": {},
-      "tagsByName": {}
+      "tagsByName": {},
+      "slug": "util/Id",
+      "anchorId": "Id"
     },
-    "637": {
-      "id": 637,
+    "645": {
+      "id": 645,
       "name": "UseAsyncValuePropsSingle",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -244,16 +255,17 @@
       ],
       "typeParameter": [
         {
-          "id": 643,
+          "id": 651,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
+          "anchorId": "T",
           "docFlags": {},
           "tagsByName": {}
         },
         {
-          "id": 644,
+          "id": 652,
           "name": "U",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -263,6 +275,7 @@
             "id": 54,
             "name": "Id"
           },
+          "anchorId": "U",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -272,16 +285,15 @@
         "types": [
           {
             "type": "reference",
-            "id": 1787,
             "typeArguments": [
               {
                 "type": "reference",
-                "id": 643,
+                "id": 651,
                 "name": "T"
               },
               {
                 "type": "reference",
-                "id": 644,
+                "id": 652,
                 "name": "U"
               }
             ],
@@ -290,14 +302,14 @@
           {
             "type": "reflection",
             "declaration": {
-              "id": 638,
-              "name": "__type",
+              "id": 646,
+              "name": "UseAsyncValuePropsSingle",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 639,
+                  "id": 647,
                   "name": "id",
                   "kind": 1024,
                   "kindString": "Property",
@@ -320,7 +332,7 @@
                     "types": [
                       {
                         "type": "reference",
-                        "id": 644,
+                        "id": 652,
                         "name": "U"
                       },
                       {
@@ -329,11 +341,12 @@
                       }
                     ]
                   },
+                  "anchorId": "Properties-id",
                   "docFlags": {},
                   "tagsByName": {}
                 },
                 {
-                  "id": 640,
+                  "id": 648,
                   "name": "resolve",
                   "kind": 2048,
                   "kindString": "Method",
@@ -347,7 +360,7 @@
                   ],
                   "signatures": [
                     {
-                      "id": 641,
+                      "id": 649,
                       "name": "resolve",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -360,16 +373,17 @@
                       },
                       "parameters": [
                         {
-                          "id": 642,
+                          "id": 650,
                           "name": "id",
                           "kind": 32768,
                           "kindString": "Parameter",
                           "flags": {},
                           "type": {
                             "type": "reference",
-                            "id": 644,
+                            "id": 652,
                             "name": "U"
                           },
+                          "anchorId": "id",
                           "docFlags": {},
                           "tagsByName": {}
                         }
@@ -379,7 +393,7 @@
                         "typeArguments": [
                           {
                             "type": "reference",
-                            "id": 643,
+                            "id": 651,
                             "name": "T"
                           }
                         ],
@@ -387,6 +401,7 @@
                         "package": "typescript",
                         "name": "Promise"
                       },
+                      "anchorId": "resolve",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -399,12 +414,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [639]
+                  "children": [
+                    647
+                  ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [640]
+                  "children": [
+                    648
+                  ]
                 }
               ],
               "sources": [
@@ -414,6 +433,7 @@
                   "character": 76
                 }
               ],
+              "anchorId": "UseAsyncValuePropsSingle",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -425,10 +445,12 @@
       },
       "tagsByName": {
         "expand-properties": ""
-      }
+      },
+      "slug": "util/UseAsyncValuePropsSingle",
+      "anchorId": "UseAsyncValuePropsSingle"
     },
-    "645": {
-      "id": 645,
+    "653": {
+      "id": 653,
       "name": "UseAsyncValuePropsMulti",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -450,16 +472,17 @@
       ],
       "typeParameter": [
         {
-          "id": 651,
+          "id": 659,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
+          "anchorId": "T",
           "docFlags": {},
           "tagsByName": {}
         },
         {
-          "id": 652,
+          "id": 660,
           "name": "U",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -469,6 +492,7 @@
             "id": 54,
             "name": "Id"
           },
+          "anchorId": "U",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -478,16 +502,15 @@
         "types": [
           {
             "type": "reference",
-            "id": 1787,
             "typeArguments": [
               {
                 "type": "reference",
-                "id": 651,
+                "id": 659,
                 "name": "T"
               },
               {
                 "type": "reference",
-                "id": 652,
+                "id": 660,
                 "name": "U"
               }
             ],
@@ -496,14 +519,14 @@
           {
             "type": "reflection",
             "declaration": {
-              "id": 646,
-              "name": "__type",
+              "id": 654,
+              "name": "UseAsyncValuePropsMulti",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 647,
+                  "id": 655,
                   "name": "ids",
                   "kind": 1024,
                   "kindString": "Property",
@@ -528,7 +551,7 @@
                         "type": "array",
                         "elementType": {
                           "type": "reference",
-                          "id": 652,
+                          "id": 660,
                           "name": "U"
                         }
                       },
@@ -538,11 +561,12 @@
                       }
                     ]
                   },
+                  "anchorId": "Properties-ids",
                   "docFlags": {},
                   "tagsByName": {}
                 },
                 {
-                  "id": 648,
+                  "id": 656,
                   "name": "resolve",
                   "kind": 2048,
                   "kindString": "Method",
@@ -556,7 +580,7 @@
                   ],
                   "signatures": [
                     {
-                      "id": 649,
+                      "id": 657,
                       "name": "resolve",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -567,7 +591,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 650,
+                          "id": 658,
                           "name": "ids",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -576,10 +600,11 @@
                             "type": "array",
                             "elementType": {
                               "type": "reference",
-                              "id": 652,
+                              "id": 660,
                               "name": "U"
                             }
                           },
+                          "anchorId": "ids",
                           "docFlags": {},
                           "tagsByName": {}
                         }
@@ -591,7 +616,7 @@
                             "type": "array",
                             "elementType": {
                               "type": "reference",
-                              "id": 651,
+                              "id": 659,
                               "name": "T"
                             }
                           }
@@ -600,6 +625,7 @@
                         "package": "typescript",
                         "name": "Promise"
                       },
+                      "anchorId": "resolve",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -612,12 +638,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [647]
+                  "children": [
+                    655
+                  ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [648]
+                  "children": [
+                    656
+                  ]
                 }
               ],
               "sources": [
@@ -627,6 +657,7 @@
                   "character": 75
                 }
               ],
+              "anchorId": "UseAsyncValuePropsMulti",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -638,10 +669,12 @@
       },
       "tagsByName": {
         "expand-properties": ""
-      }
+      },
+      "slug": "util/UseAsyncValuePropsMulti",
+      "anchorId": "UseAsyncValuePropsMulti"
     },
-    "653": {
-      "id": 653,
+    "661": {
+      "id": 661,
       "name": "UseAsyncValueReturn",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -655,11 +688,12 @@
       ],
       "typeParameter": [
         {
-          "id": 663,
+          "id": 671,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
+          "anchorId": "T",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -667,14 +701,14 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 654,
-          "name": "__type",
+          "id": 662,
+          "name": "UseAsyncValueReturn",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 655,
+              "id": 663,
               "name": "error",
               "kind": 1024,
               "kindString": "Property",
@@ -699,18 +733,18 @@
                   },
                   {
                     "type": "reference",
-                    "id": 1168,
                     "qualifiedName": "Error",
                     "package": "typescript",
                     "name": "Error"
                   }
                 ]
               },
+              "anchorId": "Properties-error",
               "docFlags": {},
               "tagsByName": {}
             },
             {
-              "id": 656,
+              "id": 664,
               "name": "isLoading",
               "kind": 1024,
               "kindString": "Property",
@@ -730,11 +764,12 @@
                 "type": "intrinsic",
                 "name": "boolean"
               },
+              "anchorId": "Properties-isLoading",
               "docFlags": {},
               "tagsByName": {}
             },
             {
-              "id": 657,
+              "id": 665,
               "name": "value",
               "kind": 1024,
               "kindString": "Property",
@@ -755,7 +790,7 @@
                 "types": [
                   {
                     "type": "reference",
-                    "id": 663,
+                    "id": 671,
                     "name": "T"
                   },
                   {
@@ -764,11 +799,12 @@
                   }
                 ]
               },
+              "anchorId": "Properties-value",
               "docFlags": {},
               "tagsByName": {}
             },
             {
-              "id": 661,
+              "id": 669,
               "name": "reset",
               "kind": 2048,
               "kindString": "Method",
@@ -782,7 +818,7 @@
               ],
               "signatures": [
                 {
-                  "id": 662,
+                  "id": 670,
                   "name": "reset",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -797,6 +833,7 @@
                     "type": "intrinsic",
                     "name": "void"
                   },
+                  "anchorId": "reset",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -805,7 +842,7 @@
               "tagsByName": {}
             },
             {
-              "id": 658,
+              "id": 666,
               "name": "run",
               "kind": 2048,
               "kindString": "Method",
@@ -819,7 +856,7 @@
               ],
               "signatures": [
                 {
-                  "id": 659,
+                  "id": 667,
                   "name": "run",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -832,7 +869,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 660,
+                      "id": 668,
                       "name": "args",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -846,6 +883,7 @@
                           "name": "any"
                         }
                       },
+                      "anchorId": "args",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -862,6 +900,7 @@
                     "package": "typescript",
                     "name": "Promise"
                   },
+                  "anchorId": "run",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -874,12 +913,19 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [655, 656, 657]
+              "children": [
+                663,
+                664,
+                665
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [661, 658]
+              "children": [
+                669,
+                666
+              ]
             }
           ],
           "sources": [
@@ -889,353 +935,20 @@
               "character": 37
             }
           ],
+          "anchorId": "UseAsyncValueReturn",
           "docFlags": {},
           "tagsByName": {}
         }
       },
       "docFlags": {},
-      "tagsByName": {}
-    },
-    "1168": {
-      "id": 1168,
-      "name": "Error",
-      "kind": 32,
-      "kindString": "Variable",
-      "flags": {
-        "isExternal": true
-      },
-      "sources": [
-        {
-          "fileName": "node_modules/typescript/lib/lib.es5.d.ts",
-          "line": 1033,
-          "character": 12
-        }
-      ],
-      "type": {
-        "type": "reference",
-        "qualifiedName": "ErrorConstructor",
-        "package": "typescript",
-        "name": "ErrorConstructor"
-      },
-      "extendedBy": [
-        {
-          "type": "reference",
-          "id": 564,
-          "name": "InvalidTimeError"
-        }
-      ],
-      "docFlags": {},
-      "tagsByName": {}
-    },
-    "1787": {
-      "id": 1787,
-      "name": "CommonProps",
-      "kind": 4194304,
-      "kindString": "Type alias",
-      "flags": {},
-      "sources": [
-        {
-          "fileName": "js-packages/@prestojs/util/src/useAsyncValue.ts",
-          "line": 17,
-          "character": 5
-        }
-      ],
-      "typeParameter": [
-        {
-          "id": 1800,
-          "name": "T",
-          "kind": 131072,
-          "kindString": "Type parameter",
-          "flags": {},
-          "docFlags": {},
-          "tagsByName": {}
-        },
-        {
-          "id": 1801,
-          "name": "U",
-          "kind": 131072,
-          "kindString": "Type parameter",
-          "flags": {},
-          "type": {
-            "type": "reference",
-            "id": 54,
-            "name": "Id"
-          },
-          "docFlags": {},
-          "tagsByName": {}
-        }
-      ],
-      "type": {
-        "type": "reflection",
-        "declaration": {
-          "id": 1788,
-          "name": "__type",
-          "kind": 65536,
-          "kindString": "Type literal",
-          "flags": {},
-          "children": [
-            {
-              "id": 1789,
-              "name": "existingValues",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "comment": {
-                "shortText": "An optional array of existing values to try and find the value in.",
-                "text": "If each item does not implement [Identifiable](doc:Identifiable) then you\nmust provide the `getId` function.\n\nYou can use this to avoid resolving data that already exists. If dealing with\nViewModel instances you can use it with [useViewModelCache](doc:useViewModelCache),\neg.\n\n```js\nconst existingValues = useViewModelCache(User, cache => cache.get(id, fieldNames));\nconst { value } = useAsyncValue({ id, existingValues, resolve: fetchUser });\n```\n",
-                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"An optional array of existing values to try and find the value in.\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
-                "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      a: \"a\",\n      code: \"code\",\n      pre: \"pre\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [\"If each item does not implement \", _jsx(_components.a, {\n          href: \"doc:Identifiable\",\n          children: \"Identifiable\"\n        }), \" then you\\nmust provide the \", _jsx(_components.code, {\n          children: \"getId\"\n        }), \" function.\"]\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"You can use this to avoid resolving data that already exists. If dealing with\\nViewModel instances you can use it with \", _jsx(_components.a, {\n          href: \"doc:useViewModelCache\",\n          children: \"useViewModelCache\"\n        }), \",\\neg.\"]\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-js\",\n          children: \"const existingValues = useViewModelCache(User, cache => cache.get(id, fieldNames));\\nconst { value } = useAsyncValue({ id, existingValues, resolve: fetchUser });\\n\"\n        })\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
-              },
-              "sources": [
-                {
-                  "fileName": "js-packages/@prestojs/util/src/useAsyncValue.ts",
-                  "line": 33,
-                  "character": 4
-                }
-              ],
-              "type": {
-                "type": "array",
-                "elementType": {
-                  "type": "reference",
-                  "id": 1800,
-                  "name": "T"
-                }
-              },
-              "docFlags": {},
-              "tagsByName": {}
-            },
-            {
-              "id": 1793,
-              "name": "trigger",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "comment": {
-                "shortText": "When to trigger the fetch. Defaults to `DEEP` which means whenever `id`\nor `ids` changed it will refetch if the value hasn't already been resolved.",
-                "text": "If set to `MANUAL` nothing will happen until it changes to `DEEP`. You\ncan use this to defer execution until the value is required.\n",
-                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"When to trigger the fetch. Defaults to \", _jsx(_components.code, {\n        children: \"DEEP\"\n      }), \" which means whenever \", _jsx(_components.code, {\n        children: \"id\"\n      }), \"\\nor \", _jsx(_components.code, {\n        children: \"ids\"\n      }), \" changed it will refetch if the value hasn't already been resolved.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
-                "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"If set to \", _jsx(_components.code, {\n        children: \"MANUAL\"\n      }), \" nothing will happen until it changes to \", _jsx(_components.code, {\n        children: \"DEEP\"\n      }), \". You\\ncan use this to defer execution until the value is required.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
-              },
-              "sources": [
-                {
-                  "fileName": "js-packages/@prestojs/util/src/useAsyncValue.ts",
-                  "line": 46,
-                  "character": 4
-                }
-              ],
-              "type": {
-                "type": "union",
-                "types": [
-                  {
-                    "type": "literal",
-                    "value": "MANUAL"
-                  },
-                  {
-                    "type": "literal",
-                    "value": "DEEP"
-                  }
-                ]
-              },
-              "docFlags": {},
-              "tagsByName": {}
-            },
-            {
-              "id": 1790,
-              "name": "getId",
-              "kind": 2048,
-              "kindString": "Method",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "js-packages/@prestojs/util/src/useAsyncValue.ts",
-                  "line": 38,
-                  "character": 4
-                }
-              ],
-              "signatures": [
-                {
-                  "id": 1791,
-                  "name": "getId",
-                  "kind": 4096,
-                  "kindString": "Call signature",
-                  "flags": {},
-                  "comment": {
-                    "shortText": "A function that returns a unique ID for each item in `existingValues`. Only\nrequired if each item does not implement [Identifiable](doc:Identifiable).",
-                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      a: \"a\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"A function that returns a unique ID for each item in \", _jsx(_components.code, {\n        children: \"existingValues\"\n      }), \". Only\\nrequired if each item does not implement \", _jsx(_components.a, {\n        href: \"doc:Identifiable\",\n        children: \"Identifiable\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
-                  },
-                  "parameters": [
-                    {
-                      "id": 1792,
-                      "name": "item",
-                      "kind": 32768,
-                      "kindString": "Parameter",
-                      "flags": {},
-                      "type": {
-                        "type": "reference",
-                        "id": 1800,
-                        "name": "T"
-                      },
-                      "docFlags": {},
-                      "tagsByName": {}
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "id": 1801,
-                    "name": "U"
-                  },
-                  "docFlags": {},
-                  "tagsByName": {}
-                }
-              ],
-              "docFlags": {},
-              "tagsByName": {}
-            },
-            {
-              "id": 1797,
-              "name": "onError",
-              "kind": 2048,
-              "kindString": "Method",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "js-packages/@prestojs/util/src/useAsyncValue.ts",
-                  "line": 55,
-                  "character": 4
-                }
-              ],
-              "signatures": [
-                {
-                  "id": 1798,
-                  "name": "onError",
-                  "kind": 4096,
-                  "kindString": "Call signature",
-                  "flags": {},
-                  "comment": {
-                    "shortText": "Called when `resolve` errors. Passed the error returned from `resolve`.",
-                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Called when \", _jsx(_components.code, {\n        children: \"resolve\"\n      }), \" errors. Passed the error returned from \", _jsx(_components.code, {\n        children: \"resolve\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
-                  },
-                  "parameters": [
-                    {
-                      "id": 1799,
-                      "name": "error",
-                      "kind": 32768,
-                      "kindString": "Parameter",
-                      "flags": {},
-                      "type": {
-                        "type": "reference",
-                        "id": 1168,
-                        "qualifiedName": "Error",
-                        "package": "typescript",
-                        "name": "Error"
-                      },
-                      "docFlags": {},
-                      "tagsByName": {}
-                    }
-                  ],
-                  "type": {
-                    "type": "intrinsic",
-                    "name": "void"
-                  },
-                  "docFlags": {},
-                  "tagsByName": {}
-                }
-              ],
-              "docFlags": {},
-              "tagsByName": {}
-            },
-            {
-              "id": 1794,
-              "name": "onSuccess",
-              "kind": 2048,
-              "kindString": "Method",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "js-packages/@prestojs/util/src/useAsyncValue.ts",
-                  "line": 51,
-                  "character": 4
-                }
-              ],
-              "signatures": [
-                {
-                  "id": 1795,
-                  "name": "onSuccess",
-                  "kind": 4096,
-                  "kindString": "Call signature",
-                  "flags": {},
-                  "comment": {
-                    "shortText": "Called when `resolve` resolves successfully. Is passed a single parameter which\nis the value returned from `resolve`",
-                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"Called when \", _jsx(_components.code, {\n        children: \"resolve\"\n      }), \" resolves successfully. Is passed a single parameter which\\nis the value returned from \", _jsx(_components.code, {\n        children: \"resolve\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
-                  },
-                  "parameters": [
-                    {
-                      "id": 1796,
-                      "name": "response",
-                      "kind": 32768,
-                      "kindString": "Parameter",
-                      "flags": {},
-                      "type": {
-                        "type": "reference",
-                        "id": 1800,
-                        "name": "T"
-                      },
-                      "docFlags": {},
-                      "tagsByName": {}
-                    }
-                  ],
-                  "type": {
-                    "type": "intrinsic",
-                    "name": "void"
-                  },
-                  "docFlags": {},
-                  "tagsByName": {}
-                }
-              ],
-              "docFlags": {},
-              "tagsByName": {}
-            }
-          ],
-          "groups": [
-            {
-              "title": "Properties",
-              "kind": 1024,
-              "children": [1789, 1793]
-            },
-            {
-              "title": "Methods",
-              "kind": 2048,
-              "children": [1790, 1797, 1794]
-            }
-          ],
-          "sources": [
-            {
-              "fileName": "js-packages/@prestojs/util/src/useAsyncValue.ts",
-              "line": 17,
-              "character": 36
-            }
-          ],
-          "docFlags": {},
-          "tagsByName": {}
-        }
-      },
-      "docFlags": {},
-      "tagsByName": {}
+      "tagsByName": {},
+      "slug": "util/UseAsyncValueReturn",
+      "anchorId": "UseAsyncValueReturn"
     }
   },
   "meta": {
     "packageName": "util",
-    "permaLink": "util/useAsyncValue",
+    "permaLink": "useAsyncValue",
     "menuGroup": "default"
   }
 }

@@ -64,6 +64,7 @@ const exampleFiles = readDirRecursive(examplesDir).reduce((acc, fn) => {
     });
     return acc;
 }, {});
+
 const pickedExamples = [];
 
 const root = path.resolve(__dirname, '../');
@@ -334,7 +335,7 @@ async function main() {
 
     const packagesRoot = path.resolve(root, 'js-packages/@prestojs/');
 
-    for (const pkg of ['util', 'viewmodel']) {
+    for (const pkg of ['util' /*, 'viewmodel'*/]) {
         //fs.readdirSync(packagesRoot)) {
         if (pkg === 'codegen') continue;
         const app = new TypeDoc.Application();

@@ -24,6 +24,7 @@
     "@prestojs/ui-antd": "*",
     "@prestojs/util": "*",
     "@prestojs/viewmodel": "*",
+    "next-plugin-antd-less": "^1.8.0",
     "antd": "^4.15.0",
     "autoprefixer": "^10.4.2",
     "next": "12.0.8",

@@ -1,5 +1,5 @@
 {
-  "node": {
+  "declaration": {
     "id": 43,
     "name": "hashId",
     "kind": 64,
@@ -45,6 +45,7 @@
               "id": 54,
               "name": "Id"
             },
+            "anchorId": "id",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -53,6 +54,7 @@
           "type": "intrinsic",
           "name": "string"
         },
+        "anchorId": "hashId",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -61,7 +63,11 @@
       }
     ],
     "docFlags": {},
-    "tagsByName": {}
+    "tagsByName": {
+      "extract-docs": "",
+      "menu-group": "Identifiable"
+    },
+    "slug": "util/hashId"
   },
   "references": {
     "54": {
@@ -82,23 +88,23 @@
         "types": [
           {
             "type": "reference",
-            "id": 1266,
             "name": "SingleId"
           },
           {
             "type": "reference",
-            "id": 1267,
             "name": "CompoundId"
           }
         ]
       },
       "docFlags": {},
-      "tagsByName": {}
+      "tagsByName": {},
+      "slug": "util/Id",
+      "anchorId": "Id"
     }
   },
   "meta": {
     "packageName": "util",
-    "permaLink": "util/hashId",
-    "menuGroup": "default"
+    "permaLink": "hashId",
+    "menuGroup": "Identifiable"
   }
 }
