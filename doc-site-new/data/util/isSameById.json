@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 46,
+    "id": 2709,
     "name": "isSameById",
     "kind": 64,
     "kindString": "Function",
@@ -14,7 +14,7 @@
     ],
     "signatures": [
       {
-        "id": 47,
+        "id": 2710,
         "name": "isSameById",
         "kind": 4096,
         "kindString": "Call signature",
@@ -37,7 +37,7 @@
         },
         "parameters": [
           {
-            "id": 48,
+            "id": 2711,
             "name": "item1",
             "kind": 32768,
             "kindString": "Parameter",
@@ -46,12 +46,12 @@
               "type": "intrinsic",
               "name": "any"
             },
-            "anchorId": "item1",
+            "anchorId": "Parameter-item1",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 49,
+            "id": 2712,
             "name": "item2",
             "kind": 32768,
             "kindString": "Parameter",
@@ -60,12 +60,12 @@
               "type": "intrinsic",
               "name": "any"
             },
-            "anchorId": "item2",
+            "anchorId": "Parameter-item2",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 50,
+            "id": 2713,
             "name": "fallbackGetId",
             "kind": 32768,
             "kindString": "Parameter",
@@ -75,21 +75,21 @@
             "type": {
               "type": "reflection",
               "declaration": {
-                "id": 51,
+                "id": 2714,
                 "name": "fallbackGetId",
                 "kind": 65536,
                 "kindString": "Type literal",
                 "flags": {},
                 "signatures": [
                   {
-                    "id": 52,
+                    "id": 2715,
                     "name": "fallbackGetId",
                     "kind": 4096,
                     "kindString": "Call signature",
                     "flags": {},
                     "parameters": [
                       {
-                        "id": 53,
+                        "id": 2716,
                         "name": "item",
                         "kind": 32768,
                         "kindString": "Parameter",
@@ -98,17 +98,17 @@
                           "type": "intrinsic",
                           "name": "any"
                         },
-                        "anchorId": "item",
+                        "anchorId": "Parameter-item",
                         "docFlags": {},
                         "tagsByName": {}
                       }
                     ],
                     "type": {
                       "type": "reference",
-                      "id": 54,
+                      "id": 2717,
                       "name": "Id"
                     },
-                    "anchorId": "fallbackGetId",
+                    "anchorId": "Call-signature-fallbackGetId",
                     "docFlags": {},
                     "tagsByName": {}
                   }
@@ -117,7 +117,7 @@
                 "tagsByName": {}
               }
             },
-            "anchorId": "fallbackGetId",
+            "anchorId": "Parameter-fallbackGetId",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -126,7 +126,7 @@
           "type": "intrinsic",
           "name": "boolean"
         },
-        "anchorId": "isSameById",
+        "anchorId": "Call-signature-isSameById",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -142,8 +142,8 @@
     "slug": "util/isSameById"
   },
   "references": {
-    "54": {
-      "id": 54,
+    "2717": {
+      "id": 2717,
       "name": "Id",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -170,8 +170,7 @@
       },
       "docFlags": {},
       "tagsByName": {},
-      "slug": "util/Id",
-      "anchorId": "Id"
+      "anchorId": "Type-alias-Id"
     }
   },
   "meta": {

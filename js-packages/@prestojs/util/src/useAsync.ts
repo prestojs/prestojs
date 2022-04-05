@@ -74,12 +74,6 @@ const DEEP = 'DEEP';
 // and so wouldn't re-call the function). As such we've decided not to include it.
 
 /**
- * I do havestuff
- *
- * ```js
- * const a = 5;
- * ```
- *
  * @expand-properties
  */
 export interface UseAsyncOptions {
@@ -131,7 +125,7 @@ export interface UseAsyncOptions {
 }
 
 /**
- * Booyah
+ * @export-in-docs
  */
 interface OnSuccess {
     /**
@@ -141,6 +135,9 @@ interface OnSuccess {
     (result: {}): void;
 }
 
+/**
+ * @export-in-docs
+ */
 interface OnError {
     /**
      * Haha yeah cool man

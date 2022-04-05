@@ -59,7 +59,7 @@ export class AntdUiConfig {
     }
 
     /**
-     * Get the `DatePicker` component to use. This is used by all date/datetime based widgets (eg. [DateWidget](doc:DateWidget])).
+     * Get the `DatePicker` component to use. This is used by all date/datetime based widgets (eg. [DateWidget](doc:DateWidget)).
      *
      * @return-type-name DatePickerComponent
      * @returns {DatePickerComponent} This returns the `datePickerComponent` passed to [AntdUiProvider](doc:AntdUiProvider) or throws an error if no `datePickerComponent` has been defined.
@@ -83,7 +83,7 @@ consider using one of the suggested alternatives instead.
     }
 
     /**
-     * Get the `TimePicker` component to use. This is used by all time based widgets (eg. [TimeWidget](doc:TimeWidget])).
+     * Get the `TimePicker` component to use. This is used by all time based widgets (eg. [TimeWidget](doc:TimeWidget)).
      *
      * @return-type-name DatePickerComponent
      * @returns {DatePickerComponent} This returns the `timePickerComponent` passed to [AntdUiProvider](doc:AntdUiProvider) or throws an error if no `timePickerComponent` has been defined.

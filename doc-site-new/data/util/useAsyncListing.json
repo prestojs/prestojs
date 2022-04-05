@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 640,
+    "id": 3326,
     "name": "useAsyncListing",
     "kind": 64,
     "kindString": "Function",
@@ -9,13 +9,13 @@
     "sources": [
       {
         "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-        "line": 135,
+        "line": 144,
         "character": 24
       }
     ],
     "signatures": [
       {
-        "id": 641,
+        "id": 3327,
         "name": "useAsyncListing",
         "kind": 4096,
         "kindString": "Call signature",
@@ -34,7 +34,7 @@
         },
         "typeParameter": [
           {
-            "id": 642,
+            "id": 3328,
             "name": "T",
             "kind": 131072,
             "kindString": "Type parameter",
@@ -46,48 +46,48 @@
                 "name": "any"
               }
             },
-            "anchorId": "T",
+            "anchorId": "Type-parameter-T",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "parameters": [
           {
-            "id": 643,
+            "id": 3329,
             "name": "props",
             "kind": 32768,
             "kindString": "Parameter",
             "flags": {},
             "type": {
               "type": "reference",
-              "id": 619,
+              "id": 3305,
               "typeArguments": [
                 {
                   "type": "reference",
-                  "id": 642,
+                  "id": 3328,
                   "name": "T"
                 }
               ],
               "name": "UseAsyncListingProps"
             },
-            "anchorId": "props",
+            "anchorId": "Parameter-props",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "type": {
           "type": "reference",
-          "id": 629,
+          "id": 3315,
           "typeArguments": [
             {
               "type": "reference",
-              "id": 642,
+              "id": 3328,
               "name": "T"
             }
           ],
           "name": "UseAsyncListingReturn"
         },
-        "anchorId": "useAsyncListing",
+        "anchorId": "Call-signature-useAsyncListing",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": ""
@@ -101,15 +101,15 @@
     "slug": "util/useAsyncListing"
   },
   "references": {
-    "404": {
-      "id": 404,
+    "3067": {
+      "id": 3067,
       "name": "PaginatorInterface",
       "kind": 256,
       "kindString": "Interface",
       "flags": {},
       "children": [
         {
-          "id": 405,
+          "id": 3068,
           "name": "currentState",
           "kind": 1024,
           "kindString": "Property",
@@ -117,13 +117,13 @@
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-              "line": 69,
+              "line": 73,
               "character": 4
             }
           ],
           "type": {
             "type": "reference",
-            "id": 439,
+            "id": 3102,
             "name": "State"
           },
           "anchorId": "Properties-currentState",
@@ -131,7 +131,7 @@
           "tagsByName": {}
         },
         {
-          "id": 406,
+          "id": 3069,
           "name": "internalState",
           "kind": 1024,
           "kindString": "Property",
@@ -139,13 +139,13 @@
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-              "line": 70,
+              "line": 74,
               "character": 4
             }
           ],
           "type": {
             "type": "reference",
-            "id": 441,
+            "id": 3104,
             "name": "InternalState"
           },
           "anchorId": "Properties-internalState",
@@ -153,7 +153,7 @@
           "tagsByName": {}
         },
         {
-          "id": 413,
+          "id": 3076,
           "name": "responseIsSet",
           "kind": 1024,
           "kindString": "Property",
@@ -161,7 +161,7 @@
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-              "line": 73,
+              "line": 77,
               "character": 4
             }
           ],
@@ -174,14 +174,14 @@
           "tagsByName": {}
         },
         {
-          "id": 416,
+          "id": 3079,
           "name": "first",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 417,
+              "id": 3080,
               "name": "first",
               "kind": 4096,
               "kindString": "Call signature",
@@ -190,7 +190,7 @@
                 "type": "intrinsic",
                 "name": "void"
               },
-              "anchorId": "first",
+              "anchorId": "Call-signature-first",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -199,14 +199,14 @@
           "tagsByName": {}
         },
         {
-          "id": 418,
+          "id": 3081,
           "name": "firstState",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 419,
+              "id": 3082,
               "name": "firstState",
               "kind": 4096,
               "kindString": "Call signature",
@@ -220,12 +220,12 @@
                   },
                   {
                     "type": "reference",
-                    "id": 439,
+                    "id": 3102,
                     "name": "State"
                   }
                 ]
               },
-              "anchorId": "firstState",
+              "anchorId": "Call-signature-firstState",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -234,41 +234,41 @@
           "tagsByName": {}
         },
         {
-          "id": 428,
+          "id": 3091,
           "name": "getRequestInit",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 429,
+              "id": 3092,
               "name": "getRequestInit",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 430,
+                  "id": 3093,
                   "name": "options",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 392,
+                    "id": 3055,
                     "name": "PaginatorRequestOptions"
                   },
-                  "anchorId": "options",
+                  "anchorId": "Parameter-options",
                   "docFlags": {},
                   "tagsByName": {}
                 }
               ],
               "type": {
                 "type": "reference",
-                "id": 392,
+                "id": 3055,
                 "name": "PaginatorRequestOptions"
               },
-              "anchorId": "getRequestInit",
+              "anchorId": "Call-signature-getRequestInit",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -277,14 +277,14 @@
           "tagsByName": {}
         },
         {
-          "id": 414,
+          "id": 3077,
           "name": "hasNextPage",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 415,
+              "id": 3078,
               "name": "hasNextPage",
               "kind": 4096,
               "kindString": "Call signature",
@@ -293,7 +293,7 @@
                 "type": "intrinsic",
                 "name": "boolean"
               },
-              "anchorId": "hasNextPage",
+              "anchorId": "Call-signature-hasNextPage",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -302,14 +302,14 @@
           "tagsByName": {}
         },
         {
-          "id": 420,
+          "id": 3083,
           "name": "next",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 421,
+              "id": 3084,
               "name": "next",
               "kind": 4096,
               "kindString": "Call signature",
@@ -318,7 +318,7 @@
                 "type": "intrinsic",
                 "name": "void"
               },
-              "anchorId": "next",
+              "anchorId": "Call-signature-next",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -327,14 +327,14 @@
           "tagsByName": {}
         },
         {
-          "id": 422,
+          "id": 3085,
           "name": "nextState",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 423,
+              "id": 3086,
               "name": "nextState",
               "kind": 4096,
               "kindString": "Call signature",
@@ -348,12 +348,12 @@
                   },
                   {
                     "type": "reference",
-                    "id": 439,
+                    "id": 3102,
                     "name": "State"
                   }
                 ]
               },
-              "anchorId": "nextState",
+              "anchorId": "Call-signature-nextState",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -362,14 +362,14 @@
           "tagsByName": {}
         },
         {
-          "id": 424,
+          "id": 3087,
           "name": "previous",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 425,
+              "id": 3088,
               "name": "previous",
               "kind": 4096,
               "kindString": "Call signature",
@@ -378,7 +378,7 @@
                 "type": "intrinsic",
                 "name": "void"
               },
-              "anchorId": "previous",
+              "anchorId": "Call-signature-previous",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -387,14 +387,14 @@
           "tagsByName": {}
         },
         {
-          "id": 426,
+          "id": 3089,
           "name": "previousState",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 427,
+              "id": 3090,
               "name": "previousState",
               "kind": 4096,
               "kindString": "Call signature",
@@ -408,12 +408,12 @@
                   },
                   {
                     "type": "reference",
-                    "id": 439,
+                    "id": 3102,
                     "name": "State"
                   }
                 ]
               },
-              "anchorId": "previousState",
+              "anchorId": "Call-signature-previousState",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -422,21 +422,21 @@
           "tagsByName": {}
         },
         {
-          "id": 434,
+          "id": 3097,
           "name": "replaceStateControllers",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 435,
+              "id": 3098,
               "name": "replaceStateControllers",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 436,
+                  "id": 3099,
                   "name": "currentStatePair",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -445,12 +445,12 @@
                     "type": "intrinsic",
                     "name": "any"
                   },
-                  "anchorId": "currentStatePair",
+                  "anchorId": "Parameter-currentStatePair",
                   "docFlags": {},
                   "tagsByName": {}
                 },
                 {
-                  "id": 437,
+                  "id": 3100,
                   "name": "internalStatePair",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -459,7 +459,7 @@
                     "type": "intrinsic",
                     "name": "any"
                   },
-                  "anchorId": "internalStatePair",
+                  "anchorId": "Parameter-internalStatePair",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -468,7 +468,7 @@
                 "type": "intrinsic",
                 "name": "void"
               },
-              "anchorId": "replaceStateControllers",
+              "anchorId": "Call-signature-replaceStateControllers",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -477,7 +477,7 @@
           "tagsByName": {}
         },
         {
-          "id": 407,
+          "id": 3070,
           "name": "setCurrentState",
           "kind": 2048,
           "kindString": "Method",
@@ -485,30 +485,30 @@
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-              "line": 71,
+              "line": 75,
               "character": 4
             }
           ],
           "signatures": [
             {
-              "id": 408,
+              "id": 3071,
               "name": "setCurrentState",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 409,
+                  "id": 3072,
                   "name": "set",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 439,
+                    "id": 3102,
                     "name": "State"
                   },
-                  "anchorId": "set",
+                  "anchorId": "Parameter-set",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -517,7 +517,7 @@
                 "type": "intrinsic",
                 "name": "void"
               },
-              "anchorId": "Methods-setCurrentState",
+              "anchorId": "Call-signature-setCurrentState",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -526,7 +526,7 @@
           "tagsByName": {}
         },
         {
-          "id": 410,
+          "id": 3073,
           "name": "setInternalState",
           "kind": 2048,
           "kindString": "Method",
@@ -534,30 +534,30 @@
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-              "line": 72,
+              "line": 76,
               "character": 4
             }
           ],
           "signatures": [
             {
-              "id": 411,
+              "id": 3074,
               "name": "setInternalState",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 412,
+                  "id": 3075,
                   "name": "set",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 441,
+                    "id": 3104,
                     "name": "InternalState"
                   },
-                  "anchorId": "set",
+                  "anchorId": "Parameter-set",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -566,7 +566,7 @@
                 "type": "intrinsic",
                 "name": "void"
               },
-              "anchorId": "Methods-setInternalState",
+              "anchorId": "Call-signature-setInternalState",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -575,21 +575,21 @@
           "tagsByName": {}
         },
         {
-          "id": 431,
+          "id": 3094,
           "name": "setResponse",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 432,
+              "id": 3095,
               "name": "setResponse",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 433,
+                  "id": 3096,
                   "name": "response",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -610,7 +610,7 @@
                     "package": "typescript",
                     "name": "Record"
                   },
-                  "anchorId": "response",
+                  "anchorId": "Parameter-response",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -619,7 +619,7 @@
                 "type": "intrinsic",
                 "name": "void"
               },
-              "anchorId": "setResponse",
+              "anchorId": "Call-signature-setResponse",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -633,40 +633,40 @@
           "title": "Properties",
           "kind": 1024,
           "children": [
-            405,
-            406,
-            413
+            3068,
+            3069,
+            3076
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            416,
-            418,
-            428,
-            414,
-            420,
-            422,
-            424,
-            426,
-            434,
-            407,
-            410,
-            431
+            3079,
+            3081,
+            3091,
+            3077,
+            3083,
+            3085,
+            3087,
+            3089,
+            3097,
+            3070,
+            3073,
+            3094
           ]
         }
       ],
       "sources": [
         {
           "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-          "line": 68,
+          "line": 72,
           "character": 17
         }
       ],
       "typeParameter": [
         {
-          "id": 439,
+          "id": 3102,
           "name": "State",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -674,7 +674,7 @@
           "default": {
             "type": "reflection",
             "declaration": {
-              "id": 438,
+              "id": 3101,
               "name": "State",
               "kind": 65536,
               "kindString": "Type literal",
@@ -682,21 +682,21 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-                  "line": 68,
+                  "line": 72,
                   "character": 44
                 }
               ],
-              "anchorId": "State",
+              "anchorId": "Type-literal-State",
               "docFlags": {},
               "tagsByName": {}
             }
           },
-          "anchorId": "State",
+          "anchorId": "Type-parameter-State",
           "docFlags": {},
           "tagsByName": {}
         },
         {
-          "id": 441,
+          "id": 3104,
           "name": "InternalState",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -704,7 +704,7 @@
           "default": {
             "type": "reflection",
             "declaration": {
-              "id": 440,
+              "id": 3103,
               "name": "InternalState",
               "kind": 65536,
               "kindString": "Type literal",
@@ -712,16 +712,16 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-                  "line": 68,
+                  "line": 72,
                   "character": 64
                 }
               ],
-              "anchorId": "InternalState",
+              "anchorId": "Type-literal-InternalState",
               "docFlags": {},
               "tagsByName": {}
             }
           },
-          "anchorId": "InternalState",
+          "anchorId": "Type-parameter-InternalState",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -729,22 +729,423 @@
       "implementedBy": [
         {
           "type": "reference",
-          "id": 136,
+          "id": 2799,
           "name": "InferredPaginator"
         },
         {
           "type": "reference",
-          "id": 472,
+          "id": 3135,
           "name": "Paginator"
         }
       ],
       "docFlags": {},
       "tagsByName": {},
-      "slug": "util/pagination/PaginatorInterface",
-      "anchorId": "PaginatorInterface"
+      "anchorId": "Interface-PaginatorInterface"
     },
-    "619": {
-      "id": 619,
+    "3291": {
+      "id": 3291,
+      "name": "UseAsyncListingExecuteProps",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "expand-properties",
+            "text": ""
+          },
+          {
+            "tag": "export-in-docs",
+            "text": "\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+          "line": 10,
+          "character": 5
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 3292,
+          "name": "UseAsyncListingExecuteProps",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 3294,
+              "name": "paginator",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The paginator instance, if any",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"The paginator instance, if any\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 18,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 3067,
+                    "name": "PaginatorInterface"
+                  }
+                ]
+              },
+              "anchorId": "Properties-paginator",
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 3293,
+              "name": "query",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Any query parameters",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Any query parameters\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 14,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "typeArguments": [
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      {
+                        "type": "literal",
+                        "value": null
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "number"
+                      }
+                    ]
+                  }
+                ],
+                "qualifiedName": "Record",
+                "package": "typescript",
+                "name": "Record"
+              },
+              "anchorId": "Properties-query",
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [
+                3294,
+                3293
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+              "line": 10,
+              "character": 35
+            }
+          ],
+          "anchorId": "Type-literal-UseAsyncListingExecuteProps",
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {
+        "expandProperties": true
+      },
+      "tagsByName": {
+        "expand-properties": "",
+        "export-in-docs": ""
+      },
+      "anchorId": "Type-alias-UseAsyncListingExecuteProps"
+    },
+    "3295": {
+      "id": 3295,
+      "name": "UseAsyncListingReturnCommon",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "export-in-docs",
+            "text": "\n"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+          "line": 73,
+          "character": 5
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 3304,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "anchorId": "Type-parameter-T",
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 3296,
+          "name": "UseAsyncListingReturnCommon",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 3297,
+              "name": "isLoading",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "comment": {
+                "shortText": "True while `execute` call is in progress.",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"True while \", _jsx(_components.code, {\n        children: \"execute\"\n      }), \" call is in progress.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 77,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              },
+              "anchorId": "Properties-isLoading",
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 3298,
+              "name": "paginator",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "comment": {
+                "shortText": "The same `paginator` passed in to `useAsyncListing`",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The same \", _jsx(_components.code, {\n        children: \"paginator\"\n      }), \" passed in to \", _jsx(_components.code, {\n        children: \"useAsyncListing\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 81,
+                  "character": 4
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "reference",
+                    "id": 3067,
+                    "name": "PaginatorInterface"
+                  }
+                ]
+              },
+              "anchorId": "Properties-paginator",
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 3302,
+              "name": "reset",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 96,
+                  "character": 4
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 3303,
+                  "name": "reset",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "When called will set both result and error to null. Will not immediately trigger\na call to the action but subsequent changes to query or paginator will according\nto the value of `trigger`.",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"When called will set both result and error to null. Will not immediately trigger\\na call to the action but subsequent changes to query or paginator will according\\nto the value of \", _jsx(_components.code, {\n        children: \"trigger\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "void"
+                  },
+                  "anchorId": "Call-signature-reset",
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            },
+            {
+              "id": 3299,
+              "name": "run",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+                  "line": 90,
+                  "character": 4
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 3300,
+                  "name": "run",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "comment": {
+                    "shortText": "A function to manually trigger the action. If `options.trigger` is `MANUAL`\ncalling this function is the only way to trigger the action.",
+                    "text": "This function will return a promise that resolves/rejects to same value\nreturned by `execute`. If `accumulatePages` is set the value returned is\nthe accumulated value.\n",
+                    "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"A function to manually trigger the action. If \", _jsx(_components.code, {\n        children: \"options.trigger\"\n      }), \" is \", _jsx(_components.code, {\n        children: \"MANUAL\"\n      }), \"\\ncalling this function is the only way to trigger the action.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
+                    "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"This function will return a promise that resolves/rejects to same value\\nreturned by \", _jsx(_components.code, {\n        children: \"execute\"\n      }), \". If \", _jsx(_components.code, {\n        children: \"accumulatePages\"\n      }), \" is set the value returned is\\nthe accumulated value.\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+                  },
+                  "parameters": [
+                    {
+                      "id": 3301,
+                      "name": "args",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isRest": true
+                      },
+                      "type": {
+                        "type": "array",
+                        "elementType": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
+                      },
+                      "anchorId": "Parameter-args",
+                      "docFlags": {},
+                      "tagsByName": {}
+                    }
+                  ],
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "reference",
+                        "id": 3304,
+                        "name": "T"
+                      }
+                    ],
+                    "qualifiedName": "Promise",
+                    "package": "typescript",
+                    "name": "Promise"
+                  },
+                  "anchorId": "Call-signature-run",
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              ],
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [
+                3297,
+                3298
+              ]
+            },
+            {
+              "title": "Methods",
+              "kind": 2048,
+              "children": [
+                3302,
+                3299
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+              "line": 73,
+              "character": 38
+            }
+          ],
+          "anchorId": "Type-literal-UseAsyncListingReturnCommon",
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      },
+      "docFlags": {},
+      "tagsByName": {
+        "export-in-docs": ""
+      },
+      "anchorId": "Type-alias-UseAsyncListingReturnCommon"
+    },
+    "3305": {
+      "id": 3305,
       "name": "UseAsyncListingProps",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -753,6 +1154,10 @@
         "tags": [
           {
             "tag": "expand-properties",
+            "text": ""
+          },
+          {
+            "tag": "export-in-docs",
             "text": "\n"
           }
         ]
@@ -760,18 +1165,18 @@
       "sources": [
         {
           "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-          "line": 23,
+          "line": 25,
           "character": 12
         }
       ],
       "typeParameter": [
         {
-          "id": 628,
+          "id": 3314,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
-          "anchorId": "T",
+          "anchorId": "Type-parameter-T",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -779,14 +1184,14 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 620,
+          "id": 3306,
           "name": "UseAsyncListingProps",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 623,
+              "id": 3309,
               "name": "accumulatePages",
               "kind": 1024,
               "kindString": "Property",
@@ -802,7 +1207,7 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                  "line": 49,
+                  "line": 51,
                   "character": 4
                 }
               ],
@@ -815,7 +1220,7 @@
               "tagsByName": {}
             },
             {
-              "id": 624,
+              "id": 3310,
               "name": "paginator",
               "kind": 1024,
               "kindString": "Property",
@@ -831,7 +1236,7 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                  "line": 56,
+                  "line": 58,
                   "character": 4
                 }
               ],
@@ -840,7 +1245,7 @@
                 "types": [
                   {
                     "type": "reference",
-                    "id": 404,
+                    "id": 3067,
                     "name": "PaginatorInterface"
                   },
                   {
@@ -854,7 +1259,7 @@
               "tagsByName": {}
             },
             {
-              "id": 622,
+              "id": 3308,
               "name": "query",
               "kind": 1024,
               "kindString": "Property",
@@ -868,7 +1273,7 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                  "line": 38,
+                  "line": 40,
                   "character": 4
                 }
               ],
@@ -910,7 +1315,7 @@
               "tagsByName": {}
             },
             {
-              "id": 621,
+              "id": 3307,
               "name": "trigger",
               "kind": 1024,
               "kindString": "Property",
@@ -926,7 +1331,7 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                  "line": 34,
+                  "line": 36,
                   "character": 4
                 }
               ],
@@ -948,7 +1353,7 @@
               "tagsByName": {}
             },
             {
-              "id": 625,
+              "id": 3311,
               "name": "execute",
               "kind": 2048,
               "kindString": "Method",
@@ -956,13 +1361,13 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                  "line": 65,
+                  "line": 67,
                   "character": 4
                 }
               ],
               "signatures": [
                 {
-                  "id": 626,
+                  "id": 3312,
                   "name": "execute",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -975,16 +1380,17 @@
                   },
                   "parameters": [
                     {
-                      "id": 627,
+                      "id": 3313,
                       "name": "props",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
+                        "id": 3291,
                         "name": "UseAsyncListingExecuteProps"
                       },
-                      "anchorId": "props",
+                      "anchorId": "Parameter-props",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -994,7 +1400,7 @@
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 628,
+                        "id": 3314,
                         "name": "T"
                       }
                     ],
@@ -1002,7 +1408,7 @@
                     "package": "typescript",
                     "name": "Promise"
                   },
-                  "anchorId": "execute",
+                  "anchorId": "Call-signature-execute",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -1016,28 +1422,28 @@
               "title": "Properties",
               "kind": 1024,
               "children": [
-                623,
-                624,
-                622,
-                621
+                3309,
+                3310,
+                3308,
+                3307
               ]
             },
             {
               "title": "Methods",
               "kind": 2048,
               "children": [
-                625
+                3311
               ]
             }
           ],
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-              "line": 23,
+              "line": 25,
               "character": 38
             }
           ],
-          "anchorId": "UseAsyncListingProps",
+          "anchorId": "Type-literal-UseAsyncListingProps",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -1046,32 +1452,40 @@
         "expandProperties": true
       },
       "tagsByName": {
-        "expand-properties": ""
+        "expand-properties": "",
+        "export-in-docs": ""
       },
-      "slug": "util/UseAsyncListingProps",
-      "anchorId": "UseAsyncListingProps"
+      "anchorId": "Type-alias-UseAsyncListingProps"
     },
-    "629": {
-      "id": 629,
+    "3315": {
+      "id": 3315,
       "name": "UseAsyncListingReturn",
       "kind": 4194304,
       "kindString": "Type alias",
       "flags": {},
+      "comment": {
+        "tags": [
+          {
+            "tag": "export-in-docs",
+            "text": "\n"
+          }
+        ]
+      },
       "sources": [
         {
           "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-          "line": 93,
+          "line": 102,
           "character": 12
         }
       ],
       "typeParameter": [
         {
-          "id": 639,
+          "id": 3325,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
-          "anchorId": "T",
+          "anchorId": "Type-parameter-T",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -1084,10 +1498,11 @@
             "types": [
               {
                 "type": "reference",
+                "id": 3295,
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 639,
+                    "id": 3325,
                     "name": "T"
                   }
                 ],
@@ -1096,14 +1511,14 @@
               {
                 "type": "reflection",
                 "declaration": {
-                  "id": 630,
+                  "id": 3316,
                   "name": "UseAsyncListingReturn",
                   "kind": 65536,
                   "kindString": "Type literal",
                   "flags": {},
                   "children": [
                     {
-                      "id": 631,
+                      "id": 3317,
                       "name": "error",
                       "kind": 1024,
                       "kindString": "Property",
@@ -1115,7 +1530,7 @@
                       "sources": [
                         {
                           "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                          "line": 98,
+                          "line": 107,
                           "character": 10
                         }
                       ],
@@ -1128,7 +1543,7 @@
                       "tagsByName": {}
                     },
                     {
-                      "id": 632,
+                      "id": 3318,
                       "name": "result",
                       "kind": 1024,
                       "kindString": "Property",
@@ -1136,7 +1551,7 @@
                       "sources": [
                         {
                           "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                          "line": 99,
+                          "line": 108,
                           "character": 10
                         }
                       ],
@@ -1154,19 +1569,19 @@
                       "title": "Properties",
                       "kind": 1024,
                       "children": [
-                        631,
-                        632
+                        3317,
+                        3318
                       ]
                     }
                   ],
                   "sources": [
                     {
                       "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                      "line": 94,
+                      "line": 103,
                       "character": 40
                     }
                   ],
-                  "anchorId": "UseAsyncListingReturn",
+                  "anchorId": "Type-literal-UseAsyncListingReturn",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -1178,10 +1593,11 @@
             "types": [
               {
                 "type": "reference",
+                "id": 3295,
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 639,
+                    "id": 3325,
                     "name": "T"
                   }
                 ],
@@ -1190,14 +1606,14 @@
               {
                 "type": "reflection",
                 "declaration": {
-                  "id": 633,
+                  "id": 3319,
                   "name": "UseAsyncListingReturn",
                   "kind": 65536,
                   "kindString": "Type literal",
                   "flags": {},
                   "children": [
                     {
-                      "id": 634,
+                      "id": 3320,
                       "name": "error",
                       "kind": 1024,
                       "kindString": "Property",
@@ -1209,7 +1625,7 @@
                       "sources": [
                         {
                           "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                          "line": 107,
+                          "line": 116,
                           "character": 10
                         }
                       ],
@@ -1224,7 +1640,7 @@
                       "tagsByName": {}
                     },
                     {
-                      "id": 635,
+                      "id": 3321,
                       "name": "result",
                       "kind": 1024,
                       "kindString": "Property",
@@ -1236,7 +1652,7 @@
                       "sources": [
                         {
                           "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                          "line": 111,
+                          "line": 120,
                           "character": 10
                         }
                       ],
@@ -1254,19 +1670,19 @@
                       "title": "Properties",
                       "kind": 1024,
                       "children": [
-                        634,
-                        635
+                        3320,
+                        3321
                       ]
                     }
                   ],
                   "sources": [
                     {
                       "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                      "line": 101,
+                      "line": 110,
                       "character": 40
                     }
                   ],
-                  "anchorId": "UseAsyncListingReturn",
+                  "anchorId": "Type-literal-UseAsyncListingReturn",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -1278,10 +1694,11 @@
             "types": [
               {
                 "type": "reference",
+                "id": 3295,
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 639,
+                    "id": 3325,
                     "name": "T"
                   }
                 ],
@@ -1290,14 +1707,14 @@
               {
                 "type": "reflection",
                 "declaration": {
-                  "id": 636,
+                  "id": 3322,
                   "name": "UseAsyncListingReturn",
                   "kind": 65536,
                   "kindString": "Type literal",
                   "flags": {},
                   "children": [
                     {
-                      "id": 637,
+                      "id": 3323,
                       "name": "error",
                       "kind": 1024,
                       "kindString": "Property",
@@ -1309,7 +1726,7 @@
                       "sources": [
                         {
                           "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                          "line": 117,
+                          "line": 126,
                           "character": 10
                         }
                       ],
@@ -1322,7 +1739,7 @@
                       "tagsByName": {}
                     },
                     {
-                      "id": 638,
+                      "id": 3324,
                       "name": "result",
                       "kind": 1024,
                       "kindString": "Property",
@@ -1334,13 +1751,13 @@
                       "sources": [
                         {
                           "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                          "line": 121,
+                          "line": 130,
                           "character": 10
                         }
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 639,
+                        "id": 3325,
                         "name": "T"
                       },
                       "anchorId": "Properties-result",
@@ -1353,19 +1770,19 @@
                       "title": "Properties",
                       "kind": 1024,
                       "children": [
-                        637,
-                        638
+                        3323,
+                        3324
                       ]
                     }
                   ],
                   "sources": [
                     {
                       "fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-                      "line": 113,
+                      "line": 122,
                       "character": 40
                     }
                   ],
-                  "anchorId": "UseAsyncListingReturn",
+                  "anchorId": "Type-literal-UseAsyncListingReturn",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -1375,9 +1792,10 @@
         ]
       },
       "docFlags": {},
-      "tagsByName": {},
-      "slug": "util/UseAsyncListingReturn",
-      "anchorId": "UseAsyncListingReturn"
+      "tagsByName": {
+        "export-in-docs": ""
+      },
+      "anchorId": "Type-alias-UseAsyncListingReturn"
     }
   },
   "meta": {

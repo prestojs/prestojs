@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 672,
+    "id": 3358,
     "name": "useAsyncValue",
     "kind": 64,
     "kindString": "Function",
@@ -15,7 +15,7 @@
     ],
     "signatures": [
       {
-        "id": 673,
+        "id": 3359,
         "name": "useAsyncValue",
         "kind": 4096,
         "kindString": "Call signature",
@@ -34,80 +34,80 @@
         },
         "typeParameter": [
           {
-            "id": 674,
+            "id": 3360,
             "name": "T",
             "kind": 131072,
             "kindString": "Type parameter",
             "flags": {},
-            "anchorId": "T",
+            "anchorId": "Type-parameter-T",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 675,
+            "id": 3361,
             "name": "U",
             "kind": 131072,
             "kindString": "Type parameter",
             "flags": {},
             "type": {
               "type": "reference",
-              "id": 54,
+              "id": 2717,
               "name": "Id"
             },
-            "anchorId": "U",
+            "anchorId": "Type-parameter-U",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "parameters": [
           {
-            "id": 676,
+            "id": 3362,
             "name": "props",
             "kind": 32768,
             "kindString": "Parameter",
             "flags": {},
             "type": {
               "type": "reference",
-              "id": 645,
+              "id": 3331,
               "typeArguments": [
                 {
                   "type": "reference",
-                  "id": 674,
+                  "id": 3360,
                   "name": "T"
                 },
                 {
                   "type": "reference",
-                  "id": 675,
+                  "id": 3361,
                   "name": "U"
                 }
               ],
               "name": "UseAsyncValuePropsSingle"
             },
-            "anchorId": "props",
+            "anchorId": "Parameter-props",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "type": {
           "type": "reference",
-          "id": 661,
+          "id": 3347,
           "typeArguments": [
             {
               "type": "reference",
-              "id": 674,
+              "id": 3360,
               "name": "T"
             }
           ],
           "name": "UseAsyncValueReturn"
         },
-        "anchorId": "useAsyncValue",
+        "anchorId": "Call-signature-useAsyncValue",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": ""
         }
       },
       {
-        "id": 677,
+        "id": 3363,
         "name": "useAsyncValue",
         "kind": 4096,
         "kindString": "Call signature",
@@ -120,76 +120,76 @@
         },
         "typeParameter": [
           {
-            "id": 678,
+            "id": 3364,
             "name": "T",
             "kind": 131072,
             "kindString": "Type parameter",
             "flags": {},
-            "anchorId": "T",
+            "anchorId": "Type-parameter-T",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 679,
+            "id": 3365,
             "name": "U",
             "kind": 131072,
             "kindString": "Type parameter",
             "flags": {},
             "type": {
               "type": "reference",
-              "id": 54,
+              "id": 2717,
               "name": "Id"
             },
-            "anchorId": "U",
+            "anchorId": "Type-parameter-U",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "parameters": [
           {
-            "id": 680,
+            "id": 3366,
             "name": "props",
             "kind": 32768,
             "kindString": "Parameter",
             "flags": {},
             "type": {
               "type": "reference",
-              "id": 653,
+              "id": 3339,
               "typeArguments": [
                 {
                   "type": "reference",
-                  "id": 678,
+                  "id": 3364,
                   "name": "T"
                 },
                 {
                   "type": "reference",
-                  "id": 679,
+                  "id": 3365,
                   "name": "U"
                 }
               ],
               "name": "UseAsyncValuePropsMulti"
             },
-            "anchorId": "props",
+            "anchorId": "Parameter-props",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "type": {
           "type": "reference",
-          "id": 661,
+          "id": 3347,
           "typeArguments": [
             {
               "type": "array",
               "elementType": {
                 "type": "reference",
-                "id": 678,
+                "id": 3364,
                 "name": "T"
               }
             }
           ],
           "name": "UseAsyncValueReturn"
         },
-        "anchorId": "useAsyncValue",
+        "anchorId": "Call-signature-useAsyncValue",
         "docFlags": {},
         "tagsByName": {}
       }
@@ -201,8 +201,8 @@
     "slug": "util/useAsyncValue"
   },
   "references": {
-    "54": {
-      "id": 54,
+    "2717": {
+      "id": 2717,
       "name": "Id",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -229,11 +229,10 @@
       },
       "docFlags": {},
       "tagsByName": {},
-      "slug": "util/Id",
-      "anchorId": "Id"
+      "anchorId": "Type-alias-Id"
     },
-    "645": {
-      "id": 645,
+    "3331": {
+      "id": 3331,
       "name": "UseAsyncValuePropsSingle",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -255,27 +254,27 @@
       ],
       "typeParameter": [
         {
-          "id": 651,
+          "id": 3337,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
-          "anchorId": "T",
+          "anchorId": "Type-parameter-T",
           "docFlags": {},
           "tagsByName": {}
         },
         {
-          "id": 652,
+          "id": 3338,
           "name": "U",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
           "type": {
             "type": "reference",
-            "id": 54,
+            "id": 2717,
             "name": "Id"
           },
-          "anchorId": "U",
+          "anchorId": "Type-parameter-U",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -288,12 +287,12 @@
             "typeArguments": [
               {
                 "type": "reference",
-                "id": 651,
+                "id": 3337,
                 "name": "T"
               },
               {
                 "type": "reference",
-                "id": 652,
+                "id": 3338,
                 "name": "U"
               }
             ],
@@ -302,14 +301,14 @@
           {
             "type": "reflection",
             "declaration": {
-              "id": 646,
+              "id": 3332,
               "name": "UseAsyncValuePropsSingle",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 647,
+                  "id": 3333,
                   "name": "id",
                   "kind": 1024,
                   "kindString": "Property",
@@ -332,7 +331,7 @@
                     "types": [
                       {
                         "type": "reference",
-                        "id": 652,
+                        "id": 3338,
                         "name": "U"
                       },
                       {
@@ -346,7 +345,7 @@
                   "tagsByName": {}
                 },
                 {
-                  "id": 648,
+                  "id": 3334,
                   "name": "resolve",
                   "kind": 2048,
                   "kindString": "Method",
@@ -360,7 +359,7 @@
                   ],
                   "signatures": [
                     {
-                      "id": 649,
+                      "id": 3335,
                       "name": "resolve",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -373,17 +372,17 @@
                       },
                       "parameters": [
                         {
-                          "id": 650,
+                          "id": 3336,
                           "name": "id",
                           "kind": 32768,
                           "kindString": "Parameter",
                           "flags": {},
                           "type": {
                             "type": "reference",
-                            "id": 652,
+                            "id": 3338,
                             "name": "U"
                           },
-                          "anchorId": "id",
+                          "anchorId": "Parameter-id",
                           "docFlags": {},
                           "tagsByName": {}
                         }
@@ -393,7 +392,7 @@
                         "typeArguments": [
                           {
                             "type": "reference",
-                            "id": 651,
+                            "id": 3337,
                             "name": "T"
                           }
                         ],
@@ -401,7 +400,7 @@
                         "package": "typescript",
                         "name": "Promise"
                       },
-                      "anchorId": "resolve",
+                      "anchorId": "Call-signature-resolve",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -415,14 +414,14 @@
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    647
+                    3333
                   ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    648
+                    3334
                   ]
                 }
               ],
@@ -433,7 +432,7 @@
                   "character": 76
                 }
               ],
-              "anchorId": "UseAsyncValuePropsSingle",
+              "anchorId": "Type-literal-UseAsyncValuePropsSingle",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -446,11 +445,10 @@
       "tagsByName": {
         "expand-properties": ""
       },
-      "slug": "util/UseAsyncValuePropsSingle",
-      "anchorId": "UseAsyncValuePropsSingle"
+      "anchorId": "Type-alias-UseAsyncValuePropsSingle"
     },
-    "653": {
-      "id": 653,
+    "3339": {
+      "id": 3339,
       "name": "UseAsyncValuePropsMulti",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -472,27 +470,27 @@
       ],
       "typeParameter": [
         {
-          "id": 659,
+          "id": 3345,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
-          "anchorId": "T",
+          "anchorId": "Type-parameter-T",
           "docFlags": {},
           "tagsByName": {}
         },
         {
-          "id": 660,
+          "id": 3346,
           "name": "U",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
           "type": {
             "type": "reference",
-            "id": 54,
+            "id": 2717,
             "name": "Id"
           },
-          "anchorId": "U",
+          "anchorId": "Type-parameter-U",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -505,12 +503,12 @@
             "typeArguments": [
               {
                 "type": "reference",
-                "id": 659,
+                "id": 3345,
                 "name": "T"
               },
               {
                 "type": "reference",
-                "id": 660,
+                "id": 3346,
                 "name": "U"
               }
             ],
@@ -519,14 +517,14 @@
           {
             "type": "reflection",
             "declaration": {
-              "id": 654,
+              "id": 3340,
               "name": "UseAsyncValuePropsMulti",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 655,
+                  "id": 3341,
                   "name": "ids",
                   "kind": 1024,
                   "kindString": "Property",
@@ -551,7 +549,7 @@
                         "type": "array",
                         "elementType": {
                           "type": "reference",
-                          "id": 660,
+                          "id": 3346,
                           "name": "U"
                         }
                       },
@@ -566,7 +564,7 @@
                   "tagsByName": {}
                 },
                 {
-                  "id": 656,
+                  "id": 3342,
                   "name": "resolve",
                   "kind": 2048,
                   "kindString": "Method",
@@ -580,7 +578,7 @@
                   ],
                   "signatures": [
                     {
-                      "id": 657,
+                      "id": 3343,
                       "name": "resolve",
                       "kind": 4096,
                       "kindString": "Call signature",
@@ -591,7 +589,7 @@
                       },
                       "parameters": [
                         {
-                          "id": 658,
+                          "id": 3344,
                           "name": "ids",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -600,11 +598,11 @@
                             "type": "array",
                             "elementType": {
                               "type": "reference",
-                              "id": 660,
+                              "id": 3346,
                               "name": "U"
                             }
                           },
-                          "anchorId": "ids",
+                          "anchorId": "Parameter-ids",
                           "docFlags": {},
                           "tagsByName": {}
                         }
@@ -616,7 +614,7 @@
                             "type": "array",
                             "elementType": {
                               "type": "reference",
-                              "id": 659,
+                              "id": 3345,
                               "name": "T"
                             }
                           }
@@ -625,7 +623,7 @@
                         "package": "typescript",
                         "name": "Promise"
                       },
-                      "anchorId": "resolve",
+                      "anchorId": "Call-signature-resolve",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -639,14 +637,14 @@
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    655
+                    3341
                   ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    656
+                    3342
                   ]
                 }
               ],
@@ -657,7 +655,7 @@
                   "character": 75
                 }
               ],
-              "anchorId": "UseAsyncValuePropsMulti",
+              "anchorId": "Type-literal-UseAsyncValuePropsMulti",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -670,11 +668,10 @@
       "tagsByName": {
         "expand-properties": ""
       },
-      "slug": "util/UseAsyncValuePropsMulti",
-      "anchorId": "UseAsyncValuePropsMulti"
+      "anchorId": "Type-alias-UseAsyncValuePropsMulti"
     },
-    "661": {
-      "id": 661,
+    "3347": {
+      "id": 3347,
       "name": "UseAsyncValueReturn",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -688,12 +685,12 @@
       ],
       "typeParameter": [
         {
-          "id": 671,
+          "id": 3357,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
-          "anchorId": "T",
+          "anchorId": "Type-parameter-T",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -701,14 +698,14 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 662,
+          "id": 3348,
           "name": "UseAsyncValueReturn",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 663,
+              "id": 3349,
               "name": "error",
               "kind": 1024,
               "kindString": "Property",
@@ -744,7 +741,7 @@
               "tagsByName": {}
             },
             {
-              "id": 664,
+              "id": 3350,
               "name": "isLoading",
               "kind": 1024,
               "kindString": "Property",
@@ -769,7 +766,7 @@
               "tagsByName": {}
             },
             {
-              "id": 665,
+              "id": 3351,
               "name": "value",
               "kind": 1024,
               "kindString": "Property",
@@ -790,7 +787,7 @@
                 "types": [
                   {
                     "type": "reference",
-                    "id": 671,
+                    "id": 3357,
                     "name": "T"
                   },
                   {
@@ -804,7 +801,7 @@
               "tagsByName": {}
             },
             {
-              "id": 669,
+              "id": 3355,
               "name": "reset",
               "kind": 2048,
               "kindString": "Method",
@@ -818,7 +815,7 @@
               ],
               "signatures": [
                 {
-                  "id": 670,
+                  "id": 3356,
                   "name": "reset",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -833,7 +830,7 @@
                     "type": "intrinsic",
                     "name": "void"
                   },
-                  "anchorId": "reset",
+                  "anchorId": "Call-signature-reset",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -842,7 +839,7 @@
               "tagsByName": {}
             },
             {
-              "id": 666,
+              "id": 3352,
               "name": "run",
               "kind": 2048,
               "kindString": "Method",
@@ -856,7 +853,7 @@
               ],
               "signatures": [
                 {
-                  "id": 667,
+                  "id": 3353,
                   "name": "run",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -869,7 +866,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 668,
+                      "id": 3354,
                       "name": "args",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -883,7 +880,7 @@
                           "name": "any"
                         }
                       },
-                      "anchorId": "args",
+                      "anchorId": "Parameter-args",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -900,7 +897,7 @@
                     "package": "typescript",
                     "name": "Promise"
                   },
-                  "anchorId": "run",
+                  "anchorId": "Call-signature-run",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -914,17 +911,17 @@
               "title": "Properties",
               "kind": 1024,
               "children": [
-                663,
-                664,
-                665
+                3349,
+                3350,
+                3351
               ]
             },
             {
               "title": "Methods",
               "kind": 2048,
               "children": [
-                669,
-                666
+                3355,
+                3352
               ]
             }
           ],
@@ -935,15 +932,14 @@
               "character": 37
             }
           ],
-          "anchorId": "UseAsyncValueReturn",
+          "anchorId": "Type-literal-UseAsyncValueReturn",
           "docFlags": {},
           "tagsByName": {}
         }
       },
       "docFlags": {},
       "tagsByName": {},
-      "slug": "util/UseAsyncValueReturn",
-      "anchorId": "UseAsyncValueReturn"
+      "anchorId": "Type-alias-UseAsyncValueReturn"
     }
   },
   "meta": {

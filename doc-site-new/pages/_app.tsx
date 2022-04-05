@@ -7,10 +7,13 @@ function MyApp({ Component, pageProps, router }: AppProps) {
     const isExample = router.pathname.startsWith('/examples/');
     useEffect(() => {
         if (isExample && typeof document !== 'undefined') {
+            const container = document.querySelector('#code-example-root');
+            if (!container) {
+                return;
+            }
             const resizeObserver = new ResizeObserver(entries => {
                 // Notify parent when height changes. CodeExamples.js uses this to adjust
                 // size of frame.
-                console.log(entries);
                 window.parent.postMessage(
                     JSON.stringify({
                         type: 'height-change',
@@ -19,12 +22,12 @@ function MyApp({ Component, pageProps, router }: AppProps) {
                     '*'
                 );
             });
-            resizeObserver.observe(document.body);
+            resizeObserver.observe(container);
         }
     }, [isExample]);
     if (isExample) {
         return (
-            <div className="p-10 code-examples">
+            <div className="p-10 code-examples" id="code-example-root">
                 <Component {...pageProps} />
             </div>
         );

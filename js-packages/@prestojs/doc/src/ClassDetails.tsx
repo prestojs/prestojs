@@ -1,19 +1,11 @@
-import React from 'react';
+import { OnThisPageSection, useOnThisPageSections } from '@prestojs/doc/OnThisPageProvider';
+import React, { useEffect } from 'react';
 import { JSONOutput } from 'typedoc';
 import AnchorLink, { generateId } from './AnchorLink';
 import SignatureDoc from './SignatureDoc';
 import Variable from './Variable';
 
-type MethodOrPropertyDetails<T extends JSONOutput.DeclarationReflection> = {
-    direct: T[];
-    inherited: T[];
-    total: number;
-};
-
 function MethodDoc({ method }) {
-    if (method.name === 'getRequestInit') {
-        console.log('haha', method);
-    }
     return (
         <div className="py-2">
             {method.signatures.map((sig, i) => (
@@ -26,7 +18,7 @@ function MethodDoc({ method }) {
 function SectionHeading({ children, id }: { children: React.ReactNode; id?: string }) {
     return (
         <AnchorLink
-            component="h2"
+            component="h3"
             id={id || generateId(children)}
             className="group flex whitespace-pre-wrap text-md text-cyan-500 font-semibold"
         >
@@ -36,25 +28,76 @@ function SectionHeading({ children, id }: { children: React.ReactNode; id?: stri
 }
 
 export default function ClassDetails({
-    constructor,
-    methods,
-    properties,
-    staticMethods,
-    staticProperties,
+    classDetails,
 }: {
-    constructor?: JSONOutput.DeclarationReflection;
-    methods: JSONOutput.DeclarationReflection[];
-    properties: JSONOutput.DeclarationReflection[];
-    staticMethods: JSONOutput.DeclarationReflection[];
-    staticProperties: JSONOutput.DeclarationReflection[];
+    classDetails: {
+        constructor?: JSONOutput.DeclarationReflection;
+        methods: JSONOutput.DeclarationReflection[];
+        properties: JSONOutput.DeclarationReflection[];
+        staticMethods: JSONOutput.DeclarationReflection[];
+        staticProperties: JSONOutput.DeclarationReflection[];
+    };
 }) {
+    const { addSections } = useOnThisPageSections();
+    useEffect(() => {
+        const sections: OnThisPageSection[] = [];
+        if (classDetails.constructor?.signatures) {
+            sections.push({
+                title: 'Constructor',
+                links: [
+                    {
+                        title: classDetails.constructor.signatures[0].name,
+                        id: classDetails.constructor.signatures[0].anchorId,
+                    },
+                ],
+            });
+        }
+        if (classDetails.methods.length) {
+            sections.push({
+                title: 'Methods',
+                links: classDetails.methods.map(method => ({
+                    id: method.signatures?.[0].anchorId || method.anchorId,
+                    title: method.name,
+                })),
+            });
+        }
+        if (classDetails.staticMethods.length) {
+            sections.push({
+                title: 'Static Methods',
+                links: classDetails.methods.map(method => ({
+                    id: method.signatures?.[0].anchorId || method.anchorId,
+                    title: method.name,
+                })),
+            });
+        }
+        if (classDetails.properties.length) {
+            sections.push({
+                title: 'Properties',
+                links: classDetails.properties.map(method => ({
+                    id: method.signatures?.[0].anchorId || method.anchorId,
+                    title: method.name,
+                })),
+            });
+        }
+        if (classDetails.staticProperties.length) {
+            sections.push({
+                title: 'Static Properties',
+                links: classDetails.staticProperties.map(method => ({
+                    id: method.signatures?.[0].anchorId || method.anchorId,
+                    title: method.name,
+                })),
+            });
+        }
+        return addSections(sections);
+    }, [classDetails]);
+    const { constructor, methods, staticMethods, staticProperties, properties } = classDetails;
     return (
         <>
             {constructor && (
                 <>
                     <SectionHeading>Constructor</SectionHeading>
                     {constructor.signatures?.map((sig, i) => (
-                        <SignatureDoc key={i} signature={sig} />
+                        <SignatureDoc key={i} signature={sig} hideTypeParameters />
                     ))}
                 </>
             )}
@@ -77,11 +120,9 @@ export default function ClassDetails({
             {properties.length > 0 && (
                 <>
                     <SectionHeading>Properties</SectionHeading>
-                    {properties
-                        .map(prop => prop.getSignature?.[0] || prop)
-                        .map(prop => (
-                            <Variable key={prop.name} variable={prop} />
-                        ))}
+                    {properties.map(prop => (
+                        <Variable key={prop.name} variable={prop} />
+                    ))}
                 </>
             )}
             {staticProperties.length > 0 && (

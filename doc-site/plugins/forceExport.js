@@ -4,17 +4,17 @@ const ModuleFlags = TypeScript.SymbolFlags.ValueModule | TypeScript.SymbolFlags.
 
 /** @param {{ application: import("typedoc").Application }} param0 */
 exports.load = function (application) {
-    let includeTag = 'extract-docs';
+    const includeTags = ['extract-docs', 'export-in-docs'];
 
-    application.options.addDeclaration({
-        name: 'includeTag',
-        help: '[typedoc-plugin-not-exported] Specify the tag name for non-exported member to be imported under',
-        defaultValue: includeTag,
-    });
-
-    application.converter.on(Converter.EVENT_BEGIN, () => {
-        includeTag = application.options.getValue('includeTag').toLocaleLowerCase();
-    });
+    // application.options.addDeclaration({
+    //     name: 'includeTag',
+    //     help: '[typedoc-plugin-not-exported] Specify the tag name for non-exported member to be imported under',
+    //     defaultValue: includeTag,
+    // });
+    //
+    // application.converter.on(Converter.EVENT_BEGIN, () => {
+    //     includeTag = application.options.getValue('includeTag').toLocaleLowerCase();
+    // });
 
     application.converter.on(Converter.EVENT_CREATE_DECLARATION, lookForFakeExports);
 
@@ -50,7 +50,11 @@ exports.load = function (application) {
             .filter(symbol => !exportedSymbols.includes(symbol));
 
         for (const symbol of symbols) {
-            if (symbol.getJsDocTags().some(tag => tag.name.toLocaleLowerCase() === includeTag)) {
+            if (
+                symbol
+                    .getJsDocTags()
+                    .some(tag => includeTags.includes(tag.name.toLocaleLowerCase()))
+            ) {
                 context.converter.convertSymbol(context, symbol);
             }
         }

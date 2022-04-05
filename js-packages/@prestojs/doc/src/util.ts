@@ -1,4 +1,4 @@
-import sortBy from 'lodash/sortBy';
+import orderBy from 'lodash/orderBy';
 import { JSONOutput } from 'typedoc';
 
 function getMethod(
@@ -23,59 +23,44 @@ function getMethods(
     methods: JSONOutput.DeclarationReflection[],
     isStatic: boolean
 ): JSONOutput.DeclarationReflection[] {
-    return methods
-        .map(getMethod)
-        .filter(m => m && !!m.flags?.isStatic === isStatic) as JSONOutput.DeclarationReflection[];
+    return orderBy(
+        methods
+            .map(getMethod)
+            .filter(
+                m => m && !!m.flags?.isStatic === isStatic
+            ) as JSONOutput.DeclarationReflection[],
+        'name'
+    );
 }
 
 function getProperties(
     properties: JSONOutput.DeclarationReflection[],
     isStatic: boolean
 ): JSONOutput.DeclarationReflection[] {
-    return properties.filter(m => !getMethod(m) && !!m.flags?.isStatic === isStatic);
+    return orderBy(
+        properties.filter(
+            m =>
+                !getMethod(m) &&
+                ['Property', 'Accessor'].includes(m.kindString || '') &&
+                !!m.flags?.isStatic === isStatic
+        ),
+        'name'
+    );
 }
 
-export function getClassDetails(details: {
-    groups: JSONOutput.ReflectionGroup[];
-    children: JSONOutput.DeclarationReflection[];
-}) {
-    const groups = details.groups.reduce(
-        (acc: Record<string, JSONOutput.ReflectionGroup>, group) => {
-            acc[group.title] = group;
-            return acc;
-        },
-        {}
-    );
-    const children = details.children.reduce(
-        (acc: Record<string, JSONOutput.DeclarationReflection>, child) => {
-            acc[child.id] = child;
-            return acc;
-        },
-        {}
-    );
-    const constructor = groups.Constructors?.children && children[groups.Constructors.children[0]];
-    const methods =
-        groups.Methods?.children
-            ?.map(id => children[id])
-            .filter(method => !method.flags.isPrivate) || [];
-    let groupProperties = groups.Properties?.children || [];
-    if (groups['Object literals']?.children) {
-        groupProperties.push(...groups['Object literals'].children);
-    }
-    if (groups.Accessors?.children) {
-        groupProperties.push(...groups.Accessors.children);
-    }
-    const properties: JSONOutput.DeclarationReflection[] = sortBy(
-        [...new Set(groupProperties)]
-            .map(id => children[id])
-            .filter(prop => !prop.flags.isPrivate && !prop.name.startsWith('__')) || [],
-        'name'
+export function getClassDetails(
+    details: { children: JSONOutput.DeclarationReflection[] },
+    includeInherited: boolean
+) {
+    const constructor = details.children.find(child => child.kindString === 'Constructor');
+    const children = details.children.filter(
+        child => !child.flags?.isPrivate && (includeInherited || !child.inheritedFrom)
     );
     return {
         constructor,
-        methods: getMethods(details.children, false),
-        staticMethods: getMethods(details.children, true),
-        properties: getProperties(details.children, false),
-        staticProperties: getProperties(details.children, true),
+        methods: getMethods(children, false),
+        staticMethods: getMethods(children, true),
+        properties: getProperties(children, false),
+        staticProperties: getProperties(children, true),
     };
 }

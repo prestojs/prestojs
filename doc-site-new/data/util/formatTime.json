@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 560,
+    "id": 3223,
     "name": "formatTime",
     "kind": 64,
     "kindString": "Function",
@@ -14,7 +14,7 @@
     ],
     "signatures": [
       {
-        "id": 561,
+        "id": 3224,
         "name": "formatTime",
         "kind": 4096,
         "kindString": "Call signature",
@@ -37,7 +37,7 @@
         },
         "parameters": [
           {
-            "id": 562,
+            "id": 3225,
             "name": "parts",
             "kind": 32768,
             "kindString": "Parameter",
@@ -57,12 +57,12 @@
                 }
               ]
             },
-            "anchorId": "parts",
+            "anchorId": "Parameter-parts",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 563,
+            "id": 3226,
             "name": "options",
             "kind": 32768,
             "kindString": "Parameter",
@@ -72,7 +72,7 @@
               "name": "TimeFormatOptions"
             },
             "defaultValue": "{}",
-            "anchorId": "options",
+            "anchorId": "Parameter-options",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -81,7 +81,7 @@
           "type": "intrinsic",
           "name": "string"
         },
-        "anchorId": "formatTime",
+        "anchorId": "Call-signature-formatTime",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",

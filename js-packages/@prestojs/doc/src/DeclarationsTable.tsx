@@ -1,11 +1,12 @@
-import DeclarationDescription from '@prestojs/doc/DeclarationDescription';
-import { useDocContext } from '@prestojs/doc/DocProvider';
-import KindDescription from '@prestojs/doc/KindDescription';
-import Table from '@prestojs/doc/Table';
-import TypeName from '@prestojs/doc/TypeName';
-import { DeclarationReflection } from '@prestojs/doc/types';
+import orderBy from 'lodash/orderBy';
 import React, { ReactNode } from 'react';
 import { JSONOutput } from 'typedoc';
+import DeclarationDescription from './DeclarationDescription';
+import { useDocContext } from './DocProvider';
+import KindDescription from './KindDescription';
+import Table from './Table';
+import TypeName, { TypeNameProvider } from './TypeName';
+import { DeclarationReflection } from './types';
 
 export function resolveChildrenFromType(
     type: Exclude<JSONOutput.DeclarationReflection['type'], undefined>,
@@ -13,12 +14,36 @@ export function resolveChildrenFromType(
 ) {
     if (type.type === 'reference' && type.name === 'Omit' && type.typeArguments) {
         const children = resolveChildrenFromType(type.typeArguments[0], referencedTypes);
-        const omitTypes = type.typeArguments[1] as JSONOutput.LiteralType | JSONOutput.UnionType;
-        const omitKeys =
-            omitTypes.type === 'union'
-                ? omitTypes.types.map((t: JSONOutput.LiteralType) => t.value)
-                : [omitTypes.value];
-        return children.filter(child => !omitKeys.includes(child.name));
+        if (children) {
+            const omitTypes = type.typeArguments[1] as
+                | JSONOutput.LiteralType
+                | JSONOutput.UnionType;
+            const omitKeys =
+                omitTypes.type === 'union'
+                    ? omitTypes.types.map((t: JSONOutput.LiteralType) => t.value)
+                    : [omitTypes.value];
+            return orderBy(
+                children.filter(child => !omitKeys.includes(child.name)),
+                'name'
+            );
+        } else {
+            console.warn('Missing referenced type', type.typeArguments[0]);
+        }
+    }
+    if (type.type === 'reference' && type.name === 'Pick' && type.typeArguments) {
+        const children = resolveChildrenFromType(type.typeArguments[0], referencedTypes);
+        if (children) {
+            const pickTypes = type.typeArguments[1] as
+                | JSONOutput.LiteralType
+                | JSONOutput.UnionType;
+            const pickKeys =
+                pickTypes.type === 'union'
+                    ? pickTypes.types.map((t: JSONOutput.LiteralType) => t.value)
+                    : [pickTypes.value];
+            return orderBy(children.filter(child => pickKeys.includes(child.name)));
+        } else {
+            console.warn('Missing referenced type', type.typeArguments[0]);
+        }
     }
     if (type.type === 'reference' && type.id && referencedTypes[type.id]) {
         return resolveChildren(referencedTypes[type.id], referencedTypes);
@@ -27,20 +52,37 @@ export function resolveChildrenFromType(
         return resolveChildren(type.declaration, referencedTypes);
     }
     if (type.type === 'intersection') {
-        return type.types
-            .map(t => resolveChildrenFromType(t, referencedTypes))
-            .reduce(
-                (acc: DeclarationReflection[], children: DeclarationReflection[] | undefined) => {
-                    if (!children) {
+        return orderBy(
+            type.types
+                .map(t => resolveChildrenFromType(t, referencedTypes))
+                .reduce(
+                    (
+                        acc: DeclarationReflection[],
+                        children: DeclarationReflection[] | undefined
+                    ) => {
+                        if (!children) {
+                            return acc;
+                        }
+                        const names = children.map(child => child.name);
+                        acc = acc.filter(({ name }) => !names.includes(name));
+                        acc.push(...children);
                         return acc;
-                    }
-                    const names = children.map(child => child.name);
-                    acc = acc.filter(({ name }) => !names.includes(name));
-                    acc.push(...children);
-                    return acc;
-                },
-                []
-            );
+                    },
+                    []
+                ),
+            'name'
+        );
+    }
+    if (type.type === 'reference' && type.name === 'Partial' && type.typeArguments) {
+        const children = resolveChildrenFromType(type.typeArguments[0], referencedTypes);
+        if (children) {
+            return children.map(child => ({
+                ...child,
+                flags: { ...child.flags, isOptional: true },
+            }));
+        } else {
+            console.warn('Missing referenced type', type.typeArguments[0]);
+        }
     }
     console.log('BLAH WOW', { type });
 }
@@ -50,7 +92,7 @@ function resolveChildren(
     referencedTypes: Record<string, JSONOutput.DeclarationReflection>
 ) {
     if (declaration.children) {
-        return declaration.children;
+        return orderBy(declaration.children, 'name');
     }
     const { type } = declaration;
     if (!type) {
@@ -81,11 +123,13 @@ export default function DeclarationsTable({
     attributeHeader = 'Property',
     showRequiredColumn = false,
     title,
+    indexSignature,
 }: {
     declarations: JSONOutput.DeclarationReflection[];
     attributeHeader?: React.ReactNode;
     showRequiredColumn?: boolean;
     title?: ReactNode;
+    indexSignature?: JSONOutput.SignatureReflection;
 }): React.ReactElement {
     const context = useDocContext();
     const { referencedTypes = {} } = context || {};
@@ -113,7 +157,9 @@ export default function DeclarationsTable({
             parameters.push(param);
         }
     }
-    console.log(parameters);
+    if (indexSignature) {
+        parameters.push(indexSignature);
+    }
     return (
         <Table
             title={title}
@@ -122,7 +168,11 @@ export default function DeclarationsTable({
                     title: '',
                     key: 'required',
                     render(_, param) {
-                        if (!param.flags?.isOptional && !param.defaultValue) {
+                        if (
+                            param !== indexSignature &&
+                            !param.flags?.isOptional &&
+                            !param.defaultValue
+                        ) {
                             return (
                                 <abbr
                                     className="text-red-500 underline decoration-dotted"
@@ -143,6 +193,9 @@ export default function DeclarationsTable({
                         return record.docFlags.expandProperties ? 2 : 1;
                     },
                     render(name, prop) {
+                        if (prop === indexSignature) {
+                            return '...';
+                        }
                         if (prop.flags?.isRest) {
                             return `...${name}`;
                         }
@@ -152,7 +205,7 @@ export default function DeclarationsTable({
                                     {name}
                                     <br />
                                     <em className="font-normal font-sans text-gray-800">
-                                        See properties below
+                                        An object with the properties below
                                     </em>
                                 </div>
                             );
@@ -167,10 +220,15 @@ export default function DeclarationsTable({
                         return property.docFlags.expandProperties;
                     },
                     render: (type, property): React.ReactNode => {
-                        if (type) {
-                            return <TypeName type={type} />;
-                        }
-                        return <KindDescription declaration={property} />;
+                        return (
+                            <TypeNameProvider mode="COMPACT">
+                                {type ? (
+                                    <TypeName type={type} />
+                                ) : (
+                                    <KindDescription declaration={property} />
+                                )}
+                            </TypeNameProvider>
+                        );
                     },
                 },
                 {

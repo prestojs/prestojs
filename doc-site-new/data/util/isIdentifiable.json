@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 33,
+    "id": 2696,
     "name": "isIdentifiable",
     "kind": 64,
     "kindString": "Function",
@@ -14,7 +14,7 @@
     ],
     "signatures": [
       {
-        "id": 34,
+        "id": 2697,
         "name": "isIdentifiable",
         "kind": 4096,
         "kindString": "Call signature",
@@ -35,7 +35,7 @@
         },
         "parameters": [
           {
-            "id": 35,
+            "id": 2698,
             "name": "item",
             "kind": 32768,
             "kindString": "Parameter",
@@ -44,7 +44,7 @@
               "type": "intrinsic",
               "name": "any"
             },
-            "anchorId": "item",
+            "anchorId": "Parameter-item",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -55,11 +55,11 @@
           "asserts": false,
           "targetType": {
             "type": "reference",
-            "id": 55,
+            "id": 2718,
             "name": "Identifiable"
           }
         },
-        "anchorId": "isIdentifiable",
+        "anchorId": "Call-signature-isIdentifiable",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -75,8 +75,38 @@
     "slug": "util/isIdentifiable"
   },
   "references": {
-    "55": {
-      "id": 55,
+    "2717": {
+      "id": 2717,
+      "name": "Id",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/identifiable.ts",
+          "line": 3,
+          "character": 12
+        }
+      ],
+      "type": {
+        "type": "union",
+        "types": [
+          {
+            "type": "reference",
+            "name": "SingleId"
+          },
+          {
+            "type": "reference",
+            "name": "CompoundId"
+          }
+        ]
+      },
+      "docFlags": {},
+      "tagsByName": {},
+      "anchorId": "Type-alias-Id"
+    },
+    "2718": {
+      "id": 2718,
       "name": "Identifiable",
       "kind": 256,
       "kindString": "Interface",
@@ -99,7 +129,7 @@
       },
       "children": [
         {
-          "id": 56,
+          "id": 2719,
           "name": "_key",
           "kind": 1024,
           "kindString": "Property",
@@ -113,7 +143,7 @@
           ],
           "type": {
             "type": "reference",
-            "id": 54,
+            "id": 2717,
             "name": "Id"
           },
           "anchorId": "Properties-_key",
@@ -126,7 +156,7 @@
           "title": "Properties",
           "kind": 1024,
           "children": [
-            56
+            2719
           ]
         }
       ],
@@ -142,8 +172,8 @@
         "extract-docs": "",
         "menu-group": "Identifiable"
       },
-      "slug": "util/Identifiable",
-      "anchorId": "Identifiable"
+      "anchorId": "Interface-Identifiable",
+      "slug": "util/Identifiable"
     }
   },
   "meta": {

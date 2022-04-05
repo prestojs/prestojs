@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 20,
+    "id": 2683,
     "name": "NodeLabeled",
     "kind": 256,
     "kindString": "Interface",
@@ -23,14 +23,14 @@
     },
     "children": [
       {
-        "id": 21,
+        "id": 2684,
         "name": "getNodeLabel",
         "kind": 2048,
         "kindString": "Method",
         "flags": {},
         "signatures": [
           {
-            "id": 22,
+            "id": 2685,
             "name": "getNodeLabel",
             "kind": 4096,
             "kindString": "Call signature",
@@ -47,7 +47,7 @@
               "package": "@types/react",
               "name": "ReactNode"
             },
-            "anchorId": "getNodeLabel",
+            "anchorId": "Call-signature-getNodeLabel",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -61,7 +61,7 @@
         "title": "Methods",
         "kind": 2048,
         "children": [
-          21
+          2684
         ]
       }
     ],
@@ -77,8 +77,8 @@
       "extract-docs": "",
       "menu-group": "Labeled"
     },
-    "slug": "util/NodeLabeled",
-    "anchorId": "NodeLabeled"
+    "anchorId": "Interface-NodeLabeled",
+    "slug": "util/NodeLabeled"
   },
   "references": {},
   "meta": {

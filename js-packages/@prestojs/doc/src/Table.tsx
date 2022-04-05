@@ -20,7 +20,7 @@ export default function Table<T>({
     rowKey: string;
     title?: React.ReactNode;
 }): React.ReactElement {
-    const resolvedColumns: Column<T>[] = columns.filter(Boolean);
+    const resolvedColumns: Column<T>[] = columns.filter(Boolean) as Column<T>[];
     return (
         <table className="w-full text-left table-collapse mb-5 z-10 relative">
             <thead>

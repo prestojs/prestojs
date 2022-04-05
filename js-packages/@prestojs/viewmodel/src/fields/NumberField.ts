@@ -3,10 +3,10 @@ import Field, { FieldProps } from './Field';
 /**
  * @expand-properties
  */
-export type NumberFieldProps<T> = FieldProps<T> & {
+export interface NumberFieldProps<T> extends FieldProps<T> {
     minValue?: number;
     maxValue?: number;
-};
+}
 
 /**
  * Base class for numeric fields
@@ -15,16 +15,18 @@ export type NumberFieldProps<T> = FieldProps<T> & {
  *
  * @extract-docs
  * @menu-group Fields
+ * @typeParam ValueT The type of the numeric value. This could be `number` or `string` or some other object (eg. decimal implementation)
+ * @typeParam ValueT This the type the field knows how to parse into `ValueT` when constructing a `ViewModel`.
  */
-export default class NumberField<T = string | number, ParsableValueT = T> extends Field<
-    T,
+export default class NumberField<ValueT = string | number, ParsableValueT = ValueT> extends Field<
+    ValueT,
     ParsableValueT
 > {
     static fieldClassName = 'NumberField';
     public minValue?: number;
     public maxValue?: number;
 
-    constructor(values: NumberFieldProps<T> = {}) {
+    constructor(values: NumberFieldProps<ValueT> = {}) {
         const { minValue, maxValue, ...rest } = values;
 
         if (minValue != null && typeof minValue !== 'number')

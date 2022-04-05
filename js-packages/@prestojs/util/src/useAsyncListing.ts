@@ -5,6 +5,7 @@ import useAsync from './useAsync';
 
 /**
  * @expand-properties
+ * @export-in-docs
  */
 type UseAsyncListingExecuteProps = {
     /**
@@ -19,6 +20,7 @@ type UseAsyncListingExecuteProps = {
 
 /**
  * @expand-properties
+ * @export-in-docs
  */
 export type UseAsyncListingProps<T> = {
     /**
@@ -65,6 +67,9 @@ export type UseAsyncListingProps<T> = {
     execute: (props: UseAsyncListingExecuteProps) => Promise<T>;
 };
 
+/**
+ * @export-in-docs
+ */
 type UseAsyncListingReturnCommon<T> = {
     /**
      * True while `execute` call is in progress.
@@ -90,6 +95,10 @@ type UseAsyncListingReturnCommon<T> = {
      */
     reset: () => void;
 };
+
+/**
+ * @export-in-docs
+ */
 export type UseAsyncListingReturn<T> =
     | (UseAsyncListingReturnCommon<T> & {
           /**

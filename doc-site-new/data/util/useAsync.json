@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 581,
+    "id": 3244,
     "name": "useAsync",
     "kind": 64,
     "kindString": "Function",
@@ -8,13 +8,13 @@
     "sources": [
       {
         "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-        "line": 275,
+        "line": 272,
         "character": 9
       }
     ],
     "signatures": [
       {
-        "id": 583,
+        "id": 3253,
         "name": "useAsync",
         "kind": 4096,
         "kindString": "Call signature",
@@ -33,7 +33,7 @@
         },
         "typeParameter": [
           {
-            "id": 584,
+            "id": 3254,
             "name": "ResultT",
             "kind": 131072,
             "kindString": "Type parameter",
@@ -42,12 +42,12 @@
               "shortText": "The type of the result returned by `fn`.",
               "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The type of the result returned by \", _jsx(_components.code, {\n        children: \"fn\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
             },
-            "anchorId": "ResultT",
+            "anchorId": "Type-parameter-ResultT",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 585,
+            "id": 3255,
             "name": "ErrorT",
             "kind": 131072,
             "kindString": "Type parameter",
@@ -62,14 +62,14 @@
               "package": "typescript",
               "name": "Error"
             },
-            "anchorId": "ErrorT",
+            "anchorId": "Type-parameter-ErrorT",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "parameters": [
           {
-            "id": 586,
+            "id": 3256,
             "name": "fn",
             "kind": 32768,
             "kindString": "Parameter",
@@ -81,21 +81,21 @@
             "type": {
               "type": "reflection",
               "declaration": {
-                "id": 587,
+                "id": 3257,
                 "name": "fn",
                 "kind": 65536,
                 "kindString": "Type literal",
                 "flags": {},
                 "signatures": [
                   {
-                    "id": 588,
+                    "id": 3258,
                     "name": "fn",
                     "kind": 4096,
                     "kindString": "Call signature",
                     "flags": {},
                     "parameters": [
                       {
-                        "id": 589,
+                        "id": 3259,
                         "name": "args",
                         "kind": 32768,
                         "kindString": "Parameter",
@@ -109,7 +109,7 @@
                             "name": "any"
                           }
                         },
-                        "anchorId": "args",
+                        "anchorId": "Parameter-args",
                         "docFlags": {},
                         "tagsByName": {}
                       }
@@ -119,7 +119,7 @@
                       "typeArguments": [
                         {
                           "type": "reference",
-                          "id": 584,
+                          "id": 3254,
                           "name": "ResultT"
                         }
                       ],
@@ -127,7 +127,7 @@
                       "package": "typescript",
                       "name": "Promise"
                     },
-                    "anchorId": "fn",
+                    "anchorId": "Call-signature-fn",
                     "docFlags": {},
                     "tagsByName": {}
                   }
@@ -136,45 +136,45 @@
                 "tagsByName": {}
               }
             },
-            "anchorId": "fn",
+            "anchorId": "Parameter-fn",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 590,
+            "id": 3260,
             "name": "options",
             "kind": 32768,
             "kindString": "Parameter",
             "flags": {},
             "type": {
               "type": "reference",
-              "id": 595,
+              "id": 3267,
               "name": "UseAsyncOptions"
             },
             "defaultValue": "{}",
-            "anchorId": "options",
+            "anchorId": "Parameter-options",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "type": {
           "type": "reference",
-          "id": 600,
+          "id": 3272,
           "typeArguments": [
             {
               "type": "reference",
-              "id": 584,
+              "id": 3254,
               "name": "ResultT"
             },
             {
               "type": "reference",
-              "id": 585,
+              "id": 3255,
               "name": "ErrorT"
             }
           ],
           "name": "UseAsyncReturnObject"
         },
-        "anchorId": "useAsync",
+        "anchorId": "Call-signature-useAsync",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": ""
@@ -188,61 +188,146 @@
     "slug": "util/useAsync"
   },
   "references": {
-    "584": {
-      "id": 584,
-      "name": "ResultT",
-      "kind": 131072,
-      "kindString": "Type parameter",
+    "3246": {
+      "id": 3246,
+      "name": "OnSuccess",
+      "kind": 256,
+      "kindString": "Interface",
       "flags": {},
-      "comment": {
-        "shortText": "The type of the result returned by `fn`.",
-        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The type of the result returned by \", _jsx(_components.code, {\n        children: \"fn\"\n      }), \".\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
-      },
-      "anchorId": "ResultT",
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
+          "line": 130,
+          "character": 10
+        }
+      ],
+      "signatures": [
+        {
+          "id": 3247,
+          "name": "OnSuccess",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Haha whatver",
+            "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Haha whatver\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+          },
+          "parameters": [
+            {
+              "id": 3248,
+              "name": "result",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "comment": {
+                "shortText": "Stuff etc\n",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Stuff etc\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 3249,
+                  "name": "result",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "anchorId": "Type-literal-result",
+                  "docFlags": {},
+                  "tagsByName": {}
+                }
+              },
+              "anchorId": "Parameter-result",
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "anchorId": "Call-signature-OnSuccess",
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
       "docFlags": {},
       "tagsByName": {}
     },
-    "585": {
-      "id": 585,
-      "name": "ErrorT",
-      "kind": 131072,
-      "kindString": "Type parameter",
+    "3250": {
+      "id": 3250,
+      "name": "OnError",
+      "kind": 256,
+      "kindString": "Interface",
       "flags": {},
-      "comment": {
-        "shortText": "The type of the error in the case the promise returned by `fn` rejects\n",
-        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"The type of the error in the case the promise returned by \", _jsx(_components.code, {\n        children: \"fn\"\n      }), \" rejects\"]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
-      },
-      "default": {
-        "type": "reference",
-        "qualifiedName": "Error",
-        "package": "typescript",
-        "name": "Error"
-      },
-      "anchorId": "ErrorT",
+      "sources": [
+        {
+          "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
+          "line": 141,
+          "character": 10
+        }
+      ],
+      "signatures": [
+        {
+          "id": 3251,
+          "name": "OnError",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Haha yeah cool man",
+            "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"Haha yeah cool man\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+          },
+          "parameters": [
+            {
+              "id": 3252,
+              "name": "error",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "comment": {
+                "shortText": "DO stuff `ya know maen`\n",
+                "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_components.p, {\n      children: [\"DO stuff \", _jsx(_components.code, {\n        children: \"ya know maen\"\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+              },
+              "type": {
+                "type": "reference",
+                "qualifiedName": "Error",
+                "package": "typescript",
+                "name": "Error"
+              },
+              "anchorId": "Parameter-error",
+              "docFlags": {},
+              "tagsByName": {}
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          },
+          "anchorId": "Call-signature-OnError",
+          "docFlags": {},
+          "tagsByName": {}
+        }
+      ],
       "docFlags": {},
       "tagsByName": {}
     },
-    "595": {
-      "id": 595,
+    "3267": {
+      "id": 3267,
       "name": "UseAsyncOptions",
       "kind": 256,
       "kindString": "Interface",
       "flags": {},
       "comment": {
-        "shortText": "I do havestuff",
-        "text": "```js\nconst a = 5;\n```\n",
         "tags": [
           {
             "tag": "expand-properties",
             "text": "\n"
           }
-        ],
-        "shortTextMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.p, {\n      children: \"I do havestuff\"\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n",
-        "textMdx": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {jsx: _jsx} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      pre: \"pre\",\n      code: \"code\"\n    }, _provideComponents(), props.components);\n    return _jsx(_components.pre, {\n      children: _jsx(_components.code, {\n        className: \"language-js\",\n        children: \"const a = 5;\\n\"\n      })\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n"
+        ]
       },
       "children": [
         {
-          "id": 597,
+          "id": 3269,
           "name": "args",
           "kind": 1024,
           "kindString": "Property",
@@ -256,7 +341,7 @@
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-              "line": 113,
+              "line": 107,
               "character": 4
             }
           ],
@@ -272,7 +357,7 @@
           "tagsByName": {}
         },
         {
-          "id": 599,
+          "id": 3271,
           "name": "onError",
           "kind": 1024,
           "kindString": "Property",
@@ -288,12 +373,13 @@
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-              "line": 130,
+              "line": 124,
               "character": 4
             }
           ],
           "type": {
             "type": "reference",
+            "id": 3250,
             "name": "OnError"
           },
           "anchorId": "Properties-onError",
@@ -301,7 +387,7 @@
           "tagsByName": {}
         },
         {
-          "id": 598,
+          "id": 3270,
           "name": "onSuccess",
           "kind": 1024,
           "kindString": "Property",
@@ -317,12 +403,13 @@
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-              "line": 124,
+              "line": 118,
               "character": 4
             }
           ],
           "type": {
             "type": "reference",
+            "id": 3246,
             "name": "OnSuccess"
           },
           "anchorId": "Properties-onSuccess",
@@ -330,7 +417,7 @@
           "tagsByName": {}
         },
         {
-          "id": 596,
+          "id": 3268,
           "name": "trigger",
           "kind": 1024,
           "kindString": "Property",
@@ -346,7 +433,7 @@
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-              "line": 105,
+              "line": 99,
               "character": 4
             }
           ],
@@ -377,17 +464,17 @@
           "title": "Properties",
           "kind": 1024,
           "children": [
-            597,
-            599,
-            598,
-            596
+            3269,
+            3271,
+            3270,
+            3268
           ]
         }
       ],
       "sources": [
         {
           "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-          "line": 85,
+          "line": 79,
           "character": 17
         }
       ],
@@ -397,11 +484,10 @@
       "tagsByName": {
         "expand-properties": ""
       },
-      "slug": "util/UseAsyncOptions",
-      "anchorId": "UseAsyncOptions"
+      "anchorId": "Interface-UseAsyncOptions"
     },
-    "600": {
-      "id": 600,
+    "3272": {
+      "id": 3272,
       "name": "UseAsyncReturnObject",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -409,28 +495,28 @@
       "sources": [
         {
           "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-          "line": 154,
+          "line": 151,
           "character": 12
         }
       ],
       "typeParameter": [
         {
-          "id": 611,
+          "id": 3283,
           "name": "ResultT",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
-          "anchorId": "ResultT",
+          "anchorId": "Type-parameter-ResultT",
           "docFlags": {},
           "tagsByName": {}
         },
         {
-          "id": 612,
+          "id": 3284,
           "name": "ErrorT",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
-          "anchorId": "ErrorT",
+          "anchorId": "Type-parameter-ErrorT",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -438,14 +524,14 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 601,
+          "id": 3273,
           "name": "UseAsyncReturnObject",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 603,
+              "id": 3275,
               "name": "error",
               "kind": 1024,
               "kindString": "Property",
@@ -459,7 +545,7 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-                  "line": 174,
+                  "line": 171,
                   "character": 4
                 }
               ],
@@ -468,7 +554,7 @@
                 "types": [
                   {
                     "type": "reference",
-                    "id": 612,
+                    "id": 3284,
                     "name": "ErrorT"
                   },
                   {
@@ -482,7 +568,7 @@
               "tagsByName": {}
             },
             {
-              "id": 602,
+              "id": 3274,
               "name": "isLoading",
               "kind": 1024,
               "kindString": "Property",
@@ -494,7 +580,7 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-                  "line": 158,
+                  "line": 155,
                   "character": 4
                 }
               ],
@@ -507,7 +593,7 @@
               "tagsByName": {}
             },
             {
-              "id": 605,
+              "id": 3277,
               "name": "response",
               "kind": 1024,
               "kindString": "Property",
@@ -523,7 +609,7 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-                  "line": 185,
+                  "line": 182,
                   "character": 4
                 }
               ],
@@ -532,7 +618,7 @@
                 "types": [
                   {
                     "type": "reference",
-                    "id": 611,
+                    "id": 3283,
                     "name": "ResultT"
                   },
                   {
@@ -550,7 +636,7 @@
               }
             },
             {
-              "id": 604,
+              "id": 3276,
               "name": "result",
               "kind": 1024,
               "kindString": "Property",
@@ -562,7 +648,7 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-                  "line": 181,
+                  "line": 178,
                   "character": 4
                 }
               ],
@@ -571,7 +657,7 @@
                 "types": [
                   {
                     "type": "reference",
-                    "id": 611,
+                    "id": 3283,
                     "name": "ResultT"
                   },
                   {
@@ -585,7 +671,7 @@
               "tagsByName": {}
             },
             {
-              "id": 609,
+              "id": 3281,
               "name": "reset",
               "kind": 2048,
               "kindString": "Method",
@@ -593,13 +679,13 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-                  "line": 201,
+                  "line": 198,
                   "character": 4
                 }
               ],
               "signatures": [
                 {
-                  "id": 610,
+                  "id": 3282,
                   "name": "reset",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -612,7 +698,7 @@
                     "type": "intrinsic",
                     "name": "void"
                   },
-                  "anchorId": "reset",
+                  "anchorId": "Call-signature-reset",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -621,7 +707,7 @@
               "tagsByName": {}
             },
             {
-              "id": 606,
+              "id": 3278,
               "name": "run",
               "kind": 2048,
               "kindString": "Method",
@@ -629,13 +715,13 @@
               "sources": [
                 {
                   "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-                  "line": 195,
+                  "line": 192,
                   "character": 4
                 }
               ],
               "signatures": [
                 {
-                  "id": 607,
+                  "id": 3279,
                   "name": "run",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -648,7 +734,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 608,
+                      "id": 3280,
                       "name": "args",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -662,7 +748,7 @@
                           "name": "any"
                         }
                       },
-                      "anchorId": "args",
+                      "anchorId": "Parameter-args",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -672,7 +758,7 @@
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 611,
+                        "id": 3283,
                         "name": "ResultT"
                       }
                     ],
@@ -680,7 +766,7 @@
                     "package": "typescript",
                     "name": "Promise"
                   },
-                  "anchorId": "run",
+                  "anchorId": "Call-signature-run",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -694,57 +780,36 @@
               "title": "Properties",
               "kind": 1024,
               "children": [
-                603,
-                602,
-                605,
-                604
+                3275,
+                3274,
+                3277,
+                3276
               ]
             },
             {
               "title": "Methods",
               "kind": 2048,
               "children": [
-                609,
-                606
+                3281,
+                3278
               ]
             }
           ],
           "sources": [
             {
               "fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-              "line": 154,
+              "line": 151,
               "character": 52
             }
           ],
-          "anchorId": "UseAsyncReturnObject",
+          "anchorId": "Type-literal-UseAsyncReturnObject",
           "docFlags": {},
           "tagsByName": {}
         }
       },
       "docFlags": {},
       "tagsByName": {},
-      "slug": "util/UseAsyncReturnObject",
-      "anchorId": "UseAsyncReturnObject"
-    },
-    "611": {
-      "id": 611,
-      "name": "ResultT",
-      "kind": 131072,
-      "kindString": "Type parameter",
-      "flags": {},
-      "anchorId": "ResultT",
-      "docFlags": {},
-      "tagsByName": {}
-    },
-    "612": {
-      "id": 612,
-      "name": "ErrorT",
-      "kind": 131072,
-      "kindString": "Type parameter",
-      "flags": {},
-      "anchorId": "ErrorT",
-      "docFlags": {},
-      "tagsByName": {}
+      "anchorId": "Type-alias-UseAsyncReturnObject"
     }
   },
   "meta": {

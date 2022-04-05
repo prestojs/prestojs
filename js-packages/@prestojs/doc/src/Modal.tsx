@@ -47,7 +47,7 @@ export default function Modal({ children, title, isVisible, onClose }: Props) {
             </div>
 
             <div
-                className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-4xl sm:w-full"
+                className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-screen-2xl min-w-[500px]"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="modal-headline"

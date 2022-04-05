@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 690,
+    "id": 3376,
     "name": "useChangeObserver",
     "kind": 64,
     "kindString": "Function",
@@ -15,7 +15,7 @@
     ],
     "signatures": [
       {
-        "id": 691,
+        "id": 3377,
         "name": "useChangeObserver",
         "kind": 4096,
         "kindString": "Call signature",
@@ -36,19 +36,19 @@
         },
         "typeParameter": [
           {
-            "id": 692,
+            "id": 3378,
             "name": "T",
             "kind": 131072,
             "kindString": "Type parameter",
             "flags": {},
-            "anchorId": "T",
+            "anchorId": "Type-parameter-T",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "parameters": [
           {
-            "id": 693,
+            "id": 3379,
             "name": "value",
             "kind": 32768,
             "kindString": "Parameter",
@@ -59,15 +59,15 @@
             },
             "type": {
               "type": "reference",
-              "id": 692,
+              "id": 3378,
               "name": "T"
             },
-            "anchorId": "value",
+            "anchorId": "Parameter-value",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 694,
+            "id": 3380,
             "name": "onChange",
             "kind": 32768,
             "kindString": "Parameter",
@@ -79,46 +79,46 @@
             "type": {
               "type": "reflection",
               "declaration": {
-                "id": 695,
+                "id": 3381,
                 "name": "onChange",
                 "kind": 65536,
                 "kindString": "Type literal",
                 "flags": {},
                 "signatures": [
                   {
-                    "id": 696,
+                    "id": 3382,
                     "name": "onChange",
                     "kind": 4096,
                     "kindString": "Call signature",
                     "flags": {},
                     "parameters": [
                       {
-                        "id": 697,
+                        "id": 3383,
                         "name": "lastValue",
                         "kind": 32768,
                         "kindString": "Parameter",
                         "flags": {},
                         "type": {
                           "type": "reference",
-                          "id": 692,
+                          "id": 3378,
                           "name": "T"
                         },
-                        "anchorId": "lastValue",
+                        "anchorId": "Parameter-lastValue",
                         "docFlags": {},
                         "tagsByName": {}
                       },
                       {
-                        "id": 698,
+                        "id": 3384,
                         "name": "nextValue",
                         "kind": 32768,
                         "kindString": "Parameter",
                         "flags": {},
                         "type": {
                           "type": "reference",
-                          "id": 692,
+                          "id": 3378,
                           "name": "T"
                         },
-                        "anchorId": "nextValue",
+                        "anchorId": "Parameter-nextValue",
                         "docFlags": {},
                         "tagsByName": {}
                       }
@@ -127,7 +127,7 @@
                       "type": "intrinsic",
                       "name": "void"
                     },
-                    "anchorId": "onChange",
+                    "anchorId": "Call-signature-onChange",
                     "docFlags": {},
                     "tagsByName": {}
                   }
@@ -136,12 +136,12 @@
                 "tagsByName": {}
               }
             },
-            "anchorId": "onChange",
+            "anchorId": "Parameter-onChange",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 699,
+            "id": 3385,
             "name": "options",
             "kind": 32768,
             "kindString": "Parameter",
@@ -150,17 +150,17 @@
             },
             "type": {
               "type": "reference",
-              "id": 682,
+              "id": 3368,
               "typeArguments": [
                 {
                   "type": "reference",
-                  "id": 692,
+                  "id": 3378,
                   "name": "T"
                 }
               ],
               "name": "ChangeObserverOptions"
             },
-            "anchorId": "options",
+            "anchorId": "Parameter-options",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -169,7 +169,7 @@
           "type": "intrinsic",
           "name": "void"
         },
-        "anchorId": "useChangeObserver",
+        "anchorId": "Call-signature-useChangeObserver",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": ""
@@ -183,8 +183,8 @@
     "slug": "util/useChangeObserver"
   },
   "references": {
-    "682": {
-      "id": 682,
+    "3368": {
+      "id": 3368,
       "name": "ChangeObserverOptions",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -206,12 +206,12 @@
       ],
       "typeParameter": [
         {
-          "id": 689,
+          "id": 3375,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
           "flags": {},
-          "anchorId": "T",
+          "anchorId": "Type-parameter-T",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -219,14 +219,14 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 683,
+          "id": 3369,
           "name": "ChangeObserverOptions",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 688,
+              "id": 3374,
               "name": "disabled",
               "kind": 1024,
               "kindString": "Property",
@@ -253,7 +253,7 @@
               "tagsByName": {}
             },
             {
-              "id": 684,
+              "id": 3370,
               "name": "isEqual",
               "kind": 2048,
               "kindString": "Method",
@@ -269,7 +269,7 @@
               ],
               "signatures": [
                 {
-                  "id": 685,
+                  "id": 3371,
                   "name": "isEqual",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -280,32 +280,32 @@
                   },
                   "parameters": [
                     {
-                      "id": 686,
+                      "id": 3372,
                       "name": "a",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 689,
+                        "id": 3375,
                         "name": "T"
                       },
-                      "anchorId": "a",
+                      "anchorId": "Parameter-a",
                       "docFlags": {},
                       "tagsByName": {}
                     },
                     {
-                      "id": 687,
+                      "id": 3373,
                       "name": "b",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 689,
+                        "id": 3375,
                         "name": "T"
                       },
-                      "anchorId": "b",
+                      "anchorId": "Parameter-b",
                       "docFlags": {},
                       "tagsByName": {}
                     }
@@ -314,7 +314,7 @@
                     "type": "intrinsic",
                     "name": "boolean"
                   },
-                  "anchorId": "isEqual",
+                  "anchorId": "Call-signature-isEqual",
                   "docFlags": {},
                   "tagsByName": {}
                 }
@@ -328,14 +328,14 @@
               "title": "Properties",
               "kind": 1024,
               "children": [
-                688
+                3374
               ]
             },
             {
               "title": "Methods",
               "kind": 2048,
               "children": [
-                684
+                3370
               ]
             }
           ],
@@ -346,7 +346,7 @@
               "character": 39
             }
           ],
-          "anchorId": "ChangeObserverOptions",
+          "anchorId": "Type-literal-ChangeObserverOptions",
           "docFlags": {},
           "tagsByName": {}
         }
@@ -357,8 +357,7 @@
       "tagsByName": {
         "expand-properties": ""
       },
-      "slug": "util/ChangeObserverOptions",
-      "anchorId": "ChangeObserverOptions"
+      "anchorId": "Type-alias-ChangeObserverOptions"
     }
   },
   "meta": {

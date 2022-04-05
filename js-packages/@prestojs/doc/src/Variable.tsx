@@ -5,6 +5,11 @@ import Comment from './Comment';
 import TypeName from './TypeName';
 
 export default function Variable({ variable }: { variable: JSONOutput.DeclarationReflection }) {
+    if (variable.anchorId === 'model') {
+        console.log({ variable });
+    }
+
+    const resolvedVariable = variable.getSignature?.[0] || variable;
     return (
         <div className="border-t-2 border-gray-200 mt-3 pt-3">
             <AnchorLink
@@ -14,13 +19,13 @@ export default function Variable({ variable }: { variable: JSONOutput.Declaratio
             >
                 {variable.name}
             </AnchorLink>
-            {variable.type ? (
-                <TypeName type={variable.type} />
+            {resolvedVariable.type ? (
+                <TypeName type={resolvedVariable.type} />
             ) : (
-                variable.kindString === 'Accessor' && variable.getSignature
+                resolvedVariable.kindString
             )}
             <div className="mt-2">
-                <Comment comment={variable.comment} />
+                <Comment comment={resolvedVariable.comment} />
             </div>
         </div>
     );

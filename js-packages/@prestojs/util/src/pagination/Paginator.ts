@@ -1,5 +1,7 @@
 /**
- * See the [fetch init](https://developer.mozilla.org/en-US/docs/Web/API/fetch#parameters) argument for more details
+ * An object containing the below properties in addition to those accepted by [fetch init](https://developer.mozilla.org/en-US/docs/Web/API/fetch#parameters)
+ *
+ * @expand-properties
  */
 export type PaginatorRequestOptions = Omit<RequestInit, 'headers'> & {
     /**
@@ -18,7 +20,9 @@ export type PaginatorRequestOptions = Omit<RequestInit, 'headers'> & {
 };
 
 /**
- * @expand-properties eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)
+ * eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)
+ *
+ * @expand-properties
  */
 export type PaginationRequestDetails = {
     /**

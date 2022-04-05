@@ -2,9 +2,8 @@
 const TypeDoc = require('typedoc');
 const fs = require('fs');
 const path = require('path');
-const { Converter } = require('typedoc');
 
-const root = path.resolve(__dirname, '../');
+const repoRoot = path.resolve(__dirname, '../');
 
 function getTsFiles(dir) {
     if (dir.endsWith('__tests__')) {
@@ -26,7 +25,7 @@ function getTsFiles(dir) {
 }
 
 async function main() {
-    const packagesRoot = path.resolve(root, 'js-packages/@prestojs/');
+    const packagesRoot = path.resolve(repoRoot, 'js-packages/@prestojs/');
 
     for (const pkg of ['util', 'viewmodel', 'ui', 'final-form', 'ui-antd', 'routing', 'rest']) {
         //fs.readdirSync(packagesRoot)) {
@@ -41,11 +40,11 @@ async function main() {
             entryPoints,
             tsconfig: path.join(packagesRoot, pkg, 'tsconfig.json'),
             plugin: [
-                path.resolve(root, 'doc-site/plugins/forceExport.js'),
+                path.resolve(repoRoot, 'doc-site/plugins/forceExport.js'),
                 'typedoc-plugin-rename-defaults',
-                path.resolve(root, 'doc-site/plugins/fixSource.js'),
+                path.resolve(repoRoot, 'doc-site/plugins/fixSource.js'),
             ],
-            'presto-root': root,
+            'presto-root': repoRoot,
             'presto-package-root': path.join(packagesRoot, pkg),
         });
 

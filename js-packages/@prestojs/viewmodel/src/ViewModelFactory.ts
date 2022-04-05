@@ -181,6 +181,7 @@ export function flattenFieldPath<
 
 /**
  * @expand-properties
+ * @export-in-docs
  */
 interface ViewModelOptions<
     T extends FieldsMapping,
@@ -652,7 +653,7 @@ export class BaseViewModel<
      *
      * A naive solution is to just check `_assignedFieldsDeep`:
      *
-     * ```
+     * ```js
      * const paths = intersectionBy(
      *   ...assignedData[key].map(record => record._assignedFieldsDeep),
      *   p => flattenFieldPath(p).join('|')
@@ -663,7 +664,7 @@ export class BaseViewModel<
      *
      * This function handles nested records such that a null relation is ignored. For example if you received:
      *
-     * ```
+     * ```js
      * [
      *   {
      *     id: 1,
@@ -692,7 +693,7 @@ export class BaseViewModel<
      *
      * would result in
      *
-     * ```
+     * ```js
      * ['id', 'nestedRecordId', ['nestedRecord', 'id'], ['nestedRecord', 'name']]
      * ```
      *
@@ -1260,6 +1261,7 @@ export class InvalidFieldError extends Error {}
  * ```
  *
  * @param fields A map of field name to an instance of `Field`
+ * @extract-docs
  */
 export default function viewModelFactory<
     FieldMappingType extends FieldsMapping,

@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 17,
+    "id": 2680,
     "name": "TextLabeled",
     "kind": 256,
     "kindString": "Interface",
@@ -23,14 +23,14 @@
     },
     "children": [
       {
-        "id": 18,
+        "id": 2681,
         "name": "getLabel",
         "kind": 2048,
         "kindString": "Method",
         "flags": {},
         "signatures": [
           {
-            "id": 19,
+            "id": 2682,
             "name": "getLabel",
             "kind": 4096,
             "kindString": "Call signature",
@@ -45,7 +45,7 @@
               "type": "intrinsic",
               "name": "string"
             },
-            "anchorId": "getLabel",
+            "anchorId": "Call-signature-getLabel",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -59,7 +59,7 @@
         "title": "Methods",
         "kind": 2048,
         "children": [
-          18
+          2681
         ]
       }
     ],
@@ -75,8 +75,8 @@
       "extract-docs": "",
       "menu-group": "Labeled"
     },
-    "slug": "util/TextLabeled",
-    "anchorId": "TextLabeled"
+    "anchorId": "Interface-TextLabeled",
+    "slug": "util/TextLabeled"
   },
   "references": {},
   "meta": {

@@ -132,9 +132,15 @@ const theme = {
     },
 };
 
-export default function CodeBlock({ children }): React.ReactElement {
+export default function CodeBlock({
+    children,
+    className,
+}: {
+    children: React.ReactNode;
+    className?: string;
+}): React.ReactElement {
     return (
-        <Prism language="jsx" style={theme}>
+        <Prism language="jsx" style={theme} className={className}>
             {children}
         </Prism>
     );

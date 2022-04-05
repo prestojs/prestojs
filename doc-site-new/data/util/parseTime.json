@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 557,
+    "id": 3220,
     "name": "parseTime",
     "kind": 64,
     "kindString": "Function",
@@ -14,7 +14,7 @@
     ],
     "signatures": [
       {
-        "id": 558,
+        "id": 3221,
         "name": "parseTime",
         "kind": 4096,
         "kindString": "Call signature",
@@ -37,7 +37,7 @@
         },
         "parameters": [
           {
-            "id": 559,
+            "id": 3222,
             "name": "value",
             "kind": 32768,
             "kindString": "Parameter",
@@ -61,7 +61,7 @@
                 }
               ]
             },
-            "anchorId": "value",
+            "anchorId": "Parameter-value",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -70,7 +70,7 @@
           "type": "reference",
           "name": "TimeParts"
         },
-        "anchorId": "parseTime",
+        "anchorId": "Call-signature-parseTime",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",

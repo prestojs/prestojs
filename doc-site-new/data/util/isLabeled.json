@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 8,
+    "id": 2671,
     "name": "isLabeled",
     "kind": 64,
     "kindString": "Function",
@@ -14,7 +14,7 @@
     ],
     "signatures": [
       {
-        "id": 9,
+        "id": 2672,
         "name": "isLabeled",
         "kind": 4096,
         "kindString": "Call signature",
@@ -35,7 +35,7 @@
         },
         "parameters": [
           {
-            "id": 10,
+            "id": 2673,
             "name": "item",
             "kind": 32768,
             "kindString": "Parameter",
@@ -44,7 +44,7 @@
               "type": "intrinsic",
               "name": "any"
             },
-            "anchorId": "item",
+            "anchorId": "Parameter-item",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -58,18 +58,18 @@
             "types": [
               {
                 "type": "reference",
-                "id": 17,
+                "id": 2680,
                 "name": "TextLabeled"
               },
               {
                 "type": "reference",
-                "id": 20,
+                "id": 2683,
                 "name": "NodeLabeled"
               }
             ]
           }
         },
-        "anchorId": "isLabeled",
+        "anchorId": "Call-signature-isLabeled",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -85,8 +85,8 @@
     "slug": "util/isLabeled"
   },
   "references": {
-    "17": {
-      "id": 17,
+    "2680": {
+      "id": 2680,
       "name": "TextLabeled",
       "kind": 256,
       "kindString": "Interface",
@@ -109,14 +109,14 @@
       },
       "children": [
         {
-          "id": 18,
+          "id": 2681,
           "name": "getLabel",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 19,
+              "id": 2682,
               "name": "getLabel",
               "kind": 4096,
               "kindString": "Call signature",
@@ -131,7 +131,7 @@
                 "type": "intrinsic",
                 "name": "string"
               },
-              "anchorId": "getLabel",
+              "anchorId": "Call-signature-getLabel",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -145,7 +145,7 @@
           "title": "Methods",
           "kind": 2048,
           "children": [
-            18
+            2681
           ]
         }
       ],
@@ -161,11 +161,11 @@
         "extract-docs": "",
         "menu-group": "Labeled"
       },
-      "slug": "util/TextLabeled",
-      "anchorId": "TextLabeled"
+      "anchorId": "Interface-TextLabeled",
+      "slug": "util/TextLabeled"
     },
-    "20": {
-      "id": 20,
+    "2683": {
+      "id": 2683,
       "name": "NodeLabeled",
       "kind": 256,
       "kindString": "Interface",
@@ -188,14 +188,14 @@
       },
       "children": [
         {
-          "id": 21,
+          "id": 2684,
           "name": "getNodeLabel",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 22,
+              "id": 2685,
               "name": "getNodeLabel",
               "kind": 4096,
               "kindString": "Call signature",
@@ -212,7 +212,7 @@
                 "package": "@types/react",
                 "name": "ReactNode"
               },
-              "anchorId": "getNodeLabel",
+              "anchorId": "Call-signature-getNodeLabel",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -226,7 +226,7 @@
           "title": "Methods",
           "kind": 2048,
           "children": [
-            21
+            2684
           ]
         }
       ],
@@ -242,8 +242,8 @@
         "extract-docs": "",
         "menu-group": "Labeled"
       },
-      "slug": "util/NodeLabeled",
-      "anchorId": "NodeLabeled"
+      "anchorId": "Interface-NodeLabeled",
+      "slug": "util/NodeLabeled"
     }
   },
   "meta": {

@@ -2,52 +2,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import _menuByName from '../data/apiMenu.json';
-import Sidebar from './Sidebar';
-
-const DEFAULTS_PROCESSED = Symbol.for('DEFAULTS_PROCESSED');
 
 const menuByName = _menuByName as Record<
     string,
-    Record<
-        string,
-        {
+    {
+        items: {
             title: string;
-            slug: string;
-        }[]
-    >
+            href: string;
+        }[];
+        isDefault?: boolean;
+        title?: string;
+    }[]
 >;
-
-// Only do this once... only necessary for dev hotloading
-// @ts-ignore
-if (!menuByName[DEFAULTS_PROCESSED]) {
-    // @ts-ignore
-    menuByName[DEFAULTS_PROCESSED] = true;
-    // Any customisations to generated menu are done here
-    // if (!menuByName.viewmodel.default) {
-    //     menuByName.viewmodel.default = [];
-    // }
-    // menuByName.viewmodel.default.push({
-    //     slug: 'viewmodel/viewModelFactory',
-    //     title: 'viewModelFactory',
-    // });
-}
-
-function mapMenu(menu) {
-    return {
-        title: menu.title,
-        href: `/docs/${menu.slug}`,
-    };
-}
-
-function compareMenu(a, b) {
-    if (a.title < b.title) {
-        return -1;
-    }
-    if (a.title > b.title) {
-        return 1;
-    }
-    return 0;
-}
 
 function isCurrent(router, href) {
     if (!href.endsWith('/')) {
@@ -60,8 +26,7 @@ function isCurrent(router, href) {
     return asPath.startsWith(href);
 }
 
-function NavItem({ href, children, as }) {
-    const router = useRouter();
+function NavItem({ href, children, as }: { href: string; children: React.ReactNode; as?: string }) {
     return (
         <Link href={href} as={as}>
             <a className="flex items-center lg:text-sm lg:leading-6 mb-1 font-semibold text-gray-700 hover:text-gray-900">
@@ -99,43 +64,21 @@ const packageLinks = [
 ];
 
 export default function MainMenuSidebar({
-    children,
     className,
     forceOpen = false,
     onCloseMenu,
 }: {
-    children?: React.ReactNode;
     className?: string;
     forceOpen?: boolean;
     onCloseMenu: () => void;
 }) {
     const router = useRouter();
     const currentPackageName = router.asPath.split('/').filter(Boolean).slice(1).shift() as string;
-    let currentMenu;
-    if (menuByName[currentPackageName]) {
-        const defaultSection = (menuByName[currentPackageName].default || []).map(mapMenu);
-        defaultSection.sort(compareMenu);
-        currentMenu = [];
-        for (const [groupName, items] of Object.entries(menuByName[currentPackageName])) {
-            if (groupName === 'default') continue;
-            const subMenu = items.map(mapMenu);
-            items.sort(compareMenu);
-            currentMenu.push({
-                title: groupName,
-                items: subMenu,
-            });
-        }
-        currentMenu.sort(compareMenu);
-        currentMenu.unshift({
-            isDefault: true,
-            items: defaultSection,
-        });
-    }
+    const currentMenu = menuByName[currentPackageName];
     className = `lg:block fixed z-50 inset-0 right-auto pb-10 px-8 overflow-y-auto ${className} bg-white`;
     if (!forceOpen) {
         className += ' hidden';
     }
-    console.log(currentMenu);
     return (
         <>
             <div className={className}>
@@ -204,21 +147,21 @@ export default function MainMenuSidebar({
                                 <NavItem href={link.href}>{link.title}</NavItem>
                                 {link.packageName === currentPackageName && (
                                     <ul>
-                                        {currentMenu?.map(menu => (
-                                            <>
+                                        {currentMenu?.map((menu, i) => (
+                                            <React.Fragment key={i}>
                                                 {!menu.isDefault && (
                                                     <li className="ml-2 font-bold py-2">
                                                         {menu.title}
                                                     </li>
                                                 )}
                                                 {menu.items.map(item => (
-                                                    <li className="pl-2">
+                                                    <li className="pl-2" key={item.href}>
                                                         <SubNavItem href={item.href} as={item.href}>
                                                             {item.title}
                                                         </SubNavItem>
                                                     </li>
                                                 ))}
-                                            </>
+                                            </React.Fragment>
                                         ))}
                                     </ul>
                                 )}
@@ -236,25 +179,5 @@ export default function MainMenuSidebar({
                 </div>
             )}
         </>
-    );
-    return (
-        <Sidebar
-            id="primary-nav"
-            links={[
-                { href: '/docs/guide', title: 'Getting Started' },
-                { href: '/docs/tutorial', title: 'Tutorial' },
-                { heading: 'Packages' },
-                { href: '/docs/viewmodel', title: 'View Model' },
-                { href: '/docs/final-form', title: 'Final Form' },
-                { href: '/docs/rest', title: 'REST' },
-                { href: '/docs/routing', title: 'Routing' },
-                { href: '/docs/ui', title: 'UI' },
-                { href: '/docs/ui-antd', title: 'UI ANTD' },
-                { href: '/docs/util', title: 'Util' },
-            ]}
-        >
-            {currentMenu && <Sidebar.LinksSection title={currentPackageName} links={currentMenu} />}
-            {children}
-        </Sidebar>
     );
 }

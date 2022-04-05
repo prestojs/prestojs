@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 704,
+    "id": 3390,
     "name": "useListChangeObserver",
     "kind": 64,
     "kindString": "Function",
@@ -15,7 +15,7 @@
     ],
     "signatures": [
       {
-        "id": 705,
+        "id": 3391,
         "name": "useListChangeObserver",
         "kind": 4096,
         "kindString": "Call signature",
@@ -36,7 +36,7 @@
         },
         "typeParameter": [
           {
-            "id": 706,
+            "id": 3392,
             "name": "T",
             "kind": 131072,
             "kindString": "Type parameter",
@@ -48,14 +48,14 @@
                 "name": "any"
               }
             },
-            "anchorId": "T",
+            "anchorId": "Type-parameter-T",
             "docFlags": {},
             "tagsByName": {}
           }
         ],
         "parameters": [
           {
-            "id": 707,
+            "id": 3393,
             "name": "value",
             "kind": 32768,
             "kindString": "Parameter",
@@ -81,17 +81,17 @@
                 },
                 {
                   "type": "reference",
-                  "id": 706,
+                  "id": 3392,
                   "name": "T"
                 }
               ]
             },
-            "anchorId": "value",
+            "anchorId": "Parameter-value",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 708,
+            "id": 3394,
             "name": "onChange",
             "kind": 32768,
             "kindString": "Parameter",
@@ -105,18 +105,18 @@
               "typeArguments": [
                 {
                   "type": "reference",
-                  "id": 706,
+                  "id": 3392,
                   "name": "T"
                 }
               ],
               "name": "OnChange"
             },
-            "anchorId": "onChange",
+            "anchorId": "Parameter-onChange",
             "docFlags": {},
             "tagsByName": {}
           },
           {
-            "id": 709,
+            "id": 3395,
             "name": "options",
             "kind": 32768,
             "kindString": "Parameter",
@@ -128,13 +128,13 @@
               "typeArguments": [
                 {
                   "type": "reference",
-                  "id": 706,
+                  "id": 3392,
                   "name": "T"
                 }
               ],
               "name": "ListChangeObserverOptions"
             },
-            "anchorId": "options",
+            "anchorId": "Parameter-options",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -143,7 +143,7 @@
           "type": "intrinsic",
           "name": "void"
         },
-        "anchorId": "useListChangeObserver",
+        "anchorId": "Call-signature-useListChangeObserver",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": ""

@@ -10,9 +10,18 @@ import TypeName, { TypeNameProvider } from './TypeName';
 
 type Props = {
     signature: JSONOutput.SignatureReflection;
+    excludeParameterNames?: string[];
+    hideTypeParameters?: boolean;
 };
 
-export default function SignatureDoc({ signature }: Props) {
+export default function SignatureDoc({
+    signature,
+    excludeParameterNames = [],
+    hideTypeParameters,
+}: Props) {
+    const parameters = signature.parameters?.filter(
+        param => !excludeParameterNames.includes(param.name)
+    );
     return (
         <>
             <div className="flex items-center justify-between mb-5">
@@ -20,16 +29,18 @@ export default function SignatureDoc({ signature }: Props) {
                     <FunctionSignature
                         signature={signature}
                         className="text-xl text-gray-700 font-semibold"
+                        excludeParameterNames={excludeParameterNames}
+                        hideTypeParameters={hideTypeParameters}
                     />
                 </AnchorLink>
                 <SourceLink declaration={signature} />
             </div>
             <Comment comment={signature.comment} />
-            {signature.parameters && (
+            {parameters && (
                 <div className="my-5">
                     <strong className="pb-3 block">Params:</strong>
                     <DeclarationsTable
-                        declarations={signature.parameters}
+                        declarations={parameters}
                         showRequiredColumn
                         attributeHeader="Parameter"
                     />

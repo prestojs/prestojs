@@ -1247,7 +1247,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 104,
+									"line": 108,
 									"character": 4
 								}
 							],
@@ -1271,7 +1271,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 105,
+									"line": 109,
 									"character": 4
 								}
 							],
@@ -1303,7 +1303,7 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-															"line": 105,
+															"line": 109,
 															"character": 37
 														}
 													],
@@ -1341,7 +1341,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 106,
+									"line": 110,
 									"character": 4
 								}
 							],
@@ -1397,7 +1397,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 107,
+									"line": 111,
 									"character": 4
 								}
 							],
@@ -1612,7 +1612,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 112,
+									"line": 116,
 									"character": 8
 								}
 							],
@@ -2066,7 +2066,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 155,
+									"line": 159,
 									"character": 4
 								}
 							],
@@ -4932,7 +4932,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 104,
+									"line": 108,
 									"character": 4
 								}
 							],
@@ -4956,7 +4956,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 105,
+									"line": 109,
 									"character": 4
 								}
 							],
@@ -4988,7 +4988,7 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-															"line": 105,
+															"line": 109,
 															"character": 37
 														}
 													],
@@ -5026,7 +5026,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 106,
+									"line": 110,
 									"character": 4
 								}
 							],
@@ -5082,7 +5082,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 107,
+									"line": 111,
 									"character": 4
 								}
 							],
@@ -5210,7 +5210,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 112,
+									"line": 116,
 									"character": 8
 								}
 							],
@@ -5826,7 +5826,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 155,
+									"line": 159,
 									"character": 4
 								}
 							],
@@ -6489,7 +6489,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 104,
+									"line": 108,
 									"character": 4
 								}
 							],
@@ -6513,7 +6513,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 105,
+									"line": 109,
 									"character": 4
 								}
 							],
@@ -6545,7 +6545,7 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-															"line": 105,
+															"line": 109,
 															"character": 37
 														}
 													],
@@ -6583,7 +6583,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 106,
+									"line": 110,
 									"character": 4
 								}
 							],
@@ -6639,7 +6639,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 107,
+									"line": 111,
 									"character": 4
 								}
 							],
@@ -6776,7 +6776,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 112,
+									"line": 116,
 									"character": 8
 								}
 							],
@@ -7404,7 +7404,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 155,
+									"line": 159,
 									"character": 4
 								}
 							],
@@ -8057,7 +8057,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 119,
+									"line": 123,
 									"character": 4
 								}
 							],
@@ -8167,7 +8167,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 104,
+									"line": 108,
 									"character": 4
 								}
 							],
@@ -8191,7 +8191,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 105,
+									"line": 109,
 									"character": 4
 								}
 							],
@@ -8223,7 +8223,7 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-															"line": 105,
+															"line": 109,
 															"character": 37
 														}
 													],
@@ -8261,7 +8261,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 106,
+									"line": 110,
 									"character": 4
 								}
 							],
@@ -8317,7 +8317,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 107,
+									"line": 111,
 									"character": 4
 								}
 							],
@@ -8373,7 +8373,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 112,
+									"line": 116,
 									"character": 8
 								}
 							],
@@ -8413,7 +8413,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 206,
+									"line": 210,
 									"character": 4
 								}
 							],
@@ -8453,7 +8453,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 215,
+									"line": 219,
 									"character": 4
 								}
 							],
@@ -8495,7 +8495,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 188,
+									"line": 192,
 									"character": 4
 								}
 							],
@@ -8553,7 +8553,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 254,
+									"line": 258,
 									"character": 4
 								}
 							],
@@ -8593,7 +8593,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 222,
+									"line": 226,
 									"character": 4
 								}
 							],
@@ -8633,7 +8633,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 231,
+									"line": 235,
 									"character": 4
 								}
 							],
@@ -8684,7 +8684,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 238,
+									"line": 242,
 									"character": 4
 								}
 							],
@@ -8724,7 +8724,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 247,
+									"line": 251,
 									"character": 4
 								}
 							],
@@ -8775,7 +8775,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 155,
+									"line": 159,
 									"character": 4
 								}
 							],
@@ -8846,7 +8846,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 199,
+									"line": 203,
 									"character": 4
 								}
 							],
@@ -8951,7 +8951,7 @@
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-							"line": 101,
+							"line": 105,
 							"character": 30
 						}
 					],
@@ -8973,7 +8973,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 101,
+											"line": 105,
 											"character": 54
 										}
 									]
@@ -8997,7 +8997,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 101,
+											"line": 105,
 											"character": 80
 										}
 									]
@@ -9058,7 +9058,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 69,
+									"line": 73,
 									"character": 4
 								}
 							],
@@ -9077,7 +9077,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 70,
+									"line": 74,
 									"character": 4
 								}
 							],
@@ -9096,7 +9096,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 73,
+									"line": 77,
 									"character": 4
 								}
 							],
@@ -9363,7 +9363,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 71,
+									"line": 75,
 									"character": 4
 								}
 							],
@@ -9404,7 +9404,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 72,
+									"line": 76,
 									"character": 4
 								}
 							],
@@ -9514,7 +9514,7 @@
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-							"line": 68,
+							"line": 72,
 							"character": 17
 						}
 					],
@@ -9536,7 +9536,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 68,
+											"line": 72,
 											"character": 44
 										}
 									]
@@ -9560,7 +9560,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 68,
+											"line": 72,
 											"character": 64
 										}
 									]
@@ -10155,7 +10155,7 @@
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-							"line": 88,
+							"line": 92,
 							"character": 17
 						}
 					],
@@ -10194,17 +10194,18 @@
 					"kindString": "Type alias",
 					"flags": {},
 					"comment": {
+						"shortText": "eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)",
 						"tags": [
 							{
 								"tag": "expand-properties",
-								"text": "eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)\n"
+								"text": "\n"
 							}
 						]
 					},
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-							"line": 23,
+							"line": 27,
 							"character": 12
 						}
 					],
@@ -10232,7 +10233,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 65,
+											"line": 69,
 											"character": 4
 										}
 									],
@@ -10255,7 +10256,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 27,
+											"line": 31,
 											"character": 4
 										}
 									],
@@ -10307,7 +10308,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 39,
+											"line": 43,
 											"character": 4
 										}
 									],
@@ -10330,7 +10331,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 35,
+											"line": 39,
 											"character": 4
 										}
 									],
@@ -10353,7 +10354,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 31,
+											"line": 35,
 											"character": 4
 										}
 									],
@@ -10391,7 +10392,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-									"line": 23,
+									"line": 27,
 									"character": 39
 								}
 							]
@@ -10405,12 +10406,18 @@
 					"kindString": "Type alias",
 					"flags": {},
 					"comment": {
-						"shortText": "See the [fetch init](https://developer.mozilla.org/en-US/docs/Web/API/fetch#parameters) argument for more details"
+						"shortText": "An object containing the below properties in addition to those accepted by [fetch init](https://developer.mozilla.org/en-US/docs/Web/API/fetch#parameters)",
+						"tags": [
+							{
+								"tag": "expand-properties",
+								"text": "\n"
+							}
+						]
 					},
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-							"line": 4,
+							"line": 6,
 							"character": 12
 						}
 					],
@@ -10458,7 +10465,7 @@
 											"sources": [
 												{
 													"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-													"line": 9,
+													"line": 11,
 													"character": 4
 												}
 											],
@@ -10513,7 +10520,7 @@
 											"sources": [
 												{
 													"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-													"line": 17,
+													"line": 19,
 													"character": 4
 												}
 											],
@@ -10565,7 +10572,7 @@
 											"sources": [
 												{
 													"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-													"line": 13,
+													"line": 15,
 													"character": 4
 												}
 											],
@@ -10601,7 +10608,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-											"line": 4,
+											"line": 6,
 											"character": 69
 										}
 									]
@@ -10639,7 +10646,7 @@
 			"sources": [
 				{
 					"fileName": "js-packages/@prestojs/util/src/pagination/Paginator.ts",
-					"line": 4,
+					"line": 6,
 					"character": 0
 				}
 			]
@@ -11762,8 +11769,6 @@
 					"kindString": "Interface",
 					"flags": {},
 					"comment": {
-						"shortText": "I do havestuff",
-						"text": "```js\nconst a = 5;\n```\n",
 						"tags": [
 							{
 								"tag": "expand-properties",
@@ -11786,7 +11791,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-									"line": 113,
+									"line": 107,
 									"character": 4
 								}
 							],
@@ -11813,7 +11818,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-									"line": 130,
+									"line": 124,
 									"character": 4
 								}
 							],
@@ -11837,7 +11842,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-									"line": 124,
+									"line": 118,
 									"character": 4
 								}
 							],
@@ -11861,7 +11866,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-									"line": 105,
+									"line": 99,
 									"character": 4
 								}
 							],
@@ -11899,7 +11904,7 @@
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-							"line": 85,
+							"line": 79,
 							"character": 17
 						}
 					]
@@ -11913,7 +11918,7 @@
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-							"line": 154,
+							"line": 145,
 							"character": 12
 						}
 					],
@@ -11955,7 +11960,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-											"line": 174,
+											"line": 165,
 											"character": 4
 										}
 									],
@@ -11986,7 +11991,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-											"line": 158,
+											"line": 149,
 											"character": 4
 										}
 									],
@@ -12012,7 +12017,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-											"line": 185,
+											"line": 176,
 											"character": 4
 										}
 									],
@@ -12043,7 +12048,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-											"line": 181,
+											"line": 172,
 											"character": 4
 										}
 									],
@@ -12071,7 +12076,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-											"line": 201,
+											"line": 192,
 											"character": 4
 										}
 									],
@@ -12101,7 +12106,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-											"line": 195,
+											"line": 186,
 											"character": 4
 										}
 									],
@@ -12174,7 +12179,7 @@
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-									"line": 154,
+									"line": 145,
 									"character": 52
 								}
 							]
@@ -12218,7 +12223,7 @@
 											"sources": [
 												{
 													"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-													"line": 503,
+													"line": 494,
 													"character": 13
 												}
 											],
@@ -12238,7 +12243,7 @@
 											"sources": [
 												{
 													"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-													"line": 502,
+													"line": 493,
 													"character": 13
 												}
 											],
@@ -12258,7 +12263,7 @@
 											"sources": [
 												{
 													"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-													"line": 504,
+													"line": 495,
 													"character": 13
 												}
 											],
@@ -12324,7 +12329,7 @@
 			"flags": {},
 			"children": [
 				{
-					"id": 619,
+					"id": 633,
 					"name": "UseAsyncListingProps",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -12333,6 +12338,10 @@
 						"tags": [
 							{
 								"tag": "expand-properties",
+								"text": ""
+							},
+							{
+								"tag": "export-in-docs",
 								"text": "\n"
 							}
 						]
@@ -12340,13 +12349,13 @@
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-							"line": 23,
+							"line": 25,
 							"character": 12
 						}
 					],
 					"typeParameter": [
 						{
-							"id": 628,
+							"id": 642,
 							"name": "T",
 							"kind": 131072,
 							"kindString": "Type parameter",
@@ -12356,14 +12365,14 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 620,
+							"id": 634,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 623,
+									"id": 637,
 									"name": "accumulatePages",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12377,7 +12386,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-											"line": 49,
+											"line": 51,
 											"character": 4
 										}
 									],
@@ -12387,7 +12396,7 @@
 									}
 								},
 								{
-									"id": 624,
+									"id": 638,
 									"name": "paginator",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12401,7 +12410,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-											"line": 56,
+											"line": 58,
 											"character": 4
 										}
 									],
@@ -12421,7 +12430,7 @@
 									}
 								},
 								{
-									"id": 622,
+									"id": 636,
 									"name": "query",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12434,7 +12443,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-											"line": 38,
+											"line": 40,
 											"character": 4
 										}
 									],
@@ -12473,7 +12482,7 @@
 									}
 								},
 								{
-									"id": 621,
+									"id": 635,
 									"name": "trigger",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12487,7 +12496,7 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-											"line": 34,
+											"line": 36,
 											"character": 4
 										}
 									],
@@ -12506,7 +12515,7 @@
 									}
 								},
 								{
-									"id": 625,
+									"id": 639,
 									"name": "execute",
 									"kind": 2048,
 									"kindString": "Method",
@@ -12514,13 +12523,13 @@
 									"sources": [
 										{
 											"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-											"line": 65,
+											"line": 67,
 											"character": 4
 										}
 									],
 									"signatures": [
 										{
-											"id": 626,
+											"id": 640,
 											"name": "execute",
 											"kind": 4096,
 											"kindString": "Call signature",
@@ -12531,13 +12540,14 @@
 											},
 											"parameters": [
 												{
-													"id": 627,
+													"id": 641,
 													"name": "props",
 													"kind": 32768,
 													"kindString": "Parameter",
 													"flags": {},
 													"type": {
 														"type": "reference",
+														"id": 619,
 														"name": "UseAsyncListingExecuteProps"
 													}
 												}
@@ -12547,7 +12557,7 @@
 												"typeArguments": [
 													{
 														"type": "reference",
-														"id": 628,
+														"id": 642,
 														"name": "T"
 													}
 												],
@@ -12564,24 +12574,24 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										623,
-										624,
-										622,
-										621
+										637,
+										638,
+										636,
+										635
 									]
 								},
 								{
 									"title": "Methods",
 									"kind": 2048,
 									"children": [
-										625
+										639
 									]
 								}
 							],
 							"sources": [
 								{
 									"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-									"line": 23,
+									"line": 25,
 									"character": 38
 								}
 							]
@@ -12589,21 +12599,29 @@
 					}
 				},
 				{
-					"id": 629,
+					"id": 643,
 					"name": "UseAsyncListingReturn",
 					"kind": 4194304,
 					"kindString": "Type alias",
 					"flags": {},
+					"comment": {
+						"tags": [
+							{
+								"tag": "export-in-docs",
+								"text": "\n"
+							}
+						]
+					},
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-							"line": 93,
+							"line": 102,
 							"character": 12
 						}
 					],
 					"typeParameter": [
 						{
-							"id": 639,
+							"id": 653,
 							"name": "T",
 							"kind": 131072,
 							"kindString": "Type parameter",
@@ -12618,10 +12636,11 @@
 								"types": [
 									{
 										"type": "reference",
+										"id": 623,
 										"typeArguments": [
 											{
 												"type": "reference",
-												"id": 639,
+												"id": 653,
 												"name": "T"
 											}
 										],
@@ -12630,14 +12649,14 @@
 									{
 										"type": "reflection",
 										"declaration": {
-											"id": 630,
+											"id": 644,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 631,
+													"id": 645,
 													"name": "error",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12648,7 +12667,7 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-															"line": 98,
+															"line": 107,
 															"character": 10
 														}
 													],
@@ -12658,7 +12677,7 @@
 													}
 												},
 												{
-													"id": 632,
+													"id": 646,
 													"name": "result",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12666,7 +12685,7 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-															"line": 99,
+															"line": 108,
 															"character": 10
 														}
 													],
@@ -12681,15 +12700,15 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														631,
-														632
+														645,
+														646
 													]
 												}
 											],
 											"sources": [
 												{
 													"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-													"line": 94,
+													"line": 103,
 													"character": 40
 												}
 											]
@@ -12702,10 +12721,11 @@
 								"types": [
 									{
 										"type": "reference",
+										"id": 623,
 										"typeArguments": [
 											{
 												"type": "reference",
-												"id": 639,
+												"id": 653,
 												"name": "T"
 											}
 										],
@@ -12714,14 +12734,14 @@
 									{
 										"type": "reflection",
 										"declaration": {
-											"id": 633,
+											"id": 647,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 634,
+													"id": 648,
 													"name": "error",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12732,7 +12752,7 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-															"line": 107,
+															"line": 116,
 															"character": 10
 														}
 													],
@@ -12744,7 +12764,7 @@
 													}
 												},
 												{
-													"id": 635,
+													"id": 649,
 													"name": "result",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12755,7 +12775,7 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-															"line": 111,
+															"line": 120,
 															"character": 10
 														}
 													],
@@ -12770,15 +12790,15 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														634,
-														635
+														648,
+														649
 													]
 												}
 											],
 											"sources": [
 												{
 													"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-													"line": 101,
+													"line": 110,
 													"character": 40
 												}
 											]
@@ -12791,10 +12811,11 @@
 								"types": [
 									{
 										"type": "reference",
+										"id": 623,
 										"typeArguments": [
 											{
 												"type": "reference",
-												"id": 639,
+												"id": 653,
 												"name": "T"
 											}
 										],
@@ -12803,14 +12824,14 @@
 									{
 										"type": "reflection",
 										"declaration": {
-											"id": 636,
+											"id": 650,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 637,
+													"id": 651,
 													"name": "error",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12821,7 +12842,7 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-															"line": 117,
+															"line": 126,
 															"character": 10
 														}
 													],
@@ -12831,7 +12852,7 @@
 													}
 												},
 												{
-													"id": 638,
+													"id": 652,
 													"name": "result",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12842,13 +12863,13 @@
 													"sources": [
 														{
 															"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-															"line": 121,
+															"line": 130,
 															"character": 10
 														}
 													],
 													"type": {
 														"type": "reference",
-														"id": 639,
+														"id": 653,
 														"name": "T"
 													}
 												}
@@ -12858,15 +12879,15 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														637,
-														638
+														651,
+														652
 													]
 												}
 											],
 											"sources": [
 												{
 													"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-													"line": 113,
+													"line": 122,
 													"character": 40
 												}
 											]
@@ -12878,7 +12899,7 @@
 					}
 				},
 				{
-					"id": 640,
+					"id": 654,
 					"name": "useAsyncListing",
 					"kind": 64,
 					"kindString": "Function",
@@ -12887,13 +12908,13 @@
 					"sources": [
 						{
 							"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
-							"line": 135,
+							"line": 144,
 							"character": 24
 						}
 					],
 					"signatures": [
 						{
-							"id": 641,
+							"id": 655,
 							"name": "useAsyncListing",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -12910,7 +12931,7 @@
 							},
 							"typeParameter": [
 								{
-									"id": 642,
+									"id": 656,
 									"name": "T",
 									"kind": 131072,
 									"kindString": "Type parameter",
@@ -12926,18 +12947,18 @@
 							],
 							"parameters": [
 								{
-									"id": 643,
+									"id": 657,
 									"name": "props",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 619,
+										"id": 633,
 										"typeArguments": [
 											{
 												"type": "reference",
-												"id": 642,
+												"id": 656,
 												"name": "T"
 											}
 										],
@@ -12947,11 +12968,11 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 629,
+								"id": 643,
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 642,
+										"id": 656,
 										"name": "T"
 									}
 								],
@@ -12966,15 +12987,15 @@
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						619,
-						629
+						633,
+						643
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						640
+						654
 					]
 				}
 			],
@@ -12987,14 +13008,14 @@
 			]
 		},
 		{
-			"id": 644,
+			"id": 658,
 			"name": "useAsyncValue",
 			"kind": 2,
 			"kindString": "Module",
 			"flags": {},
 			"children": [
 				{
-					"id": 653,
+					"id": 667,
 					"name": "UseAsyncValuePropsMulti",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -13016,14 +13037,14 @@
 					],
 					"typeParameter": [
 						{
-							"id": 659,
+							"id": 673,
 							"name": "T",
 							"kind": 131072,
 							"kindString": "Type parameter",
 							"flags": {}
 						},
 						{
-							"id": 660,
+							"id": 674,
 							"name": "U",
 							"kind": 131072,
 							"kindString": "Type parameter",
@@ -13043,12 +13064,12 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 659,
+										"id": 673,
 										"name": "T"
 									},
 									{
 										"type": "reference",
-										"id": 660,
+										"id": 674,
 										"name": "U"
 									}
 								],
@@ -13057,14 +13078,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 654,
+									"id": 668,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 655,
+											"id": 669,
 											"name": "ids",
 											"kind": 1024,
 											"kindString": "Property",
@@ -13087,7 +13108,7 @@
 														"type": "array",
 														"elementType": {
 															"type": "reference",
-															"id": 660,
+															"id": 674,
 															"name": "U"
 														}
 													},
@@ -13099,7 +13120,7 @@
 											}
 										},
 										{
-											"id": 656,
+											"id": 670,
 											"name": "resolve",
 											"kind": 2048,
 											"kindString": "Method",
@@ -13113,7 +13134,7 @@
 											],
 											"signatures": [
 												{
-													"id": 657,
+													"id": 671,
 													"name": "resolve",
 													"kind": 4096,
 													"kindString": "Call signature",
@@ -13123,7 +13144,7 @@
 													},
 													"parameters": [
 														{
-															"id": 658,
+															"id": 672,
 															"name": "ids",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -13132,7 +13153,7 @@
 																"type": "array",
 																"elementType": {
 																	"type": "reference",
-																	"id": 660,
+																	"id": 674,
 																	"name": "U"
 																}
 															}
@@ -13145,7 +13166,7 @@
 																"type": "array",
 																"elementType": {
 																	"type": "reference",
-																	"id": 659,
+																	"id": 673,
 																	"name": "T"
 																}
 															}
@@ -13163,14 +13184,14 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												655
+												669
 											]
 										},
 										{
 											"title": "Methods",
 											"kind": 2048,
 											"children": [
-												656
+												670
 											]
 										}
 									],
@@ -13187,7 +13208,7 @@
 					}
 				},
 				{
-					"id": 645,
+					"id": 659,
 					"name": "UseAsyncValuePropsSingle",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -13209,14 +13230,14 @@
 					],
 					"typeParameter": [
 						{
-							"id": 651,
+							"id": 665,
 							"name": "T",
 							"kind": 131072,
 							"kindString": "Type parameter",
 							"flags": {}
 						},
 						{
-							"id": 652,
+							"id": 666,
 							"name": "U",
 							"kind": 131072,
 							"kindString": "Type parameter",
@@ -13236,12 +13257,12 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 651,
+										"id": 665,
 										"name": "T"
 									},
 									{
 										"type": "reference",
-										"id": 652,
+										"id": 666,
 										"name": "U"
 									}
 								],
@@ -13250,14 +13271,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 646,
+									"id": 660,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 647,
+											"id": 661,
 											"name": "id",
 											"kind": 1024,
 											"kindString": "Property",
@@ -13278,7 +13299,7 @@
 												"types": [
 													{
 														"type": "reference",
-														"id": 652,
+														"id": 666,
 														"name": "U"
 													},
 													{
@@ -13289,7 +13310,7 @@
 											}
 										},
 										{
-											"id": 648,
+											"id": 662,
 											"name": "resolve",
 											"kind": 2048,
 											"kindString": "Method",
@@ -13303,7 +13324,7 @@
 											],
 											"signatures": [
 												{
-													"id": 649,
+													"id": 663,
 													"name": "resolve",
 													"kind": 4096,
 													"kindString": "Call signature",
@@ -13314,14 +13335,14 @@
 													},
 													"parameters": [
 														{
-															"id": 650,
+															"id": 664,
 															"name": "id",
 															"kind": 32768,
 															"kindString": "Parameter",
 															"flags": {},
 															"type": {
 																"type": "reference",
-																"id": 652,
+																"id": 666,
 																"name": "U"
 															}
 														}
@@ -13331,7 +13352,7 @@
 														"typeArguments": [
 															{
 																"type": "reference",
-																"id": 651,
+																"id": 665,
 																"name": "T"
 															}
 														],
@@ -13348,14 +13369,14 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												647
+												661
 											]
 										},
 										{
 											"title": "Methods",
 											"kind": 2048,
 											"children": [
-												648
+												662
 											]
 										}
 									],
@@ -13372,7 +13393,7 @@
 					}
 				},
 				{
-					"id": 661,
+					"id": 675,
 					"name": "UseAsyncValueReturn",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -13386,7 +13407,7 @@
 					],
 					"typeParameter": [
 						{
-							"id": 671,
+							"id": 685,
 							"name": "T",
 							"kind": 131072,
 							"kindString": "Type parameter",
@@ -13396,14 +13417,14 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 662,
+							"id": 676,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 663,
+									"id": 677,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13435,7 +13456,7 @@
 									}
 								},
 								{
-									"id": 664,
+									"id": 678,
 									"name": "isLoading",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13456,7 +13477,7 @@
 									}
 								},
 								{
-									"id": 665,
+									"id": 679,
 									"name": "value",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13476,7 +13497,7 @@
 										"types": [
 											{
 												"type": "reference",
-												"id": 671,
+												"id": 685,
 												"name": "T"
 											},
 											{
@@ -13487,7 +13508,7 @@
 									}
 								},
 								{
-									"id": 669,
+									"id": 683,
 									"name": "reset",
 									"kind": 2048,
 									"kindString": "Method",
@@ -13501,7 +13522,7 @@
 									],
 									"signatures": [
 										{
-											"id": 670,
+											"id": 684,
 											"name": "reset",
 											"kind": 4096,
 											"kindString": "Call signature",
@@ -13518,7 +13539,7 @@
 									]
 								},
 								{
-									"id": 666,
+									"id": 680,
 									"name": "run",
 									"kind": 2048,
 									"kindString": "Method",
@@ -13532,7 +13553,7 @@
 									],
 									"signatures": [
 										{
-											"id": 667,
+											"id": 681,
 											"name": "run",
 											"kind": 4096,
 											"kindString": "Call signature",
@@ -13543,7 +13564,7 @@
 											},
 											"parameters": [
 												{
-													"id": 668,
+													"id": 682,
 													"name": "args",
 													"kind": 32768,
 													"kindString": "Parameter",
@@ -13580,17 +13601,17 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										663,
-										664,
-										665
+										677,
+										678,
+										679
 									]
 								},
 								{
 									"title": "Methods",
 									"kind": 2048,
 									"children": [
-										669,
-										666
+										683,
+										680
 									]
 								}
 							],
@@ -13605,7 +13626,7 @@
 					}
 				},
 				{
-					"id": 672,
+					"id": 686,
 					"name": "useAsyncValue",
 					"kind": 64,
 					"kindString": "Function",
@@ -13620,7 +13641,7 @@
 					],
 					"signatures": [
 						{
-							"id": 673,
+							"id": 687,
 							"name": "useAsyncValue",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -13637,14 +13658,14 @@
 							},
 							"typeParameter": [
 								{
-									"id": 674,
+									"id": 688,
 									"name": "T",
 									"kind": 131072,
 									"kindString": "Type parameter",
 									"flags": {}
 								},
 								{
-									"id": 675,
+									"id": 689,
 									"name": "U",
 									"kind": 131072,
 									"kindString": "Type parameter",
@@ -13658,23 +13679,23 @@
 							],
 							"parameters": [
 								{
-									"id": 676,
+									"id": 690,
 									"name": "props",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 645,
+										"id": 659,
 										"typeArguments": [
 											{
 												"type": "reference",
-												"id": 674,
+												"id": 688,
 												"name": "T"
 											},
 											{
 												"type": "reference",
-												"id": 675,
+												"id": 689,
 												"name": "U"
 											}
 										],
@@ -13684,11 +13705,11 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 661,
+								"id": 675,
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 674,
+										"id": 688,
 										"name": "T"
 									}
 								],
@@ -13696,7 +13717,7 @@
 							}
 						},
 						{
-							"id": 677,
+							"id": 691,
 							"name": "useAsyncValue",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -13707,14 +13728,14 @@
 							},
 							"typeParameter": [
 								{
-									"id": 678,
+									"id": 692,
 									"name": "T",
 									"kind": 131072,
 									"kindString": "Type parameter",
 									"flags": {}
 								},
 								{
-									"id": 679,
+									"id": 693,
 									"name": "U",
 									"kind": 131072,
 									"kindString": "Type parameter",
@@ -13728,23 +13749,23 @@
 							],
 							"parameters": [
 								{
-									"id": 680,
+									"id": 694,
 									"name": "props",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 653,
+										"id": 667,
 										"typeArguments": [
 											{
 												"type": "reference",
-												"id": 678,
+												"id": 692,
 												"name": "T"
 											},
 											{
 												"type": "reference",
-												"id": 679,
+												"id": 693,
 												"name": "U"
 											}
 										],
@@ -13754,13 +13775,13 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 661,
+								"id": 675,
 								"typeArguments": [
 									{
 										"type": "array",
 										"elementType": {
 											"type": "reference",
-											"id": 678,
+											"id": 692,
 											"name": "T"
 										}
 									}
@@ -13776,16 +13797,16 @@
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						653,
-						645,
-						661
+						667,
+						659,
+						675
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						672
+						686
 					]
 				}
 			],
@@ -13798,14 +13819,14 @@
 			]
 		},
 		{
-			"id": 681,
+			"id": 695,
 			"name": "useChangeObserver",
 			"kind": 2,
 			"kindString": "Module",
 			"flags": {},
 			"children": [
 				{
-					"id": 682,
+					"id": 696,
 					"name": "ChangeObserverOptions",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -13827,7 +13848,7 @@
 					],
 					"typeParameter": [
 						{
-							"id": 689,
+							"id": 703,
 							"name": "T",
 							"kind": 131072,
 							"kindString": "Type parameter",
@@ -13837,14 +13858,14 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 683,
+							"id": 697,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 688,
+									"id": 702,
 									"name": "disabled",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13867,7 +13888,7 @@
 									}
 								},
 								{
-									"id": 684,
+									"id": 698,
 									"name": "isEqual",
 									"kind": 2048,
 									"kindString": "Method",
@@ -13883,7 +13904,7 @@
 									],
 									"signatures": [
 										{
-											"id": 685,
+											"id": 699,
 											"name": "isEqual",
 											"kind": 4096,
 											"kindString": "Call signature",
@@ -13893,26 +13914,26 @@
 											},
 											"parameters": [
 												{
-													"id": 686,
+													"id": 700,
 													"name": "a",
 													"kind": 32768,
 													"kindString": "Parameter",
 													"flags": {},
 													"type": {
 														"type": "reference",
-														"id": 689,
+														"id": 703,
 														"name": "T"
 													}
 												},
 												{
-													"id": 687,
+													"id": 701,
 													"name": "b",
 													"kind": 32768,
 													"kindString": "Parameter",
 													"flags": {},
 													"type": {
 														"type": "reference",
-														"id": 689,
+														"id": 703,
 														"name": "T"
 													}
 												}
@@ -13930,14 +13951,14 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										688
+										702
 									]
 								},
 								{
 									"title": "Methods",
 									"kind": 2048,
 									"children": [
-										684
+										698
 									]
 								}
 							],
@@ -13952,7 +13973,7 @@
 					}
 				},
 				{
-					"id": 690,
+					"id": 704,
 					"name": "useChangeObserver",
 					"kind": 64,
 					"kindString": "Function",
@@ -13967,7 +13988,7 @@
 					],
 					"signatures": [
 						{
-							"id": 691,
+							"id": 705,
 							"name": "useChangeObserver",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -13985,7 +14006,7 @@
 							},
 							"typeParameter": [
 								{
-									"id": 692,
+									"id": 706,
 									"name": "T",
 									"kind": 131072,
 									"kindString": "Type parameter",
@@ -13994,7 +14015,7 @@
 							],
 							"parameters": [
 								{
-									"id": 693,
+									"id": 707,
 									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -14004,12 +14025,12 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 692,
+										"id": 706,
 										"name": "T"
 									}
 								},
 								{
-									"id": 694,
+									"id": 708,
 									"name": "onChange",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -14020,40 +14041,40 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 695,
+											"id": 709,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"signatures": [
 												{
-													"id": 696,
+													"id": 710,
 													"name": "__type",
 													"kind": 4096,
 													"kindString": "Call signature",
 													"flags": {},
 													"parameters": [
 														{
-															"id": 697,
+															"id": 711,
 															"name": "lastValue",
 															"kind": 32768,
 															"kindString": "Parameter",
 															"flags": {},
 															"type": {
 																"type": "reference",
-																"id": 692,
+																"id": 706,
 																"name": "T"
 															}
 														},
 														{
-															"id": 698,
+															"id": 712,
 															"name": "nextValue",
 															"kind": 32768,
 															"kindString": "Parameter",
 															"flags": {},
 															"type": {
 																"type": "reference",
-																"id": 692,
+																"id": 706,
 																"name": "T"
 															}
 														}
@@ -14068,7 +14089,7 @@
 									}
 								},
 								{
-									"id": 699,
+									"id": 713,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -14077,11 +14098,11 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 682,
+										"id": 696,
 										"typeArguments": [
 											{
 												"type": "reference",
-												"id": 692,
+												"id": 706,
 												"name": "T"
 											}
 										],
@@ -14102,14 +14123,14 @@
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						682
+						696
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						690
+						704
 					]
 				}
 			],
@@ -14122,14 +14143,14 @@
 			]
 		},
 		{
-			"id": 700,
+			"id": 714,
 			"name": "useListChangeObserver",
 			"kind": 2,
 			"kindString": "Module",
 			"flags": {},
 			"children": [
 				{
-					"id": 701,
+					"id": 715,
 					"name": "ADD",
 					"kind": 32,
 					"kindString": "Variable",
@@ -14148,7 +14169,7 @@
 					"defaultValue": "'ADD'"
 				},
 				{
-					"id": 703,
+					"id": 717,
 					"name": "DELETE",
 					"kind": 32,
 					"kindString": "Variable",
@@ -14167,7 +14188,7 @@
 					"defaultValue": "'DELETE'"
 				},
 				{
-					"id": 702,
+					"id": 716,
 					"name": "UPDATE",
 					"kind": 32,
 					"kindString": "Variable",
@@ -14186,7 +14207,7 @@
 					"defaultValue": "'UPDATE'"
 				},
 				{
-					"id": 704,
+					"id": 718,
 					"name": "useListChangeObserver",
 					"kind": 64,
 					"kindString": "Function",
@@ -14201,7 +14222,7 @@
 					],
 					"signatures": [
 						{
-							"id": 705,
+							"id": 719,
 							"name": "useListChangeObserver",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -14219,7 +14240,7 @@
 							},
 							"typeParameter": [
 								{
-									"id": 706,
+									"id": 720,
 									"name": "T",
 									"kind": 131072,
 									"kindString": "Type parameter",
@@ -14235,7 +14256,7 @@
 							],
 							"parameters": [
 								{
-									"id": 707,
+									"id": 721,
 									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -14260,14 +14281,14 @@
 											},
 											{
 												"type": "reference",
-												"id": 706,
+												"id": 720,
 												"name": "T"
 											}
 										]
 									}
 								},
 								{
-									"id": 708,
+									"id": 722,
 									"name": "onChange",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -14280,7 +14301,7 @@
 										"typeArguments": [
 											{
 												"type": "reference",
-												"id": 706,
+												"id": 720,
 												"name": "T"
 											}
 										],
@@ -14288,7 +14309,7 @@
 									}
 								},
 								{
-									"id": 709,
+									"id": 723,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -14300,7 +14321,7 @@
 										"typeArguments": [
 											{
 												"type": "reference",
-												"id": 706,
+												"id": 720,
 												"name": "T"
 											}
 										],
@@ -14321,16 +14342,16 @@
 					"title": "Variables",
 					"kind": 32,
 					"children": [
-						701,
-						703,
-						702
+						715,
+						717,
+						716
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						704
+						718
 					]
 				}
 			],
@@ -14343,14 +14364,14 @@
 			]
 		},
 		{
-			"id": 710,
+			"id": 724,
 			"name": "useMemoOne",
 			"kind": 2,
 			"kindString": "Module",
 			"flags": {},
 			"children": [
 				{
-					"id": 711,
+					"id": 725,
 					"name": "ComparisonFn",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -14365,7 +14386,7 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 712,
+							"id": 726,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
@@ -14379,14 +14400,14 @@
 							],
 							"signatures": [
 								{
-									"id": 713,
+									"id": 727,
 									"name": "__type",
 									"kind": 4096,
 									"kindString": "Call signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 714,
+											"id": 728,
 											"name": "newInputs",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -14400,7 +14421,7 @@
 											}
 										},
 										{
-											"id": 715,
+											"id": 729,
 											"name": "lastInputs",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -14424,7 +14445,7 @@
 					}
 				},
 				{
-					"id": 716,
+					"id": 730,
 					"name": "useMemoOne",
 					"kind": 64,
 					"kindString": "Function",
@@ -14439,7 +14460,7 @@
 					],
 					"signatures": [
 						{
-							"id": 717,
+							"id": 731,
 							"name": "useMemoOne",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -14451,7 +14472,7 @@
 							},
 							"typeParameter": [
 								{
-									"id": 718,
+									"id": 732,
 									"name": "T",
 									"kind": 131072,
 									"kindString": "Type parameter",
@@ -14460,7 +14481,7 @@
 							],
 							"parameters": [
 								{
-									"id": 719,
+									"id": 733,
 									"name": "getResult",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -14471,21 +14492,21 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 720,
+											"id": 734,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"signatures": [
 												{
-													"id": 721,
+													"id": 735,
 													"name": "__type",
 													"kind": 4096,
 													"kindString": "Call signature",
 													"flags": {},
 													"type": {
 														"type": "reference",
-														"id": 718,
+														"id": 732,
 														"name": "T"
 													}
 												}
@@ -14494,7 +14515,7 @@
 									}
 								},
 								{
-									"id": 722,
+									"id": 736,
 									"name": "inputs",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -14513,7 +14534,7 @@
 									}
 								},
 								{
-									"id": 723,
+									"id": 737,
 									"name": "compare",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -14523,7 +14544,7 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 711,
+										"id": 725,
 										"name": "ComparisonFn"
 									},
 									"defaultValue": "isEqual"
@@ -14531,7 +14552,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 718,
+								"id": 732,
 								"name": "T"
 							}
 						}
@@ -14543,14 +14564,14 @@
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						711
+						725
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						716
+						730
 					]
 				}
 			],
@@ -14616,6 +14637,354 @@
 			]
 		},
 		{
+			"id": 619,
+			"name": "UseAsyncListingExecuteProps",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {},
+			"comment": {
+				"tags": [
+					{
+						"tag": "expand-properties",
+						"text": ""
+					},
+					{
+						"tag": "export-in-docs",
+						"text": "\n"
+					}
+				]
+			},
+			"sources": [
+				{
+					"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+					"line": 10,
+					"character": 5
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 620,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {},
+					"children": [
+						{
+							"id": 622,
+							"name": "paginator",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "The paginator instance, if any"
+							},
+							"sources": [
+								{
+									"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+									"line": 18,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "literal",
+										"value": null
+									},
+									{
+										"type": "reference",
+										"id": 404,
+										"name": "PaginatorInterface"
+									}
+								]
+							}
+						},
+						{
+							"id": 621,
+							"name": "query",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "Any query parameters"
+							},
+							"sources": [
+								{
+									"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+									"line": 14,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "string"
+									},
+									{
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "boolean"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											},
+											{
+												"type": "literal",
+												"value": null
+											},
+											{
+												"type": "intrinsic",
+												"name": "number"
+											}
+										]
+									}
+								],
+								"qualifiedName": "Record",
+								"package": "typescript",
+								"name": "Record"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								622,
+								621
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+							"line": 10,
+							"character": 35
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 623,
+			"name": "UseAsyncListingReturnCommon",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {},
+			"comment": {
+				"tags": [
+					{
+						"tag": "export-in-docs",
+						"text": "\n"
+					}
+				]
+			},
+			"sources": [
+				{
+					"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+					"line": 73,
+					"character": 5
+				}
+			],
+			"typeParameter": [
+				{
+					"id": 632,
+					"name": "T",
+					"kind": 131072,
+					"kindString": "Type parameter",
+					"flags": {}
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 624,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {},
+					"children": [
+						{
+							"id": 625,
+							"name": "isLoading",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "True while `execute` call is in progress."
+							},
+							"sources": [
+								{
+									"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+									"line": 77,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						},
+						{
+							"id": 626,
+							"name": "paginator",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "The same `paginator` passed in to `useAsyncListing`"
+							},
+							"sources": [
+								{
+									"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+									"line": 81,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "literal",
+										"value": null
+									},
+									{
+										"type": "reference",
+										"id": 404,
+										"name": "PaginatorInterface"
+									}
+								]
+							}
+						},
+						{
+							"id": 630,
+							"name": "reset",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+									"line": 96,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 631,
+									"name": "reset",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "When called will set both result and error to null. Will not immediately trigger\na call to the action but subsequent changes to query or paginator will according\nto the value of `trigger`."
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						},
+						{
+							"id": 627,
+							"name": "run",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+									"line": 90,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 628,
+									"name": "run",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "A function to manually trigger the action. If `options.trigger` is `MANUAL`\ncalling this function is the only way to trigger the action.",
+										"text": "This function will return a promise that resolves/rejects to same value\nreturned by `execute`. If `accumulatePages` is set the value returned is\nthe accumulated value.\n"
+									},
+									"parameters": [
+										{
+											"id": 629,
+											"name": "args",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isRest": true
+											},
+											"type": {
+												"type": "array",
+												"elementType": {
+													"type": "intrinsic",
+													"name": "any"
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reference",
+												"id": 632,
+												"name": "T"
+											}
+										],
+										"qualifiedName": "Promise",
+										"package": "typescript",
+										"name": "Promise"
+									}
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								625,
+								626
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								630,
+								627
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "js-packages/@prestojs/util/src/useAsyncListing.ts",
+							"line": 73,
+							"character": 38
+						}
+					]
+				}
+			}
+		},
+		{
 			"id": 581,
 			"name": "useAsync",
 			"kind": 64,
@@ -14624,7 +14993,7 @@
 			"sources": [
 				{
 					"fileName": "js-packages/@prestojs/util/src/useAsync.ts",
-					"line": 275,
+					"line": 266,
 					"character": 9
 				}
 			],
@@ -14794,10 +15163,10 @@
 				556,
 				580,
 				618,
-				644,
-				681,
-				700,
-				710
+				658,
+				695,
+				714,
+				724
 			]
 		},
 		{
@@ -14805,6 +15174,14 @@
 			"kind": 4,
 			"children": [
 				591
+			]
+		},
+		{
+			"title": "Type aliases",
+			"kind": 4194304,
+			"children": [
+				619,
+				623
 			]
 		},
 		{

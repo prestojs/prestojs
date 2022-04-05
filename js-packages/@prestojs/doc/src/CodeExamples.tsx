@@ -2,40 +2,21 @@ import cx from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 
 import CodeBlock from './CodeBlock';
+import Modal from './Modal';
 import PrecompiledMarkdown from './PrecompiledMarkdown';
+import { DocExample } from './types';
 
-const OPEN_CODE_HEIGHT = 40;
-
-function RightChevron(props: { className: string }) {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={`h-6 w-6 ${props.className}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-        >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-    );
-}
-
-function CodeExample({ example, container, language, showExpand }) {
-    console.log(example);
-    const iframeRef = useRef();
-    const codeRef = useRef();
+function CodeExample({ example, language }) {
+    const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const [open, setOpen] = useState(false);
     const [height, setHeight] = useState();
-    const [expanded, setExpanded] = useState(false);
-    const lastExpanded = useRef(expanded);
     useEffect(() => {
         const listener = e => {
             // This message comes from _app.js
             try {
                 const data = JSON.parse(e.data);
                 if (
-                    e.source.document === iframeRef.current.contentDocument &&
+                    e.source.document === iframeRef.current?.contentDocument &&
                     data.type === 'height-change'
                 ) {
                     setHeight(data.height);
@@ -45,25 +26,11 @@ function CodeExample({ example, container, language, showExpand }) {
         window.addEventListener('message', listener);
         return () => window.removeEventListener('message', listener);
     }, []);
-    useEffect(() => {
-        if (lastExpanded.current !== expanded && typeof window !== 'undefined') {
-            lastExpanded.current = expanded;
-            const top = codeRef.current.getBoundingClientRect().top;
-            window.scrollBy({
-                top: top - 100,
-                behavior: 'smooth',
-            });
-        }
-    }, [expanded]);
     const {
         header: { title, description },
     } = example;
     return (
-        <div
-            className={cx('border code-example flex flex-col', {
-                'col-span-2': open && expanded,
-            })}
-        >
+        <div className="border code-example flex flex-col">
             <iframe
                 ref={iframeRef}
                 src={example.url}
@@ -73,9 +40,6 @@ function CodeExample({ example, container, language, showExpand }) {
                     flex: 1,
                     minHeight: height ? height : 100,
                 }}
-                onLoad={e =>
-                    setHeight(e.target.contentDocument.body.getBoundingClientRect().height)
-                }
             />
             {description && (
                 <div className="px-5 relative border-t mb-5">
@@ -85,53 +49,20 @@ function CodeExample({ example, container, language, showExpand }) {
                     <PrecompiledMarkdown code={description} />
                 </div>
             )}
-            <div
-                className={cx('relative', {
-                    'z-10': open && expanded,
-                })}
-            >
+            <div className="relative">
                 <button
                     onClick={() => setOpen(!open)}
                     className="text-blue-700 items-center py-2 w-full text-left pl-5 bg-gray-100"
-                    style={{ height: OPEN_CODE_HEIGHT }}
+                    style={{ height: 40 }}
                 >
-                    <RightChevron
-                        className={`w-4 h-4 mr-5 inline transform ${
-                            open ? '-rotate-90' : 'rotate-90'
-                        }`}
-                    />
-                    {open ? 'Hide code' : 'Show code'}
+                    Show Code
                 </button>{' '}
-                {open && (
-                    <div className="relative" ref={codeRef}>
-                        {showExpand && (
-                            <button
-                                onClick={() => setExpanded(x => !x)}
-                                title={expanded ? 'Collapse' : 'Expand'}
-                                className="absolute right-0 mr-2 mt-2 text-white opacity-75 hover:opacity-100"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-6 w-6"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                                    />
-                                </svg>
-                            </button>
-                        )}
-                        <CodeBlock
-                            children={example.code[language === 'tsx' ? 'ts' : 'js']}
-                            className={`language-${language}`}
-                        />
-                    </div>
-                )}
+                <Modal isVisible={open} onClose={() => setOpen(false)}>
+                    <CodeBlock
+                        children={example.code[language === 'tsx' ? 'ts' : 'js']}
+                        className="overflow-x-auto"
+                    />
+                </Modal>
             </div>
         </div>
     );
@@ -149,11 +80,10 @@ function useLocalStorageState(key, defaultValue) {
     return [value, setValue];
 }
 
-export default function CodeExamples({ examples }) {
-    const containerRef = useRef();
+export default function CodeExamples({ examples }: { examples: DocExample[] }) {
     const [language, setLanguage] = useLocalStorageState('codeExamplesLanguage', 'jsx');
     return (
-        <div className="my-5" ref={containerRef}>
+        <div className="my-5">
             <h3 className="text-4xl mb-5 flex justify-between">
                 Examples
                 <select
@@ -172,13 +102,7 @@ export default function CodeExamples({ examples }) {
                 })}
             >
                 {examples.map(example => (
-                    <CodeExample
-                        key={example.name}
-                        example={example}
-                        container={containerRef}
-                        language={language}
-                        showExpand={examples.length > 1}
-                    />
+                    <CodeExample key={example.name} example={example} language={language} />
                 ))}
             </div>
         </div>

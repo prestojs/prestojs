@@ -4,7 +4,7 @@
  * Pass `multiple` through to allow selection of multiple values. In this case the value will
  * be an array.
  *
- * When the number of choices is small (<=3) the default is a checkbox widget, otherwise it
+ * When the number of choices is small (3 or less) the default is a checkbox widget, otherwise it
  * is a select widget. You can specify the type to use with `widgetType`.
  *
  * Any extra props are passed through to the underlying component (eg. `showSearch` in the last example)

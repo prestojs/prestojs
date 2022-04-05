@@ -21,11 +21,11 @@ const withMDX = require('@next/mdx')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    lessLoaderOptions: {
-        lessOptions: {
-            javascriptEnabled: true,
-        },
-    },
+    // lessLoaderOptions: {
+    //     lessOptions: {
+    //         javascriptEnabled: true,
+    //     },
+    // },
     reactStrictMode: true,
     webpack: (config, { isServer, defaultLoaders }) => {
         if (!isServer) {
@@ -41,8 +41,8 @@ const nextConfig = {
     },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
 };
-const withLess = require('next-with-less');
+// const withLess = require('next-with-less');
 // const withAntdLess = require('next-plugin-antd-less');
 const withPlugins = require('next-compose-plugins');
 
-module.exports = withPlugins([withTM, withLess, withMDX], nextConfig);
+module.exports = withPlugins([withTM, /*withLess,*/ withMDX], nextConfig);

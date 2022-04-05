@@ -6,9 +6,28 @@ import { createRequire } from 'module';
 import path, { dirname } from 'path';
 
 import prettier from 'prettier';
-import { JSONOutput, ReflectionKind } from 'typedoc';
+import TypeDoc, { JSONOutput } from 'typedoc';
 import { visit } from 'unist-util-visit';
 import { fileURLToPath } from 'url';
+
+function getTsFiles(dir): string[] {
+    if (dir.endsWith('__tests__')) {
+        return [];
+    }
+    const files: string[] = [];
+    for (const f of fs.readdirSync(dir)) {
+        if (f === 'index.ts') {
+            continue;
+        }
+        const fn = path.join(dir, f);
+        if (fs.statSync(fn).isDirectory()) {
+            files.push(...getTsFiles(fn));
+        } else if (fn.endsWith('ts') || fn.endsWith('tsx')) {
+            files.push(fn);
+        }
+    }
+    return files;
+}
 
 function makeDocLinksPlugin(docsJson) {
     return () => tree => {
@@ -17,7 +36,7 @@ function makeDocLinksPlugin(docsJson) {
                 const [name, hash] = node.url.split(':')[1].split('#');
                 const target = docsJson[name];
                 if (target) {
-                    let url = `/docs/${target.slug}`;
+                    let url = `/docs/${getSlug(target)}`;
                     if (hash) {
                         url += `#${hash}`;
                     }
@@ -34,16 +53,6 @@ const require = createRequire(import.meta.url);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-const children: JSONOutput.DeclarationReflection[] = [
-    ...require('./___temp_util.json').children,
-    ...require('./___temp_viewmodel.json').children,
-    ...require('./___temp_ui.json').children,
-    ...require('./___temp_ui-antd.json').children,
-    ...require('./___temp_routing.json').children,
-    ...require('./___temp_rest.json').children,
-    ...require('./___temp_final-form.json').children,
-];
 
 function readDirRecursive(dir) {
     const files: string[] = [];
@@ -112,6 +121,12 @@ async function compileMdx(code, docLinks) {
     }
 }
 
+function getSlug(docItem) {
+    const { fileName = '' } = docItem.sources?.[0] || {};
+    const importPath = fileName.replace('js-packages/', '').replace('src/', '').split('.')[0];
+    return [...importPath.split('/').slice(1, -1), docItem.name].join('/');
+}
+
 async function extractChildren(
     node: JSONOutput.DeclarationReflection
 ): Promise<DeclarationReflection[]> {
@@ -138,7 +153,6 @@ async function extractChildren(
     }
     return extractedChildren;
 }
-
 async function traverse(obj, fn, visitedTracker = new Map(), path: any[] = []) {
     if (!obj || typeof obj !== 'object') {
         return obj;
@@ -165,53 +179,68 @@ async function traverse(obj, fn, visitedTracker = new Map(), path: any[] = []) {
 }
 
 async function main() {
+    const repoRoot = path.resolve(__dirname, '../../');
+    const packagesRoot = path.resolve(repoRoot, 'js-packages/@prestojs/');
+
+    for (const pkg of ['viewmodel', 'util']) {
+        //['util', 'viewmodel', 'ui', 'final-form', 'ui-antd', 'routing', 'rest']) {
+        const app = new TypeDoc.Application();
+
+        app.options.addReader(new TypeDoc.TSConfigReader());
+        const entryPoints = getTsFiles(path.join(packagesRoot, pkg, 'src/'));
+        app.bootstrap({
+            entryPoints,
+            tsconfig: path.join(packagesRoot, pkg, 'tsconfig.json'),
+            plugin: [
+                path.resolve(repoRoot, 'doc-site/plugins/forceExport.js'),
+                'typedoc-plugin-rename-defaults',
+                path.resolve(repoRoot, 'doc-site/plugins/fixSource.js'),
+            ],
+            // @ts-ignore
+            'presto-root': repoRoot,
+            'presto-package-root': path.join(packagesRoot, pkg),
+        });
+
+        const project = app.convert();
+        if (!project) {
+            throw new Error(`convert failed for ${pkg}`);
+        }
+        const tmpFile = `./___temp_${pkg}.json`;
+        await app.generateJson(project, tmpFile);
+    }
+
+    const children: JSONOutput.DeclarationReflection[] = [
+        ...require('./___temp_util.json').children,
+        ...require('./___temp_viewmodel.json').children,
+        ...require('./___temp_ui.json').children,
+        ...require('./___temp_ui-antd.json').children,
+        ...require('./___temp_routing.json').children,
+        ...require('./___temp_rest.json').children,
+        ...require('./___temp_final-form.json').children,
+    ];
     // @ts-ignore
-    const x: DeclarationReflection[] = [];
+    const declarations: DeclarationReflection[] = [];
     for (const child of children) {
-        x.push(...(await extractChildren(child)));
+        declarations.push(...(await extractChildren(child)));
     }
     const docsPath = path.resolve(__dirname, '../data/');
 
-    // fs.writeFileSync(path.resolve(docsPath, `all.json`), JSON.stringify(x, null, 2));
-
     const byId = {};
     const byName = {};
-    const menuByName = {};
-    for (const docItem of x) {
+    const menuByName: Record<string, any> = {};
+    for (const docItem of declarations) {
         byId[docItem.id] = docItem;
         byName[docItem.name] = docItem;
-        if (docItem.name === 'useAsync')
-            await traverse(docItem, (node, path) => {
-                // Try find name for __type. THis happens eg. for
-                // function useAsync<ResultT, ErrorT = Error>(
-                //     fn: (...args: Array<any>) => Promise<ResultT>,
-                //     options: UseAsyncOptions = {}
-                // ): UseAsyncReturnObject<ResultT, ErrorT> {
-                //
-                // the name for `fn` at the type level will be __type because it's
-                // an arrow function. Get the name from the parent node (eg. `fn`).
-                if (node.name === '__type' && node.kindString === 'Call signature') {
-                    for (let i = path.length - 1; i >= 0; i--) {
-                        if (path[i].name && path[i].name !== '__type') {
-                            node.name = path[i].name;
-                            break;
-                        }
-                    }
-                }
-                if ([ReflectionKind.TypeParameter].includes(node.kind)) {
-                    byId[node.id] = node;
-                }
-            });
-
-        const { fileName = '' } = docItem.sources?.[0] || {};
-        const importPath = fileName.replace('js-packages/', '').replace('src/', '').split('.')[0];
-        const slug = [...importPath.split('/').slice(1, -1), docItem.name].join('/');
-        // @ts-ignore
-        docItem.slug = slug;
     }
     const docLinks = makeDocLinksPlugin(byName);
     const visitedTracker = new Map();
-    for (const docItem of x) {
+    function getName(obj) {
+        if (obj.name === 'default' && obj.type === 'reference' && byId[obj.id]) {
+            return getName(byId[obj.id]);
+        }
+        return obj.name;
+    }
+    for (const docItem of declarations) {
         let comment = docItem.comment;
         if (
             docItem.kindString === 'Function' &&
@@ -223,11 +252,24 @@ async function main() {
         if (!comment?.tags?.find(tag => tag.tag === 'extract-docs')) {
             continue;
         }
+
         const references = {};
         const fn = async (obj, path) => {
+            if (obj.type === 'reference' && !obj.id) {
+                if (byName[obj.name]) {
+                    obj.id = byName[obj.name].id;
+                }
+            }
+            if (obj.name === 'default' && obj.type === 'reference' && byId[obj.id]) {
+                obj.name = getName(obj);
+            }
             let { comment, signatures, kindString } = obj;
             if (obj.name === '__namedParameters') {
                 obj.name = 'props';
+                if (!obj.docFlags) {
+                    obj.docFlags = {};
+                }
+                obj.docFlags.expandProperties = true;
             }
             if (obj.name === '__type' && path.length) {
                 // This is where parameter like:
@@ -262,9 +304,11 @@ async function main() {
                 });
             } else if (obj.id && obj.flags) {
                 const group = getGroup();
-                let anchorId = obj.name.replace(' ', '-');
+                let anchorId = obj.name.split(' ').join('-');
                 if (group) {
                     anchorId = `${group.title}-${anchorId}`;
+                } else if (obj.kindString) {
+                    anchorId = `${obj.kindString.split(' ').join('-')}-${anchorId}`;
                 }
                 obj.anchorId = anchorId;
             }
@@ -299,6 +343,9 @@ async function main() {
                         if (tag.tag === 'expand-properties') {
                             obj.docFlags.expandProperties = true;
                         }
+                        if (tag.tag === 'forward-ref') {
+                            obj.docFlags.isForwardRef = true;
+                        }
                     }
                     let tagsByName: Record<string, any> = {};
                     const paramTags = {};
@@ -321,11 +368,71 @@ async function main() {
             }
         };
         await traverse(docItem, fn, visitedTracker);
+        const referenceVisitedTracker = new Map();
+        await traverse(
+            docItem,
+            async obj => {
+                if (obj.type === 'reference' && byId[obj.id]) {
+                    references[obj.id] = await traverse(byId[obj.id], fn, referenceVisitedTracker);
+                }
+            },
+            referenceVisitedTracker
+        );
+        if (docItem.comment) {
+            type Section = { title: string; links: { id: string; title: string }[] };
+            const inPageLinks: Section[] = [];
+            let section: null | Section = null;
+            for (const attr of ['shortText', 'text']) {
+                const value = docItem.comment[attr];
+                if (value && docItem.comment[attr + 'Mdx']) {
+                    const matches = value
+                        .split('\n')
+                        .map(line => line.match(/^(#+) (.*)$/))
+                        .filter(Boolean);
+                    if (matches.length > 0) {
+                        for (const [, hashes, title] of matches) {
+                            const heading = `h${hashes.length}`;
+                            if (heading !== 'h2' && heading !== 'h3') {
+                                throw new Error(`Dunno how to handle ${heading} - update logic`);
+                            }
+                            if (heading === 'h2') {
+                                if (section) {
+                                    inPageLinks.push(section);
+                                }
+                                section = {
+                                    title,
+                                    links: [],
+                                };
+                            }
+                            if (heading === 'h3') {
+                                if (!section) {
+                                    section = {
+                                        title: docItem.name,
+                                        links: [],
+                                    };
+                                }
+                                section.links.push({
+                                    title: title,
+                                    id: title.split(' ').join('-'),
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            if (section) {
+                inPageLinks.push(section);
+            }
+            if (inPageLinks.length > 0) {
+                docItem.inPageLinks = inPageLinks;
+            }
+        }
 
         const menuGroup = docItem.tagsByName?.['menu-group'] || 'default';
         const { fileName = '' } = docItem.sources?.[0] || {};
         const importPath = fileName.replace('js-packages/', '').replace('src/', '').split('.')[0];
         const slug = [...importPath.split('/').slice(1, -1), docItem.name].join('/');
+        docItem.slug = slug;
         const permaLink = slug.split('/').slice(1).join('/');
         const [packageName] = slug.split('/');
         const packageDir = `${docsPath}/${packageName}`;
@@ -336,12 +443,10 @@ async function main() {
             await Promise.all(
                 examples.map(async example => {
                     if (example.header.description) {
-                        const before = example.header.description;
                         example.header.description = await compileMdx(
                             example.header.description,
                             docLinks
                         );
-                        console.log('Lets generate ', before, example.header.description);
                     }
                 })
             );
@@ -376,7 +481,33 @@ async function main() {
             slug,
         });
     }
-    fs.writeFileSync(path.resolve(docsPath, `apiMenu.json`), JSON.stringify(menuByName, null, 2));
+    const apiMenu = {};
+    for (const [menuName, menu] of Object.entries(menuByName)) {
+        const sections: [string, any][] = Object.entries(menu);
+        sections.sort((a, b) => {
+            if (a[0] === 'default') {
+                return -1;
+            }
+            if (b[0] === 'default') {
+                return 1;
+            }
+            return a[0].localeCompare(b[0]);
+        });
+        const sortedMenu: { items: any; isDefault?: boolean; title?: string }[] = [];
+        for (const [sectionName, _items] of sections) {
+            _items.sort((a, b) => {
+                return a.title.localeCompare(b.title);
+            });
+            const items = _items.map(item => ({ title: item.title, href: `/docs/${item.slug}` }));
+            if (sectionName === 'default') {
+                sortedMenu.push({ items, isDefault: true });
+            } else {
+                sortedMenu.push({ items, title: sectionName });
+            }
+        }
+        apiMenu[menuName] = sortedMenu;
+    }
+    fs.writeFileSync(path.resolve(docsPath, `apiMenu.json`), JSON.stringify(apiMenu, null, 2));
     const missedExamples = Object.keys(exampleFiles).filter(key => !pickedExamples.includes(key));
     if (missedExamples.length > 0) {
         console.error(`There are example files that were not matched to a source file:

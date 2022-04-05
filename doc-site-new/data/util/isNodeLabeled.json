@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 5,
+    "id": 2668,
     "name": "isNodeLabeled",
     "kind": 64,
     "kindString": "Function",
@@ -14,7 +14,7 @@
     ],
     "signatures": [
       {
-        "id": 6,
+        "id": 2669,
         "name": "isNodeLabeled",
         "kind": 4096,
         "kindString": "Call signature",
@@ -35,7 +35,7 @@
         },
         "parameters": [
           {
-            "id": 7,
+            "id": 2670,
             "name": "item",
             "kind": 32768,
             "kindString": "Parameter",
@@ -44,7 +44,7 @@
               "type": "intrinsic",
               "name": "any"
             },
-            "anchorId": "item",
+            "anchorId": "Parameter-item",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -55,11 +55,11 @@
           "asserts": false,
           "targetType": {
             "type": "reference",
-            "id": 20,
+            "id": 2683,
             "name": "NodeLabeled"
           }
         },
-        "anchorId": "isNodeLabeled",
+        "anchorId": "Call-signature-isNodeLabeled",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -75,8 +75,8 @@
     "slug": "util/isNodeLabeled"
   },
   "references": {
-    "20": {
-      "id": 20,
+    "2683": {
+      "id": 2683,
       "name": "NodeLabeled",
       "kind": 256,
       "kindString": "Interface",
@@ -99,14 +99,14 @@
       },
       "children": [
         {
-          "id": 21,
+          "id": 2684,
           "name": "getNodeLabel",
           "kind": 2048,
           "kindString": "Method",
           "flags": {},
           "signatures": [
             {
-              "id": 22,
+              "id": 2685,
               "name": "getNodeLabel",
               "kind": 4096,
               "kindString": "Call signature",
@@ -123,7 +123,7 @@
                 "package": "@types/react",
                 "name": "ReactNode"
               },
-              "anchorId": "getNodeLabel",
+              "anchorId": "Call-signature-getNodeLabel",
               "docFlags": {},
               "tagsByName": {}
             }
@@ -137,7 +137,7 @@
           "title": "Methods",
           "kind": 2048,
           "children": [
-            21
+            2684
           ]
         }
       ],
@@ -153,8 +153,8 @@
         "extract-docs": "",
         "menu-group": "Labeled"
       },
-      "slug": "util/NodeLabeled",
-      "anchorId": "NodeLabeled"
+      "anchorId": "Interface-NodeLabeled",
+      "slug": "util/NodeLabeled"
     }
   },
   "meta": {

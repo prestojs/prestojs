@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 14,
+    "id": 2677,
     "name": "getTextLabel",
     "kind": 64,
     "kindString": "Function",
@@ -14,7 +14,7 @@
     ],
     "signatures": [
       {
-        "id": 15,
+        "id": 2678,
         "name": "getTextLabel",
         "kind": 4096,
         "kindString": "Call signature",
@@ -37,7 +37,7 @@
         },
         "parameters": [
           {
-            "id": 16,
+            "id": 2679,
             "name": "item",
             "kind": 32768,
             "kindString": "Parameter",
@@ -46,7 +46,7 @@
               "type": "intrinsic",
               "name": "any"
             },
-            "anchorId": "item",
+            "anchorId": "Parameter-item",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -55,7 +55,7 @@
           "type": "intrinsic",
           "name": "string"
         },
-        "anchorId": "getTextLabel",
+        "anchorId": "Call-signature-getTextLabel",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",

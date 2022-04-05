@@ -1,3 +1,9 @@
+import {
+    OnThisPage,
+    OnThisPageProvider,
+    PreferencesProvider,
+    useOnThisPageSections,
+} from '@prestojs/doc';
 import { UiProvider } from '@prestojs/ui';
 import FormItemWrapper from '@prestojs/ui-antd/FormItemWrapper';
 import FormWrapper from '@prestojs/ui-antd/FormWrapper';
@@ -9,11 +15,6 @@ import getWidgetForField from '../getWidgetForField';
 import Header from './Header';
 import MainMenuSidebar from './MainMenuSidebar';
 
-console.log({
-    FormItemWrapper,
-    FormWrapper,
-});
-
 const User = viewModelFactory(
     {
         id: new Field<any>(),
@@ -22,10 +23,26 @@ const User = viewModelFactory(
     { pkFieldName: 'id' }
 );
 
+function MainContent({ children }: { children: ReactNode }) {
+    const { sections } = useOnThisPageSections();
+    return (
+        <>
+            <div
+                className={`lg:ml-[18.5rem] main-content pb-10${
+                    sections.length > 0 ? ' xl:mr-[19.5rem]' : ''
+                }`}
+            >
+                <div className="max-w-3xl mx-auto pt-10 xl:max-w-none">{children}</div>
+            </div>
+            <OnThisPage />
+        </>
+    );
+}
+
 export default function Layout({ children }: { children: ReactNode }) {
     const [showMenu, setShowMenu] = useState(false);
     return (
-        <>
+        <PreferencesProvider>
             <Head>
                 <title>Presto</title>
             </Head>
@@ -38,15 +55,15 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <Header onToggleMenu={() => setShowMenu(visible => !visible)} />
                 <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8">
                     <MainMenuSidebar
-                        className="w-[18.5rem] top-16 pt-10"
+                        className="w-[18.5rem] top-16 pt-10 left-[max(0px,calc(50%-48rem))]"
                         forceOpen={showMenu}
                         onCloseMenu={() => setShowMenu(false)}
                     />
-                    <div className="lg:ml-[18.5rem] main-content pb-10">
-                        <div className="max-w-3xl mx-auto pt-10 xl:max-w-none">{children}</div>
-                    </div>
+                    <OnThisPageProvider>
+                        <MainContent>{children}</MainContent>
+                    </OnThisPageProvider>
                 </div>
             </UiProvider>
-        </>
+        </PreferencesProvider>
     );
 }

@@ -1,6 +1,6 @@
 {
   "declaration": {
-    "id": 43,
+    "id": 2706,
     "name": "hashId",
     "kind": 64,
     "kindString": "Function",
@@ -14,7 +14,7 @@
     ],
     "signatures": [
       {
-        "id": 44,
+        "id": 2707,
         "name": "hashId",
         "kind": 4096,
         "kindString": "Call signature",
@@ -35,17 +35,17 @@
         },
         "parameters": [
           {
-            "id": 45,
+            "id": 2708,
             "name": "id",
             "kind": 32768,
             "kindString": "Parameter",
             "flags": {},
             "type": {
               "type": "reference",
-              "id": 54,
+              "id": 2717,
               "name": "Id"
             },
-            "anchorId": "id",
+            "anchorId": "Parameter-id",
             "docFlags": {},
             "tagsByName": {}
           }
@@ -54,7 +54,7 @@
           "type": "intrinsic",
           "name": "string"
         },
-        "anchorId": "hashId",
+        "anchorId": "Call-signature-hashId",
         "docFlags": {},
         "tagsByName": {
           "extract-docs": "",
@@ -70,8 +70,8 @@
     "slug": "util/hashId"
   },
   "references": {
-    "54": {
-      "id": 54,
+    "2717": {
+      "id": 2717,
       "name": "Id",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -98,8 +98,7 @@
       },
       "docFlags": {},
       "tagsByName": {},
-      "slug": "util/Id",
-      "anchorId": "Id"
+      "anchorId": "Type-alias-Id"
     }
   },
   "meta": {
