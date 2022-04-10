@@ -75,8 +75,10 @@ const DEEP = 'DEEP';
 
 /**
  * @expand-properties
+ * @typeParam ResultT @inherit
+ * @typeParam ErrorT @inherit
  */
-export interface UseAsyncOptions {
+export interface UseAsyncOptions<ResultT, ErrorT> {
     /**
      * Determines when the function is called. Defaults to `MANUAL`.
      *
@@ -106,8 +108,8 @@ export interface UseAsyncOptions {
      */
     args?: Array<any>;
     /**
-     * Called when action resolves successfully. Is passed a single parameter which
-     * is the result from the async action.
+     * Called when async function resolves successfully. Is passed a single parameter which
+     * is the result from the async function.
      *
      * **NOTE:** If your component unmounts before the promise resolves this function
      * will NOT be called. This is to avoid the general case of calling React
@@ -115,42 +117,45 @@ export interface UseAsyncOptions {
      * method to be called regardless then attach your own callbacks to the
      * promise when you call `run` or in the async function definition itself.
      */
-    onSuccess?: OnSuccess;
+    onSuccess?: OnSuccess<ResultT>;
     /**
-     * Called when action errors. Passed the error returned from async action.
+     * Called when async function errors. Passed the error returned from async function.
      *
      * See note above on `onSuccess` for behaviour when component has unmounted.
      */
-    onError?: OnError;
+    onError?: OnError<ErrorT>;
 }
 
 /**
  * @export-in-docs
+ * @typeParam ResultT @inherit
  */
-interface OnSuccess {
-    /**
-     * Haha whatver
-     * @param result Stuff etc
-     */
-    (result: {}): void;
+interface OnSuccess<ResultT> {
+    (result: ResultT): void;
 }
 
 /**
  * @export-in-docs
+ * @typeParam ErrorT @inherit
  */
-interface OnError {
+interface OnError<ErrorT> {
     /**
-     * Haha yeah cool man
-     * @param error DO stuff `ya know maen`
+     * Called when the async function errors
+     *
+     * @param error The error thrown by the async function
      */
-    (error: Error): void;
+    (error: ErrorT): void;
 }
 
 const validOptionKeys = ['trigger', 'args', 'onSuccess', 'onError'];
 
+/**
+ * @typeParam ResultT @inherit
+ * @typeParam ErrorT @inherit
+ */
 export type UseAsyncReturnObject<ResultT, ErrorT> = {
     /**
-     * True when action is in progress.
+     * True when async call is in progress.
      */
     isLoading: boolean;
     /**
@@ -181,18 +186,18 @@ export type UseAsyncReturnObject<ResultT, ErrorT> = {
      */
     response: ResultT | null;
     /**
-     * A function to manually trigger the action. If `options.trigger` is `useAsync.MANUAL`
-     * calling this function is the only way to trigger the action. You can pass
+     * A function to manually trigger the function. If `options.trigger` is `useAsync.MANUAL`
+     * calling this function is the only way to trigger the function. You can pass
      * arguments to `run` which will override the defaults. If no arguments are passed then
      * `options.args` will be passed by default (if supplied).
      *
      * This function will return a promise that resolves/rejects to same value
-     * resolved/rejected from the async action.
+     * resolved/rejected from the async function.
      */
     run: (...args) => Promise<ResultT>;
     /**
      * When called will set both result or error to null. Will not immediately trigger
-     * a call to the action but subsequent changes to `fn` or `options.args` will
+     * a call to the function but subsequent changes to `fn` or `options.args` will
      * according to the value of `trigger`.
      */
     reset: () => void;
@@ -271,7 +276,7 @@ const comparisonByTrigger = {
  */
 function useAsync<ResultT, ErrorT = Error>(
     fn: (...args: Array<any>) => Promise<ResultT>,
-    options: UseAsyncOptions = {}
+    options: UseAsyncOptions<ResultT, ErrorT> = {}
 ): UseAsyncReturnObject<ResultT, ErrorT> {
     const { trigger = MANUAL, args = [], onSuccess, onError } = options;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

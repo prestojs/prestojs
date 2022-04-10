@@ -17,7 +17,7 @@
  * You can pass any extra props to each `Radio` by passing `choiceProps` which is a `Map` of choice value to the props to apply.
  */
 import { RadioChoicesWidget } from '@prestojs/ui-antd';
-import 'antddd/dist/antd.min.css';
+import 'antd/dist/antd.min.css';
 import React, { useState } from 'react';
 
 const choices: [string, string][] = [

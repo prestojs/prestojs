@@ -1,9 +1,4 @@
-import {
-    OnThisPage,
-    OnThisPageProvider,
-    PreferencesProvider,
-    useOnThisPageSections,
-} from '@prestojs/doc';
+import { PreferencesProvider } from '@prestojs/doc';
 import { UiProvider } from '@prestojs/ui';
 import FormItemWrapper from '@prestojs/ui-antd/FormItemWrapper';
 import FormWrapper from '@prestojs/ui-antd/FormWrapper';
@@ -24,18 +19,10 @@ const User = viewModelFactory(
 );
 
 function MainContent({ children }: { children: ReactNode }) {
-    const { sections } = useOnThisPageSections();
     return (
-        <>
-            <div
-                className={`lg:ml-[18.5rem] main-content pb-10${
-                    sections.length > 0 ? ' xl:mr-[19.5rem]' : ''
-                }`}
-            >
-                <div className="max-w-3xl mx-auto pt-10 xl:max-w-none">{children}</div>
-            </div>
-            <OnThisPage />
-        </>
+        <div className="lg:ml-[18.5rem] main-content pb-10" id="top-of-content">
+            <div className="max-w-3xl mx-auto pt-10 xl:max-w-none">{children}</div>
+        </div>
     );
 }
 
@@ -59,9 +46,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                         forceOpen={showMenu}
                         onCloseMenu={() => setShowMenu(false)}
                     />
-                    <OnThisPageProvider>
-                        <MainContent>{children}</MainContent>
-                    </OnThisPageProvider>
+                    <MainContent>{children}</MainContent>
                 </div>
             </UiProvider>
         </PreferencesProvider>

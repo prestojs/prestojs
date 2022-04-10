@@ -876,6 +876,8 @@ export function isViewModelClass<T extends ViewModelConstructor<any, any>>(view:
 
 /**
  * @type-name ViewModel Class
+ *
+ * @extract-docs
  */
 export interface ViewModelConstructor<
     FieldMappingType extends FieldsMapping,

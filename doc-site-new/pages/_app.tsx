@@ -27,15 +27,21 @@ function MyApp({ Component, pageProps, router }: AppProps) {
     }, [isExample]);
     if (isExample) {
         return (
-            <div className="p-10 code-examples" id="code-example-root">
-                <Component {...pageProps} />
-            </div>
+            <>
+                <div className="p-10 code-examples" id="code-example-root">
+                    <Component {...pageProps} />
+                </div>
+                <div id="tooltip-container" />
+            </>
         );
     }
     return (
-        <Layout>
-            <Component {...pageProps} />
-        </Layout>
+        <>
+            <Layout>
+                <Component {...pageProps} />
+            </Layout>
+            <div id="tooltip-container" />
+        </>
     );
 }
 

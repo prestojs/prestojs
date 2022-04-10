@@ -94,6 +94,7 @@ function ReferencedType({ type }: { type: JSONOutput.ReferenceType }): React.Rea
     if (typeArguments[type.name]) {
         const { resolvedType, typeArgument } = typeArguments[type.name];
         if (resolvedType) {
+            // @ts-ignore
             return <TypeName type={resolvedType} />;
         }
         return (
@@ -230,7 +231,6 @@ export default function TypeName({ type, name }: Props): React.ReactElement {
         case 'intrinsic':
             return <span className="text-purple-400">{type.name}</span>;
         case 'literal':
-            type.value;
             if (typeof type.value == 'string') {
                 return <span className="text-green-400">"{type.value}"</span>;
             }
@@ -300,7 +300,6 @@ export default function TypeName({ type, name }: Props): React.ReactElement {
         case 'rest':
         case 'template-literal':
         case 'unknown':
-            console.log(type);
             return <>TODO: {type.type}</>;
         default:
             // will be a type error if missing a case above

@@ -84,7 +84,6 @@ export function resolveChildrenFromType(
             console.warn('Missing referenced type', type.typeArguments[0]);
         }
     }
-    console.log('BLAH WOW', { type });
 }
 
 function resolveChildren(

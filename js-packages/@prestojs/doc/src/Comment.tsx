@@ -1,6 +1,6 @@
-import PrecompiledMarkdown from './PrecompiledMarkdown';
 import React from 'react';
 import { JSONOutput } from 'typedoc';
+import PrecompiledMarkdown from './PrecompiledMarkdown';
 
 type Props = {
     comment?: JSONOutput.Comment;
@@ -8,7 +8,6 @@ type Props = {
 
 export default function Comment({ comment }: Props) {
     if (!comment || (!comment.shortTextMdx && !comment.textMdx)) {
-        console.log(comment);
         return null;
     }
 

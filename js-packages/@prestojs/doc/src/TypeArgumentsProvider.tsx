@@ -62,7 +62,6 @@ export default function TypeArgumentsProvider({
                 // @ts-ignore
                 extendedTypes[0].typeArguments || []
             );
-            console.log('rofl', declaration.typeParameter);
             return {
                 typeArguments: resolvedTypes.reduce((acc, t) => {
                     acc[t.typeArgument.name] = t;

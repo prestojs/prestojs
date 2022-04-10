@@ -69,6 +69,10 @@ export type PaginationRequestDetails = {
     decodedBody?: any;
 };
 
+/**
+ * @typeParam State Type representing the state of the pagination
+ * @typeParam InternalState Type representing the internal state of the pagination. Internal state refers to state that does not need to be restored (eg. pagination details from the URL for example)
+ */
 export interface PaginatorInterface<State = {}, InternalState = {}> {
     currentState: State;
     internalState: InternalState;
@@ -101,6 +105,8 @@ export interface PaginatorInterfaceClass<T extends PaginatorInterface = Paginato
  *
  * @menu-group Pagination
  * @extract-docs
+ * @typeParam State Type representing the state of the pagination. This is the state that would be serialized (eg. to the URL) and restored when the paginator is created (contrast this to `InternalState` which isn't (contrast this to `InternalState` which isn't).
+ * @typeParam InternalState Type representing the internal state of the pagination. Internal state refers to state that does not need to be restored (eg. pagination details from the URL for example)
  */
 export default abstract class Paginator<State extends {}, InternalState extends {}>
     implements PaginatorInterface<State, InternalState>
