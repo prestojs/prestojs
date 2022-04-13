@@ -4,7 +4,7 @@ const ModuleFlags = TypeScript.SymbolFlags.ValueModule | TypeScript.SymbolFlags.
 
 /** @param {{ application: import("typedoc").Application }} param0 */
 exports.load = function (application) {
-    const includeTags = ['extract-docs', 'export-in-docs'];
+    const includeTags = ['extract-docs', 'export-in-docs', 'expand-properties'];
 
     // application.options.addDeclaration({
     //     name: 'includeTag',
