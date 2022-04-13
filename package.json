@@ -1,6 +1,6 @@
 {
   "name": "prestojs",
-  "version": "0.0.29",
+  "version": "0.0.30",
   "main": "index.js",
   "author": "Dave Coates <david.coates@alliancesoftware.com.au>",
   "license": "MIT",
