@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+* Fix bug that meant changes to a record referenced by `RelatedViewModelField` or `ManyRelatedViewModelField` would not reflect in the parent record (even if you refetch it)
+
 ## [0.0.29] - 2022-03-21
 
 ### Changed
