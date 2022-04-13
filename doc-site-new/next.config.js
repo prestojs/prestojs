@@ -40,6 +40,7 @@ const nextConfig = {
         return config;
     },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+    staticPageGenerationTimeout: 180
 };
 // const withLess = require('next-with-less');
 // const withAntdLess = require('next-plugin-antd-less');

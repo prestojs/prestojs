@@ -49,7 +49,7 @@ export default function FunctionDocumentation({
                     <strong className="pb-3 block">Returns:</strong>
                     <Type type={signature.returnType} />
                     {signature.description?.returns && (
-                        <div>
+                        <div className="mt-5">
                             <PrecompiledMarkdown code={signature.description.returns} />
                         </div>
                     )}

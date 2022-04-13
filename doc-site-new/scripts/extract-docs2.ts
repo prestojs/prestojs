@@ -509,7 +509,8 @@ class Converter {
             | JSONOutput.NamedTupleMemberType
             | IntersectWithReference
             | undefined,
-        name?: string
+        sourceDeclaration?: JSONOutput.DeclarationReflection,
+        options?: { isReturnType?: boolean }
     ): Promise<DocType> {
         // @ts-ignore
         if (!type) {
@@ -519,7 +520,7 @@ class Converter {
         if (n) {
             return n;
         }
-        const node = await this._convertType(type, name);
+        const node = await this._convertType(type, sourceDeclaration, options);
         this.resolvedNodes.set(type, node);
         return node;
     }
@@ -531,12 +532,26 @@ class Converter {
             | JSONOutput.TemplateLiteralType
             | JSONOutput.NamedTupleMemberType
             | IntersectWithReference,
-        name?: string
+        sourceDeclaration?: JSONOutput.DeclarationReflection,
+
+        { isReturnType = false }: { isReturnType?: boolean } = {}
     ): Promise<DocType> {
+        if (sourceDeclaration) {
+            const tag = getTagByName(
+                sourceDeclaration,
+                isReturnType ? 'return-type-name' : 'type-name'
+            );
+            if (tag) {
+                return {
+                    typeName: 'unknown',
+                    name: tag.text.trim(),
+                };
+            }
+        }
         if (type.type === 'intersectWithReference') {
             return {
                 typeName: 'propertiesFrom',
-                type: await this.convertType(type.reference),
+                type: await this.convertType(type.reference, sourceDeclaration),
             };
         }
         if (type.type === 'array') {
@@ -573,7 +588,7 @@ class Converter {
         }
         if (type.type === 'intersection') {
             const children: JSONOutput.DeclarationReflection[] = this.resolveChildrenFromType(type);
-            return this.createContainerType(children, name);
+            return this.createContainerType(children, sourceDeclaration?.name);
         }
         if (type.type === 'literal') {
             return {
@@ -678,7 +693,7 @@ class Converter {
             ...(await this.createNode(signature, 'Method')),
             parameters: await Promise.all(
                 (signature.parameters || []).map(async param => {
-                    const type = await this.convertType(param.type, param.name);
+                    const type = await this.convertType(param.type, param);
                     const resolvedType = this.resolveReferencedType(param);
                     return {
                         name: param.name,
@@ -695,7 +710,7 @@ class Converter {
                 })
             ),
             typeParameters: await this.convertTypeParameter(signature.typeParameter),
-            returnType: await this.convertType(signature.type),
+            returnType: await this.convertType(signature.type, signature, { isReturnType: true }),
             sourceLocation: this.convertSourceLocation(signature),
             isInherited: !!signature.inheritedFrom,
         };
@@ -778,7 +793,14 @@ class Converter {
                             }
                             childType = await this.createMethodType(child);
                         } else {
-                            if (!child.type) {
+                            const tag = getTagByName(originalChild, 'type-name');
+                            if (tag) {
+                                console.log('wow', tag);
+                                childType = {
+                                    typeName: 'unknown',
+                                    name: tag.text.trim(),
+                                };
+                            } else if (!child.type) {
                                 const url = getDocUrl(child);
                                 if (url) {
                                     childType = {
@@ -790,7 +812,7 @@ class Converter {
                                     childType = { typeName: 'unknown', name: child.name };
                                 }
                             } else {
-                                childType = await this.convertType(child.type, originalChild.name);
+                                childType = await this.convertType(child.type, originalChild);
                             }
                         }
                         return {
@@ -1140,7 +1162,7 @@ class Converter {
                         name: referencedType.kindString,
                     } as UnknownType;
                 }
-                return this.convertType(referencedType.type, referencedType.name);
+                return this.convertType(referencedType.type, referencedType);
             });
         } else if (this.currentTypeParameter && type.id) {
             const match = this.matchCurrentTypeParameter(type.id);
@@ -1188,7 +1210,7 @@ class Converter {
         }
         return {
             ...(await this.createNode(property, 'Property')),
-            type: await this.convertType(type),
+            type: await this.convertType(type, property),
             isInherited: !!property.inheritedFrom,
         };
     }
@@ -1204,12 +1226,20 @@ class Converter {
     }
 }
 
-function getMenuGroup(docItem: DeclarationReflection) {
+function getComment(docItem: JSONOutput.DeclarationReflection) {
     let { comment } = docItem;
     if (!comment && docItem.signatures) {
         comment = docItem.signatures[0].comment;
     }
-    return comment?.tags?.find(tag => tag.tag === 'menu-group')?.text.trim() || 'default';
+    return comment;
+}
+
+function getTagByName(docItem: JSONOutput.DeclarationReflection, tagName: string) {
+    return getComment(docItem)?.tags?.find(tag => tag.tag === tagName);
+}
+
+function getMenuGroup(docItem: DeclarationReflection) {
+    return getTagByName(docItem, 'menu-group')?.text.trim() || 'default';
 }
 
 async function main() {
@@ -1248,11 +1278,11 @@ async function main() {
     const children: JSONOutput.DeclarationReflection[] = [
         ...require('./___temp_util.json').children,
         ...require('./___temp_viewmodel.json').children,
-        // ...require('./___temp_ui.json').children,
-        // ...require('./___temp_ui-antd.json').children,
-        // ...require('./___temp_routing.json').children,
-        // ...require('./___temp_rest.json').children,
-        // ...require('./___temp_final-form.json').children,
+        ...require('./___temp_ui.json').children,
+        ...require('./___temp_ui-antd.json').children,
+        ...require('./___temp_routing.json').children,
+        ...require('./___temp_rest.json').children,
+        ...require('./___temp_final-form.json').children,
     ];
     // @ts-ignore
     const declarations: DeclarationReflection[] = [];
@@ -1537,7 +1567,9 @@ async function main() {
         );
 
         fs.writeFileSync(outPath, jsonData);
-
+        if (docItem.name === 'ViewModelConstructor') {
+            continue;
+        }
         menuByName[packageName] = menuByName[packageName] || {};
         menuByName[packageName][menuGroup] = menuByName[packageName][menuGroup] || [];
         menuByName[packageName][menuGroup].push({
@@ -1545,6 +1577,26 @@ async function main() {
             slug,
         });
     }
+
+    // Combine ViewModelConstructor into BaseViewModel but as static methods/properties
+    const viewModelConstructorPath = `${docsPath}/viewmodel/ViewModelConstructor.json`;
+    const baseViewModelPath = `${docsPath}/viewmodel/BaseViewModel.json`;
+    const viewModelConstructorData = require(viewModelConstructorPath);
+    const baseViewModelData = require(baseViewModelPath);
+    baseViewModelData.page.staticMethods.push(...viewModelConstructorData.page.methods);
+    baseViewModelData.page.staticProperties.push(...viewModelConstructorData.page.properties);
+    baseViewModelData.page.pageSections.push(
+        ...viewModelConstructorData.page.pageSections.map(section => ({
+            ...section,
+            title: `Static ${section.title}`,
+            anchorId: `Static-${section.anchorId}`,
+        }))
+    );
+    fs.unlinkSync(viewModelConstructorPath);
+    fs.writeFileSync(
+        path.resolve(`${docsPath}/viewmodel/BaseViewModel.json`),
+        JSON.stringify(baseViewModelData, null, 2)
+    );
     const apiMenu = {};
     for (const [menuName, menu] of Object.entries(menuByName)) {
         const sections: [string, any][] = Object.entries(menu);

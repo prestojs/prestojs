@@ -6,16 +6,8 @@ html {
    @apply bg-white antialiased;
 }
 
-.td-type-desc p:last-child {
+.td-type-desc p:last-child, .tooltip p:last-child {
    margin-bottom: 0;
-}
-
-.tooltip {
-   @apply invisible absolute w-80;
-}
-
-.tooltip-container:hover .tooltip {
-   @apply visible z-50 p-2 rounded border border-gray-200 bg-white  shadow-lg ml-4 text-sm;
 }
 
 .algolia-autocomplete {
@@ -26,6 +18,9 @@ html {
    font-weight: 600;
    @apply border-b border-cyan-500 hover:border-b-2;
 }
-.mdx blockquote p:last-child{
+.mdx blockquote p:last-child, .mdx blockquote ul:last-child  {
    margin-bottom: 0;
+}
+.mdx strong {
+   font-weight: bold;
 }

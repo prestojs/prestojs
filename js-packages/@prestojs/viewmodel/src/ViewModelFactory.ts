@@ -1264,6 +1264,8 @@ export class InvalidFieldError extends Error {}
  *
  * @param fields A map of field name to an instance of `Field`
  * @extract-docs
+ * @returns A class that extends [BaseViewModel](doc:BaseViewModel)
+ * @return-type-name ViewModelClass
  */
 export default function viewModelFactory<
     FieldMappingType extends FieldsMapping,
