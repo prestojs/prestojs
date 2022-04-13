@@ -184,6 +184,10 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
         const key =
             record._assignedFieldPaths as unknown as ViewModelFieldPaths<ViewModelClassType>;
         this.setValueForKey(key, record);
+
+        if (record) {
+            this.setupRelationListeners(key, record);
+        }
     }
 
     /**
@@ -248,6 +252,9 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                 }
                 const r = new this.viewModel(data) as PartialViewModel<ViewModelClassType>;
                 this.setValueForKey(key, r);
+                if (r) {
+                    this.setupRelationListeners(key, r);
+                }
                 return r;
             }
         }

@@ -3964,3 +3964,256 @@ test('cache should handle many related with some null values', () => {
         expect(booking.suppliers[1].parent).toBe(null);
     }
 });
+
+test('changes to nested records should reflect in parent record', () => {
+    class Owner extends viewModelFactory(
+        {
+            id: new Field(),
+            title: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    class Supplier extends viewModelFactory(
+        {
+            id: new Field(),
+            title: new Field(),
+            ownerId: new Field(),
+            owner: new RelatedViewModelField({
+                to: Owner,
+                sourceFieldName: 'ownerId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    class Business extends viewModelFactory(
+        {
+            id: new Field(),
+            primarySupplierId: new Field(),
+            primarySupplier: new RelatedViewModelField({
+                to: Supplier,
+                sourceFieldName: 'primarySupplierId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    class Booking extends viewModelFactory(
+        {
+            id: new Field(),
+            supplierIds: new ListField({ childField: new Field() }),
+            suppliers: new ManyRelatedViewModelField({
+                to: Supplier,
+                sourceFieldName: 'supplierIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    Booking.cache.add({
+        id: 1,
+        suppliers: [
+            {
+                id: 1,
+                title: 'Supplier 1',
+                owner: null,
+            },
+            {
+                id: 2,
+                title: 'Supplier 2',
+                owner: {
+                    id: 1,
+                    title: 'Owner 1',
+                },
+            },
+        ],
+    });
+
+    Business.cache.add({ id: 1, primarySupplierId: 2 });
+
+    let booking = Booking.cache.get(1, '*');
+    expect(booking).not.toBeNull();
+    if (booking) {
+        expect(booking.suppliers[1]).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Supplier 2',
+                owner: {
+                    id: 1,
+                    title: 'Owner 1',
+                },
+            })
+        );
+    }
+    let business = Business.cache.get(1, '*');
+    expect(business).not.toBeNull();
+    if (business) {
+        expect(business.primarySupplier).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Supplier 2',
+                owner: {
+                    id: 1,
+                    title: 'Owner 1',
+                },
+            })
+        );
+    }
+
+    let supplier = Supplier.cache.get(2, '*');
+    expect(supplier).not.toBeNull();
+    if (supplier) {
+        expect(supplier.owner).toEqual(
+            recordEqualTo({
+                id: 1,
+                title: 'Owner 1',
+            })
+        );
+    }
+
+    Owner.cache.add({
+        id: 1,
+        title: 'Owner One',
+    });
+    booking = Booking.cache.get(1, '*');
+    expect(booking).not.toBeNull();
+    if (booking) {
+        expect(booking.suppliers[1]).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Supplier 2',
+                owner: {
+                    id: 1,
+                    title: 'Owner One',
+                },
+            })
+        );
+    }
+
+    business = Business.cache.get(1, '*');
+    expect(business).not.toBeNull();
+    if (business) {
+        expect(business.primarySupplier).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Supplier 2',
+                owner: {
+                    id: 1,
+                    title: 'Owner One',
+                },
+            })
+        );
+    }
+
+    supplier = Supplier.cache.get(2, '*');
+    expect(supplier).not.toBeNull();
+    if (supplier) {
+        expect(supplier.owner).toEqual(
+            recordEqualTo({
+                id: 1,
+                title: 'Owner One',
+            })
+        );
+    }
+});
+
+test('changes to nested records should reflect in parent record with recursive relationships', () => {
+    // As above but handle a recursive relationship
+    class Supplier extends viewModelFactory(
+        {
+            id: new Field(),
+            title: new Field(),
+            parentId: new Field(),
+            parent: new RelatedViewModelField<any>({
+                to: (): any => Supplier,
+                sourceFieldName: 'parentId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    class Booking extends viewModelFactory(
+        {
+            id: new Field(),
+            supplierIds: new ListField({ childField: new Field() }),
+            suppliers: new ManyRelatedViewModelField({
+                to: Supplier,
+                sourceFieldName: 'supplierIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    Booking.cache.add({
+        id: 1,
+        suppliers: [
+            {
+                id: 1,
+                title: 'Supplier 1',
+                parentId: 2,
+            },
+            {
+                id: 2,
+                title: 'Supplier 2',
+                parentId: null,
+            },
+        ],
+    });
+
+    let booking = Booking.cache.get(1, '*');
+    expect(booking).not.toBeNull();
+    if (booking) {
+        expect(booking.suppliers[1].parent).toBe(null);
+        expect(booking.suppliers[0].parent).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Supplier 2',
+                parentId: null,
+            })
+        );
+    }
+
+    let supplier = Supplier.cache.get(1, '*');
+    expect(supplier).not.toBeNull();
+    if (supplier) {
+        expect(supplier.parent).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Supplier 2',
+                parentId: null,
+            })
+        );
+    }
+
+    Supplier.cache.add({
+        id: 2,
+        title: 'Supplier Two',
+        parentId: null,
+    });
+
+    booking = Booking.cache.get(1, '*');
+    expect(booking).not.toBeNull();
+    if (booking) {
+        expect(booking.suppliers[1].parent).toBe(null);
+        expect(booking.suppliers[0].parent).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Supplier Two',
+                parentId: null,
+            })
+        );
+    }
+
+    supplier = Supplier.cache.get(1, '*');
+    expect(supplier).not.toBeNull();
+    if (supplier) {
+        expect(supplier.parent).toEqual(
+            recordEqualTo({
+                id: 2,
+                title: 'Supplier Two',
+                parentId: null,
+            })
+        );
+    }
+});
