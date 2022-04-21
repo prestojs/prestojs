@@ -20,4 +20,5 @@ export type {
     TypeParameter,
     UnknownType,
     VariableNode,
+    DocExample,
 } from './newTypes';

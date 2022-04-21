@@ -1,6 +1,6 @@
 import Field from './Field';
 
-/*
+/**
  * DateTime Field.
  *
  * The basic javascript Date type is consumed and spitted out by this field. All third party libraries, such as Moment, should be compatible

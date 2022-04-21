@@ -1,6 +1,6 @@
 import { run } from '@mdx-js/mdx';
 import React, { Fragment, useEffect, useState } from 'react';
-import * as runtime from 'react/jsx-runtime.js';
+import * as runtime from 'react/jsx-runtime';
 import AnchorLink from './AnchorLink';
 import CodeBlock from './CodeBlock';
 

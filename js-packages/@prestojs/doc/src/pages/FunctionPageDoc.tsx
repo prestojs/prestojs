@@ -1,3 +1,4 @@
+import CodeExamples from '@prestojs/doc/components/CodeExamples';
 import React from 'react';
 import FunctionDocumentation from '../components/FunctionDocumentation';
 import PageHeader from '../components/PageHeader';
@@ -9,13 +10,13 @@ type Props = {
 };
 
 export default function FunctionPageDoc({ page, meta }: Props) {
-    console.log(page);
     return (
         <div>
             <PageHeader page={page} meta={meta} />
             {page.signatures.map((sig, i) => (
                 <FunctionDocumentation key={i} signature={sig} />
             ))}
+            {meta.examples && <CodeExamples examples={meta.examples} />}
         </div>
     );
 }

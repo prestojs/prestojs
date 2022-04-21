@@ -1,3 +1,5 @@
+import CodeExamples from '@prestojs/doc/components/CodeExamples';
+import Type from '@prestojs/doc/components/Type';
 import React from 'react';
 import AnchorLink, { generateId } from '../components/AnchorLink';
 import ApiPreferencesBar from '../components/ApiPreferencesBar';
@@ -48,6 +50,41 @@ function MethodDoc({ method }) {
     );
 }
 
+function ClassHierarchy({ page }: { page: ClassPage }) {
+    if (page.hierarchy.parent == null && page.hierarchy.children.length == 0) {
+        return null;
+    }
+    return (
+        <div className="mb-3 mt-3 bg-sky-50 p-2 rounded text-gray-800">
+            <h3 className="font-semibold font-lg">Hierarchy</h3>
+            <ul className="ml-5">
+                {page.hierarchy.parent && (
+                    <li className="list-disc">
+                        <Type type={page.hierarchy.parent} />
+                    </li>
+                )}
+                <li
+                    className={`list-disc font-semibold ${page.hierarchy.parent ? 'ml-5' : 'ml-0'}`}
+                >
+                    {page.name}
+                </li>
+                {page.hierarchy.children.length > 0 && (
+                    <>
+                        {page.hierarchy.children.map((child, i) => (
+                            <li
+                                key={i}
+                                className={`list-disc ${page.hierarchy.parent ? 'ml-10' : 'ml-5'}`}
+                            >
+                                <Type type={child} />
+                            </li>
+                        ))}
+                    </>
+                )}
+            </ul>
+        </div>
+    );
+}
+
 export default function ClassPageDoc({ page, meta }: Props) {
     const { showInherited } = usePreferences();
     const showOnThisPage = page.pageSections.length > 0;
@@ -61,7 +98,9 @@ export default function ClassPageDoc({ page, meta }: Props) {
             {showOnThisPage && <OnThisPage sections={page.pageSections} />}
             <div className={showOnThisPage ? 'xl:mr-[19.5rem]' : ''}>
                 <PageHeader page={page} meta={meta} />
+                <ClassHierarchy page={page} />
                 <Description description={page.description} />
+                {meta.examples && <CodeExamples examples={meta.examples} />}
                 <ApiPreferencesBar />
                 {page.constructorDefinition && (
                     <>

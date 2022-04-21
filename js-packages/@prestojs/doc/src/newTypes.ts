@@ -36,6 +36,10 @@ export interface ClassPage {
     staticProperties: VariableNode[];
     sourceLocation?: SourceLocation;
     typeParameters?: TypeParameter[];
+    hierarchy: {
+        parent: ReferenceLinkType | ExternalReferenceType | null;
+        children: (ReferenceLinkType | ExternalReferenceType)[];
+    };
 }
 
 export type Page = FunctionPage | ClassPage;

@@ -4,6 +4,7 @@ import type {
     ClassConstructor,
     ClassPage,
     ContainerType,
+    DocExample,
     DocNode,
     DocType,
     ExternalReferenceType,
@@ -239,9 +240,16 @@ type IntersectWithReference = {
 class Converter {
     references: Record<string, JSONOutput.DeclarationReflection>;
     docLinks: any;
-    constructor(references: Record<string, JSONOutput.DeclarationReflection>, docLinks) {
+    examples?: DocExample[];
+
+    constructor(
+        references: Record<string, JSONOutput.DeclarationReflection>,
+        docLinks,
+        examples?: DocExample[]
+    ) {
         this.docLinks = docLinks;
         this.references = references;
+        this.examples = examples;
     }
 
     resolvedChildren = new Map<
@@ -916,9 +924,8 @@ class Converter {
         declaration: JSONOutput.DeclarationReflection,
         description?: RichDescription
     ): PageSection[] {
+        const inPageLinks: PageSection[] = [];
         if (description && declaration.comment) {
-            type Section = { title: string; links: { id: string; title: string }[] };
-            const inPageLinks: PageSection[] = [];
             let section: null | PageSection = null;
             for (const [descAttr, commentAttr] of [
                 ['short', 'shortText'],
@@ -971,9 +978,16 @@ class Converter {
             if (section) {
                 inPageLinks.push(section);
             }
-            return inPageLinks;
         }
-        return [];
+        if (this.examples) {
+            inPageLinks.push({
+                title: 'Examples',
+                showEmpty: true,
+                anchorId: 'examples',
+                links: [],
+            });
+        }
+        return inPageLinks;
     }
 
     private async convertClass(docItem: JSONOutput.DeclarationReflection): Promise<ClassPage> {
@@ -1085,12 +1099,63 @@ class Converter {
         ].filter(section => section.links.length > 0);
         pageSections.unshift(...(this.extractInPageLinks(docItem, description) || []));
 
+        let hierarchy: {
+            parent: ReferenceLinkType | ExternalReferenceType | null;
+            children: (ReferenceLinkType | ExternalReferenceType)[];
+        } = {
+            parent: null,
+            children: [],
+        };
+        if (docItem.extendedTypes?.length) {
+            // @ts-ignore
+            const referencedType = this.references[docItem.extendedTypes[0]?.id];
+            if (referencedType) {
+                const url = getDocUrl(referencedType);
+                if (url) {
+                    hierarchy.parent = {
+                        typeName: 'referenceLink',
+                        name: referencedType.name,
+                        url,
+                    } as ReferenceLinkType;
+                } else {
+                    console.error('Could not find URL for ', referencedType.name);
+                }
+            } else {
+                // @ts-ignore
+                hierarchy.parent = this.convertExternalReference(docItem.extendedTypes[0]);
+            }
+        }
+        if (docItem.extendedBy?.length) {
+            for (const item of docItem.extendedBy) {
+                // @ts-ignore
+                const referencedType = this.references[item?.id];
+                if (referencedType) {
+                    const url = getDocUrl(referencedType);
+                    if (url) {
+                        hierarchy.children.push({
+                            typeName: 'referenceLink',
+                            name: referencedType.name,
+                            url,
+                        } as ReferenceLinkType);
+                    } else {
+                        console.error(
+                            'Could not find URL for extendedBy type ',
+                            referencedType.name
+                        );
+                    }
+                } else {
+                    console.error('Expected only reference types', item);
+                }
+            }
+        }
+
         return this.withTypeParameter(
             docItem.typeParameter,
             async () =>
                 ({
                     pageType: 'class',
                     pageSections,
+                    hierarchy,
                     sourceLocation: this.convertSourceLocation(docItem),
                     name: docItem.name,
                     description,
@@ -1245,7 +1310,9 @@ async function main() {
     const repoRoot = path.resolve(__dirname, '../../');
     const packagesRoot = path.resolve(repoRoot, 'js-packages/@prestojs/');
 
-    for (const pkg of ['util', 'viewmodel', 'ui', 'final-form', 'ui-antd', 'routing', 'rest']) {
+    for (const pkg of [
+        // 'util', 'viewmodel', 'ui', 'final-form', 'ui-antd', 'routing', 'rest'
+    ]) {
         const app = new TypeDoc.Application();
 
         app.options.addReader(new TypeDoc.TSConfigReader());
@@ -1450,7 +1517,7 @@ async function main() {
         const packageDir = `${docsPath}/${packageName}`;
         const outPath = path.resolve(packageDir, `${slug.split('/').slice(1).join('/')}.json`);
         const exampleKey = importPath.replace('@prestojs/', '');
-        const examples = exampleFiles[exampleKey];
+        const examples: undefined | DocExample[] = exampleFiles[exampleKey];
         if (examples) {
             await Promise.all(
                 examples.map(async example => {
@@ -1468,7 +1535,7 @@ async function main() {
         if (!fs.existsSync(path.dirname(outPath))) {
             fs.mkdirSync(path.dirname(outPath), { recursive: true });
         }
-        const converter = new Converter(references, docLinks);
+        const converter = new Converter(references, docLinks, examples);
         const page = await converter.convert(docItem);
         const meta = {
             packageName,
