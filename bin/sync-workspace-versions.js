@@ -7,6 +7,7 @@ const rootPath = './js-packages/@prestojs';
 const paths = fs.readdirSync(rootPath);
 
 for (const path of paths) {
+    if (path === 'doc') continue;
     const p = `${rootPath}/${path}/package.json`;
     const packageJson = JSON.parse(fs.readFileSync(p));
     packageJson.version = version;

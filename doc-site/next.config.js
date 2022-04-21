@@ -1,49 +1,49 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withTM = require('next-transpile-modules')([
+    '@prestojs/viewmodel',
+    '@prestojs/ui',
+    '@prestojs/ui-antd',
+    '@prestojs/rest',
+    '@prestojs/util',
+    '@prestojs/routing',
+    '@prestojs/final-form',
+    '@prestojs/doc',
+]);
+
 const withMDX = require('@next/mdx')({
     extension: /\.mdx?$/,
     options: {
-        remarkPlugins: [
-            require('remark-code-import'),
-            require('./remark-plugins/docLinks.js'),
-            require('./remark-plugins/codesandbox'),
-        ],
+        remarkPlugins: [],
+        rehypePlugins: [],
+        // If you use `MDXProvider`, uncomment the following line.
+        // providerImportSource: "@mdx-js/react",
     },
 });
-const withAntdLess = require('next-plugin-antd-less');
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    // lessLoaderOptions: {
+    //     lessOptions: {
+    //         javascriptEnabled: true,
+    //     },
+    // },
+    reactStrictMode: true,
+    // webpack: (config, { isServer, defaultLoaders }) => {
+    //     if (!isServer) {
+    //         config.resolve.fallback.fs = false;
+    //     }
+    //     // Process ui-antd with babel so that babel-plugin-import runs on it and imports necessary styles
+    //     // config.module.rules.push({
+    //     //     test: /\.+(js|jsx|mjs|ts|tsx)$/,
+    //     //     loader: defaultLoaders.babel,
+    //     //     include: /@prestojs\//,
+    //     // });
+    //     return config;
+    // },
+    pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+    staticPageGenerationTimeout: 180,
+};
+// const withLess = require('next-with-less');
+// const withAntdLess = require('next-plugin-antd-less');
 const withPlugins = require('next-compose-plugins');
-module.exports = withPlugins([withAntdLess, withMDX], {
-    pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
-    webpack: (config, options) => {
-        config.module.rules.push({
-            test: /\.svg$/,
-            issuer: {
-                test: /\.(js|ts)x?$/,
-            },
-            use: ['@svgr/webpack'],
-        });
-        // Using react-view was getting issues with "Can't resolve 'fs' in '....@babel/core/lib/transformation'
-        // This seems wrong but it seems to fix it
-        config.node = {
-            fs: 'empty',
-        };
-        // Process ui-antd with babel so that babel-plugin-import runs on it and imports necessary styles
-        config.module.rules.push({
-            test: /\.+(js|jsx|mjs|ts|tsx)$/,
-            loader: options.defaultLoaders.babel,
-            include: /@prestojs\//,
-        });
-        return config;
-    },
-    webpackDevMiddleware: config => {
-        // Perform customizations to webpack dev middleware config
-        // Important: return the modified config
-        return config;
-    },
-    // This makes it so next export works with our linking but now without trailing
-    // slash in dev you get 404's.
-    // Without this option everything must have .html suffix... but trying to get that
-    // working in dev also failed (worked in dev but doing a build would complain
-    // about moving a file with a .html.html extension...)
-    trailingSlash: true,
-    distDir: '../.next',
-});
+
+module.exports = withPlugins([withTM, /*withLess,*/ withMDX], nextConfig);

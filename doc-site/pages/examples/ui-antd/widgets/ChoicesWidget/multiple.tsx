@@ -11,6 +11,7 @@
  */
 import { ChoicesWidget } from '@prestojs/ui-antd';
 import { Switch } from 'antd';
+import 'antd/dist/antd.min.css';
 import React, { useState } from 'react';
 
 const shortChoices: [string, string][] = [

@@ -1,5 +1,5 @@
-import { Page, PageMetaData } from '@prestojs/doc/newTypes';
 import React, { useEffect, useState } from 'react';
+import { Page, PageMetaData } from '../newTypes';
 import SourceLink from './SourceLink';
 import Tooltip from './Tooltip';
 import TypeParameters from './TypeParameters';

@@ -1,13 +1,13 @@
-import AnchorLink, { generateId } from '@prestojs/doc/AnchorLink';
-import ApiPreferencesBar from '@prestojs/doc/components/ApiPreferencesBar';
-import Description from '@prestojs/doc/components/Description';
-import FunctionDocumentation from '@prestojs/doc/components/FunctionDocumentation';
-import OnThisPage from '@prestojs/doc/components/OnThisPage';
-import { usePreferences } from '@prestojs/doc/components/PreferencesProvider';
-import { ClassPage, PageMetaData } from '@prestojs/doc/newTypes';
 import React from 'react';
+import AnchorLink, { generateId } from '../components/AnchorLink';
+import ApiPreferencesBar from '../components/ApiPreferencesBar';
+import Description from '../components/Description';
+import FunctionDocumentation from '../components/FunctionDocumentation';
+import OnThisPage from '../components/OnThisPage';
 import PageHeader from '../components/PageHeader';
+import { usePreferences } from '../components/PreferencesProvider';
 import Variable from '../components/Variable';
+import { ClassPage, PageMetaData } from '../newTypes';
 
 type Props = {
     page: ClassPage;

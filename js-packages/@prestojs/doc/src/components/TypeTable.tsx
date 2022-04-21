@@ -1,8 +1,8 @@
-import Description from '@prestojs/doc/components/Description';
-import Type from '@prestojs/doc/components/Type';
-import { DocType, Flags, RichDescription } from '@prestojs/doc/newTypes';
 import React, { ReactNode } from 'react';
+import { DocType, Flags, RichDescription } from '../newTypes';
+import Description from './Description';
 import Table from './Table';
+import Type from './Type';
 
 type Item = {
     flags: Flags;

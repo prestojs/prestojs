@@ -1,9 +1,9 @@
-import { usePreferences } from '@prestojs/doc/components/PreferencesProvider';
-import { PageSection } from '@prestojs/doc/newTypes';
 import debounce from 'lodash/debounce';
 import React, { useEffect, useMemo, useRef } from 'react';
+import { PageSection } from '../newTypes';
 // @ts-ignore
 import styles from './OnThisPage.module.css';
+import { usePreferences } from './PreferencesProvider';
 
 export function OnThisPageSection({ section }: { section: PageSection }) {
     const { showInherited } = usePreferences();

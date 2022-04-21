@@ -1,5 +1,5 @@
-import { Flags, RichDescription } from '@prestojs/doc/newTypes';
 import React from 'react';
+import { Flags, RichDescription } from '../newTypes';
 import PrecompiledMarkdown from './PrecompiledMarkdown';
 
 type Props = {

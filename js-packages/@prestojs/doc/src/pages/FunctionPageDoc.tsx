@@ -1,7 +1,7 @@
-import { FunctionPage, PageMetaData } from '@prestojs/doc/newTypes';
 import React from 'react';
 import FunctionDocumentation from '../components/FunctionDocumentation';
 import PageHeader from '../components/PageHeader';
+import { FunctionPage, PageMetaData } from '../newTypes';
 
 type Props = {
     page: FunctionPage;

@@ -1,0 +1,9 @@
+{
+  "name": "doc-site-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "extract": "node --loader ts-node/esm extract-docs.ts"
+  }
+}

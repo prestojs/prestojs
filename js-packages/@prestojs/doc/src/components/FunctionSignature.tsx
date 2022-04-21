@@ -1,5 +1,5 @@
-import { Signature } from '@prestojs/doc/newTypes';
 import React from 'react';
+import { Signature } from '../newTypes';
 import Type from './Type';
 import TypeParameters from './TypeParameters';
 

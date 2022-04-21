@@ -7,7 +7,7 @@
   "private": true,
   "workspaces": [
     "js-packages/@prestojs/*",
-    "doc-site-new",
+    "doc-site",
     "django-testbed"
   ],
   "scripts": {

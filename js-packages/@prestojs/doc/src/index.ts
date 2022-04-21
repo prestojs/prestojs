@@ -1,14 +1,23 @@
-export { default as FunctionSignature } from './FunctionSignature';
-export { default as TypeName } from './TypeName';
-export { default as PrecompiledMarkdown } from './PrecompiledMarkdown';
-export { default as CodeBlock } from './CodeBlock';
-export { default as DocProvider } from './DocProvider';
-export { default as Modal } from './Modal';
-export { default as FunctionDoc } from './FunctionDoc';
-export { default as ClassDoc } from './ClassDoc';
 export { default as PreferencesProvider } from './components/PreferencesProvider';
-export { default as OnThisPageProvider, useOnThisPageSections } from './OnThisPageProvider';
-export type { OnThisPageSection } from './OnThisPageProvider';
-export { default as OnThisPage } from './OnThisPage';
 export { getClassDetails } from './util';
-export type { DeclarationReflection } from './types';
+export { default as ClassPageDoc } from './pages/ClassPageDoc';
+export { default as FunctionPageDoc } from './pages/FunctionPageDoc';
+export type {
+    ClassConstructor,
+    ClassPage,
+    ContainerType,
+    DocNode,
+    DocType,
+    ExternalReferenceType,
+    Flags,
+    FunctionPage,
+    MethodType,
+    Page,
+    PageSection,
+    ReferenceLinkType,
+    RichDescription,
+    Signature,
+    TypeParameter,
+    UnknownType,
+    VariableNode,
+} from './newTypes';

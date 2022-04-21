@@ -1,8 +1,8 @@
-import SourceLink from '@prestojs/doc/components/SourceLink';
 import React from 'react';
 import { VariableNode } from '../newTypes';
 import AnchorLink from './AnchorLink';
 import Description from './Description';
+import SourceLink from './SourceLink';
 import Type from './Type';
 
 export default function Variable({ variable }: { variable: VariableNode }) {

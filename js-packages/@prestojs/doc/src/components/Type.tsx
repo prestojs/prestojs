@@ -1,10 +1,10 @@
-import FunctionDocumentation from '@prestojs/doc/components/FunctionDocumentation';
-
-import TypeParameterDescription from '@prestojs/doc/components/TypeParameterDescription';
-import Modal from '@prestojs/doc/Modal';
 import Link from 'next/link';
 import React, { ReactNode } from 'react';
 import { DocType, IndexedAccessType, TupleType } from '../newTypes';
+import FunctionDocumentation from './FunctionDocumentation';
+import Modal from './Modal';
+
+import TypeParameterDescription from './TypeParameterDescription';
 import TypeTable from './TypeTable';
 
 type Props = {

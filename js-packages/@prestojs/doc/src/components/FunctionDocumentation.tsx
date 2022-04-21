@@ -1,5 +1,3 @@
-import Type from '@prestojs/doc/components/Type';
-import TypeTable from '@prestojs/doc/components/TypeTable';
 import React from 'react';
 import { Signature } from '../newTypes';
 import AnchorLink from './AnchorLink';
@@ -7,6 +5,8 @@ import Description from './Description';
 import FunctionSignature from './FunctionSignature';
 import PrecompiledMarkdown from './PrecompiledMarkdown';
 import SourceLink from './SourceLink';
+import Type from './Type';
+import TypeTable from './TypeTable';
 
 type Props = {
     signature: Signature;

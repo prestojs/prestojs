@@ -1,5 +1,5 @@
-import { SourceLocation } from '@prestojs/doc/newTypes';
 import React from 'react';
+import { SourceLocation } from '../newTypes';
 
 export default function SourceLink({ sourceLocation }: { sourceLocation?: SourceLocation }) {
     if (!sourceLocation) {

@@ -4,6 +4,7 @@
  * Any extra props are passed through to [Select](https://ant.design/components/select/)
  */
 import { SelectChoicesWidget } from '@prestojs/ui-antd';
+import 'antd/dist/antd.min.css';
 import React, { useState } from 'react';
 
 const choices: [string, string][] = [

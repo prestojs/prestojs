@@ -1,6 +1,6 @@
-import Description from '@prestojs/doc/components/Description';
-import { TypeParameter } from '@prestojs/doc/newTypes';
 import React from 'react';
+import { TypeParameter } from '../newTypes';
+import Description from './Description';
 import Tooltip from './Tooltip';
 import Type from './Type';
 
