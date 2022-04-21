@@ -1254,9 +1254,9 @@ async function main() {
             entryPoints,
             tsconfig: path.join(packagesRoot, pkg, 'tsconfig.json'),
             plugin: [
-                path.resolve(__dirname, 'plugins/forceExport.js'),
+                path.resolve(__dirname, '../plugins/forceExport.js'),
                 'typedoc-plugin-rename-defaults',
-                path.resolve(__dirname, 'plugins/fixSource.js'),
+                path.resolve(__dirname, '../plugins/fixSource.js'),
             ],
             // @ts-ignore
             'presto-root': repoRoot,

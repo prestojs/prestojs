@@ -19,7 +19,7 @@
     "prebuild": "wsrun -m -x doc-site clean",
     "test": "# Always runInBand so performance tests are more consistent\njest --runInBand",
     "dev": "wsrun dev",
-    "build": "wsrun -t -x doc-site -x django-testbed build @prestojs/doc",
+    "build": "wsrun -t -x doc-site -x django-testbed -x @prestojs/doc build",
     "build:docs": "yarn workspace doc-site run build",
     "build:watch": "wsrun --exclude django-testbed 'build:watch'",
     "build:declarations": "yarn workspace @prestojs/routing run build:declaration && yarn workspace @prestojs/viewmodel run build:declaration && yarn workspace @prestojs/ui run build:declaration && yarn workspace @prestojs/rest run build:declaration && yarn workspace @prestojs/final-form run build:declaration && yarn workspace @prestojs/ui-antd run build:declaration",
