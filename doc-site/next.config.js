@@ -41,6 +41,7 @@ const nextConfig = {
     // },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     staticPageGenerationTimeout: 180,
+    distDir: '../.next',
 };
 // const withLess = require('next-with-less');
 // const withAntdLess = require('next-plugin-antd-less');
