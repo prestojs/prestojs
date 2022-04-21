@@ -23,7 +23,7 @@
     "@prestojs/viewmodel": "~0.0.11",
     "final-form": ">= 4.18.7",
     "react": ">= 16.12.0 < 18",
-    "react-dom": ">= 16.12.0 < 18",
+    "react-dom": ">= 16.12.0 < 19",
     "react-final-form": ">= 6.3.5"
   },
   "dependencies": {
@@ -34,8 +34,8 @@
     "@prestojs/viewmodel": "*",
     "@testing-library/jest-dom": "^5.1.1",
     "@testing-library/react": "^10.0.4",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "react-final-form": "^6.5.8",
     "final-form": "^4.20.6",
     "typescript": "^4.5.4"
