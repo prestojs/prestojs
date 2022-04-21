@@ -15,7 +15,6 @@
     "check-types": "tsc -b tsconfig.lint.json && tsd tsd_checks",
     "clean": "rm -rf /tmp/tsc-output/@prestojs && wsrun -x doc-site -x django-testbed -m clean",
     "docs": "yarn workspace doc-site run develop",
-    "extract-docs": "yarn node doc-site/extract-docs",
     "prebuild": "wsrun -m -x doc-site clean",
     "test": "# Always runInBand so performance tests are more consistent\njest --runInBand",
     "dev": "wsrun dev",

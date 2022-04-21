@@ -4,7 +4,6 @@
 
 html {
    @apply bg-white antialiased;
-
 }
 
 .td-type-desc p:last-child, .tooltip p:last-child {
@@ -25,3 +24,4 @@ html {
 .mdx strong {
    font-weight: bold;
 }
+
