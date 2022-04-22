@@ -38,6 +38,7 @@ export interface ClassPage {
     typeParameters?: TypeParameter[];
     hierarchy: {
         parent: ReferenceLinkType | ExternalReferenceType | null;
+        typeArguments?: DocType[];
         children: (ReferenceLinkType | ExternalReferenceType)[];
     };
 }
@@ -201,6 +202,7 @@ export type DocExample = {
     header: {
         title: string;
         description?: string;
+        tags: Record<string, any>;
     };
     name: string;
     url: string;

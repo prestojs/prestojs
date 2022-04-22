@@ -1,61 +1,79 @@
+import { CharField } from '@prestojs/viewmodel';
 import dynamic from 'next/dynamic';
 
-const mapping = new Map([
-    // ['BooleanField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.BooleanWidget))],
+const mapping = new Map<string, any>([
+    // @ts-ignore
+    ['BooleanField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.BooleanWidget))],
     [
         'CharField',
         // @ts-ignore
         dynamic(() => import('@prestojs/ui-antd/widgets/CharWidget').then(mod => mod.default)),
     ],
-    // ['CurrencyField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.CurrencyWidget))],
-    // ['DateField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DateWidget))],
-    // ['DateRangeField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DateRangeWidget))],
-    // ['DateTimeField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DateTimeWidget))],
-    // [
-    //     'DateTimeRangeField',
-    //     dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DateTimeRangeWidget)),
-    // ],
-    // ['DecimalField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DecimalWidget))],
-    // ['DurationField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DurationWidget))],
-    // ['EmailField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.EmailWidget))],
-    // ['FileField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.FileWidget))],
-    // ['FloatField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.FloatWidget))],
-    // [
-    //     'FloatRangeField',
-    //     dynamic(() => import('@prestojs/ui-antd').then(mod => mod.FloatRangeWidget)),
-    // ],
-    // ['ImageField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.ImageWidget))],
-    // ['IntegerField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.IntegerWidget))],
-    // [
-    //     'IntegerRangeField',
-    //     dynamic(() => import('@prestojs/ui-antd').then(mod => mod.IntegerRangeWidget)),
-    // ],
-    // ['IPAddressField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.IPAddressWidget))],
-    // ['JsonField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.JsonWidget))],
-    // ['NumberField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.NumberWidget))],
-    // [
-    //     'NullableBooleanField',
-    //     dynamic(() => import('@prestojs/ui-antd').then(mod => mod.NullableBooleanWidget)),
-    // ],
-    // ['SlugField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.SlugWidget))],
-    // ['TextField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.TextWidget))],
-    // ['TimeField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.TimeWidget))],
-    // ['URLField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.URLWidget))],
-    // ['UUIDField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.UUIDWidget))],
+    // @ts-ignore
+    ['CurrencyField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.CurrencyWidget))],
+    // @ts-ignore
+    ['DateField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DateWidget))],
+    // @ts-ignore
+    ['DateRangeField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DateRangeWidget))],
+    // @ts-ignore
+    ['DateTimeField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DateTimeWidget))],
+    [
+        'DateTimeRangeField',
+        // @ts-ignore
+        dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DateTimeRangeWidget)),
+    ],
+    // @ts-ignore
+    ['DecimalField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DecimalWidget))],
+    // @ts-ignore
+    ['DurationField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.DurationWidget))],
+    // @ts-ignore
+    ['EmailField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.EmailWidget))],
+    // @ts-ignore
+    ['FileField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.FileWidget))],
+    // @ts-ignore
+    ['FloatField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.FloatWidget))],
+    [
+        'FloatRangeField',
+        // @ts-ignore
+        dynamic(() => import('@prestojs/ui-antd').then(mod => mod.FloatRangeWidget)),
+    ],
+    ['ImageField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.ImageWidget))],
+    // @ts-ignore
+    ['IntegerField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.IntegerWidget))],
+    [
+        'IntegerRangeField',
+        // @ts-ignore
+        dynamic(() => import('@prestojs/ui-antd').then(mod => mod.IntegerRangeWidget)),
+    ],
+    // @ts-ignore
+    ['IPAddressField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.IPAddressWidget))],
+    // @ts-ignore
+    ['JsonField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.JsonWidget))],
+    // @ts-ignore
+    ['NumberField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.NumberWidget))],
+    [
+        'NullableBooleanField',
+        dynamic(() => import('@prestojs/ui-antd').then(mod => mod.NullableBooleanWidget)),
+    ],
+    // @ts-ignore
+    ['SlugField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.SlugWidget))],
+    // @ts-ignore
+    ['TextField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.TextWidget))],
+    // @ts-ignore
+    ['TimeField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.TimeWidget))],
+    // @ts-ignore
+    ['URLField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.URLWidget))],
+    // @ts-ignore
+    ['UUIDField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.UUIDWidget))],
 ]);
 
 // choices -> select/radio widgets; only accepting integer(for enum) and char for now - might want to expand to currency type of currency later.
 const choicesMapping = new Map([
+    ['CharField', dynamic(() => import('@prestojs/ui-antd').then(mod => mod.CharChoicesWidget))],
     [
-        'CharField',
-        dynamic(() =>
-            import('@prestojs/ui-antd/widgets/CharChoicesWidget').then(mod => mod.default)
-        ),
+        'IntegerField',
+        dynamic(() => import('@prestojs/ui-antd').then(mod => mod.IntegerChoicesWidget)),
     ],
-    // [
-    //     'IntegerField',
-    //     dynamic(() => import('@prestojs/ui-antd').then(mod => mod.IntegerChoicesWidget)),
-    // ],
 ]);
 
 /*
@@ -78,6 +96,9 @@ export default function getWidgetForField(field) {
                 return [w, { choices: f.choices }];
             }
         } else {
+            if (f.maxLength) {
+                return [w, { maxLength: f.maxLength }];
+            }
             return w;
         }
     };

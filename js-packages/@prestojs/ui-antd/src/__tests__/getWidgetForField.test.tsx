@@ -171,8 +171,8 @@ test.each(
         ) as any;
         let extraProps = {};
         if (Array.isArray(UnknownWidget)) {
-            UnknownWidget = UnknownWidget[0];
             extraProps = UnknownWidget[1];
+            UnknownWidget = UnknownWidget[0];
         }
         const input = { onChange: jest.fn() };
 
@@ -183,7 +183,15 @@ test.each(
                 </AntdUiProvider>
             </React.Suspense>
         );
-        const result = await UnknownWidget._result;
+        const result = await UnknownWidget._payload._result;
         expect(result.default ?? result).toBe(widgetClass);
     }
 );
+
+test('getWidgetForField should pass maxLength to Input fields', async () => {
+    let UnknownWidget = getWidgetForField(new CharField({ maxLength: 10 })) as any;
+    expect(Array.isArray(UnknownWidget)).toBe(true);
+    if (Array.isArray(UnknownWidget)) {
+        expect(UnknownWidget[1]).toEqual({ maxLength: 10 });
+    }
+});

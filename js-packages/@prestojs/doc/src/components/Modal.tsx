@@ -33,7 +33,7 @@ export default function Modal({ children, title, isVisible, onClose }: Props) {
                 portalEl.current = null;
             }
         };
-    }, [isVisible]);
+    }, []);
     if (!isVisible || !portalEl.current) {
         return null;
     }
@@ -53,10 +53,10 @@ export default function Modal({ children, title, isVisible, onClose }: Props) {
                 aria-labelledby="modal-headline"
             >
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <div className="mt-3 text-center sm:mt-0 sm:text-left">
                         <button
                             onClick={() => onClose?.()}
-                            className="text-gray-400 absolute right-2 top-2 hover:text-gray-500"
+                            className="text-gray-400 absolute right-1 top-1 hover:text-gray-500"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"

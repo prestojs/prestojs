@@ -6,9 +6,34 @@ import Field, { FieldProps } from './Field';
 type CharFieldProps = FieldProps<string> & { maxLength?: number };
 
 /**
- * Base class for string fields
+ * Base class for any string based fields (see above for more specific fields).
  *
- * Other char fields (EmailField, URLField...) will extend this.
+ * This class accepts all the props of [Field](doc:Field) as well as the optional
+ * `maxLength` property which can be used by form widgets to limit the accepted
+ * length of the inputted text.
+ *
+ * ### Usage
+ *
+ * Use with [viewModelFactory](doc:viewModelFactory).
+ *
+ * ```js
+ * viewModelFactory({
+ *   id: new Field(),
+ *   fullName: new CharField(),
+ * }, { pkFieldName: 'id' });
+ * ```
+ *
+ * Optionally provide `maxLength` or any options from [Field](doc:Field):
+ *
+ * ```js
+ * viewModelFactory({
+ *   id: new Field(),
+ *   fullName: new CharField({
+ *     maxLength: 50,
+ *     helpText: 'Enter name in 50 characters or less'
+ *   }),
+ * }, { pkFieldName: 'id' });
+ * ```
  *
  * @extract-docs
  * @menu-group Fields

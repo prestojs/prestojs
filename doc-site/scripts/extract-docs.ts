@@ -99,11 +99,20 @@ const exampleFiles = readDirRecursive(examplesDir).reduce((acc, fn) => {
     }
     let source = fs.readFileSync(fn).toString();
     const match = source.match(/\/\*\*(.*)\n[ ]*\*\/(.*)/s);
-    let header = { title: exampleName, description: '' };
+    let header = { title: exampleName, description: '', tags: {} };
     if (match) {
         const headerText = match[1].trim().replace(/^[ ]*\*/gm, '');
         const [title, ...body] = headerText.split('\n');
-        header = { title, description: body.join('\n').trim() };
+        let tags = {};
+        for (let i = body.length - 1; i >= 0; i--) {
+            if (body[i].trim().startsWith('@')) {
+                const [tagName, ...value] = body[i].trim().split(' ').filter(Boolean);
+                tags[tagName.slice(1)] = value.join(' ') || true;
+            } else {
+                break;
+            }
+        }
+        header = { title, description: body.join('\n').trim(), tags };
         source = match[2];
     }
     acc[key].push({
@@ -1100,29 +1109,38 @@ class Converter {
         pageSections.unshift(...(this.extractInPageLinks(docItem, description) || []));
 
         let hierarchy: {
-            parent: ReferenceLinkType | ExternalReferenceType | null;
+            parent: UnknownType | ReferenceLinkType | ExternalReferenceType | null;
+            typeArguments?: DocType[];
             children: (ReferenceLinkType | ExternalReferenceType)[];
         } = {
             parent: null,
             children: [],
         };
         if (docItem.extendedTypes?.length) {
-            // @ts-ignore
-            const referencedType = this.references[docItem.extendedTypes[0]?.id];
-            if (referencedType) {
-                const url = getDocUrl(referencedType);
-                if (url) {
-                    hierarchy.parent = {
-                        typeName: 'referenceLink',
-                        name: referencedType.name,
-                        url,
-                    } as ReferenceLinkType;
+            const extendedType = docItem.extendedTypes[0];
+            if (extendedType.type === 'reference') {
+                const referencedType = extendedType.id ? this.references[extendedType.id] : null;
+                if (referencedType) {
+                    const url = getDocUrl(referencedType);
+                    if (url) {
+                        hierarchy.parent = {
+                            typeName: 'referenceLink',
+                            name: referencedType.name,
+                            url,
+                        } as ReferenceLinkType;
+                    } else {
+                        console.error('Could not find URL for ', referencedType.name);
+                    }
                 } else {
-                    console.error('Could not find URL for ', referencedType.name);
+                    hierarchy.parent = this.convertExternalReference(extendedType);
+                }
+                if (extendedType.typeArguments) {
+                    hierarchy.typeArguments = await Promise.all(
+                        extendedType.typeArguments.map(typeArg => this.convertType(typeArg))
+                    );
                 }
             } else {
-                // @ts-ignore
-                hierarchy.parent = this.convertExternalReference(docItem.extendedTypes[0]);
+                console.error('Extended type is not a reference', extendedType);
             }
         }
         if (docItem.extendedBy?.length) {
@@ -1336,7 +1354,7 @@ async function main() {
         }
         const tmpFile = `./___temp_${pkg}.json`;
         await app.generateJson(project, tmpFile);
-        await app.generateDocs(project, './out');
+        // await app.generateDocs(project, './out');
     }
 
     const children: JSONOutput.DeclarationReflection[] = [

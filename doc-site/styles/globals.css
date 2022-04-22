@@ -25,3 +25,6 @@ html {
    font-weight: bold;
 }
 
+.code-examples dt {
+     @apply font-semibold text-sm;
+}

@@ -61,6 +61,21 @@ function ClassHierarchy({ page }: { page: ClassPage }) {
                 {page.hierarchy.parent && (
                     <li className="list-disc">
                         <Type type={page.hierarchy.parent} />
+                        {page.hierarchy.typeArguments && (
+                            <span>
+                                &lt;
+                                {page.hierarchy.typeArguments.map((t, i) => (
+                                    <span className="text-gray-500" key={i}>
+                                        <Type type={t} />
+                                        {page.hierarchy.typeArguments &&
+                                            i < page.hierarchy.typeArguments.length - 1 && (
+                                                <span className="text-gray-300 mr-1">,</span>
+                                            )}
+                                    </span>
+                                ))}
+                                &gt;
+                            </span>
+                        )}
                     </li>
                 )}
                 <li

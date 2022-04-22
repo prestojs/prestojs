@@ -7,7 +7,7 @@ import CodeBlock from './CodeBlock';
 import Modal from './Modal';
 import PrecompiledMarkdown from './PrecompiledMarkdown';
 
-function CodeExample({ example, language }) {
+function CodeExample({ example, language, forceWide }) {
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const [open, setOpen] = useState(false);
     const [height, setHeight] = useState();
@@ -28,10 +28,14 @@ function CodeExample({ example, language }) {
         return () => window.removeEventListener('message', listener);
     }, []);
     const {
-        header: { title, description },
+        header: { title, description, tags },
     } = example;
     return (
-        <div className="border code-example flex flex-col">
+        <div
+            className={cx('border code-example flex flex-col', {
+                'col-span-2': tags.wide || forceWide,
+            })}
+        >
             <iframe
                 ref={iframeRef}
                 src={example.url}
@@ -45,7 +49,7 @@ function CodeExample({ example, language }) {
             {description && (
                 <div className="px-5 relative border-t mb-5">
                     <h3
-                        className="relative bg-white inline-block px-1 font-semibold"
+                        className="relative bg-white inline-block px-1 font-semibold text-lg"
                         style={{ top: -15 }}
                     >
                         {title}
@@ -108,8 +112,13 @@ export default function CodeExamples({ examples }: { examples: DocExample[] }) {
                     'grid-cols-2': examples.length !== 1,
                 })}
             >
-                {examples.map(example => (
-                    <CodeExample key={example.name} example={example} language={language} />
+                {examples.map((example, i) => (
+                    <CodeExample
+                        key={example.name}
+                        example={example}
+                        language={language}
+                        forceWide={i === examples.length - 1 && i % 2 == 1}
+                    />
                 ))}
             </div>
         </div>

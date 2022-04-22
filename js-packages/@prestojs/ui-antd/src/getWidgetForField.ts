@@ -148,7 +148,7 @@ export default function getWidgetForField<
         }
         if (fieldClassName === 'ListField' && !widget) {
             const [_widget, props] = splitWidgetAndProps(
-                getWidget(((field as unknown) as ListField<any, any>).childField)
+                getWidget((field as unknown as ListField<any, any>).childField)
             );
             if (_widget) {
                 return [_widget, { ...props, multiple: true }];
@@ -165,7 +165,7 @@ export default function getWidgetForField<
     ):
         | FieldWidgetType<FieldValue, T>
         | [FieldWidgetType<FieldValue, T>, Record<string, unknown>] => {
-        if (field.choices || field.asyncChoices) {
+        if (_field.choices || _field.asyncChoices) {
             const finalWidget = Array.isArray(_widget) ? _widget[0] : _widget;
             const props = Array.isArray(_widget) ? _widget[1] : {};
             const finalProps = {
@@ -174,14 +174,24 @@ export default function getWidgetForField<
             };
             // Only set this when necessary to avoid passing props through
             // with undefined value that may make it's way through to the DOM
-            if (field.choices) {
-                finalProps.choices = field.choices;
+            if (_field.choices) {
+                finalProps.choices = _field.choices;
             }
-            if (field.asyncChoices) {
-                finalProps.asyncChoices = field.asyncChoices;
+            if (_field.asyncChoices) {
+                finalProps.asyncChoices = _field.asyncChoices;
             }
             return [finalWidget, finalProps];
         } else {
+            if (
+                widget &&
+                'maxLength' in _field &&
+                (_field as typeof _field & { maxLength: number }).maxLength > 0
+            ) {
+                return [
+                    _widget,
+                    { maxLength: (_field as typeof _field & { maxLength: number }).maxLength },
+                ];
+            }
             return _widget;
         }
     };
