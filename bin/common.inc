@@ -131,9 +131,5 @@ CORE_PYTHON_PACKAGES=(
 repo_dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")"
 
 is_ci="${CI-false}"
-project_dir="$repo_dir/django-testbed/django-root"
-base_dir="$project_dir/django_site"
-static_dir="$repo_dir/assets"
-frontend_dir="$repo_dir/frontend"
 
 cd "$repo_dir"

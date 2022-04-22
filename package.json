@@ -85,7 +85,6 @@
   "husky": {
     "hooks": {
       "pre-commit": "yarn check-types && lint-staged",
-      "pre-push": "LINT_PUSH=1 ./bin/lint/lint-general.py",
       "commit-msg": "./bin/git-hooks/commit-msg $HUSKY_GIT_PARAMS",
       "prepare-commit-msg": "./bin/git-hooks/prepare-commit-msg $HUSKY_GIT_PARAMS"
     }
