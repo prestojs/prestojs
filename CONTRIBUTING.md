@@ -9,27 +9,15 @@
 This is a monorepo. Structure:
 
 * `js-packages` - all packages to be published to NPM go here. Managed with [yarn workspaces](https://yarnpkg.com/lang/en/docs/workspaces/)
-* `python-packages` - all packages to be `pip` installed go here
-* `django-testbed` - clone of the django template project for testing things end to end. all `js-packages` can be imported and any python django apps should be symlinked in `django-root`.
+* `doc-site` - the documentation site published to vercel
 
 ### Releases
-
-#### Javascript 
 
 * All packages are kept in sync to the same version. If 1 package releases all packages do.
 * To bump version run `yarn version`. All packages are kept in sync with the `./bin/sync-workspace-versions.js` command which is run automatically when version is changed.
 * To publish all packages run `yarn release` - this will do a build and release for everything
     * This will prompt you to enter a one time password for 2FA on npm
 
-#### Python
-
-* Publish to pypi
-
-```bash
-cd python-packages/presto_drf
-python3 setup.py sdist bdist_wheel
-python3 -m twine upload dist/*
-```
 
 ### Initial setup
 
@@ -37,12 +25,6 @@ python3 -m twine upload dist/*
 
 ```bash
 yarn install
-```
-
-* Create django virtualenv
-
-```bash
-./bin/init-dev-virtualenv.sh
 ```
 
 ### Installing new dependencies
@@ -63,12 +45,6 @@ django project run this in the root:
 
 ```bash
 yarn dev
-```
-
-Then start a django dev server like normal:
-
-```bash
-./manage.py runserver
 ```
 
 ## Tests

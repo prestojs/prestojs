@@ -1,5 +1,0 @@
-[[plugins]]
-package = "netlify-plugin-cache-nextjs"
-
-	[plugins.inputs]
-	build_dir_path = "doc-site"

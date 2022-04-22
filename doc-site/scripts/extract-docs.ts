@@ -1329,7 +1329,14 @@ async function main() {
     const packagesRoot = path.resolve(repoRoot, 'js-packages/@prestojs/');
 
     for (const pkg of [
-        // 'util', 'viewmodel', 'ui', 'final-form', 'ui-antd', 'routing', 'rest'
+        // 'viewmodel',
+        'util',
+        'viewmodel',
+        'ui',
+        'final-form',
+        'ui-antd',
+        'routing',
+        'rest',
     ]) {
         const app = new TypeDoc.Application();
 
