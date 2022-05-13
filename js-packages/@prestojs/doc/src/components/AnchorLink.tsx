@@ -3,7 +3,10 @@ import React from 'react';
 
 export function generateId(children: string | React.ReactNode) {
     if (typeof children === 'string') {
-        return children.split(' ').join('-');
+        return children
+            .split(' ')
+            .join('-')
+            .replace(/[^a-zA-Z0-9-]/g, '');
     }
     console.warn('You must specify id if children is not a string');
     return '';
@@ -18,7 +21,7 @@ export default function AnchorLink({
 }: {
     children: React.ReactNode;
     component:
-        | React.ComponentType<{ id: string; className: String }>
+        | React.ComponentType<{ id: string; className: string }>
         | 'div'
         | 'h1'
         | 'h2'

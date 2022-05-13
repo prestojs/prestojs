@@ -1,9 +1,11 @@
+import { MDXProvider } from '@mdx-js/react';
+import { mdxComponents } from '@prestojs/doc';
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
 import Layout from '../components/Layout';
 import '../styles/globals.css';
 
-function MyApp({ Component, pageProps, router }: AppProps) {
+function MyApp({ Component, pageProps, router, ...rest }: AppProps) {
     const isExample = router.pathname.startsWith('/examples/');
     useEffect(() => {
         if (isExample && typeof document !== 'undefined') {
@@ -36,12 +38,12 @@ function MyApp({ Component, pageProps, router }: AppProps) {
         );
     }
     return (
-        <>
+        <MDXProvider components={mdxComponents}>
             <Layout>
                 <Component {...pageProps} />
             </Layout>
             <div id="tooltip-container" />
-        </>
+        </MDXProvider>
     );
 }
 

@@ -1,13 +1,13 @@
-import AnchorLink from '@prestojs/doc/components/AnchorLink';
 import cx from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 import { DocExample } from '../newTypes';
+import AnchorLink from './AnchorLink';
 
 import CodeBlock from './CodeBlock';
 import Modal from './Modal';
 import PrecompiledMarkdown from './PrecompiledMarkdown';
 
-function CodeExample({ example, language, forceWide }) {
+export function CodeExample({ example, language, forceWide }) {
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const [open, setOpen] = useState(false);
     const [height, setHeight] = useState();
@@ -30,6 +30,13 @@ function CodeExample({ example, language, forceWide }) {
     const {
         header: { title, description, tags },
     } = example;
+    let minHeight = 100;
+    if (tags['min-height']) {
+        const h = Number(tags['min-height']);
+        if (!Number.isNaN(h)) {
+           minHeight = h;
+        }
+    }
     return (
         <div
             className={cx('border code-example flex flex-col', {
@@ -43,7 +50,7 @@ function CodeExample({ example, language, forceWide }) {
                 className="z-20 mb-5"
                 style={{
                     flex: 1,
-                    minHeight: height ? height : 100,
+                    minHeight: Math.max(minHeight, height || 0),
                 }}
             />
             {description && (

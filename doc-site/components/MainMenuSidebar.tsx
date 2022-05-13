@@ -53,6 +53,33 @@ function SubNavItem({ href, children, as }) {
     );
 }
 
+const gettingStartedMenuItems = [
+    {
+        title: 'Installation',
+        href: '/docs/getting-started/installation',
+    },
+    {
+        title: 'ViewModel & Caching',
+        href: '/docs/getting-started/viewmodel',
+    },
+    {
+        title: 'Async Functions',
+        href: '/docs/getting-started/async-functions',
+    },
+    {
+        title: 'URLs',
+        href: '/docs/getting-started/urls',
+    },
+    {
+        title: 'Data Fetching with REST',
+        href: '/docs/getting-started/rest',
+    },
+    {
+        title: 'Forms',
+        href: '/docs/getting-started/forms',
+    },
+];
+
 const packageLinks = [
     { href: '/docs/viewmodel', title: 'View Model', packageName: 'viewmodel' },
     { href: '/docs/final-form', title: 'Final Form', packageName: 'final-form' },
@@ -73,7 +100,13 @@ export default function MainMenuSidebar({
     onCloseMenu: () => void;
 }) {
     const router = useRouter();
-    const currentPackageName = router.asPath.split('/').filter(Boolean).slice(1).shift() as string;
+    const currentPackageName = router.asPath
+        .split('#')[0]
+        .split('/')
+        .filter(Boolean)
+        .slice(1)
+        .shift() as string;
+    const isGettingStarted = router.pathname.startsWith('/docs/getting-started/');
     const currentMenu = menuByName[currentPackageName];
     className = `lg:block fixed z-50 inset-0 right-auto pb-10 px-8 overflow-y-auto ${className} bg-white`;
     if (!forceOpen) {
@@ -102,7 +135,7 @@ export default function MainMenuSidebar({
                 <nav id="nav" className="lg:text-sm lg:leading-6 relative">
                     <ul>
                         <li className="pb-2">
-                            <NavItem href="/docs/guide">
+                            <NavItem href="/docs/getting-started/installation">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-4 w-4 mr-1"
@@ -119,9 +152,20 @@ export default function MainMenuSidebar({
                                 </svg>
                                 Getting Started
                             </NavItem>
+                            {isGettingStarted && (
+                                <ul>
+                                    {gettingStartedMenuItems.map(item => (
+                                        <li className="pl-5" key={item.href}>
+                                            <SubNavItem href={item.href} as={item.href}>
+                                                {item.title}
+                                            </SubNavItem>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </li>
                         <li className="pb-2">
-                            <NavItem href="/docs/tutorial">
+                            <NavItem href="/docs/guides">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-4 w-4 mr-1"
@@ -136,7 +180,7 @@ export default function MainMenuSidebar({
                                         d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
                                     />
                                 </svg>
-                                Tutorial
+                                Guides
                             </NavItem>
                         </li>
                         <li className="mb-2 font-semibold text-gray-600 border-b">

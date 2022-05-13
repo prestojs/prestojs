@@ -143,7 +143,7 @@ export default function TypeTable({
                 },
             ]}
             data={parameters}
-            rowKey="id"
+            rowKey="name"
         />
     );
 }

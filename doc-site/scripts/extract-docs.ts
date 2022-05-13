@@ -63,7 +63,7 @@ function makeDocLinksPlugin(docsJson) {
                     }
                     node.url = url;
                 } else {
-                    // console.warn(`${node.url} does not match the name of any documented item`);
+                    console.warn(`${node.url} does not match the name of any documented item`);
                 }
             }
         });
@@ -98,22 +98,27 @@ const exampleFiles = readDirRecursive(examplesDir).reduce((acc, fn) => {
         acc[key] = [];
     }
     let source = fs.readFileSync(fn).toString();
-    const match = source.match(/\/\*\*(.*)\n[ ]*\*\/(.*)/s);
+    const match = source.match(/^\/\*\*(.*)\n(( \*.*\n)*) \*\/((.*\n)*)/)
     let header = { title: exampleName, description: '', tags: {} };
     if (match) {
-        const headerText = match[1].trim().replace(/^[ ]*\*/gm, '');
+        const headerText = match[2].trim().replace(/^[ ]*\*/gm, '');
         const [title, ...body] = headerText.split('\n');
+        if (fn.includes('DateField') && exampleName === 'form-usage') {
+            console.log(headerText)
+        }
         let tags = {};
-        for (let i = body.length - 1; i >= 0; i--) {
+        const l = body.length - 1;
+        for (let i = l; i >= 0; i--) {
             if (body[i].trim().startsWith('@')) {
-                const [tagName, ...value] = body[i].trim().split(' ').filter(Boolean);
+                const line = body.pop() as string;
+                const [tagName, ...value] = line.trim().split(' ').filter(Boolean);
                 tags[tagName.slice(1)] = value.join(' ') || true;
             } else {
                 break;
             }
         }
         header = { title, description: body.join('\n').trim(), tags };
-        source = match[2];
+        source = match[4];
     }
     acc[key].push({
         name: exampleName,

@@ -36,27 +36,6 @@ else
 	}
 fi
 
-function require_virtualenv() {
-	local virtualenvs_dir
-
-	# validate that a virtualenv is active and if not, try to activate it
-	if [ "$VIRTUAL_ENV" = "" ] ; then
-		virtualenvs_dir=${WORKON_HOME:-${VIRTUALENVWRAPPER_HOOK_DIR:-~/.virtualenvs}}
-		if [[ $( type -t workon ) = "function" ]] ; then
-			workon "$(<.venv)"
-		elif [[ -e "$virtualenvs_dir/$(<.venv)/bin/activate" ]] ; then
-			source "$virtualenvs_dir/$(<.venv)/bin/activate"
-		elif [[ -e venv/bin/activate ]] ; then
-			source venv/bin/activate
-		elif [[ -e .venv/bin/activate ]] ; then
-			source .venv/bin/activate
-		else
-			fail "No virtualenv is active (and couldn't find the right one)"
-		fi
-
-	fi
-}
-
 function require_nodejs() {
 	local node_ver_active
 	# Check the version of nodejs in use

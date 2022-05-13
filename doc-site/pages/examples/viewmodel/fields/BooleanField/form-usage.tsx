@@ -13,6 +13,7 @@
 import { Form } from '@prestojs/final-form';
 import { AntdUiProvider, FormItemWrapper, FormWrapper } from '@prestojs/ui-antd';
 import { BooleanField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
+import { Button } from 'antd';
 import 'antd/dist/antd.min.css';
 import React from 'react'; // TODO: in react18 you can just use `getWidgetForField` from '@prestojs/ui-antd' (just wrap below in React.Suspense)
 import getWidgetForField from '../../../../../getWidgetForField';
@@ -46,6 +47,9 @@ export default function FormUsage() {
                         field={ExampleModel.fields.receiveNewsletter}
                         fieldProps={{ type: 'checkbox' }}
                     />
+                    <Form.Item wrapperCol={{ offset: 6 }}>
+                        <Button type="primary" htmlType="submit">Submit (check console)</Button>
+                    </Form.Item>
                 </Form>
             </div>
         </AntdUiProvider>

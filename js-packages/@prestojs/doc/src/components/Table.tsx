@@ -43,28 +43,33 @@ export default function Table<T>({
                 </tr>
             </thead>
             <tbody>
-                {data.map(datum => (
-                    <tr key={datum[rowKey]}>
-                        {resolvedColumns
-                            .filter(column => !column.shouldExclude?.(datum))
-                            .map(column => {
-                                const value = datum[column.key];
-                                let className = column.className;
-                                if (typeof className === 'function') {
-                                    className = className(datum);
-                                }
-                                return (
-                                    <td
-                                        className={`p-2 border-t align-top ${className || ''}`}
-                                        key={column.key}
-                                        colSpan={column.colSpan?.(datum) || 1}
-                                    >
-                                        {column.render ? column.render(value, datum) : value}
-                                    </td>
-                                );
-                            })}
-                    </tr>
-                ))}
+                {data.map(datum => {
+                    if (!(rowKey in datum)) {
+                        console.warn(`Missing rowKey '${rowKey}' for row`, datum);
+                    }
+                    return (
+                        <tr key={datum[rowKey]}>
+                            {resolvedColumns
+                                .filter(column => !column.shouldExclude?.(datum))
+                                .map(column => {
+                                    const value = datum[column.key];
+                                    let className = column.className;
+                                    if (typeof className === 'function') {
+                                        className = className(datum);
+                                    }
+                                    return (
+                                        <td
+                                            className={`p-2 border-t align-top ${className || ''}`}
+                                            key={column.key}
+                                            colSpan={column.colSpan?.(datum) || 1}
+                                        >
+                                            {column.render ? column.render(value, datum) : value}
+                                        </td>
+                                    );
+                                })}
+                        </tr>
+                    );
+                })}
             </tbody>
         </table>
     );

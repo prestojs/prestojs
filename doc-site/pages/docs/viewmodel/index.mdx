@@ -1,1 +1,56 @@
+import MdxPage from '../../../components/MdxPage';
+
+export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
+
 # View Model
+
+In Presto a _ViewModel_ is a class that defines the list of
+fields & some metadata for some piece of data (eg. a record from a single database table, some data joined from multiple
+data sources, a form filled out by a user etc).
+
+It's not specific to a backend implementation rather it's concerned with describing what the data is so that a UI can be
+generated from it & transformations can be done on the data (eg. from user input to specific format or vice versa).
+
+This package provides the core functionality for defining a [ViewModel](doc:viewModelFactory) and using them with a [ViewModelCache](doc:ViewModelCache).
+
+---
+
+## Installation
+
+Install the packages from npm
+
+```bash
+yarn add @prestojs/util @prestojs/viewmodel
+```
+
+## Usage
+
+Create a `ViewModel` using [viewModelFactory](doc:viewModelFactory), for example:
+
+```js
+import { BooleanField, CharField, EmailField, viewModelFactory } from '@prestojs/viewmodel';
+
+export class User extends viewModelFactory(
+    {
+        id: new NumberField(),
+        firstName: new CharField(),
+        lastName: new CharField(),
+        email: new EmailField(),
+        isActive: new BooleanField({ label: 'Active?' }),
+        contactType: new CharField({
+            defaultValue: 'lead',
+            choices: [
+                ['lead', 'Lead'],
+                ['contact', 'Contact'],
+            ],
+        }),
+    },
+    { pkFieldName: 'id' }
+) {
+    static label = 'User';
+    static labelPlural = 'Users';
+}
+```
+
+You can cache instances with [ViewModelCache](doc:ViewModelCache) and read from the cache in
+components using [useViewModelCache](doc:useViewModelCache).

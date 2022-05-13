@@ -28,3 +28,22 @@ html {
 .code-examples dt {
      @apply font-semibold text-sm;
 }
+
+.mdx h1 {
+   @apply text-3xl;
+}
+.mdx h1:first-child {
+   @apply mt-0;
+}
+.mdx h2 {
+   @apply text-2xl mb-4 mt-8;
+}
+.mdx h2:where(hr+*) {
+   margin-top: 0;
+}
+.mdx h3 {
+   @apply text-xl;
+}
+.mdx hr {
+   @apply my-10;
+}

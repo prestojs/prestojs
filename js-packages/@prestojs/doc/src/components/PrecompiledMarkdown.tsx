@@ -1,7 +1,8 @@
 import { run } from '@mdx-js/mdx';
+import cx from 'classnames';
 import React, { Fragment, useEffect, useState } from 'react';
 import * as runtime from 'react/jsx-runtime';
-import AnchorLink from './AnchorLink';
+import AnchorLink, { generateId } from './AnchorLink';
 import CodeBlock from './CodeBlock';
 
 const Paragraph = (props): React.ReactElement => <p {...props} className="mb-6" />;
@@ -15,7 +16,6 @@ const Code = (props): React.ReactElement => {
 const Alert = ({
     type = 'warning',
     children,
-    ...rest
 }: {
     type: 'warning' | 'info' | 'danger';
     children: React.ReactNode;
@@ -36,23 +36,32 @@ const Alert = ({
 function Heading({
     component,
     children,
+    className,
 }: {
+    className?: string;
     component: 'h1' | 'h2' | 'h3' | 'h4';
     children: string;
 }) {
-    const id = children.split(' ').join('-');
+    const id = generateId(children);
     return (
-        <AnchorLink component={component} id={id} className=" font-bold my-4">
+        <AnchorLink component={component} id={id} className={cx('font-bold my-4', className)}>
             {children}
         </AnchorLink>
     );
 }
 
-const mdxComponents = {
+export const mdxComponents = {
+    wrapper: props => <span className="mdx" {...props} />,
     p: Paragraph,
     code: Code,
     ul: props => <ul className="m-5" {...props} />,
     li: props => <li className="m-1 list-disc" {...props} />,
+    h1: props => {
+        if (typeof props.children != 'string') {
+            return <h1 {...props} />;
+        }
+        return <Heading component="h1">{props.children}</Heading>;
+    },
     h2: props => {
         if (typeof props.children != 'string') {
             return <h2 {...props} />;
@@ -61,9 +70,9 @@ const mdxComponents = {
     },
     h3: props => {
         if (typeof props.children != 'string') {
-            return <h2 {...props} />;
+            return <h3 {...props} />;
         }
-        return <Heading component="h2">{props.children}</Heading>;
+        return <Heading component="h3">{props.children}</Heading>;
     },
     blockquote: Alert,
     Alert,
