@@ -1,14 +1,13 @@
 import Field from './Field';
 
-/*
- * Date Field.
+/**
+ * A date is stored as javascript [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
+ * object. As a `Date` always has a time component the only difference between `DateField` and [DateTimeField](doc:DateTimeField)
+ * is how it's handled by formatters or widgets. For example [DateFormatter](doc:DateFormatter) will only
+ * display the date component and ignore the time component.
  *
- * The basic javascript Date type is consumed and spitted out by this field. All third party libraries, such as Moment, should be compatible
- * as regardless of how they implement, the underlying base instance will always be Date.
- *
- * Invalid dates are treated as Null. Does not truncate "time" part for a datetime passed in - if necessary, truncate in UI components.
- *
- * TODO: Format for Date Field should spit out ISO8601 date string by default.
+ * This field supports either a [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
+ * or a string that will be parsed with [Date.parse()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse).
  *
  * @extract-docs
  * @menu-group Fields

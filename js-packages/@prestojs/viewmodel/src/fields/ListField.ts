@@ -18,6 +18,8 @@ import Field, { FieldProps } from './Field';
  *
  * @extract-docs
  * @menu-group Fields
+ * @typeParam T The value of each element in the list
+ * @typeParam ParsableType This the type the field knows how to parse into `ValueType` when constructing a `ViewModel`.
  */
 export default class ListField<T, ParsableType = T> extends Field<T[], ParsableType[], T> {
     static fieldClassName = 'ListField';
@@ -34,7 +36,12 @@ export default class ListField<T, ParsableType = T> extends Field<T[], ParsableT
         // If `blankAsNull` is set we instead default to `null` to bypass this.
         defaultValue = blankAsNull ? null : [],
         ...rest
-    }: { childField: Field<T, ParsableType> } & FieldProps<T[], T>) {
+    }: {
+        /**
+         * The underlying field used for each value in the list
+         */
+        childField: Field<T, ParsableType>;
+    } & FieldProps<T[], T>) {
         super({ ...rest, blankAsNull, defaultValue });
         this.childField = childField;
         this.choices = childField.choices;

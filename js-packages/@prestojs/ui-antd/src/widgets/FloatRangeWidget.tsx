@@ -7,7 +7,7 @@ import RangeWidget from './RangeWidget';
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
  *
- * As with all range widgets, ref should be shaped as { lowerRef: Ref(), upperRef: Ref() }
+ * As with all range widgets, ref should be shaped as `{ lowerRef: Ref(), upperRef: Ref() }`
  *
  * You may pass in props to be used for the individual input as lowerInput / upperInput
  *
@@ -19,7 +19,7 @@ function FloatRangeWidget(
     props: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
     ref: React.RefObject<typeof InputNumber>
 ): React.ReactElement {
-    const { lowerInput={}, upperInput={}, separator, meta, ...rest } = props;
+    const { lowerInput = {}, upperInput = {}, separator, meta, ...rest } = props;
     return (
         <RangeWidget
             ref={ref}

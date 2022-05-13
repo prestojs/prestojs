@@ -167,7 +167,7 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  * that isn't yet defined.
  *
  * ```js
- * const middleware = viewModelCachingMiddleware(() => {
+ * const middleware = viewModelCachingMiddleware(async () => {
  *   const Booking = (await import('./Booking')).default;
  *   return {
  *     "records.users": User,

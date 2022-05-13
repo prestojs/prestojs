@@ -23,6 +23,7 @@ type BatchKey = any;
 
 /**
  * @expand-properties
+ * @export-in-docs
  */
 type BatchMiddlewareOptions<BatchCallReturn, IndividualResult> = {
     /**
@@ -101,10 +102,8 @@ type QueueItem<T> = {
 };
 
 class BatchMiddleware<BatchCallReturn, IndividualResult> {
-    queueMap: Map<
-        BatchKey,
-        { isPending: boolean; queue: QueueItem<IndividualResult>[] }
-    > = new Map();
+    queueMap: Map<BatchKey, { isPending: boolean; queue: QueueItem<IndividualResult>[] }> =
+        new Map();
     getBatchKey: (call: EndpointCall<IndividualResult>) => false | BatchKey;
     execute: (calls: EndpointCall<IndividualResult>[], batchKey: BatchKey) => Promise<Response>;
     resolve: (

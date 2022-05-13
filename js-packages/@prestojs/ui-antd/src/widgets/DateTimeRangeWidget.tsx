@@ -8,7 +8,7 @@ import RangeWidget from './RangeWidget';
 /**
  * See [DatePicker](https://ant.design/components/date-picker/) for props available
  *
- * As with all range widgets, ref should be shaped as { lowerRef: Ref(), upperRef: Ref() }
+ * As with all range widgets, ref should be shaped as `{ lowerRef: Ref(), upperRef: Ref() }`
  *
  * You may pass in props to be used for the individual input as lowerInput / upperInput
  *

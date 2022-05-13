@@ -155,7 +155,7 @@ export default class CursorPaginator extends Paginator<
         }
     }
 
-    getRequestInit({ query, ...options }): PaginatorRequestOptions {
+    getRequestInit({ query, ...options }: PaginatorRequestOptions): PaginatorRequestOptions {
         const newQuery = { ...query };
         if (this.currentState.pageSize) {
             newQuery.pageSize = this.currentState.pageSize;
@@ -203,11 +203,15 @@ export default class CursorPaginator extends Paginator<
 
     /**
      * Expected pagination state in the shape:
+     *
+     * ```json
      * {
      *     next: null|'http://example.com/?cursor=abc123',
      *     previous: null|'http://example.com/?cursor=abc123',
      *     results: Array
      * }
+     * ```
+     *
      * @param requestDetails
      */
     static getPaginationState(

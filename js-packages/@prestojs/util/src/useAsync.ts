@@ -75,8 +75,10 @@ const DEEP = 'DEEP';
 
 /**
  * @expand-properties
+ * @typeParam ResultT @inherit
+ * @typeParam ErrorT @inherit
  */
-export type UseAsyncOptions = {
+export interface UseAsyncOptions<ResultT, ErrorT> {
     /**
      * Determines when the function is called. Defaults to `MANUAL`.
      *
@@ -106,8 +108,8 @@ export type UseAsyncOptions = {
      */
     args?: Array<any>;
     /**
-     * Called when action resolves successfully. Is passed a single parameter which
-     * is the result from the async action.
+     * Called when async function resolves successfully. Is passed a single parameter which
+     * is the result from the async function.
      *
      * **NOTE:** If your component unmounts before the promise resolves this function
      * will NOT be called. This is to avoid the general case of calling React
@@ -115,20 +117,45 @@ export type UseAsyncOptions = {
      * method to be called regardless then attach your own callbacks to the
      * promise when you call `run` or in the async function definition itself.
      */
-    onSuccess?: (result: {}) => void;
+    onSuccess?: OnSuccess<ResultT>;
     /**
-     * Called when action errors. Passed the error returned from async action.
+     * Called when async function errors. Passed the error returned from async function.
      *
      * See note above on `onSuccess` for behaviour when component has unmounted.
      */
-    onError?: (error: Error) => void;
-};
+    onError?: OnError<ErrorT>;
+}
+
+/**
+ * @export-in-docs
+ * @typeParam ResultT @inherit
+ */
+interface OnSuccess<ResultT> {
+    (result: ResultT): void;
+}
+
+/**
+ * @export-in-docs
+ * @typeParam ErrorT @inherit
+ */
+interface OnError<ErrorT> {
+    /**
+     * Called when the async function errors
+     *
+     * @param error The error thrown by the async function
+     */
+    (error: ErrorT): void;
+}
 
 const validOptionKeys = ['trigger', 'args', 'onSuccess', 'onError'];
 
+/**
+ * @typeParam ResultT @inherit
+ * @typeParam ErrorT @inherit
+ */
 export type UseAsyncReturnObject<ResultT, ErrorT> = {
     /**
-     * True when action is in progress.
+     * True when async call is in progress.
      */
     isLoading: boolean;
     /**
@@ -149,18 +176,18 @@ export type UseAsyncReturnObject<ResultT, ErrorT> = {
      */
     response: ResultT | null;
     /**
-     * A function to manually trigger the action. If `options.trigger` is `useAsync.MANUAL`
-     * calling this function is the only way to trigger the action. You can pass
+     * A function to manually trigger the function. If `options.trigger` is `useAsync.MANUAL`
+     * calling this function is the only way to trigger the function. You can pass
      * arguments to `run` which will override the defaults. If no arguments are passed then
      * `options.args` will be passed by default (if supplied).
      *
      * This function will return a promise that resolves/rejects to same value
-     * resolved/rejected from the async action.
+     * resolved/rejected from the async function.
      */
     run: (...args) => Promise<ResultT>;
     /**
      * When called will set both result or error to null. Will not immediately trigger
-     * a call to the action but subsequent changes to `fn` or `options.args` will
+     * a call to the function but subsequent changes to `fn` or `options.args` will
      * according to the value of `trigger`.
      */
     reset: () => void;
@@ -232,12 +259,14 @@ const comparisonByTrigger = {
  * in your component or hook. To help detect runaway effects caused by this automatically
  * consider using [stop-runaway-react-effects](https://github.com/kentcdodds/stop-runaway-react-effects).
  *
+ * @typeParam ResultT The type of the result returned by `fn`.
+ * @typeParam ErrorT The type of the error in the case the promise returned by `fn` rejects
  *
  * @extract-docs
  */
 function useAsync<ResultT, ErrorT = Error>(
     fn: (...args: Array<any>) => Promise<ResultT>,
-    options: UseAsyncOptions = {}
+    options: UseAsyncOptions<ResultT, ErrorT> = {}
 ): UseAsyncReturnObject<ResultT, ErrorT> {
     const { trigger = MANUAL, args = [], onSuccess, onError } = options;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -300,61 +329,65 @@ function useAsync<ResultT, ErrorT = Error>(
     // Note that this function is never recreated - it's cached once with
     // useCallback and from that point on should have consistent identity.
     // It either gets passed the arguments or reads then from a ref at call time.
-    const execute = useCallback((
-        executeFn,
-        executeArgs,
-        // When execute is called read the current value for onSuccess and
-        // onError. This allows for nicer ergonomics by allowing inline
-        // arrow functions to be passed without triggering the function
-        // when trigger is not MANUAL. Without doing it this way it would
-        // need to be a dependency on the initial fetch useEffect below and
-        // as such would trigger a re-execute whenever it changed.
-        executeOnSuccess = lastValues.current.onSuccess,
-        executeOnError = lastValues.current.onError
-    ): [Promise<any>, () => void] => {
-        let isCurrent = true;
-        const currentCallId = callId.current;
-        callId.current += 1;
-        // Avoid possibility of overflow
-        if (callId.current > 100000) {
-            callId.current = 0;
-        }
-        dispatch({ type: 'start', id: currentCallId });
-        const promise = executeFn(...executeArgs);
-        if (!isPromise(promise)) {
-            const message = 'useAsync can only be used with functions that return a Promise. Got: ';
-            // eslint-disable-next-line no-console
-            console.error(message, promise);
-            throw new Error(message);
-        }
-        promise.then(
-            result => {
-                if (!isCurrent) {
-                    return;
-                }
-                dispatch({ type: 'success', payload: result });
-                if (executeOnSuccess) {
-                    executeOnSuccess(result);
-                }
-            },
-            e => {
-                if (!isCurrent) {
-                    return;
-                }
-                dispatch({ type: 'error', payload: e });
-                if (executeOnError) {
-                    executeOnError(e);
-                }
+    const execute = useCallback(
+        (
+            executeFn,
+            executeArgs,
+            // When execute is called read the current value for onSuccess and
+            // onError. This allows for nicer ergonomics by allowing inline
+            // arrow functions to be passed without triggering the function
+            // when trigger is not MANUAL. Without doing it this way it would
+            // need to be a dependency on the initial fetch useEffect below and
+            // as such would trigger a re-execute whenever it changed.
+            executeOnSuccess = lastValues.current.onSuccess,
+            executeOnError = lastValues.current.onError
+        ): [Promise<any>, () => void] => {
+            let isCurrent = true;
+            const currentCallId = callId.current;
+            callId.current += 1;
+            // Avoid possibility of overflow
+            if (callId.current > 100000) {
+                callId.current = 0;
             }
-        );
-        return [
-            promise,
-            (): void => {
-                dispatch({ type: 'abort', id: currentCallId });
-                isCurrent = false;
-            },
-        ];
-    }, []);
+            dispatch({ type: 'start', id: currentCallId });
+            const promise = executeFn(...executeArgs);
+            if (!isPromise(promise)) {
+                const message =
+                    'useAsync can only be used with functions that return a Promise. Got: ';
+                // eslint-disable-next-line no-console
+                console.error(message, promise);
+                throw new Error(message);
+            }
+            promise.then(
+                result => {
+                    if (!isCurrent) {
+                        return;
+                    }
+                    dispatch({ type: 'success', payload: result });
+                    if (executeOnSuccess) {
+                        executeOnSuccess(result);
+                    }
+                },
+                e => {
+                    if (!isCurrent) {
+                        return;
+                    }
+                    dispatch({ type: 'error', payload: e });
+                    if (executeOnError) {
+                        executeOnError(e);
+                    }
+                }
+            );
+            return [
+                promise,
+                (): void => {
+                    dispatch({ type: 'abort', id: currentCallId });
+                    isCurrent = false;
+                },
+            ];
+        },
+        []
+    );
     // =========================================================================
 
     // abortRef is used by execute to store an abort function so that if the

@@ -2,7 +2,7 @@ import CharField from './CharField';
 
 export type JSON<T> = string & { ' __JSON': T };
 
-/*
+/**
  * JSON Field.
  *
  * Parses valid json string into json objects. Invalid input will be treated as if they're already an object and returned as is.
