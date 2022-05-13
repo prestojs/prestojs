@@ -121,9 +121,6 @@ const exampleFiles = readDirRecursive(examplesDir).reduce((acc, fn) => {
     if (match) {
         const headerText = match[2].trim().replace(/^[ ]*\*/gm, '');
         const [title, ...body] = headerText.split('\n');
-        if (fn.includes('DateField') && exampleName === 'form-usage') {
-            console.log(headerText);
-        }
         let tags = {};
         const l = body.length - 1;
         for (let i = l; i >= 0; i--) {
@@ -267,12 +264,15 @@ class Converter {
     references: Record<string, JSONOutput.DeclarationReflection>;
     docLinks: any;
     examples?: DocExample[];
+    pathMap: Map<JSONOutput.DeclarationReflection, JSONOutput.DeclarationReflection[]>;
 
     constructor(
         references: Record<string, JSONOutput.DeclarationReflection>,
         docLinks,
-        examples?: DocExample[]
+        pathMap: Map<JSONOutput.DeclarationReflection, JSONOutput.DeclarationReflection[]>,
+        examples?: DocExample[],
     ) {
+        this.pathMap = pathMap;
         this.docLinks = docLinks;
         this.references = references;
         this.examples = examples;
@@ -390,7 +390,6 @@ class Converter {
                 // console.warn('Missing referenced type', type.typeArguments[0]);
             }
         }
-        // console.log('BLAH WOW', { type });
     }
 
     resolveChildren(
@@ -508,7 +507,7 @@ class Converter {
             if (docItem.kindString === 'Class' || docItem.kindString === 'Interface') {
                 return await this.convertClass(docItem);
             }
-            console.log(docItem.kindString);
+            console.log('Failed to find', docItem.kindString);
         });
     }
 
@@ -602,7 +601,7 @@ class Converter {
                 const children = this.resolveChildren(declaration);
                 if (children) {
                     return this.withTypeParameter(declaration.typeParameter, () =>
-                        this.createContainerType(children, declaration.name)
+                        this.createContainerType(children, declaration)
                     );
                 }
             }
@@ -615,13 +614,13 @@ class Converter {
                 }
                 return {
                     typeName: 'unknown',
-                    name: type.declaration.name,
+                    name: this.resolveName(type.declaration),
                 };
             }
         }
         if (type.type === 'intersection') {
             const children: JSONOutput.DeclarationReflection[] = this.resolveChildrenFromType(type);
-            return this.createContainerType(children, sourceDeclaration?.name);
+            return this.createContainerType(children, sourceDeclaration);
         }
         if (type.type === 'literal') {
             return {
@@ -721,6 +720,33 @@ class Converter {
         return transformed;
     }
 
+    fixUnnamedFunction<T extends DocType>(type: T, dec: JSONOutput.DeclarationReflection): T{
+        // This is where parameter like:
+        // isEquals: (a, b) => boolean
+        // The function def will get __type as the name so when we render it
+        // in modal it looks bad. Render is as isEquals instead
+        if (type.typeName === 'methodType' && type.name === '__type') {
+            const path = this.pathMap.get(dec)
+            if (path) {
+                for (let i = path.length - 1; i >= 0; i--) {
+                    if (path[i].name && path[i].name !== type.name) {
+                        type.name = path[i].name;
+                        break;
+                    }
+                }
+                type.signatures.forEach(sig => {
+                    if (sig.name === '__type') {
+                        sig.name = type.name;
+                        sig.anchorId = sig.anchorId.replace('__type', type.name)
+                    }
+                })
+            }
+        } else if (type.typeName === 'union') {
+            type.types.forEach(t => this.fixUnnamedFunction(t, dec));
+        }
+        return type
+    }
+
     async convertSignature(signature: JSONOutput.SignatureReflection): Promise<Signature> {
         return {
             ...(await this.createNode(signature, 'Method')),
@@ -728,9 +754,10 @@ class Converter {
                 (signature.parameters || []).map(async param => {
                     const type = await this.convertType(param.type, param);
                     const resolvedType = this.resolveReferencedType(param);
+                    const name = param.name === '__namedParameters' ? 'props' : param.name
                     return {
-                        name: param.name,
-                        type,
+                        name,
+                        type: this.fixUnnamedFunction(type, param),
                         description: await this.convertComment({
                             ...resolvedType.comment,
                             ...param.comment,
@@ -788,7 +815,7 @@ class Converter {
     resolvedContainers = new Map<JSONOutput.DeclarationReflection[], ContainerType>();
     async createContainerType(
         children: JSONOutput.DeclarationReflection[],
-        name?: string
+        source?: JSONOutput.DeclarationReflection
     ): Promise<ContainerType> {
         const resolved = this.resolvedContainers.get(children);
         if (resolved) {
@@ -796,7 +823,7 @@ class Converter {
         }
         const obj: ContainerType = {
             typeName: 'container',
-            name: name,
+            name: source ? this.resolveName(source) : undefined,
             children: [],
         };
         this.resolvedContainers.set(children, obj);
@@ -828,7 +855,6 @@ class Converter {
                         } else {
                             const tag = getTagByName(originalChild, 'type-name');
                             if (tag) {
-                                console.log('wow', tag);
                                 childType = {
                                     typeName: 'unknown',
                                     name: tag.text.trim(),
@@ -851,7 +877,7 @@ class Converter {
                         return {
                             name: originalChild.name,
                             flags: await this.convertFlags(originalChild),
-                            type: childType,
+                            type: this.fixUnnamedFunction(childType, originalChild),
                             description: await this.convertComment(comment || child.comment),
                         };
                     });
@@ -862,11 +888,11 @@ class Converter {
     }
 
     async createMethodType(child: JSONOutput.DeclarationReflection): Promise<MethodType> {
-        return {
+        return this.fixUnnamedFunction({
             name: child.name,
             typeName: 'methodType',
             signatures: await this.convertSignatures(child.signatures || []),
-        };
+        }, child);
     }
 
     private resolveReferencedType(declaration: JSONOutput.DeclarationReflection) {
@@ -936,7 +962,6 @@ class Converter {
                 url: this.externalReferences[type.name],
             };
         }
-        // console.log(type.name, 'is not an external reference');
         return {
             typeName: 'unknown',
             name: type.name,
@@ -1217,11 +1242,11 @@ class Converter {
     }
 
     private async convertClassMethod(m: JSONOutput.DeclarationReflection) {
-        return {
+        return this.fixUnnamedFunction({
             typeName: 'methodType',
             name: m.name,
             signatures: await this.convertSignatures(m.signatures || []),
-        };
+        }, m);
     }
 
     resolvedReferenceTypes = new Map<number, DocType>();
@@ -1252,7 +1277,7 @@ class Converter {
                 } else if (this.shouldExpand(referencedType)) {
                     const children = this.resolveChildren(referencedType);
                     if (children) {
-                        return this.createContainerType(children, referencedType.name);
+                        return this.createContainerType(children, referencedType);
                     }
                 }
                 if (!referencedType.type) {
@@ -1323,6 +1348,28 @@ class Converter {
         }
         return undefined;
     }
+
+    private resolveName(declaration: JSONOutput.DeclarationReflection | undefined) {
+        if (!declaration) {
+            return '<unknown>';
+        }
+        let name = declaration.name;
+        if (name === '__type' && declaration) {
+            const path = this.pathMap.get(declaration)
+            if (path) {
+                for (let i = path.length - 1; i >= 0; i--) {
+                    if (path[i].name && path[i].name !== name) {
+                        name = path[i].name;
+                        break;
+                    }
+                }
+            }
+        }
+         if (name === '__namedParameters') {
+            name = 'Object';
+        }
+        return name;
+    }
 }
 
 function getMenuGroup(docItem: DeclarationReflection) {
@@ -1334,7 +1381,6 @@ async function main() {
     const packagesRoot = path.resolve(repoRoot, 'js-packages/@prestojs/');
 
     for (const pkg of [
-        // 'viewmodel',
         'util',
         'viewmodel',
         'ui',
@@ -1394,12 +1440,6 @@ async function main() {
     }
     const docLinks = makeDocLinksPlugin(byName);
     const visitedTracker = new Map();
-    function getName(obj) {
-        if (obj.name === 'default' && obj.type === 'reference' && byId[obj.id]) {
-            return getName(byId[obj.id]);
-        }
-        return obj.name;
-    }
     for (const docItem of declarations) {
         let comment = docItem.comment;
         if (
@@ -1414,22 +1454,27 @@ async function main() {
         }
 
         const references = {};
+        const pathMap = new Map<JSONOutput.DeclarationReflection, JSONOutput.DeclarationReflection[]>()
+        const defaultNameMapping = {
+            urlPattern: 'UrlPattern',
+            field: 'Field',
+        }
         const fn = async (obj, path) => {
+            pathMap.set(obj, path)
             if (obj.type === 'reference' && !obj.id) {
+                if (obj.name === 'default') {
+                    const parent =path[path.length - 1]
+                    if (parent && defaultNameMapping[parent.name]) {
+                        obj.name = defaultNameMapping[parent.name]
+                    }
+                }
                 if (byName[obj.name]) {
-                    obj.id = byName[obj.name].id;
+                    if (obj.name !== 'default') {
+                        obj.id = byName[obj.name].id;
+                    } else {
+                        console.log("Reference had name of 'default' and so couldn't be resolved", obj, path[path.length - 1])
+                    }
                 }
-            }
-            if (obj.name === 'default' && obj.type === 'reference' && byId[obj.id]) {
-                obj.name = getName(obj);
-            }
-            let { comment, signatures } = obj;
-            if (obj.name === '__namedParameters') {
-                obj.name = 'props';
-                if (!obj.docFlags) {
-                    obj.docFlags = {};
-                }
-                obj.docFlags.expandProperties = true;
             }
             if (obj.name === '__type' && path.length) {
                 // This is where parameter like:
@@ -1438,85 +1483,9 @@ async function main() {
                 // in modal it looks bad. Render is as isEquals instead
                 for (let i = path.length - 1; i >= 0; i--) {
                     if (path[i].name && path[i].name !== obj.name) {
-                        obj.name = path[i].name;
+                        // obj.name = path[i].name;
                         break;
                     }
-                }
-            }
-            const getGroup = () => {
-                const groups = path[path.length - 1]?.groups || [];
-                return groups.find(group => group.children.includes(obj.id));
-            };
-            if (signatures) {
-                const group = getGroup();
-                signatures.forEach((signature, i) => {
-                    if (!comment && signature.comment) {
-                        comment = signature.comment;
-                    }
-                    let anchorId = signature.name.replace(' ', '-');
-                    if (group) {
-                        anchorId = `${group.title}-${anchorId}`;
-                    }
-                    if (i > 0) {
-                        anchorId += `-${i}`;
-                    }
-                    signature.anchorId = anchorId;
-                });
-            } else if (obj.id && obj.flags) {
-                const group = getGroup();
-                let anchorId = obj.name.split(' ').join('-');
-                if (group) {
-                    anchorId = `${group.title}-${anchorId}`;
-                } else if (obj.kindString) {
-                    anchorId = `${obj.kindString.split(' ').join('-')}-${anchorId}`;
-                }
-                obj.anchorId = anchorId;
-            }
-            if (obj.id && obj.type !== 'reference') {
-                if (!obj.docFlags) {
-                    obj.docFlags = {};
-                }
-                visitedTracker.set(obj.docFlags, true);
-                if (!obj.tagsByName) {
-                    obj.tagsByName = {};
-                }
-                visitedTracker.set(obj.tagsByName, true);
-            }
-            if (false && comment && !obj?.flags.isExternal) {
-                if (comment.shortText) {
-                    comment.shortTextMdx = await compileMdx(comment.shortText, docLinks);
-                }
-                if (comment.text) {
-                    comment.textMdx = await compileMdx(comment.text, docLinks);
-                }
-                if (comment.returns) {
-                    comment.returnsMdx = await compileMdx(comment.returns, docLinks);
-                }
-                if (comment.tags) {
-                    for (const tag of comment.tags) {
-                        const text = tag.text.trim();
-                        if (tag.tag === 'deprecated') {
-                            obj.docFlags.deprecated = text
-                                ? await compileMdx(text, docLinks)
-                                : true;
-                        }
-                        if (tag.tag === 'expand-properties') {
-                            obj.docFlags.expandProperties = true;
-                        }
-                        if (tag.tag === 'forward-ref') {
-                            obj.docFlags.isForwardRef = true;
-                        }
-                    }
-                    let tagsByName: Record<string, any> = {};
-                    const paramTags = {};
-                    tagsByName = comment.tags.reduce((acc, tag) => {
-                        acc[tag.tag] = tag.text.trim();
-                        if (tag.param) {
-                            paramTags[tag.param] = tag.text;
-                        }
-                        return acc;
-                    }, {});
-                    obj.tagsByName = tagsByName;
                 }
             }
             if (obj.type === 'reference' && byId[obj.id]) {
@@ -1527,7 +1496,8 @@ async function main() {
         const referenceVisitedTracker = new Map();
         await traverse(
             docItem,
-            async obj => {
+            async (obj, path) => {
+                pathMap.set(obj, path)
                 if (obj.type === 'reference' && byId[obj.id]) {
                     references[obj.id] = await traverse(byId[obj.id], fn, referenceVisitedTracker);
                 }
@@ -1561,7 +1531,7 @@ async function main() {
         if (!fs.existsSync(path.dirname(outPath))) {
             fs.mkdirSync(path.dirname(outPath), { recursive: true });
         }
-        const converter = new Converter(references, docLinks, examples);
+        const converter = new Converter(references, docLinks, pathMap, examples);
         const page = await converter.convert(docItem);
         const meta = {
             packageName,

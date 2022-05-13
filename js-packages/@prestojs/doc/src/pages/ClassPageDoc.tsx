@@ -104,10 +104,11 @@ export default function ClassPageDoc({ page, meta }: Props) {
     const { showInherited } = usePreferences();
     const showOnThisPage = page.pageSections.length > 0;
     const filterInherited = node => showInherited || !node.isInherited;
+    const filterInheritedMethod = node => showInherited || !node.signatures?.[0]?.isInherited;
     const properties = page.properties.filter(filterInherited);
-    const methods = page.methods.filter(filterInherited);
+    const methods = page.methods.filter(filterInheritedMethod);
     const staticProperties = page.staticProperties.filter(filterInherited);
-    const staticMethods = page.staticMethods.filter(filterInherited);
+    const staticMethods = page.staticMethods.filter(filterInheritedMethod);
     return (
         <div>
             {showOnThisPage && <OnThisPage sections={page.pageSections} />}

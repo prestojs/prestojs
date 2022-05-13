@@ -33,7 +33,7 @@ export default function Modal({ children, title, isVisible, onClose }: Props) {
                 portalEl.current = null;
             }
         };
-    }, [onClose]);
+    }, []);
     if (!isVisible || !portalEl.current) {
         return null;
     }

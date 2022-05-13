@@ -526,7 +526,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      *
      * @param value The value to convert
      */
-    toJS(value: ValueT): string | number | null | {} {
+    toJS(value: ValueT): string | number | null | Record<string, any> {
         return value;
     }
 
