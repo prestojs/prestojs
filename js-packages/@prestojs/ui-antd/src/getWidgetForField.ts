@@ -182,6 +182,16 @@ export default function getWidgetForField<
             }
             return [finalWidget, finalProps];
         } else {
+            if (
+                widget &&
+                'maxLength' in _field &&
+                (_field as typeof _field & { maxLength: number }).maxLength > 0
+            ) {
+                return [
+                    _widget,
+                    { maxLength: (_field as typeof _field & { maxLength: number }).maxLength },
+                ];
+            }
             return _widget;
         }
     };
