@@ -1,10 +1,10 @@
-export const metadata = {
-    title: 'Routing',
-};
+import MdxPage from '../../../components/MdxPage';
+
+export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
 
 # Routing
 
-You can use any client side router with Presto - it is not tied to any particular implementation. It provides some
+You can use any (or no) client side router with Presto - it is not tied to any particular implementation. It provides some
 general utilities to assist with routing (both client or server side).
 
 -   [UrlPattern](doc:UrlPattern) provides a standard way to define URL patterns with functions to resolve any arguments
@@ -14,8 +14,42 @@ general utilities to assist with routing (both client or server side).
 -   [useUrlQueryState](doc:useUrlQueryState) makes dealing with state stored in URL query parameters as convenient as the
     `useState` hook.
 
+---
+
 ## Installation
 
 ```bash
 yarn add @prestojs/routing
+```
+
+## Usage
+
+Often times it's desirable to have a single location where all URLs can be referred to by name. This allows
+for the specific routes to change without having to update all usages of it.
+
+For example in a file `namedUrls.js`:
+
+```js
+import { NamedUrlPatterns, UrlPattern } from '@prestojs/routing';
+
+export default new NamedUrlPatterns({
+    'user-list': new UrlPattern('/users/'),
+    'user-detail': new UrlPattern('/users/:id/'),
+});
+```
+
+Then elsewhere you can resolve URLs by name:
+
+```js
+// ... elsewhere
+import namedUrls from '../urls';
+
+namedUrls.resolve('user-list');
+// /users/
+namedUrls.resolve('user-detail', { id: 5 }, { query: { showAddresses: true } });
+// /users/5/?showAddresses=true
+
+// Or to get the pattern directly without resolving URL
+namedUrls.get('user-list');
+// UrlPattern('/users/')
 ```

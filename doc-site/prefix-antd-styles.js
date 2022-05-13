@@ -1,5 +1,5 @@
 const postcss = require('postcss');
-const PostCSSPrefixWrap = require('postcss-prefixwrap/build/PostCSSPrefixWrap').default;
+const PrefixWrap = require('postcss-prefixwrap');
 
 /**
  * Prefix all antd styles with the 'doc-antd' class so doesn't pollute global styles
@@ -10,7 +10,7 @@ const PostCSSPrefixWrap = require('postcss-prefixwrap/build/PostCSSPrefixWrap').
 module.exports = postcss.plugin('prefix-antd-styles', () => {
     const prefixSelector = '.doc-antd';
     const options = {
-        whitelist: ['.*/antd/.*'],
+        whitelist: ['antd-styles.less'],
     };
-    return new PostCSSPrefixWrap(prefixSelector, options).prefix();
+    return PrefixWrap(prefixSelector, options);
 });

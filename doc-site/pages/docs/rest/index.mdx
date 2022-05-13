@@ -1,11 +1,22 @@
-export const metadata = {
-    title: 'REST',
-};
+import MdxPage from '../../../components/MdxPage';
+
+export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
 
 # REST
+
+This module provides the [Endpoint](doc:Endpoint) class for interacting the REST API endpoints
+and dealing with things like [paginated data](doc:Paginator). It supports extensive [middleware](doc:Endpoint#Middleware)
+to handle things like batching or de-duping requests, transforming paginated responses, updating [ViewModelCache](doc:ViewModelCache)
+based on the response content or any custom middleware you might want to write.
+
+---
 
 ## Installation
 
 ```bash
-yarn add @prestojs/rest
+yarn add @prestojs/ui @prestojs/ui-antd antd
 ```
+
+## Usage
+
+See [Endpoint](doc:Endpoint) for a guide on creating and using endpoints.

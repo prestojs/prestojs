@@ -1,0 +1,60 @@
+import MdxPage from '../../../components/MdxPage';
+
+export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
+
+# Installation
+
+This installation instructions assume you have a React project already setup. See [Create a new React app](https://reactjs.org/docs/create-a-new-react-app.html)
+if you need assistance.
+
+## Package Installation
+
+Presto is a collection of packages that are all published on npm. To get started install the core packages:
+
+```bash
+yarn add @prestojs/util @prestojs/viewmodel @prestojs/ui
+```
+
+The following packages may be required depending on your needs.
+
+Integration with [React Final Form](https://final-form.org/react/):
+
+```bash
+yarn add react-final-form @prestojs/final-form
+```
+
+REST API
+
+```bash
+yarn add @prestojs/routing @prestojs/rest
+```
+
+Ant Design
+
+```bash
+yarn add antd @ant-design/icons @prestojs/ui-antd
+```
+
+## Minimal App Setup
+
+The only thing that you need to add to your app is a [UiProvider](doc:UiProvider) wrapper around any component tree that
+using components from `@prestojs/final-form` or `@prestojs/ui-antd`. This provider provides the specific components to use
+for rendering things like forms, form widgets, field formatters etc.
+
+To integrate with [@prestojs/ui-antd](/docs/ui-antd) using all the defaults wrap your app in the following:
+
+```jsx
+import { UiProvider, getFormatterForField } from '@prestojs/ui';
+import { FormWrapper, getWidgetForField, FormItemWrapper } from '@prestojs/ui-antd';
+
+export default () => (
+    <UiProvider
+        getWidgetForField={getWidgetForField}
+        getFormatterForField={getFormatterForField}
+        formItemComponent={FormItemWrapper}
+        formComponent={FormWrapper}
+    >
+        <YourApp />
+    </UiProvider>
+);
+```
