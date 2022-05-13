@@ -1,0 +1,9 @@
+.section > a {
+    @apply block py-1 font-medium hover:text-cyan-600 text-cyan-500 border-b;
+}
+.activeSection > a {
+   @apply border-b border-cyan-500;
+}
+.section ul > li.activeMenu {
+    @apply bg-gray-100;
+}

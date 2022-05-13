@@ -7,23 +7,21 @@
   "private": true,
   "workspaces": [
     "js-packages/@prestojs/*",
-    "doc-site",
-    "django-testbed"
+    "doc-site"
   ],
   "scripts": {
     "lint": "eslint js-packages --ext .js,.ts",
     "check-types": "tsc -b tsconfig.lint.json && tsd tsd_checks",
-    "clean": "rm -rf /tmp/tsc-output/@prestojs && wsrun -x doc-site -x django-testbed -m clean",
+    "clean": "rm -rf /tmp/tsc-output/@prestojs && wsrun -x doc-site -m clean",
     "docs": "yarn workspace doc-site run develop",
-    "extract-docs": "yarn node doc-site/extract-docs",
     "prebuild": "wsrun -m -x doc-site clean",
     "test": "# Always runInBand so performance tests are more consistent\njest --runInBand",
     "dev": "wsrun dev",
-    "build": "wsrun -t -x doc-site -x django-testbed build",
+    "build": "wsrun -t -x doc-site -x @prestojs/doc build",
     "build:docs": "yarn workspace doc-site run build",
-    "build:watch": "wsrun --exclude django-testbed 'build:watch'",
+    "build:watch": "wsrun 'build:watch'",
     "build:declarations": "yarn workspace @prestojs/routing run build:declaration && yarn workspace @prestojs/viewmodel run build:declaration && yarn workspace @prestojs/ui run build:declaration && yarn workspace @prestojs/rest run build:declaration && yarn workspace @prestojs/final-form run build:declaration && yarn workspace @prestojs/ui-antd run build:declaration",
-    "release": "yarn build && read -p 'Enter OTP: ' OTP && yarn wsrun -x doc-site -x django-testbed publish:build --otp $OTP --registry https://registry.npmjs.org/",
+    "release": "yarn build && read -p 'Enter OTP: ' OTP && yarn wsrun -x doc-site -x @prestojs/doc publish:build --otp $OTP --registry https://registry.npmjs.org/",
     "prerelease": "yarn clean",
     "postversion": "node ./bin/sync-workspace-versions.js"
   },
@@ -32,9 +30,8 @@
     "@babel/plugin-proposal-optional-chaining": "^7.16.0",
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
     "@babel/preset-react": "^7.16.0",
-    "@strictsoftware/typedoc-plugin-monorepo": "^0.2.1",
-    "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
+    "@testing-library/dom": "^8.11.2",
     "@testing-library/react-hooks": "^3.2.1",
     "@types/jest": "^26.0.20",
     "@types/node": "^13.7.0",
@@ -60,11 +57,14 @@
     "prettier": "^2.4.1",
     "react-test-renderer": "^16.12.0",
     "ts-jest": "^26.5.3",
+    "ts-json-schema-generator": "^0.94.0",
     "tsd": "^0.18.0",
-    "typedoc": "^0.15.2",
-    "typedoc-neo-theme": "^1.0.4",
+    "typedoc": "^0.22.11",
+    "typedoc-plugin-missing-exports": "^0.22.6",
+    "typedoc-plugin-rename-defaults": "^0.4.0",
     "typescript": "^4.5.4",
-    "yargs": "^15.1.0"
+    "yargs": "^15.1.0",
+    "webpack": "^5.67.0"
   },
   "peerDependencies": {
     "lerna": "*",
@@ -78,14 +78,13 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.16.0",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "wsrun": "^5.2.0"
   },
   "husky": {
     "hooks": {
       "pre-commit": "yarn check-types && lint-staged",
-      "pre-push": "LINT_PUSH=1 ./bin/lint/lint-general.py",
       "commit-msg": "./bin/git-hooks/commit-msg $HUSKY_GIT_PARAMS",
       "prepare-commit-msg": "./bin/git-hooks/prepare-commit-msg $HUSKY_GIT_PARAMS"
     }
