@@ -27,6 +27,7 @@
     "next-plugin-antd-less": "^1.8.0",
     "antd": "^4.15.0",
     "autoprefixer": "^10.4.4",
+    "dayjs": "^1.11.2",
     "next": "^12.1.5",
     "postcss": "^8.4.12",
     "postcss-prefixwrap": "^1.27.0",
