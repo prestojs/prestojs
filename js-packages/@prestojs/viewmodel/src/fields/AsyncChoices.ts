@@ -2,19 +2,34 @@ import { getId, getNodeLabel, isIdentifiable, isLabeled } from '@prestojs/util';
 
 /**
  * A single choice
+ *
+ * @export-in-docs
  */
 export interface Choice<T> {
+    /**
+     * The value for the choices
+     */
     value: T;
+    /**
+     * The label for the choice
+     */
     label: React.ReactNode;
+    /**
+     * Any additional properties that might be returned on each choice by `getChoices`
+     */
     [x: string]: any;
 }
 /**
  * Grouped choices - a label for the grouping and an array of choices for that label
+ *
+ * @export-in-docs
  */
 export type ChoicesGrouped<T> = [string, Choice<T>[]];
 
 /**
- * Interface for asynchronous choices.
+ * Interface for asynchronous choices. If you wish to write a compatible class for
+ * use with `asyncChoices` you must conform to this interface. See [AsyncChoices](doc:AsyncChoices)
+ * for a concrete implementation that is suitable for most cases.
  *
  * A choice is a `value` that identifies the item (eg. an id) and a `label` that
  * describes the item and is shown to users (eg. the name).
@@ -36,10 +51,10 @@ export type ChoicesGrouped<T> = [string, Choice<T>[]];
  * `list` and `retrieve` respectively. The return value from the hook is passed to
  * the corresponding function.
  *
- * For a default implementation see [AsyncChoices](doc:AsyncChoices)
- *
  * @extract-docs
  * @menu-group Async Choices
+ * @typeParam ItemType The type of the item(s) return by `list` or `retrieve`.
+ * @typeParam ValueType The type of the value that identifies an item (eg. it's id)
  */
 export interface AsyncChoicesInterface<ItemType, ValueType> {
     /**
@@ -133,6 +148,7 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
 
 /**
  * @expand-properties
+ * @export-in-docs
  */
 export type AsyncChoicesOptions<ItemType, ValueType> = Omit<
     AsyncChoicesInterface<ItemType, ValueType>,
@@ -171,6 +187,8 @@ export type AsyncChoicesOptions<ItemType, ValueType> = Omit<
  *
  * @extract-docs
  * @menu-group Async Choices
+ * @typeParam ItemType The type of the item(s) return by `list` or `retrieve`.
+ * @typeParam ValueType The type of the value that identifies an item (eg. it's id)
  */
 class AsyncChoices<ItemType, ValueType> implements AsyncChoicesInterface<ItemType, ValueType> {
     options: AsyncChoicesOptions<ItemType, ValueType>;
@@ -226,7 +244,7 @@ class AsyncChoices<ItemType, ValueType> implements AsyncChoicesInterface<ItemTyp
             return this.options.getValue.call(this, item);
         }
         if (isIdentifiable(item)) {
-            return (getId(item) as unknown) as ValueType;
+            return getId(item) as unknown as ValueType;
         }
         throw new Error(
             'getValue must be provided to AsyncChoices if item does not have a `_key` property'

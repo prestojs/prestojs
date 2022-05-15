@@ -24,7 +24,9 @@
       "@prestojs/rest": ["./js-packages/@prestojs/rest/src/"],
       "@prestojs/rest/*": ["./js-packages/@prestojs/rest/src/*"],
       "@prestojs/util": ["./js-packages/@prestojs/util/src/"],
-      "@prestojs/util/*": ["./js-packages/@prestojs/util/src/*"]
+      "@prestojs/util/*": ["./js-packages/@prestojs/util/src/*"],
+      "@prestojs/doc": ["./js-packages/@prestojs/doc/src/"],
+      "@prestojs/doc/*": ["./js-packages/@prestojs/doc/src/*"]
     }
   },
   "references": [
@@ -51,6 +53,9 @@
     },
     {
       "path": "./js-packages/@prestojs/rest/tsconfig.json"
+    },
+    {
+      "path": "./js-packages/@prestojs/codegen/tsconfig.json"
     }
   ],
 

@@ -1,12 +1,11 @@
 import Field from './Field';
 
-/*
- * DateTime Field.
+/**
+ * A datetime is stored as javascript [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
+ * object.
  *
- * The basic javascript Date type is consumed and spitted out by this field. All third party libraries, such as Moment, should be compatible
- * as regardless of how they implement, the underlying base instance will always be Date.
- *
- * Invalid datetimes are treated as Null.
+ * This field supports either a [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
+ * or a string that will be parsed with [Date.parse()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse).
  *
  * @extract-docs
  * @menu-group Fields

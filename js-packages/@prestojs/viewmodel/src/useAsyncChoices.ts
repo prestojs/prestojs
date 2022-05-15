@@ -11,6 +11,7 @@ import { AsyncChoicesInterface } from './fields/AsyncChoices';
 
 /**
  * @expand-properties
+ * @export-in-docs
  */
 type UseAsyncChoicesProps<ItemT, ValueT> = Pick<
     UseAsyncListingProps<ItemT[]>,
@@ -56,6 +57,7 @@ type UseAsyncChoicesProps<ItemT, ValueT> = Pick<
 
 /**
  * @expand-properties
+ * @export-in-docs
  */
 type UseAsyncChoicesReturn<ItemT, ValueT> = {
     /**

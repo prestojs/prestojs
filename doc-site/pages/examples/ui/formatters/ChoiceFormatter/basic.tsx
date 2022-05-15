@@ -1,6 +1,7 @@
 import { ChoiceFormatter } from '@prestojs/ui';
 import { ChoicesWidget } from '@prestojs/ui-antd';
 import { Button } from 'antd';
+import 'antd/es/radio/style/index.css';
 import React, { useState } from 'react';
 
 const choices: [string, string][] = [

@@ -74,7 +74,7 @@ type RangeFormatterProps<T, BoundsFormatter extends React.ComponentType<{ value:
  * will be returned as is. You can pass extra props to the formatters specifically using `boundsFormatterProps` (both upper
  * and lower), `lowerFormatterProps` (lower only) and `upperFormatterProps` (upper only).
  *
- * This is the [default formatter](doc:getFormatterForField) used for [DateRangeField](doc:DateRangeField), [DateTimeRangeField](doc:DateTimeRangeFiel),
+ * This is the [default formatter](doc:getFormatterForField) used for [DateRangeField](doc:DateRangeField), [DateTimeRangeField](doc:DateTimeRangeField),
  * [FloatRangeField](doc:FloatRangeField) and [IntegerRangeField](doc:IntegerRangeField).
  *
  * @extract-docs

@@ -9,6 +9,7 @@ type RawValue = string | number;
 
 /**
  * @expand-properties Any additional props are passed through to the specify widget
+ * @export-in-docs
  */
 type ChoicesWidgetProps<ValueType extends RawValue | RawValue[]> = WidgetProps<
     ValueType,

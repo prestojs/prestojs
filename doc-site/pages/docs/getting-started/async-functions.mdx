@@ -1,0 +1,176 @@
+import MdxPage from '../../../components/MdxPage';
+
+export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
+
+# Async Hooks
+
+Presto provides 3 hooks for dealing with asynchronous calls such as API calls.
+
+## useAsync
+
+The [useAsync](doc:useAsync) is a low level hook to deal with triggering async function calls and handling response / errors and loading states.
+
+```jsx
+async function getUser(id) {
+    // Does API cal lo fetch user
+}
+const { response, isLoading, error, run, reset } = useAsync(getUser, {
+    args: [userId],
+});
+```
+
+[useAsync](doc:useAsync) will go through the following steps:
+
+-   When `run` is called `isLoading` will become true
+-   Once the function `getUser` resolves `isLoading` will become false
+-   If `getUser` promise rejects `error` will be set to the rejected value
+-   If `getUser` promise resolves `response` will be set to the resolved value
+
+By default you have to call `run` to make the function execute but often you
+want it to happen automatically on mount and then again when anything changes.
+
+We can make it do that by setting the trigger:
+
+```jsx {2}
+const { response, isLoading, error, run, reset } = useAsync(getUser, {
+    trigger: 'SHALLOW',
+    args: [userId],
+});
+```
+
+The trigger tells `useAsync` when to run the function. By default it is `MANUAL` which
+means only you explicitly call `run` but it call also be `DEEP` or `SHALLOW`: these two values
+refer to the method by which the previous and current arguments are compared. With `DEEP` it
+does a deep object comparison and with `SHALLOW` a shallow comparison (ie. one level deep).
+
+Now when the component is first rendered `getUser` will be called. When `userId` changes it will
+be called again.
+
+What if we don't have `userId` yet and want to only call `getUser` once we do? For cases like
+this dynamically changing the `trigger` is the easiest solution:
+
+```jsx {2}
+const { response, isLoading, error, run, reset } = useAsync(getUser, {
+    trigger: userId != null ? 'SHALLOW' : 'MANUAL',
+    args: [userId],
+});
+```
+
+Until we have `userId` the trigger will be set to `MANUAL` and nothing will be called (unless
+we manually call `run`).
+
+The `reset` function can be called to clear `error` and `response`.
+
+## useAsyncListing
+
+[useAsyncListing](doc:useAsyncListing) is more specialised and works with lists of data and assists with handling
+pagination.
+
+```jsx
+async function getUsers({ query }) {
+    // Call an API endpoint with the specified `query` parameters
+}
+const { result, isLoading, error } = useAsyncListing({
+    trigger: 'SHALLOW',
+    execute: getUsers,
+    query: { keywords },
+});
+```
+
+This works similar to `useAsync` but supports a few additional options and expects the function
+to return an `Array`. In the example above the function `getUsers` will be called and passed
+the `query` object (eg. so it can return results filtered by the supplied keywords).
+
+If the response is paginated a [Paginator](doc:Paginator) instance can be provided to handle the
+pagination state. A Paginator abstracts away how the pagination is stored, how it's updated from
+a response and how the state is changed (eg. going to the next page).
+
+Some paginators like [PageNumberPaginator](doc:PageNumberPaginator) are provided.
+
+```jsx {10,12,16}
+async function getUsers({ query, paginator }) {
+    // Call an API endpoint with the specified `query` parameters
+    const requestInit = paginator.getRequestInit({ query });
+    const response = await fetch('/users', requestInit).then(r => {
+        if (r.ok) {
+            return r.json();
+        }
+        throw r;
+    });
+    paginator.setResponse({ total: response.count, response.pageSize });
+}
+const paginator = usePaginator(PageNumberPaginator);
+const { result, isLoading, error } = useAsyncListing({
+    trigger: 'SHALLOW',
+    execute: getUsers,
+    paginator,
+    query: { keywords },
+});
+```
+
+The first highlighted row shows how the pagination state is updated from the backend: specifically
+it is told the total number of records & the size of each page.
+
+The second highlighted row shows usage of [usePaginator](doc:usePaginator) to create a paginator
+instance that is hooked up to some local state. The local state is where the pagination state is
+stored so that we can re-render React components whenever it changes.
+
+The third highlighted row shows how you pass it to `useAsyncListing`.
+
+To then change page call the relevant functions on the paginator:
+
+```jsx
+<button onClick={() => paginator.next()}>Next Page</button>
+```
+
+When the button is pressed `paginator.next()` will be called which will update
+the pagination state which will trigger a new call to `useAsyncListing`.
+
+[useAsyncListing](doc:useAsyncListing) also provides the `accumulatePages` option
+to make it easy to implement a UI where each page of results is appended to the
+last (eg. infinite scroll).
+
+```jsx {6}
+const { result, isLoading, error } = useAsyncListing({
+    trigger: 'SHALLOW',
+    execute: getUsers,
+    paginator,
+    query: { keywords },
+    accumulatePages: true,
+});
+```
+
+The first time it's called it will return:
+
+```json
+[
+    { "id": 1, "name": "Bilbo" },
+    { "id": 2, "name": "Frodo" }
+]
+```
+
+If we call `paginator.next()` the result will be appended resulting in:
+
+```json {4-5}
+[
+    { "id": 1, "name": "Bilbo" },
+    { "id": 2, "name": "Frodo" },
+    { "id": 3, "name": "Gandalf" },
+    { "id": 4, "name": "Samwise" }
+]
+```
+
+It will only accumulate results if a subsequent call has all the same parameters _apart_
+from the page which must be the next page. If this isn't the case then the accumulated
+data will be reset. For example uf we then call `paginator.first()` it will reset the state:
+
+```json
+[
+    { "id": 1, "name": "Bilbo" },
+    { "id": 2, "name": "Frodo" }
+]
+```
+
+## useAsyncValue
+
+TODO

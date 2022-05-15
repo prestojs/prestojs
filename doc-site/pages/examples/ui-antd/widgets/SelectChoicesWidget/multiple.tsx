@@ -7,6 +7,7 @@
  * Any extra props are passed through to the underlying component (eg. `showSearch` in the last example)
  */
 import { SelectChoicesWidget } from '@prestojs/ui-antd';
+import 'antd/dist/antd.min.css';
 import React, { useState } from 'react';
 
 const choices: [string, string][] = [

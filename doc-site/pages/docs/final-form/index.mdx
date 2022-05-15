@@ -1,21 +1,20 @@
-export const metadata = {
-    title: 'Final Form',
-};
+import MdxPage from '../../../components/MdxPage';
+
+export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
 
 # Final Form
 
+This package is used for integrating with [React Final Form](https://final-form.org/react).
+
+It allows you to define forms quickly using a [ViewModel](doc:viewModelFactory) definition from which
+the type of widget to use, the label for a field, it's help text etc can be inferred.
+
+---
+
 ## Installation
+
+Install the packages from npm
 
 ```bash
 yarn add @prestojs/final-form final-form react-final-form
 ```
-
-## Default Values
-
-Default values can be specified at the field level with [FormField](/docs/final-form/FormField/) (either explicitly with `defaultValue`
-or implicitly from `field.defaultValue`) or with `initialValues` passed to [Form](/docs/final-form/FormField/). For more
-details see the final-form [defaultValue](https://final-form.org/docs/react-final-form/types/FieldProps#defaultvalue) and [initialValues](https://final-form.org/docs/react-final-form/types/FormProps#initialvalues)
-documentation.
-
-Defining field defaults can be done on the view model by passing the `defaultValue` option to [Field](/docs/viewmodel/fields/Field/). This can either be
-a function that returns a value (useful for returning dynamic like the current time) or a static value directly.

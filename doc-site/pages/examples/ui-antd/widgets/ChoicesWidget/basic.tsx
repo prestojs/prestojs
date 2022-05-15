@@ -1,13 +1,14 @@
 /**
  * Basic Usage
  *
- * When the number of choices is small (<=3) the default is a radio widget, otherwise it
+ * When the number of choices is small (3 or less) the default is a radio widget, otherwise it
  * is a select widget. You can specify the type to use with `widgetType`.
  *
  * Any extra props are passed through to the underlying component (eg. `showSearch` in the last example)
  */
 import { ChoicesWidget } from '@prestojs/ui-antd';
 import { Switch } from 'antd';
+import 'antd/dist/antd.min.css';
 import React, { useState } from 'react';
 
 const shortChoices: [string, string][] = [

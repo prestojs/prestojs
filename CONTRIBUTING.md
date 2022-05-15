@@ -9,8 +9,7 @@
 This is a monorepo. Structure:
 
 * `js-packages` - all packages to be published to NPM go here. Managed with [yarn workspaces](https://yarnpkg.com/lang/en/docs/workspaces/)
-* `python-packages` - all packages to be `pip` installed go here
-* `django-testbed` - clone of the django template project for testing things end to end. all `js-packages` can be imported and any python django apps should be symlinked in `django-root`.
+* `doc-site` - the documentation site published to vercel
 
 ### Release
 
@@ -25,12 +24,6 @@ This is a monorepo. Structure:
 
 ```bash
 yarn install
-```
-
-* Create django virtualenv. Only necessary to run the test project. For tests this is not required.
-
-```bash
-./bin/init-dev-virtualenv.sh
 ```
 
 ### Installing new dependencies
@@ -51,12 +44,6 @@ django project run this in the root:
 
 ```bash
 yarn dev
-```
-
-Then start a django dev server like normal:
-
-```bash
-./manage.py runserver
 ```
 
 ## Tests

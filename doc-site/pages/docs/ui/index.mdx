@@ -1,10 +1,11 @@
-export const metadata = {
-    title: '@prestojs/ui',
-};
+import { CodeExample } from '@prestojs/doc';
+import MdxPage from '../../../components/MdxPage';
 
-# @prestojs/ui
+export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
 
-The `@prestojs/ui` package is concerned with providing high level components and a standard interface for customising form widgets
+# UI
+
+This package is concerned with providing high level components and a standard interface for customising form widgets
 and field formatters throughout the system. It doesn't provide much in terms of concrete implementations for the UI. Using the interfaces
 defined you can implement your own UI library or use a provided implementation (currently [@prestojs/ui-antd](/docs/ui-antd/) which
 integrates with [antd](https://ant.design)).
@@ -24,6 +25,8 @@ For example a [DateField](doc:DateField) may render as a calendar input widget a
 currently provide a default implementation for these as they tend to be highly specific. `@prestojs/ui-antd` provides an implementation
 for [antd](https://ant.design) or you can implement your own.
 
+---
+
 ## Installation
 
 ```bash
@@ -33,7 +36,9 @@ yarn add @prestojs/ui
 Then you will need to add the [UiProvider](doc:UiProvider) at the top of your app. See [it's documentation](doc:UiProvider)
 for an example of this.
 
-## Formatters
+## Usage
+
+### Formatters
 
 A field formatter is just a component that accepts a `value` prop and renders it:
 
@@ -47,7 +52,4 @@ function UpperCaseFormatter({ value }) {
 ```
 
 When you use [FieldFormatter](doc:FieldFormatter) it just works out what formatter component to use based on what the
-`getFormatterForField` function on your [UiProvider](doc:UiProvider) returns:
-
-```jsx codesandbox=ui-provider-basic hidenavigation=1
-```
+`getFormatterForField` function on your [UiProvider](doc:UiProvider) returns.

@@ -1,11 +1,25 @@
-export const metadata = {
-    title: 'Util',
-};
+import MdxPage from '../../../components/MdxPage';
+
+export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
 
 # Util
 
+This package provides various utility classes, functions & hooks and is used by most other Presto packages.
+
+---
+
 ## Installation
+
+Install the packages from npm
 
 ```bash
 yarn add @prestojs/util
 ```
+
+## Usage
+
+-   The [useAsync](doc:useAsync) hook is a useful general purpose hook for dealing with any async
+    function.
+
+-   [Paginator](doc:Paginator) is a utility class for paginating data and can be used standalone or with
+    the [@prestojs/rest](/docs/rest) class [Endpoint](doc:Endpoint)

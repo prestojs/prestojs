@@ -5,6 +5,7 @@ import useAsync from './useAsync';
 
 /**
  * @expand-properties
+ * @export-in-docs
  */
 type UseAsyncListingExecuteProps = {
     /**
@@ -19,6 +20,7 @@ type UseAsyncListingExecuteProps = {
 
 /**
  * @expand-properties
+ * @export-in-docs
  */
 export type UseAsyncListingProps<T> = {
     /**
@@ -65,6 +67,9 @@ export type UseAsyncListingProps<T> = {
     execute: (props: UseAsyncListingExecuteProps) => Promise<T>;
 };
 
+/**
+ * @export-in-docs
+ */
 type UseAsyncListingReturnCommon<T> = {
     /**
      * True while `execute` call is in progress.
@@ -90,6 +95,10 @@ type UseAsyncListingReturnCommon<T> = {
      */
     reset: () => void;
 };
+
+/**
+ * @export-in-docs
+ */
 export type UseAsyncListingReturn<T> =
     | (UseAsyncListingReturnCommon<T> & {
           /**
@@ -159,43 +168,47 @@ export default function useAsyncListing<T extends Array<any>>(
     // early (eg. the UI can still show the previous results while next is loading)
     const shouldResetAccumulatedValues = useRef(false);
 
-    const { run, reset: resetAsync, result, isLoading, error } = useAsync(
-        async (): Promise<T> => {
-            // If paginator state has changed to anything except the next value we have to reset accumulator
-            if (
-                paginator &&
-                lastPaginationStateRef.current !== paginator.currentState &&
-                !isEqual(nextPaginationStateRef.current, paginator.currentState)
-            ) {
-                shouldResetAccumulatedValues.current = true;
-            }
-            // Track query at point of time last fetch occurs so we can detect any
-            // changes that occur since last fetch.
-            lastQuery.current = query;
-            lastExecute.current = execute;
-            initialRun.current = false;
-            const executeResult = await execute({ paginator, query });
-            lastPaginationStateRef.current =
-                (paginator?.responseIsSet && paginator?.currentState) || null;
-            nextPaginationStateRef.current =
-                (paginator?.responseIsSet && paginator?.nextState()) || null;
-            if (accumulatePages && !Array.isArray(executeResult)) {
-                console.warn(
-                    `accumulatePages is only valid when result is an array - it has been ignored. Received: `,
-                    executeResult
-                );
-            }
-            if (
-                Array.isArray(executeResult) &&
-                accumulatePages &&
-                !shouldResetAccumulatedValues.current
-            ) {
-                return ([...(result || []), ...executeResult] as unknown) as T;
-            }
-            shouldResetAccumulatedValues.current = false;
-            return executeResult;
+    const {
+        run,
+        reset: resetAsync,
+        result,
+        isLoading,
+        error,
+    } = useAsync(async (): Promise<T> => {
+        // If paginator state has changed to anything except the next value we have to reset accumulator
+        if (
+            paginator &&
+            lastPaginationStateRef.current !== paginator.currentState &&
+            !isEqual(nextPaginationStateRef.current, paginator.currentState)
+        ) {
+            shouldResetAccumulatedValues.current = true;
         }
-    );
+        // Track query at point of time last fetch occurs so we can detect any
+        // changes that occur since last fetch.
+        lastQuery.current = query;
+        lastExecute.current = execute;
+        initialRun.current = false;
+        const executeResult = await execute({ paginator, query });
+        lastPaginationStateRef.current =
+            (paginator?.responseIsSet && paginator?.currentState) || null;
+        nextPaginationStateRef.current =
+            (paginator?.responseIsSet && paginator?.nextState()) || null;
+        if (accumulatePages && !Array.isArray(executeResult)) {
+            console.warn(
+                `accumulatePages is only valid when result is an array - it has been ignored. Received: `,
+                executeResult
+            );
+        }
+        if (
+            Array.isArray(executeResult) &&
+            accumulatePages &&
+            !shouldResetAccumulatedValues.current
+        ) {
+            return [...(result || []), ...executeResult] as unknown as T;
+        }
+        shouldResetAccumulatedValues.current = false;
+        return executeResult;
+    });
 
     const reset = useCallback(() => {
         // If reset is called we need to reset accumulated values too

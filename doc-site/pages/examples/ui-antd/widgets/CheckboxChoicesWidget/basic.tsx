@@ -18,6 +18,7 @@
  */
 import { CheckboxChoicesWidget } from '@prestojs/ui-antd';
 import { Checkbox } from 'antd';
+import 'antd/dist/antd.min.css';
 import React, { useState } from 'react';
 
 const choices: [string, string][] = [

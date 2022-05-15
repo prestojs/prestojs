@@ -36,27 +36,6 @@ else
 	}
 fi
 
-function require_virtualenv() {
-	local virtualenvs_dir
-
-	# validate that a virtualenv is active and if not, try to activate it
-	if [ "$VIRTUAL_ENV" = "" ] ; then
-		virtualenvs_dir=${WORKON_HOME:-${VIRTUALENVWRAPPER_HOOK_DIR:-~/.virtualenvs}}
-		if [[ $( type -t workon ) = "function" ]] ; then
-			workon "$(<.venv)"
-		elif [[ -e "$virtualenvs_dir/$(<.venv)/bin/activate" ]] ; then
-			source "$virtualenvs_dir/$(<.venv)/bin/activate"
-		elif [[ -e venv/bin/activate ]] ; then
-			source venv/bin/activate
-		elif [[ -e .venv/bin/activate ]] ; then
-			source .venv/bin/activate
-		else
-			fail "No virtualenv is active (and couldn't find the right one)"
-		fi
-
-	fi
-}
-
 function require_nodejs() {
 	local node_ver_active
 	# Check the version of nodejs in use
@@ -80,14 +59,6 @@ function require_nodejs() {
 			nvm use
 		fi
 	fi
-}
-
-function set_python_target_vars() {
-	[[ -e .python-version ]] || fail "ERROR: Missing local .python-version file -- see pyenv documentation"
-
-	target_ver=$(< .python-version )
-	target_ver_short=$( cut -f-2 -d. < .python-version )
-	target_venv=$(<.venv)
 }
 
 COLOR_ERROR="\033[1;31m"	# red
@@ -131,9 +102,5 @@ CORE_PYTHON_PACKAGES=(
 repo_dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")"
 
 is_ci="${CI-false}"
-project_dir="$repo_dir/django-testbed/django-root"
-base_dir="$project_dir/django_site"
-static_dir="$repo_dir/assets"
-frontend_dir="$repo_dir/frontend"
 
 cd "$repo_dir"

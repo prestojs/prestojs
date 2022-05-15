@@ -335,6 +335,8 @@ type MiddlewareNextFunction<T> = {
  * @param process Process the request through the middleware
  * @param init Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
  * class or otherwise do some kind of initialisation.
+ *
+ * @export-in-docs
  */
 export interface MiddlewareObject<T> {
     prepare?: (options: EndpointExecuteOptions) => EndpointExecuteOptions;
