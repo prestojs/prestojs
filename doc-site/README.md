@@ -1,34 +1,30 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a [Next.js](https://nextjs.org/) project 
 
 ## Getting Started
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-```
+The dev server is started when you run `yarn dev` in the root of the project.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Writing documentation
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- New pages can be created in \_pages as required
+- Documentation is auto generated from components with a comment tag `@extract-docs`. This is extracted with the `scripts/extract-docs.ts` script.
+  - The extract docs are served under `/docs`
+    -   See `getStaticProps.js` for where this is processed
+    - You can add specific overrides if necessary by creating a file with the name of the item being documented 
+- Documentation can be written as a [mdx](https://mdxjs.com/) file
+    -   See `MDXProvider` in `_app.tsx` for where this is controlled
+- Other comment tags you can use
+    -   `@type-name MyOverride` - this replaces the type name with `MyOverride`. Useful when the typescript name is not suitable to display.
+    -   `@expand-properties` - This expands each property of a type into it's own parameter on a function parameter table. If text is provided then the original name is also kept with a description matching this text. See `Form` for an example of this in use.
+    -   `@hide-properties` - Use this with `@expand-properties` to hide specific properties names. Separate each name with a space.
+    -   `@menu-group` - This nests this item under this menu name. If not specified appears ungrouped under the package name.
+    -   `@doc-class` - Specify what documentation component class to use. If not specified defaults based on type.
+    -   `@forward-ref` - Indicate this function is used as a React.forwardRef. This allows doc site renderer to not document second `ref` parameter to the function as you don't pass it in yourself.
+    -   `@return-type-name` - Override the inferred returned type and display this text instead. Useful when the inferred type is more confusing than helpful.
+    
+## Deployment
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Deploys happen to vercel automatically on push.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
