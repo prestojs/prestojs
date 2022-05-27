@@ -11,12 +11,11 @@
  * @wide
  */
 import { Form } from '@prestojs/final-form';
-import { AntdUiProvider, FormItemWrapper, FormWrapper } from '@prestojs/ui-antd';
+import { AntdUiProvider, FormItemWrapper, FormWrapper, getWidgetForField } from '@prestojs/ui-antd';
 import { BooleanField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
 import { Button } from 'antd';
 import 'antd/dist/antd.min.css';
-import React from 'react'; // TODO: in react18 you can just use `getWidgetForField` from '@prestojs/ui-antd' (just wrap below in React.Suspense)
-import getWidgetForField from '../../../../../getWidgetForField';
+import React from 'react';
 
 class ExampleModel extends viewModelFactory(
     {
@@ -32,28 +31,30 @@ class ExampleModel extends viewModelFactory(
 
 export default function FormUsage() {
     return (
-        <AntdUiProvider
-            getWidgetForField={getWidgetForField}
-            formItemComponent={FormItemWrapper}
-            formComponent={FormWrapper}
-        >
-            <div className="grid grid-cols-1 gap-4 w-full">
-                <Form onSubmit={data => console.log(data)}>
-                    <Form.Item
-                        field={ExampleModel.fields.isActive}
-                        fieldProps={{ type: 'checkbox' }}
-                    />
-                    <Form.Item
-                        field={ExampleModel.fields.receiveNewsletter}
-                        fieldProps={{ type: 'checkbox' }}
-                    />
-                    <Form.Item wrapperCol={{ offset: 6 }}>
-                        <Button type="primary" htmlType="submit">
-                            Submit (check console)
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </div>
-        </AntdUiProvider>
+        <React.Suspense fallback="Loading...">
+            <AntdUiProvider
+                getWidgetForField={getWidgetForField}
+                formItemComponent={FormItemWrapper}
+                formComponent={FormWrapper}
+            >
+                <div className="grid grid-cols-1 gap-4 w-full">
+                    <Form onSubmit={data => console.log(data)}>
+                        <Form.Item
+                            field={ExampleModel.fields.isActive}
+                            fieldProps={{ type: 'checkbox' }}
+                        />
+                        <Form.Item
+                            field={ExampleModel.fields.receiveNewsletter}
+                            fieldProps={{ type: 'checkbox' }}
+                        />
+                        <Form.Item wrapperCol={{ offset: 6 }}>
+                            <Button type="primary" htmlType="submit">
+                                Submit (check console)
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </AntdUiProvider>
+        </React.Suspense>
     );
 }

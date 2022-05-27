@@ -27,7 +27,7 @@
  * @min-height 320
  */
 import { Form } from '@prestojs/final-form';
-import { AntdUiProvider, FormItemWrapper, FormWrapper } from '@prestojs/ui-antd';
+import { AntdUiProvider, FormItemWrapper, FormWrapper, getWidgetForField } from '@prestojs/ui-antd';
 import { DateField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
 import { Button } from 'antd';
 import 'antd/dist/antd.min.css';
@@ -35,8 +35,7 @@ import generatePicker from 'antd/lib/date-picker/generatePicker';
 
 import { Dayjs } from 'dayjs';
 import dayjsGenerateConfig from 'rc-picker/lib/generate/dayjs';
-import React from 'react'; // TODO: in react18 you can just use `getWidgetForField` from '@prestojs/ui-antd' (just wrap below in React.Suspense)
-import getWidgetForField from '../../../../../getWidgetForField';
+import React from 'react';
 
 const DatePicker = generatePicker<Dayjs>(dayjsGenerateConfig);
 
@@ -60,22 +59,24 @@ function transformData(data) {
 
 export default function FormUsage() {
     return (
-        <AntdUiProvider
-            getWidgetForField={getWidgetForField}
-            formItemComponent={FormItemWrapper}
-            formComponent={FormWrapper}
-            datePickerComponent={DatePicker}
-        >
-            <div className="grid grid-cols-1 gap-4 w-full">
-                <Form onSubmit={data => console.log(transformData(data))}>
-                    <Form.Item field={ExampleModel.fields.activatedOn} />
-                    <Form.Item wrapperCol={{ offset: 6 }}>
-                        <Button type="primary" htmlType="submit">
-                            Submit (check console)
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </div>
-        </AntdUiProvider>
+        <React.Suspense fallback="Loading...">
+            <AntdUiProvider
+                getWidgetForField={getWidgetForField}
+                formItemComponent={FormItemWrapper}
+                formComponent={FormWrapper}
+                datePickerComponent={DatePicker}
+            >
+                <div className="grid grid-cols-1 gap-4 w-full">
+                    <Form onSubmit={data => console.log(transformData(data))}>
+                        <Form.Item field={ExampleModel.fields.activatedOn} />
+                        <Form.Item wrapperCol={{ offset: 6 }}>
+                            <Button type="primary" htmlType="submit">
+                                Submit (check console)
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </AntdUiProvider>
+        </React.Suspense>
     );
 }
