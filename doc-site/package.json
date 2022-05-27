@@ -28,7 +28,7 @@
     "antd": "^4.20.6",
     "autoprefixer": "^10.4.4",
     "dayjs": "^1.11.2",
-    "next": "^12.1.5",
+    "next": "^12.1.6",
     "postcss": "^8.4.12",
     "postcss-prefixwrap": "^1.27.0",
     "postcss-loader": "^6.2.1",
