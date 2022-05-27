@@ -1,5 +1,5 @@
 import { WidgetProps } from '@prestojs/ui';
-import { Input } from 'antd';
+import { Input, InputRef } from 'antd';
 import React from 'react';
 
 type PasswordWidgetProps = WidgetProps<string, HTMLInputElement>;
@@ -14,7 +14,7 @@ type PasswordWidgetProps = WidgetProps<string, HTMLInputElement>;
  */
 function PasswordWidget(
     props: PasswordWidgetProps,
-    ref: React.RefObject<Input>
+    ref: React.RefObject<InputRef>
 ): React.ReactElement {
     const { input, meta, ...rest } = props;
     return <Input.Password ref={ref} {...input} {...rest} />;

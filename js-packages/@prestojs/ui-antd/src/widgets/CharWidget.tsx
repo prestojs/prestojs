@@ -1,5 +1,5 @@
 import { WidgetProps } from '@prestojs/ui';
-import { Input } from 'antd';
+import { Input, InputRef } from 'antd';
 import React from 'react';
 
 /**
@@ -16,7 +16,7 @@ type CharWidgetProps = WidgetProps<string, HTMLInputElement>;
  * @menu-group Widgets
  * @forward-ref
  */
-function CharWidget(props: CharWidgetProps, ref: React.RefObject<Input>): React.ReactElement {
+function CharWidget(props: CharWidgetProps, ref: React.RefObject<InputRef>): React.ReactElement {
     const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;
 }
