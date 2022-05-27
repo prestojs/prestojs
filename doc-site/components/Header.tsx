@@ -1,87 +1,34 @@
-import Head from 'next/head';
+import '@docsearch/css';
+import { DocSearch } from '@docsearch/react';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function SearchBar() {
-    const inputRef = useRef<null | HTMLInputElement>(null);
     const router = useRouter();
-    const [searchEnabled, setSearchEnabled] = useState(false);
+    const [showSearch, setShowSearch] = useState(false);
     useEffect(() => {
-        const cb = e => {
-            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
-                return;
-            }
-            if (e.code === 'Slash' && inputRef.current) {
-                inputRef.current.focus();
-                e.preventDefault();
-            }
-        };
-        document.body.addEventListener('keydown', cb);
-        // @ts-ignore
-        window.docsearch({
-            apiKey: 'a174d5aef3f073d6502856e595a673ba',
-            indexName: 'prestojs',
-            inputSelector: '#search-input',
-            debug: false, // Set debug to true if you want to inspect the dropdown
-            handleSelected: function (input, event, suggestion, datasetNumber, context) {
-                const { url } = suggestion;
-                const a = document.createElement('a');
-                a.href = url;
-                const localUrl = url.replace(a.origin, '');
-                router.push(localUrl);
-                // NOTE: This means cmd-click etc don't work. This is actually docsearch
-                // doing it - if you provide a handleSelected it prevents default - would be
-                // better if it left that to you.
-            },
-        });
-        setSearchEnabled(true);
-        return () => document.body.removeEventListener('keydown', cb);
+        setShowSearch(true);
     }, []);
     return (
-        <>
-            <Head>
-                <script
-                    type="text/javascript"
-                    src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"
-                />
-                <link
-                    rel="stylesheet"
-                    href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css"
-                />
-            </Head>
-            <div className="w-full lg:px-6 xl:w-3/4 xl:px-12 px-4">
-                <div className="relative">
-                    <input
-                        disabled={!searchEnabled}
-                        ref={inputRef}
-                        className="transition-colors duration-100 ease-in-out focus:outline-0 border border-transparent focus:bg-white focus:border-gray-300 placeholder-gray-600 rounded-lg bg-gray-200 py-2 pr-4 pl-10 block w-full appearance-none leading-normal ds-input"
-                        id="search-input"
-                        type="text"
-                        placeholder="Search"
-                        autoComplete="off"
-                        spellCheck="false"
-                        role="combobox"
-                        aria-autocomplete="list"
-                        aria-expanded="false"
-                        aria-label="search input"
+        <div className="w-full lg:px-6 xl:w-3/4 xl:px-12 px-4">
+            <div className="relative">
+                {showSearch && (
+                    <DocSearch
+                        navigator={{
+                            navigate({ itemUrl }) {
+                                const a = document.createElement('a');
+                                a.href = itemUrl;
+                                const localUrl = itemUrl.replace(a.origin, '');
+                                router.push(localUrl);
+                            },
+                        }}
+                        appId="ZE8YYRQ0LW"
+                        indexName="prestojs"
+                        apiKey="1cedf39ae06c8abf71a71baf52dee8d7"
                     />
-                    <div className="pointer-events-none absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
-                    </div>
-                </div>
+                )}
             </div>
-        </>
+        </div>
     );
 }
 

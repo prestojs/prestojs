@@ -47,3 +47,7 @@ html {
 .mdx hr {
    @apply my-10;
 }
+
+.DocSearch-Button {
+   @apply bg-gray-200 float-right;
+}
