@@ -270,7 +270,7 @@ class Converter {
         references: Record<string, JSONOutput.DeclarationReflection>,
         docLinks,
         pathMap: Map<JSONOutput.DeclarationReflection, JSONOutput.DeclarationReflection[]>,
-        examples?: DocExample[],
+        examples?: DocExample[]
     ) {
         this.pathMap = pathMap;
         this.docLinks = docLinks;
@@ -720,13 +720,13 @@ class Converter {
         return transformed;
     }
 
-    fixUnnamedFunction<T extends DocType>(type: T, dec: JSONOutput.DeclarationReflection): T{
+    fixUnnamedFunction<T extends DocType>(type: T, dec: JSONOutput.DeclarationReflection): T {
         // This is where parameter like:
         // isEquals: (a, b) => boolean
         // The function def will get __type as the name so when we render it
         // in modal it looks bad. Render is as isEquals instead
         if (type.typeName === 'methodType' && type.name === '__type') {
-            const path = this.pathMap.get(dec)
+            const path = this.pathMap.get(dec);
             if (path) {
                 for (let i = path.length - 1; i >= 0; i--) {
                     if (path[i].name && path[i].name !== type.name) {
@@ -737,14 +737,14 @@ class Converter {
                 type.signatures.forEach(sig => {
                     if (sig.name === '__type') {
                         sig.name = type.name;
-                        sig.anchorId = sig.anchorId.replace('__type', type.name)
+                        sig.anchorId = sig.anchorId.replace('__type', type.name);
                     }
-                })
+                });
             }
         } else if (type.typeName === 'union') {
             type.types.forEach(t => this.fixUnnamedFunction(t, dec));
         }
-        return type
+        return type;
     }
 
     async convertSignature(signature: JSONOutput.SignatureReflection): Promise<Signature> {
@@ -754,7 +754,7 @@ class Converter {
                 (signature.parameters || []).map(async param => {
                     const type = await this.convertType(param.type, param);
                     const resolvedType = this.resolveReferencedType(param);
-                    const name = param.name === '__namedParameters' ? 'props' : param.name
+                    const name = param.name === '__namedParameters' ? 'props' : param.name;
                     return {
                         name,
                         type: this.fixUnnamedFunction(type, param),
@@ -888,11 +888,14 @@ class Converter {
     }
 
     async createMethodType(child: JSONOutput.DeclarationReflection): Promise<MethodType> {
-        return this.fixUnnamedFunction({
-            name: child.name,
-            typeName: 'methodType',
-            signatures: await this.convertSignatures(child.signatures || []),
-        }, child);
+        return this.fixUnnamedFunction(
+            {
+                name: child.name,
+                typeName: 'methodType',
+                signatures: await this.convertSignatures(child.signatures || []),
+            },
+            child
+        );
     }
 
     private resolveReferencedType(declaration: JSONOutput.DeclarationReflection) {
@@ -1010,7 +1013,7 @@ class Converter {
                                     section = {
                                         anchorId:
                                             inPageLinks.length === 0
-                                                ? 'top-of-content'
+                                                ? 'main-content'
                                                 : title.split(' ').join('-'),
                                         title: declaration.name,
                                         showEmpty: true,
@@ -1242,11 +1245,14 @@ class Converter {
     }
 
     private async convertClassMethod(m: JSONOutput.DeclarationReflection) {
-        return this.fixUnnamedFunction({
-            typeName: 'methodType',
-            name: m.name,
-            signatures: await this.convertSignatures(m.signatures || []),
-        }, m);
+        return this.fixUnnamedFunction(
+            {
+                typeName: 'methodType',
+                name: m.name,
+                signatures: await this.convertSignatures(m.signatures || []),
+            },
+            m
+        );
     }
 
     resolvedReferenceTypes = new Map<number, DocType>();
@@ -1355,7 +1361,7 @@ class Converter {
         }
         let name = declaration.name;
         if (name === '__type' && declaration) {
-            const path = this.pathMap.get(declaration)
+            const path = this.pathMap.get(declaration);
             if (path) {
                 for (let i = path.length - 1; i >= 0; i--) {
                     if (path[i].name && path[i].name !== name) {
@@ -1365,7 +1371,7 @@ class Converter {
                 }
             }
         }
-         if (name === '__namedParameters') {
+        if (name === '__namedParameters') {
             name = 'Object';
         }
         return name;
@@ -1380,15 +1386,7 @@ async function main() {
     const repoRoot = path.resolve(__dirname, '../../');
     const packagesRoot = path.resolve(repoRoot, 'js-packages/@prestojs/');
 
-    for (const pkg of [
-        'util',
-        'viewmodel',
-        'ui',
-        'final-form',
-        'ui-antd',
-        'routing',
-        'rest',
-    ]) {
+    for (const pkg of ['util', 'viewmodel', 'ui', 'final-form', 'ui-antd', 'routing', 'rest']) {
         const app = new TypeDoc.Application();
 
         app.options.addReader(new TypeDoc.TSConfigReader());
@@ -1454,25 +1452,32 @@ async function main() {
         }
 
         const references = {};
-        const pathMap = new Map<JSONOutput.DeclarationReflection, JSONOutput.DeclarationReflection[]>()
+        const pathMap = new Map<
+            JSONOutput.DeclarationReflection,
+            JSONOutput.DeclarationReflection[]
+        >();
         const defaultNameMapping = {
             urlPattern: 'UrlPattern',
             field: 'Field',
-        }
+        };
         const fn = async (obj, path) => {
-            pathMap.set(obj, path)
+            pathMap.set(obj, path);
             if (obj.type === 'reference' && !obj.id) {
                 if (obj.name === 'default') {
-                    const parent =path[path.length - 1]
+                    const parent = path[path.length - 1];
                     if (parent && defaultNameMapping[parent.name]) {
-                        obj.name = defaultNameMapping[parent.name]
+                        obj.name = defaultNameMapping[parent.name];
                     }
                 }
                 if (byName[obj.name]) {
                     if (obj.name !== 'default') {
                         obj.id = byName[obj.name].id;
                     } else {
-                        console.log("Reference had name of 'default' and so couldn't be resolved", obj, path[path.length - 1])
+                        console.log(
+                            "Reference had name of 'default' and so couldn't be resolved",
+                            obj,
+                            path[path.length - 1]
+                        );
                     }
                 }
             }
@@ -1497,7 +1502,7 @@ async function main() {
         await traverse(
             docItem,
             async (obj, path) => {
-                pathMap.set(obj, path)
+                pathMap.set(obj, path);
                 if (obj.type === 'reference' && byId[obj.id]) {
                     references[obj.id] = await traverse(byId[obj.id], fn, referenceVisitedTracker);
                 }

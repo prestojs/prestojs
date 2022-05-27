@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -27,9 +28,15 @@ function isCurrent(router, href) {
 }
 
 function NavItem({ href, children, as }: { href: string; children: React.ReactNode; as?: string }) {
+    const router = useRouter();
     return (
         <Link href={href} as={as}>
-            <a className="flex items-center lg:text-sm lg:leading-6 mb-1 font-semibold text-gray-700 hover:text-gray-900">
+            <a
+                className={cx(
+                    'flex items-center lg:text-sm lg:leading-6 mb-1 font-semibold text-gray-700 hover:text-gray-900',
+                    { 'active-top-level-menu': isCurrent(router, href) }
+                )}
+            >
                 {children}
             </a>
         </Link>

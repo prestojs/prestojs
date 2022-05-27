@@ -12,7 +12,7 @@ type CharFieldProps = FieldProps<string> & { maxLength?: number };
  * `maxLength` property which can be used by form widgets to limit the accepted
  * length of the inputted text.
  *
- * ### Usage
+ * ## Usage
  *
  * Use with [viewModelFactory](doc:viewModelFactory).
  *

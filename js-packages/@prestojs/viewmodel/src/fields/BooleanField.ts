@@ -6,7 +6,7 @@ import NullableBooleanField from './NullableBooleanField';
  *
  * This class accepts all the props of [Field](doc:Field).
  *
- * ### Usage
+ * ## Usage
  *
  * Use with [viewModelFactory](doc:viewModelFactory).
  *
