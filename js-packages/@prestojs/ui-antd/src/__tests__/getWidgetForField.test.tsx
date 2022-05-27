@@ -32,7 +32,7 @@ import {
     UUIDField,
 } from '@prestojs/viewmodel';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import { DatePicker, TimePicker } from 'antd';
 import React from 'react';
 import AntdUiProvider from '../AntdUiProvider';
@@ -68,34 +68,32 @@ import URLWidget from '../widgets/URLWidget';
 import UUIDWidget from '../widgets/UUIDWidget';
 
 test('getWidgetForField should return widget for field', async () => {
-    const fieldArgs = { label: 'input number with a spin button' };
-    const UnknownWidget = getWidgetForField(new NumberField(fieldArgs)) as any;
+    const UnknownWidget = getWidgetForField(new PasswordField()) as any;
 
-    render(
+    const { getByTestId, getByText } = render(
         <React.Suspense fallback="loading...">
-            <UnknownWidget />
+            <UnknownWidget data-testid="widget" />
         </React.Suspense>
     );
 
-    expect(await screen.findByText('loading...')).toBeInTheDocument();
-    const lazyElement = await screen.findByRole('spinbutton');
-    expect(lazyElement).toBeInTheDocument();
+    expect(await getByText('loading...')).toBeInTheDocument();
+    // just check the widget came through with the testid so we know it resolved suspense
+    await waitFor(() => expect(getByTestId('widget')).toBeInTheDocument());
 });
 
 test('getWidgetForField should return widget for descendant classes of same type', async () => {
     class CustomDecimal extends NumberField {}
 
-    const fieldArgs = { label: 'input number with a spin button' };
-    const UnknownWidget = getWidgetForField(new CustomDecimal(fieldArgs)) as any;
+    const UnknownWidget = getWidgetForField(new CustomDecimal()) as any;
 
-    render(
+    const { getByTestId, getByText } = render(
         <React.Suspense fallback="loading...">
-            <UnknownWidget />
+            <UnknownWidget data-testid="widget" />
         </React.Suspense>
     );
 
-    const lazyElement = await screen.findByRole('spinbutton');
-    expect(lazyElement).toBeInTheDocument();
+    expect(await getByText('loading...')).toBeInTheDocument();
+    await waitFor(() => expect(getByTestId('widget')).toBeInTheDocument());
 });
 
 test.each(
@@ -183,8 +181,10 @@ test.each(
                 </AntdUiProvider>
             </React.Suspense>
         );
-        const result = await UnknownWidget._payload._result;
-        expect(result.default ?? result).toBe(widgetClass);
+        await act(async () => {
+            const result = await UnknownWidget._payload._result;
+            expect(result.default ?? result).toBe(widgetClass);
+        });
     }
 );
 
