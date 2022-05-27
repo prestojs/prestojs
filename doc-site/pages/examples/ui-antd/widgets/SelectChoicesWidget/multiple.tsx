@@ -39,7 +39,9 @@ export default function MultipleSelectionExample() {
                 input={input}
                 showSearch
                 filterOption={(input, option) =>
-                    option?.children?.toLowerCase().indexOf(input?.toLowerCase()) >= 0
+                    (option!.children as unknown as string)
+                        .toLowerCase()
+                        .indexOf(input?.toLowerCase()) >= 0
                 }
             />
         </div>
