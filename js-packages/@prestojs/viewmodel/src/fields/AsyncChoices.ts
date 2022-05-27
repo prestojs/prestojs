@@ -237,7 +237,7 @@ class AsyncChoices<ItemType, ValueType> implements AsyncChoicesInterface<ItemTyp
         if (this.options.getMissingLabel) {
             return this.options.getMissingLabel.call(this, value);
         }
-        return value;
+        return String(value);
     }
     getValue(item: ItemType): ValueType {
         if (this.options.getValue) {
