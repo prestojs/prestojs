@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from 'presto-testing-library';
 import { useState } from 'react';
 import CursorPaginator from '../pagination/CursorPaginator';
 import InferredPaginator from '../pagination/InferredPaginator';

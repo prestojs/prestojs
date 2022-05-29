@@ -7,8 +7,8 @@ import {
     ManyRelatedViewModelField,
     viewModelFactory,
 } from '@prestojs/viewmodel';
-import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
+import { renderHook } from 'presto-testing-library';
 import qs from 'query-string';
 import { useState } from 'react';
 import { act } from 'react-test-renderer';

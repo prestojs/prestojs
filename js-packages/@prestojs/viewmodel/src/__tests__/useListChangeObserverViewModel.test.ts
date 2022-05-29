@@ -1,5 +1,5 @@
 import { useListChangeObserver } from '@prestojs/util';
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from 'presto-testing-library';
 import { Field, useViewModelCache, viewModelFactory } from '../index';
 
 test('useListChangeObserver should detect additions', async () => {
