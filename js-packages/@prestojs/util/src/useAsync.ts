@@ -445,7 +445,9 @@ function useAsync<ResultT, ErrorT = Error>(
 
     return useMemo(
         () => ({
-            ...state,
+            result: state.result,
+            error: state.error,
+            isLoading: state.isLoading,
             reset,
             run,
             get response(): typeof state.result {
