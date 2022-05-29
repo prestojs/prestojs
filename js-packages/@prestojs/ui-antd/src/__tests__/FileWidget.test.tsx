@@ -1,5 +1,6 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { waitFor } from '@testing-library/react';
 import { FetchMock } from 'jest-fetch-mock';
+import { act, renderHook } from 'presto-testing-library';
 import { useFileList } from '../widgets/FileWidget';
 
 type Props = { value?: string | File | null | (string | File)[]; preview: boolean };
@@ -7,7 +8,7 @@ type Props = { value?: string | File | null | (string | File)[]; preview: boolea
 const fetchMock = fetch as FetchMock;
 
 test('useFileList should convert File objects to antd representation', async () => {
-    const { result, rerender, waitForNextUpdate } = renderHook(
+    const { result, rerender } = renderHook(
         ({ value, preview }: Props) => useFileList(value, { previewImage: preview }),
         { initialProps: { value: null, preview: false } }
     );
@@ -25,43 +26,46 @@ test('useFileList should convert File objects to antd representation', async () 
         }),
     ]);
     rerender({ value: file1, preview: true });
-    await waitForNextUpdate();
-    expect(result.current.fileList).toEqual([
-        expect.objectContaining({
-            uid: '-1',
-            name: 'test.png',
-            size: 0,
-            percent: 0,
-            thumbUrl: expect.stringContaining('data:image/png;base64'),
-            type: 'image/png',
-            originFileObj: file1,
-        }),
-    ]);
+    // TODO: Something wrong here in strict mode - thumbUrl not there
+    await waitFor(() =>
+        expect(result.current.fileList).toEqual([
+            expect.objectContaining({
+                uid: '-1',
+                name: 'test.png',
+                size: 0,
+                percent: 0,
+                thumbUrl: expect.stringContaining('data:image/png;base64'),
+                type: 'image/png',
+                originFileObj: file1,
+            }),
+        ])
+    );
 
     const file2 = new File([], 'test2.png', { type: 'image/png' });
     rerender({ value: [file1, file2], preview: true });
 
-    await waitForNextUpdate();
-    expect(result.current.fileList).toEqual([
-        expect.objectContaining({
-            uid: '-1',
-            name: 'test.png',
-            size: 0,
-            percent: 0,
-            thumbUrl: expect.stringContaining('data:image/png;base64'),
-            type: 'image/png',
-            originFileObj: file1,
-        }),
-        expect.objectContaining({
-            uid: '-2',
-            name: 'test2.png',
-            size: 0,
-            percent: 0,
-            thumbUrl: expect.stringContaining('data:image/png;base64'),
-            type: 'image/png',
-            originFileObj: file2,
-        }),
-    ]);
+    await waitFor(() =>
+        expect(result.current.fileList).toEqual([
+            expect.objectContaining({
+                uid: '-1',
+                name: 'test.png',
+                size: 0,
+                percent: 0,
+                thumbUrl: expect.stringContaining('data:image/png;base64'),
+                type: 'image/png',
+                originFileObj: file1,
+            }),
+            expect.objectContaining({
+                uid: '-2',
+                name: 'test2.png',
+                size: 0,
+                percent: 0,
+                thumbUrl: expect.stringContaining('data:image/png;base64'),
+                type: 'image/png',
+                originFileObj: file2,
+            }),
+        ])
+    );
     rerender({ value: [file1], preview: true });
     expect(result.current.fileList).toEqual([
         expect.objectContaining({
@@ -81,7 +85,7 @@ test('useFileList should convert File objects to antd representation', async () 
 });
 
 test('useFileList should convert string urls to antd representation', async () => {
-    const { result, rerender, waitForNextUpdate } = renderHook(
+    const { result, rerender } = renderHook(
         ({ value, preview }: Props) => useFileList(value, { previewImage: preview }),
         { initialProps: { value: null, preview: false } }
     );
