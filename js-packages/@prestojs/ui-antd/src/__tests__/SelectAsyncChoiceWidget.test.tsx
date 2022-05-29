@@ -7,7 +7,7 @@ import {
     useViewModelCache,
     viewModelFactory,
 } from '@prestojs/viewmodel';
-import { act, fireEvent, getAllByTestId, render, waitFor } from '@testing-library/react';
+import { act, fireEvent, getAllByTestId, render, waitFor } from 'presto-testing-library';
 import React, { useState } from 'react';
 import SelectAsyncChoicesWidget from '../widgets/SelectAsyncChoicesWidget';
 
@@ -269,14 +269,16 @@ test('should support initial value', async () => {
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, 'Item 2');
     input.value = 4;
     rerender(
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(++calledCount);
     await waitForSelectedValue(container, 'Item 4');
 
     // Now trigger a listing which will fetch the first 5 records
@@ -291,7 +293,7 @@ test('should support initial value', async () => {
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).toHaveBeenCalledTimes(1);
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, 'Item 1');
     // await waitFor(() => getByText('Item 1'));
 });
@@ -322,13 +324,15 @@ test('should support onRetrieveError', async () => {
     }
     const { container } = render(<Wrapper />);
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, 'Item 2');
     act(() => {
         input.onChange(66);
     });
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(++calledCount);
     await waitFor(() => expect(onRetrieveError).toHaveBeenCalledTimes(1));
     expect(container.querySelector('.ant-select-selection-item')).not.toBeInTheDocument();
 });
@@ -609,10 +613,12 @@ test('should support triggerWhenClosed', async () => {
             {...widgetProps}
         />
     );
-    expect(list).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(list).toHaveBeenCalledTimes(calledCount);
     openDropDown(container);
     await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
-    expect(list).toHaveBeenCalledTimes(1);
+    expect(list).toHaveBeenCalledTimes(calledCount);
 });
 
 test('should work if asyncChoices instance changes', async () => {
@@ -665,14 +671,16 @@ test('should support multi select', async () => {
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, ['Item 2', 'Item 3']);
     input.value = [4];
     rerender(
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(++calledCount);
     await waitForSelectedValue(container, ['Item 4']);
 
     // Now trigger a listing which will fetch the first 5 records
@@ -686,7 +694,7 @@ test('should support multi select', async () => {
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).toHaveBeenCalledTimes(1);
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, ['Item 1']);
 });
 
@@ -832,7 +840,9 @@ test('should support onClear', async () => {
         />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, 'Item 2');
     act(() => {
         fireEvent.mouseDown(getByTestId('close'));
@@ -855,7 +865,9 @@ test('should support onClear (multiple)', async () => {
         />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, ['Item 1', 'Item 2']);
     act(() => {
         fireEvent.mouseDown(getByTestId('close'));

@@ -1,6 +1,6 @@
 import { IntegerField } from '@prestojs/viewmodel';
 import '@testing-library/jest-dom/extend-expect';
-import { render, screen } from '@testing-library/react';
+import { render, screen } from 'presto-testing-library';
 import React from 'react';
 
 import FieldFormatter from '../FieldFormatter';
@@ -75,7 +75,8 @@ test('ChoiceFormatter supports invalidChoiceLabel', () => {
             <ChoiceFormatter value={5} choices={choices} invalidChoiceLabel="Invalid Choice" />
         </div>
     );
-    expect(spy).toHaveBeenCalledTimes(2);
+    // 2 times actually - 4 times due to StrictMode
+    expect(spy).toHaveBeenCalledTimes(4);
     spy.mockReset();
     expect(getByTestId('value')).toHaveTextContent('Invalid Choice');
     rerender(

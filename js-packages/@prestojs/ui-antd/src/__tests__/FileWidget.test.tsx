@@ -1,6 +1,5 @@
-import { waitFor } from '@testing-library/react';
 import { FetchMock } from 'jest-fetch-mock';
-import { act, renderHook } from 'presto-testing-library';
+import { act, renderHook, waitFor } from 'presto-testing-library';
 import { useFileList } from '../widgets/FileWidget';
 
 type Props = { value?: string | File | null | (string | File)[]; preview: boolean };

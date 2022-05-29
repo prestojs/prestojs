@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FieldWidgetType, useUi, WidgetProps } from '@prestojs/ui';
 import { Field } from '@prestojs/viewmodel';
-import { render } from '@testing-library/react';
+import { render } from 'presto-testing-library';
 import React from 'react';
 import AntdUiProvider, { useAntdUiConfig } from '../AntdUiProvider';
 

@@ -1,10 +1,10 @@
 import { Field } from '@prestojs/viewmodel';
+import { render } from 'presto-testing-library';
 import React from 'react';
-import { render } from '@testing-library/react';
 
 import { FieldWidgetType, WidgetProps } from '../FieldWidgetInterface';
-import useUi from '../useUi';
 import UiProvider from '../UiProvider';
+import useUi from '../useUi';
 
 function FieldWrapper({ field }): React.ReactElement {
     const { getWidgetForField } = useUi();

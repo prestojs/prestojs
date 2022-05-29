@@ -32,8 +32,8 @@ import {
     UUIDField,
 } from '@prestojs/viewmodel';
 import '@testing-library/jest-dom/extend-expect';
-import { act, render, waitFor } from '@testing-library/react';
 import { DatePicker, TimePicker } from 'antd';
+import { act, render, waitFor } from 'presto-testing-library';
 import React from 'react';
 import AntdUiProvider from '../AntdUiProvider';
 import getWidgetForField from '../getWidgetForField';
