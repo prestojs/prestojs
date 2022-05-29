@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from 'presto-testing-library';
 import useAsyncValue from '../useAsyncValue';
 
 function delay<T>(fn): Promise<T> {
@@ -69,7 +69,9 @@ test('useAsyncValue should resolve individual values', async () => {
             }),
         { initialProps: { id: 1 } }
     );
-    expect(resolve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(resolve).toHaveBeenCalledTimes(calledCount);
     expect(result.current.isLoading).toBe(true);
     await act(async () => {
         await jest.runAllTimers();
@@ -77,7 +79,7 @@ test('useAsyncValue should resolve individual values', async () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual({ name: 'Item 1', _key: 1 });
     rerender({ id: 5 });
-    expect(resolve).toHaveBeenCalledTimes(2);
+    expect(resolve).toHaveBeenCalledTimes(++calledCount);
     expect(result.current.isLoading).toBe(true);
     await act(async () => {
         await jest.runAllTimers();
@@ -86,13 +88,13 @@ test('useAsyncValue should resolve individual values', async () => {
     expect(result.current.value).toEqual({ name: 'Item 5', _key: 5 });
 
     rerender({ id: null });
-    expect(resolve).toHaveBeenCalledTimes(2);
+    expect(resolve).toHaveBeenCalledTimes(calledCount);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual(null);
     expect(result.current.error).toEqual(null);
 
     rerender({ id: 500 });
-    expect(resolve).toHaveBeenCalledTimes(3);
+    expect(resolve).toHaveBeenCalledTimes(++calledCount);
     expect(result.current.isLoading).toBe(true);
     await act(async () => {
         await jest.runAllTimers();
@@ -113,7 +115,9 @@ test('useAsyncValue should resolve multiple values', async () => {
             }),
         { initialProps: { ids: [1, 2] } }
     );
-    expect(resolve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(resolve).toHaveBeenCalledTimes(calledCount);
     expect(result.current.isLoading).toBe(true);
     await act(async () => {
         await jest.runAllTimers();
@@ -124,7 +128,7 @@ test('useAsyncValue should resolve multiple values', async () => {
         { name: 'Item 2', _key: 2 },
     ]);
     rerender({ ids: [5] });
-    expect(resolve).toHaveBeenCalledTimes(2);
+    expect(resolve).toHaveBeenCalledTimes(++calledCount);
     expect(result.current.isLoading).toBe(true);
     await act(async () => {
         await jest.runAllTimers();
@@ -133,7 +137,7 @@ test('useAsyncValue should resolve multiple values', async () => {
     expect(result.current.value).toEqual([{ name: 'Item 5', _key: 5 }]);
 
     rerender({ ids: null });
-    expect(resolve).toHaveBeenCalledTimes(2);
+    expect(resolve).toHaveBeenCalledTimes(calledCount);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual(null);
     expect(result.current.error).toEqual(null);
@@ -170,19 +174,19 @@ test('useAsyncValue should use existing values if available', async () => {
 test('useAsyncValue should error if getId required and not specified', async () => {
     jest.useFakeTimers();
     const resolve = jest.fn(resolveNoId);
-    const { result } = renderHook(
-        ({ id }) =>
-            useAsyncValue({
-                id,
-                resolve,
-                existingValues: testDataNoId.slice(0, 5),
-            }),
-        { initialProps: { id: 1 } }
-    );
-    expect(result.error).toEqual(
-        new Error(
-            'Provided item does not implement Identifiable and no fallback getter was specified. To fix pass `getId` to `useAsyncValue`.'
+    global.console.error = jest.fn();
+    expect(() =>
+        renderHook(
+            ({ id }) =>
+                useAsyncValue({
+                    id,
+                    resolve,
+                    existingValues: testDataNoId.slice(0, 5),
+                }),
+            { initialProps: { id: 1 } }
         )
+    ).toThrowError(
+        'Provided item does not implement Identifiable and no fallback getter was specified. To fix pass `getId` to `useAsyncValue`.'
     );
 });
 
@@ -325,7 +329,9 @@ test('useAsyncValue should support reset', async () => {
         await jest.runAllTimers();
     });
     expect(result.current.value).toEqual({ name: 'Item 1', _key: 1 });
-    expect(resolve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(resolve).toHaveBeenCalledTimes(calledCount);
     act(() => result.current.reset());
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toBe(null);
@@ -336,7 +342,7 @@ test('useAsyncValue should support reset', async () => {
     await act(async () => {
         await jest.runAllTimers();
     });
-    expect(resolve).toHaveBeenCalledTimes(2);
+    expect(resolve).toHaveBeenCalledTimes(++calledCount);
     expect(result.current.value).toEqual({ name: 'Item 1', _key: 1 });
     rerender({ id: 5 });
     expect(result.current.isLoading).toBe(true);
