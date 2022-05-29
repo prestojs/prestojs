@@ -256,51 +256,6 @@ test('useAsync should not set state after unmount (multiple unresolved calls tri
     expect(callAction2).toHaveBeenCalled();
 });
 
-test('useAsync with MANUAL trigger should not set state after unmount (trigger before unmount)', async () => {
-    const callAction1 = jest.fn(() => Promise.reject('test error'));
-    const { result, unmount } = renderHook(() => useAsync(callAction1));
-    const errorSpy = jest.spyOn(global.console, 'error');
-    expect(result.current).toEqual({
-        isLoading: false,
-        error: null,
-        result: null,
-        response: null,
-        run: matchesFunction,
-        reset: matchesFunction,
-    });
-    act(() => {
-        result.current.run();
-    });
-    unmount();
-    expect(errorSpy).not.toHaveBeenCalled();
-});
-
-test('useAsync with MANUAL trigger should not set state after unmount (triggered after unmount)', async () => {
-    const callAction1 = jest.fn(() => Promise.reject('test error'));
-    const { result, unmount } = renderHook(() => useAsync(callAction1));
-    const errorSpy = jest.spyOn(global.console, 'error');
-    const warnSpy = jest.fn();
-    global.console.warn = warnSpy;
-    expect(result.current).toEqual({
-        isLoading: false,
-        error: null,
-        result: null,
-        response: null,
-        run: matchesFunction,
-        reset: matchesFunction,
-    });
-    unmount();
-    act(() => {
-        expect(result.current.run()).rejects.toContain(
-            'method was called after component was unmounted'
-        );
-    });
-    expect(errorSpy).not.toHaveBeenCalled();
-    expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('method was called after component was unmounted')
-    );
-});
-
 test('useAsync should support onSuccess/onError', async () => {
     jest.useFakeTimers();
     const callAction1 = jest.fn(
