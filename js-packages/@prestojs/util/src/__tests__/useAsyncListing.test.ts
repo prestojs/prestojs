@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from 'presto-testing-library';
 import PageNumberPaginator from '../pagination/PageNumberPaginator';
 import usePaginator from '../pagination/usePaginator';
 import useAsyncListing from '../useAsyncListing';
@@ -79,17 +79,18 @@ test('useAsyncListing should work without a paginator object', async () => {
         { initialProps: { query: {} } }
     );
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(1);
+    // starts at 2 due to StrictMode
+    expect(execute).toHaveBeenCalledTimes(2);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual(testData.slice(0, 5));
     rerender({ query: { search: 'Item 2' } });
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(2);
+    expect(execute).toHaveBeenCalledTimes(3);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual([testData[2]]);
-    expect(execute).toHaveBeenCalledTimes(2);
+    expect(execute).toHaveBeenCalledTimes(3);
 });
 
 test('useAsyncListing should handle errors', async () => {
@@ -101,7 +102,7 @@ test('useAsyncListing should handle errors', async () => {
         })
     );
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(1);
+    expect(execute).toHaveBeenCalledTimes(2);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toEqual('No good');
@@ -119,7 +120,7 @@ test('useAsyncListing should support paginator', async () => {
         { initialProps: {} }
     );
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(1);
+    expect(execute).toHaveBeenCalledTimes(2);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual(testData.slice(0, 5));
@@ -128,13 +129,13 @@ test('useAsyncListing should support paginator', async () => {
     if (!paginator) throw new Error('Expected paginator');
     act(() => paginator.next());
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(2);
+    expect(execute).toHaveBeenCalledTimes(3);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual(testData.slice(5, 10));
     rerender({ query: { search: '1' } });
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(3);
+    expect(execute).toHaveBeenCalledTimes(4);
     await advanceTimers();
     // Changing query should have reset paginator state
     expect(paginator.currentState).toEqual({ page: 1, pageSize: 5 });
@@ -157,7 +158,7 @@ test('useAsyncListing should support accumulatePages', async () => {
         { initialProps: { query: {}, execute: execute1 } }
     );
     expect(result.current.isLoading).toBe(true);
-    expect(execute1).toHaveBeenCalledTimes(1);
+    expect(execute1).toHaveBeenCalledTimes(2);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual(testData.slice(0, 5));
@@ -166,13 +167,13 @@ test('useAsyncListing should support accumulatePages', async () => {
     if (!paginator) throw new Error('Expected paginator');
     act(() => paginator.next());
     expect(result.current.isLoading).toBe(true);
-    expect(execute1).toHaveBeenCalledTimes(2);
+    expect(execute1).toHaveBeenCalledTimes(3);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual(testData.slice(0, 10));
     rerender({ query: { search: '1' }, execute: execute1 });
     expect(result.current.isLoading).toBe(true);
-    expect(execute1).toHaveBeenCalledTimes(3);
+    expect(execute1).toHaveBeenCalledTimes(4);
     await advanceTimers();
     // Changing query should have reset paginator state
     expect(paginator.currentState).toEqual({ page: 1, pageSize: 5 });
@@ -303,7 +304,7 @@ test('useAsyncListing should not cause issues if unmounted', async () => {
     );
     const errorSpy = jest.spyOn(global.console, 'error');
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(1);
+    expect(execute).toHaveBeenCalledTimes(2);
     unmount();
     await advanceTimers();
     expect(errorSpy).not.toHaveBeenCalled();
@@ -321,7 +322,7 @@ test('useAsyncListing should support reset', async () => {
         { initialProps: { query: {} } }
     );
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(1);
+    expect(execute).toHaveBeenCalledTimes(2);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual(testData.slice(0, 5));
@@ -332,11 +333,11 @@ test('useAsyncListing should support reset', async () => {
     expect(result.current.result).toEqual(null);
     rerender({ query: { search: 'Item 2' } });
     expect(result.current.isLoading).toBe(true);
-    expect(execute).toHaveBeenCalledTimes(2);
+    expect(execute).toHaveBeenCalledTimes(3);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual([testData[2]]);
-    expect(execute).toHaveBeenCalledTimes(2);
+    expect(execute).toHaveBeenCalledTimes(3);
 });
 
 test('useAsyncListing should support run', async () => {
@@ -376,18 +377,18 @@ test('useAsyncListing should support run', async () => {
 test('useAsyncListing should make sure `paginator` provided when `accumulatePages` is true', async () => {
     jest.useFakeTimers();
     const execute = jest.fn(mockedPaginatedResponse);
-    const { result } = renderHook(
-        props =>
-            useAsyncListing({
-                accumulatePages: true,
-                execute,
-                ...props,
-            }),
-        { initialProps: {} }
-    );
-    expect(result.error).toEqual(
-        new Error('When `accumulatePages` is set `paginator` must be provided')
-    );
+    global.console.error = jest.fn();
+    expect(() =>
+        renderHook(
+            props =>
+                useAsyncListing({
+                    accumulatePages: true,
+                    execute,
+                    ...props,
+                }),
+            { initialProps: {} }
+        )
+    ).toThrowError('When `accumulatePages` is set `paginator` must be provided');
 });
 
 test('useAsyncListing should support changing execute function', async () => {
@@ -403,24 +404,24 @@ test('useAsyncListing should support changing execute function', async () => {
         { initialProps: { query: {}, execute: execute1 } }
     );
     expect(result.current.isLoading).toBe(true);
-    expect(execute1).toHaveBeenCalledTimes(1);
+    expect(execute1).toHaveBeenCalledTimes(2);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual(testData.slice(0, 5));
     rerender({ query: { search: 'Item 2' }, execute: execute1 });
     expect(result.current.isLoading).toBe(true);
-    expect(execute1).toHaveBeenCalledTimes(2);
+    expect(execute1).toHaveBeenCalledTimes(3);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual([testData[2]]);
-    expect(execute1).toHaveBeenCalledTimes(2);
+    expect(execute1).toHaveBeenCalledTimes(3);
     rerender({ query: { search: 'Item 2' }, execute: execute2 });
     expect(result.current.isLoading).toBe(true);
-    expect(execute1).toHaveBeenCalledTimes(2);
+    expect(execute1).toHaveBeenCalledTimes(3);
     expect(execute2).toHaveBeenCalledTimes(1);
     await advanceTimers();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.result).toEqual([testData[2]]);
-    expect(execute1).toHaveBeenCalledTimes(2);
+    expect(execute1).toHaveBeenCalledTimes(3);
     expect(execute2).toHaveBeenCalledTimes(1);
 });
