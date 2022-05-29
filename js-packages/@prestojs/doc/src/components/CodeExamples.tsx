@@ -124,7 +124,7 @@ export default function CodeExamples({ examples }: { examples: DocExample[] }) {
                         key={example.name}
                         example={example}
                         language={language}
-                        forceWide={i === examples.length - 1 && i % 2 == 1}
+                        forceWide={i === examples.length - 1 && i % 2 == 1 && i > 2}
                     />
                 ))}
             </div>
