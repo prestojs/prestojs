@@ -15,7 +15,7 @@ export interface NumberFieldProps<T> extends FieldProps<T> {
  * `minValue` and `maxValue` properties which can be used by form widgets to validate
  * the inputted value
  *
- * ### Usage
+ * ## Usage
  *
  * Use with [viewModelFactory](doc:viewModelFactory).
  *

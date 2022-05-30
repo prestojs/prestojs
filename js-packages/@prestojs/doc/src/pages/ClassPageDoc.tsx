@@ -56,7 +56,7 @@ function ClassHierarchy({ page }: { page: ClassPage }) {
     }
     return (
         <div className="mb-3 mt-3 bg-sky-50 p-2 rounded text-gray-800">
-            <h3 className="font-semibold font-lg">Hierarchy</h3>
+            <div className="font-semibold font-lg">Hierarchy</div>
             <ul className="ml-5">
                 {page.hierarchy.parent && (
                     <li className="list-disc">

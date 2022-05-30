@@ -27,18 +27,20 @@ export default function FunctionSignature({
             {!hideTypeParameters && signature.typeParameters && (
                 <TypeParameters typeParameters={signature.typeParameters} />
             )}
-            (
-            {parameters.map((param, i) => (
-                <React.Fragment key={param.name}>
-                    <span className="text-gray-500">
-                        {param.flags.isOptional && '?'}
-                        {param.flags.isRestArg && '...'}
-                        {param.name}
-                    </span>
-                    {i < parameters.length - 1 && <span className="text-gray-300 mr-1">,</span>}
-                </React.Fragment>
-            ))}
-            )
+            <span className="signature-params">
+                (
+                {parameters.map((param, i) => (
+                    <React.Fragment key={param.name}>
+                        <span className="text-gray-500">
+                            {param.flags.isOptional && '?'}
+                            {param.flags.isRestArg && '...'}
+                            {param.name}
+                        </span>
+                        {i < parameters.length - 1 && <span className="text-gray-300 mr-1">,</span>}
+                    </React.Fragment>
+                ))}
+                )
+            </span>
             {showReturn && signature.returnType && (
                 <>
                     {' '}

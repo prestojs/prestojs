@@ -11,7 +11,7 @@ import MainMenuSidebar from './MainMenuSidebar';
 
 function MainContent({ children }: { children: ReactNode }) {
     return (
-        <div className="lg:ml-[18.5rem] main-content pb-10" id="top-of-content">
+        <div className="lg:ml-[18.5rem] pb-10" id="main-content">
             <div className="max-w-3xl mx-auto pt-10 xl:max-w-none">{children}</div>
         </div>
     );

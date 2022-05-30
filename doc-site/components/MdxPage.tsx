@@ -27,7 +27,7 @@ function extractHeadings(children) {
         if (heading === 'h3') {
             if (!section) {
                 section = {
-                    anchorId: inPageLinks.length === 0 ? 'top-of-content' : anchorId,
+                    anchorId: inPageLinks.length === 0 ? 'main-content' : anchorId,
                     title: title,
                     showEmpty: true,
                     links: [],
