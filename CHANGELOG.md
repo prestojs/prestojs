@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+* Support for `React.StrictMode`.
+  * `useAsync` will no longer prevent `setState` calls happening after component is unmounted. If you are using < React18 you can manually do this yourself
+     using the `abort` method in the calling component/hook.
+  * If using @prestojs/ui-antd requires antd >= 4.20
+
 ## [0.0.30] - 2022-04-13
 
 ### Changed
