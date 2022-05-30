@@ -1,5 +1,5 @@
 import { Field, viewModelFactory } from '@prestojs/viewmodel';
-import { render } from '@testing-library/react';
+import { render } from 'presto-testing-library';
 import React from 'react';
 import FieldFormatter from '../FieldFormatter';
 

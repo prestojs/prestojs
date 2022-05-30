@@ -41,7 +41,7 @@ test('should support basic flat choices', async () => {
 test('should support getMissingLabel', async () => {
     let asyncChoices = new AsyncChoices(baseOptions);
     // Default implementation
-    expect(asyncChoices.getMissingLabel(5)).toBe(5);
+    expect(asyncChoices.getMissingLabel(5)).toBe('5');
     asyncChoices = new AsyncChoices({
         ...baseOptions,
         getMissingLabel(): string {

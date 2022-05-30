@@ -1,6 +1,5 @@
-import { render } from '@testing-library/react';
-import { act, renderHook, RenderHookResult } from '@testing-library/react-hooks';
 import diff from 'jest-diff';
+import { act, render, renderHook, RenderHookResult, waitFor } from 'presto-testing-library';
 import qs from 'query-string';
 import React, { useEffect, useState } from 'react';
 import useUrlQueryState from '../useUrlQueryState';
@@ -88,10 +87,10 @@ function useUrlQueryStateWrapper(initialState, options = {}): ResultType {
     return useUrlQueryState(initialState, { ...navigationProps, ...options });
 }
 
-function renderUrlQueryStateHook<P>(
+function renderUrlQueryStateHook<Props>(
     initialState,
     options = {}
-): Omit<RenderHookResult<P, ResultType>, 'rerender'> & {
+): Omit<RenderHookResult<ResultType, Props>, 'rerender'> & {
     rerender: (initialState: Record<string, any>, options?: {}) => void;
 } {
     const { rerender, ...rest } = renderHook(
@@ -427,7 +426,7 @@ test('useUrlQueryState should not do unnecessary URL changes', () => {
     expect(listenMock).toHaveBeenCalled();
 });
 
-test('useUrlQueryState should accept function for setState', () => {
+test('useUrlQueryState should accept function for setState', async () => {
     const hookStatus = renderUrlQueryStateHook({ q: 1 }, { prefix: 'p_' });
     const setQueryState = (nextState: {}): void => hookStatus.result.current[1](nextState);
     expect(hookStatus).queryStateEquals({ q: '1' });
@@ -450,13 +449,11 @@ test('useUrlQueryState default implementation with window.location', async () =>
     act(() => {
         history.back();
     });
-    await hook.waitForNextUpdate();
-    expect(hook).queryStateEquals({ q: '1' });
+    await waitFor(() => expect(hook).queryStateEquals({ q: '1' }));
     act(() => {
         history.forward();
     });
-    await hook.waitForNextUpdate();
-    expect(hook).queryStateEquals({ q: '1', p: '2' });
+    await waitFor(() => expect(hook).queryStateEquals({ q: '1', p: '2' }));
 });
 
 test('useUrlQueryState initial render should return initialValues', () => {
@@ -467,16 +464,19 @@ test('useUrlQueryState initial render should return initialValues', () => {
         const navigationProps = useDummyNavigation();
         const [state] = useUrlQueryState(initialState, { ...navigationProps, prefix: 'test_' });
         cb(state);
-        const count = distinctStates.get(state) || 0;
-        distinctStates.set(state, count + 1);
+        useEffect(() => {
+            const count = distinctStates.get(state) || 0;
+            distinctStates.set(state, count + 1);
+        }, [state]);
         return <div data-testid="wrapper">{state.value || ''}</div>;
     }
     const { getByTestId } = render(<Wrapper initialState={{ value: 'Test' }} />);
     // Currently we accept the additional render at start. This is hard to avoid - it's
     // dependent on the router implementation. We could support it for the default HTML5
     // integration but would complicate things so ignoring it for now.
-    // expect(cb).toHaveBeenCalledTimes(1);
-    expect(cb).toHaveBeenCalledTimes(2);
+    // NOTE: Due to StrictMode this happens twice so 2 * 2 = 4
+    // expect(cb).toHaveBeenCalledTimes(2);
+    expect(cb).toHaveBeenCalledTimes(4);
     expect(cb).toHaveBeenNthCalledWith(1, { value: 'Test', a: '1' });
     expect(cb).toHaveBeenNthCalledWith(2, { value: 'Test', a: '1' });
     expect(getByTestId('wrapper')).toContainHTML('Test');

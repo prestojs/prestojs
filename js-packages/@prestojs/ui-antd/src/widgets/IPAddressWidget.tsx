@@ -1,5 +1,5 @@
 import { WidgetProps } from '@prestojs/ui';
-import { Input } from 'antd';
+import { Input, InputRef } from 'antd';
 import React from 'react';
 
 /**
@@ -16,7 +16,7 @@ type IPAddressWidgetProps = WidgetProps<string, HTMLInputElement>;
  */
 function IPAddressWidget(
     props: IPAddressWidgetProps,
-    ref: React.RefObject<Input>
+    ref: React.RefObject<InputRef>
 ): React.ReactElement {
     const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;

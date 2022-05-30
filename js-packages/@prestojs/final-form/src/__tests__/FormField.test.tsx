@@ -1,6 +1,6 @@
 import { UiProvider } from '@prestojs/ui';
 import { NumberField, viewModelFactory } from '@prestojs/viewmodel';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render } from 'presto-testing-library';
 import React from 'react';
 import Form from '../Form';
 
@@ -16,8 +16,8 @@ class User extends viewModelFactory(
     static labelPlural = 'Users';
 }
 
-function Widget({ input }): React.ReactElement {
-    return <input name={input.name} placeholder={input.name} />;
+function Widget({ input, ...props }): React.ReactElement {
+    return <input name={input.name} placeholder={input.name} {...props} />;
 }
 
 function getWidgetForField(): typeof Widget {
@@ -31,7 +31,7 @@ test('FormField should provide default widget when none specified', () => {
                 <Form onSubmit={jest.fn()}>
                     {({ handleSubmit }): React.ReactElement => (
                         <form onSubmit={handleSubmit}>
-                            <label htmlFor="age">
+                            <label htmlFor="age" id="age-label">
                                 Age
                                 <Form.Field field={User.fields.age} {...props} id="age" />
                             </label>
@@ -48,9 +48,13 @@ test('FormField should provide default widget when none specified', () => {
     // use whatever is passed in
     rerender(<TestWrapper component="textarea" />);
     expect(getByLabelText('Age').tagName).toBe('TEXTAREA');
-    rerender(<TestWrapper render={(): React.ReactElement => <select />} />);
+    rerender(<TestWrapper render={(props): React.ReactElement => <select {...props} />} />);
     expect(getByLabelText('Age').tagName).toBe('SELECT');
-    rerender(<TestWrapper>{(): React.ReactElement => <div id="age" />}</TestWrapper>);
+    rerender(
+        <TestWrapper>
+            {(): React.ReactElement => <div id="age" aria-labelledby="age-label" />}
+        </TestWrapper>
+    );
     expect(getByLabelText('Age').tagName).toBe('DIV');
 });
 

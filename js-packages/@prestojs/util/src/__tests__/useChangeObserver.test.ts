@@ -1,5 +1,5 @@
-import { renderHook } from '@testing-library/react-hooks';
 import deepEquals from 'lodash/isEqual';
+import { renderHook } from 'presto-testing-library';
 import useChangeObserver from '../useChangeObserver';
 
 test('should handle scalar values', () => {

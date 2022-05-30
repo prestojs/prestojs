@@ -455,7 +455,14 @@ export default function useUrlQueryState(
     // This effect is used to update URL to include any missing keys that are
     // specified in initialState. It only runs once - any subsequent changes to
     // initialState have no effect.
+    const hasRunAddMissingKeysEffect = useRef(false);
     useEffect(() => {
+        // Protect with a ref as has imperative side effect (changing the URL) that should
+        // only apply once (eg. in StrictMode this runs twice)
+        if (hasRunAddMissingKeysEffect.current) {
+            return;
+        }
+        hasRunAddMissingKeysEffect.current = true;
         const query = qs.parse(search);
         const missingKeys = Object.keys(initialState).filter(key => {
             // Exclude invalid keys
@@ -562,6 +569,5 @@ export default function useUrlQueryState(
         },
         [search, controlledKeys, prefix, params, unPrefixedQueryObject, replaceUrl, pathname]
     );
-
     return [unPrefixedQueryObject, setUrlState];
 }

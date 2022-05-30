@@ -28,6 +28,7 @@ module.exports = {
             },
         },
     },
+    moduleDirectories: ['node_modules', 'js-testing'],
     moduleFileExtensions: ['ts', 'tsx', 'js'],
     modulePathIgnorePatterns: [],
     moduleNameMapper,

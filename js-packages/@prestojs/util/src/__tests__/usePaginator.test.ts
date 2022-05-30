@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from 'presto-testing-library';
 import { useState } from 'react';
 import CursorPaginator from '../pagination/CursorPaginator';
 import PageNumberPaginator from '../pagination/PageNumberPaginator';
@@ -71,7 +71,6 @@ test('should accept state with initial state', async () => {
 test('should accept no value', async () => {
     let action1: null | PaginatorClassProvider<any> = null;
     const { result, rerender } = renderHook(() => usePaginator(action1));
-
     expect(result.current).toBe(null);
 
     action1 = {
@@ -139,4 +138,20 @@ test('should handle multiple internal state transitions before commit', async ()
         previousCursor: 'b',
         responseIsSet: true,
     });
+});
+
+test('should handle paginator class changing', () => {
+    const { result, rerender } = renderHook(
+        ({ paginatorClass }: { paginatorClass: PaginatorInterfaceClass }) =>
+            usePaginator(paginatorClass),
+        { initialProps: { paginatorClass: PageNumberPaginator } }
+    );
+    const pageNumberPaginator = result.current as PageNumberPaginator;
+    act(() => pageNumberPaginator.setResponse({ total: 10, pageSize: 5 }));
+    expect(pageNumberPaginator.pageSize).toBe(5);
+    rerender({ paginatorClass: CursorPaginator });
+    expect(pageNumberPaginator).not.toBe(result.current);
+    // This should be ignored - it's on the old instance
+    act(() => pageNumberPaginator.setPageSize(100));
+    expect((result.current as CursorPaginator).pageSize).toBe(5);
 });

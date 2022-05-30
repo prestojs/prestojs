@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from 'presto-testing-library';
 import useListChangeObserver from '../useListChangeObserver';
 
 test('useListChangeObserver should detect multiple changes', async () => {
@@ -9,7 +9,7 @@ test('useListChangeObserver should detect multiple changes', async () => {
     function useTestEffect(options = {}): void {
         useListChangeObserver(records, cb, options);
     }
-    const { rerender } = renderHook(({ options }) => useTestEffect(options), {
+    const { rerender } = renderHook(() => useTestEffect(), {
         initialProps: { options: {} },
     });
     records = [{ id: 1 }];
@@ -44,11 +44,9 @@ test('useListChangeObserver should support custom getId', async () => {
     let records: { uuid: number; name?: string }[] = [];
     const getId = (item): number => item.uuid;
     function useTestEffect(options = {}): void {
-        useListChangeObserver(records, cb, { ...options, getId });
+        return useListChangeObserver(records, cb, { ...options, getId });
     }
-    const { rerender } = renderHook(({ options }) => useTestEffect(options), {
-        initialProps: { options: {} },
-    });
+    const { rerender } = renderHook(() => useTestEffect());
     records = [{ uuid: 1 }];
     rerender();
     expect(cb).toHaveBeenCalledWith(

@@ -1,5 +1,6 @@
 import { PageNumberPaginator, usePaginator } from '@prestojs/util';
-import { act, renderHook } from '@testing-library/react-hooks';
+import { waitFor } from '@testing-library/dom';
+import { act, renderHook } from 'presto-testing-library';
 import AsyncChoices from '../fields/AsyncChoices';
 import CharField from '../fields/CharField';
 import NumberField from '../fields/NumberField';
@@ -69,7 +70,7 @@ afterAll(() => {
 
 test('useAsyncChoices should support basic usage', async () => {
     const asyncChoices = new AsyncChoices(baseOptions);
-    const { rerender, result, waitForNextUpdate } = renderHook(
+    const { rerender, result } = renderHook(
         ({ value }: { value?: null | number }) =>
             useAsyncChoices({
                 asyncChoices,
@@ -79,9 +80,10 @@ test('useAsyncChoices should support basic usage', async () => {
     );
     expect(result.current.list.isLoading).toBe(true);
     expect(result.current.selected.isLoading).toBe(false);
-    await waitForNextUpdate();
-    expect(result.current.choices).toEqual(
-        testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+    await waitFor(() =>
+        expect(result.current.choices).toEqual(
+            testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+        )
     );
     expect(result.current.list.isLoading).toBe(false);
     rerender({ value: 3 });
@@ -93,9 +95,8 @@ test('useAsyncChoices should support basic usage', async () => {
     rerender({ value: 15 });
     expect(result.current.list.isLoading).toBe(false);
     expect(result.current.selected.isLoading).toBe(true);
-    await waitForNextUpdate();
-    expect(result.current.list.isLoading).toBe(false);
-    expect(result.current.selected.isLoading).toBe(false);
+    await waitFor(() => expect(result.current.list.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.selected.isLoading).toBe(false));
     expect(result.current.selected.value).toEqual(testData[15]);
 });
 
@@ -132,7 +133,7 @@ test('useAsyncChoices should support hooking up to ViewModelCache easily', async
             });
         },
     });
-    const { rerender, result, waitForNextUpdate } = renderHook(
+    const { rerender, result } = renderHook(
         ({ value }: { value?: null | number }) =>
             useAsyncChoices({
                 asyncChoices,
@@ -142,9 +143,10 @@ test('useAsyncChoices should support hooking up to ViewModelCache easily', async
     );
     expect(result.current.list.isLoading).toBe(true);
     expect(result.current.selected.isLoading).toBe(false);
-    await waitForNextUpdate();
-    expect(result.current.choices).toEqual(
-        testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+    await waitFor(() =>
+        expect(result.current.choices).toEqual(
+            testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+        )
     );
     rerender({ value: 3 });
     expect(result.current.list.isLoading).toBe(false);
@@ -172,7 +174,7 @@ test('useAsyncChoices should support useListProps', async () => {
             return { paginator };
         },
     });
-    const { result, waitForNextUpdate } = renderHook(
+    const { result } = renderHook(
         ({ value }: { value?: null | number }) =>
             useAsyncChoices({
                 asyncChoices,
@@ -182,18 +184,20 @@ test('useAsyncChoices should support useListProps', async () => {
     );
     expect(result.current.list.isLoading).toBe(true);
     expect(result.current.selected.isLoading).toBe(false);
-    await waitForNextUpdate();
-    expect(result.current.choices).toEqual(
-        testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+    await waitFor(() =>
+        expect(result.current.choices).toEqual(
+            testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+        )
     );
     act(() => {
         result.current.list.paginator?.next();
     });
     expect(result.current.list.isLoading).toBe(true);
     expect(result.current.selected.isLoading).toBe(false);
-    await waitForNextUpdate();
-    expect(result.current.choices).toEqual(
-        testData.slice(10).map(({ label, id }) => ({ value: id, label }))
+    await waitFor(() =>
+        expect(result.current.choices).toEqual(
+            testData.slice(10).map(({ label, id }) => ({ value: id, label }))
+        )
     );
 });
 
@@ -206,7 +210,7 @@ test('useAsyncChoices should support accumulatePages', async () => {
             return { paginator };
         },
     });
-    const { result, waitForNextUpdate } = renderHook(
+    const { result } = renderHook(
         ({ value }: { value?: null | number }) =>
             useAsyncChoices({
                 asyncChoices,
@@ -217,22 +221,26 @@ test('useAsyncChoices should support accumulatePages', async () => {
     );
     expect(result.current.list.isLoading).toBe(true);
     expect(result.current.selected.isLoading).toBe(false);
-    await waitForNextUpdate();
-    expect(result.current.choices).toEqual(
-        testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+    await waitFor(() =>
+        expect(result.current.choices).toEqual(
+            testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+        )
     );
     act(() => {
         result.current.list.paginator?.next();
     });
     expect(result.current.list.isLoading).toBe(true);
     expect(result.current.selected.isLoading).toBe(false);
-    await waitForNextUpdate();
-    expect(result.current.choices).toEqual(testData.map(({ label, id }) => ({ value: id, label })));
+    await waitFor(() =>
+        expect(result.current.choices).toEqual(
+            testData.map(({ label, id }) => ({ value: id, label }))
+        )
+    );
 });
 
 test('useAsyncChoices should support query', async () => {
     const asyncChoices = new AsyncChoices(baseOptions);
-    const { rerender, result, waitForNextUpdate } = renderHook(
+    const { rerender, result } = renderHook(
         ({ value, query }: { value?: null | number; query: Record<string, any> }) =>
             useAsyncChoices({
                 asyncChoices,
@@ -243,25 +251,28 @@ test('useAsyncChoices should support query', async () => {
     );
     expect(result.current.list.isLoading).toBe(true);
     expect(result.current.selected.isLoading).toBe(false);
-    await waitForNextUpdate();
-    expect(result.current.choices).toEqual(
-        testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+    await waitFor(() =>
+        expect(result.current.choices).toEqual(
+            testData.slice(0, 10).map(({ label, id }) => ({ value: id, label }))
+        )
     );
     rerender({ query: { keywords: 'Item 1' } });
     expect(result.current.list.isLoading).toBe(true);
     expect(result.current.selected.isLoading).toBe(false);
-    await waitForNextUpdate();
-    expect(result.current.choices).toEqual(
-        [testData[1], ...testData.slice(10, 19)].map(({ label, id }) => ({ value: id, label }))
+    await waitFor(() =>
+        expect(result.current.choices).toEqual(
+            [testData[1], ...testData.slice(10, 19)].map(({ label, id }) => ({ value: id, label }))
+        )
     );
     rerender({ query: { keywords: 'Item 1', exact: true } });
     expect(result.current.list.isLoading).toBe(true);
     expect(result.current.selected.isLoading).toBe(false);
-    await waitForNextUpdate();
-    expect(result.current.choices).toEqual([
-        {
-            label: 'Item 1',
-            value: 1,
-        },
-    ]);
+    await waitFor(() =>
+        expect(result.current.choices).toEqual([
+            {
+                label: 'Item 1',
+                value: 1,
+            },
+        ])
+    );
 });

@@ -1,6 +1,5 @@
-import { render } from '@testing-library/react';
-import { act, renderHook } from '@testing-library/react-hooks';
 import deepEqual from 'lodash/isEqual';
+import { act, render, renderHook } from 'presto-testing-library';
 import React from 'react';
 
 import { recordEqualTo } from '../../../../../js-testing/matchers';
@@ -38,11 +37,11 @@ test('should unsubscribe on unmount', () => {
     const selector = jest.fn(cache => cache.getAll(['firstName', 'lastName', 'email']));
 
     const { result, unmount } = renderHook(() => useViewModelCache(Test1, selector));
-    expect(selector).toHaveBeenCalledTimes(2);
+    expect(selector).toHaveBeenCalledTimes(4);
     expect(result.current).toEqual([recordEqualTo(data1)]);
     unmount();
     Test1.cache.add({ ...data1, email: 'e@f.com' });
-    expect(selector).toHaveBeenCalledTimes(2);
+    expect(selector).toHaveBeenCalledTimes(4);
 });
 
 test('should handle updates between first render and subscription', () => {
@@ -76,8 +75,10 @@ test('should rerender with new results on change', () => {
 
     const { result } = renderHook(() => useViewModelCache(Test1, selector));
     // It is called twice upfront: once as soon as the hook is called and once
-    // as soon as the subscription is added in the layout effect
-    expect(selector).toHaveBeenCalledTimes(2);
+    // as soon as the subscription is added in the layout effect. StrictMode causes
+    // this to happen twice.
+    let calledCount = 4;
+    expect(selector).toHaveBeenCalledTimes(calledCount);
 
     expect(result.current).toEqual([recordEqualTo(data1)]);
     act(() => {
@@ -85,7 +86,7 @@ test('should rerender with new results on change', () => {
     });
 
     expect(result.current).toEqual([recordEqualTo(data1), recordEqualTo(data2)]);
-    expect(selector).toHaveBeenCalledTimes(3);
+    expect(selector).toHaveBeenCalledTimes(++calledCount);
 
     act(() => {
         Test1.cache.add(data1);
@@ -93,7 +94,7 @@ test('should rerender with new results on change', () => {
     });
 
     // No changes, should not have been called again
-    expect(selector).toHaveBeenCalledTimes(3);
+    expect(selector).toHaveBeenCalledTimes(calledCount);
 
     const lastResult = result.current;
 
@@ -103,7 +104,7 @@ test('should rerender with new results on change', () => {
 
     // Selector will have been called but should return same result as cached value
     // is for subset of fields
-    expect(selector).toHaveBeenCalledTimes(4);
+    expect(selector).toHaveBeenCalledTimes(++calledCount);
     expect(result.current).toBe(lastResult);
 
     const data3 = { id: 1, firstName: 'Bobby', lastName: 'Jack', email: 'b@b.com' };
@@ -111,7 +112,7 @@ test('should rerender with new results on change', () => {
         Test1.cache.add(data3);
     });
 
-    expect(selector).toHaveBeenCalledTimes(5);
+    expect(selector).toHaveBeenCalledTimes(++calledCount);
     expect(result.current).toEqual([recordEqualTo(data3), recordEqualTo(data2)]);
 });
 

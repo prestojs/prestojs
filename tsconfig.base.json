@@ -26,7 +26,8 @@
       "@prestojs/util": ["./js-packages/@prestojs/util/src/"],
       "@prestojs/util/*": ["./js-packages/@prestojs/util/src/*"],
       "@prestojs/doc": ["./js-packages/@prestojs/doc/src/"],
-      "@prestojs/doc/*": ["./js-packages/@prestojs/doc/src/*"]
+      "@prestojs/doc/*": ["./js-packages/@prestojs/doc/src/*"],
+      "presto-testing-library": ["./js-testing/presto-testing-library"]
     }
   },
   "references": [

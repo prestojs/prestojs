@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { fireEvent, render, waitFor } from 'presto-testing-library';
 import React from 'react';
 
 import NullableBooleanWidget from '../widgets/NullableBooleanWidget';

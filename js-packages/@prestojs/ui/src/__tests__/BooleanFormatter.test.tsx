@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { render } from '@testing-library/react';
+import { render } from 'presto-testing-library';
 import BooleanFormatter from '../formatters/BooleanFormatter';
 
 test('BooleanFormatter', () => {

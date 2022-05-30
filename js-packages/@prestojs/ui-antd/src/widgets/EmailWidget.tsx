@@ -1,5 +1,5 @@
 import { WidgetProps } from '@prestojs/ui';
-import { Input } from 'antd';
+import { Input, InputRef } from 'antd';
 import React from 'react';
 
 /**
@@ -14,7 +14,7 @@ type EmailWidgetProps = WidgetProps<string, HTMLInputElement>;
  * @menu-group Widgets
  * @forward-ref
  */
-function EmailWidget(props: EmailWidgetProps, ref: React.RefObject<Input>): React.ReactElement {
+function EmailWidget(props: EmailWidgetProps, ref: React.RefObject<InputRef>): React.ReactElement {
     const { input, meta, ...rest } = props;
     return <Input ref={ref} {...input} {...rest} />;
 }

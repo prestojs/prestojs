@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FieldWidgetType, useUi, WidgetProps } from '@prestojs/ui';
 import { Field } from '@prestojs/viewmodel';
-import { render } from '@testing-library/react';
+import { render } from 'presto-testing-library';
 import React from 'react';
 import AntdUiProvider, { useAntdUiConfig } from '../AntdUiProvider';
 
@@ -18,8 +18,12 @@ test('AntdUiProvider should provide AntdUiConfig with DatePicker', () => {
     function Inner(): React.ReactElement {
         const config = useAntdUiConfig();
         countByConfigInstance.set(config, (countByConfigInstance.get(config) || 0) + 1);
-        const DatePicker = config.getDatePicker();
-        return <DatePicker />;
+        try {
+            const DatePicker = config.getDatePicker();
+            return <DatePicker />;
+        } catch (err) {
+            return <h1 data-testid="error">{err.message}</h1>;
+        }
     }
 
     function TestWrapper(props): React.ReactElement {
@@ -30,10 +34,10 @@ test('AntdUiProvider should provide AntdUiConfig with DatePicker', () => {
         );
     }
     global.console.error = jest.fn();
-    expect(() => render(<TestWrapper />)).toThrow(/you must first configure/);
+    const { rerender, getByTestId } = render(<TestWrapper />);
+    expect(getByTestId('error')).toHaveTextContent(/you must first configure/);
     expect(countByConfigInstance.size).toBe(1);
-    // @ts-ignore
-    const { rerender, getByTestId } = render(<TestWrapper datePickerComponent={TestDatePicker} />);
+    rerender(<TestWrapper datePickerComponent={TestDatePicker} />);
     expect(getByTestId('date-picker')).toContainHTML('Test DatePicker');
     // Should return same config instance if components are the same
     rerender(<TestWrapper datePickerComponent={TestDatePicker} />);
@@ -47,8 +51,12 @@ test('AntdUiProvider should provide AntdUiConfig with TimePicker', () => {
     function Inner(): React.ReactElement {
         const config = useAntdUiConfig();
         countByConfigInstance.set(config, (countByConfigInstance.get(config) || 0) + 1);
-        const TimePicker = config.getTimePicker();
-        return <TimePicker />;
+        try {
+            const TimePicker = config.getTimePicker();
+            return <TimePicker />;
+        } catch (err) {
+            return <h1 data-testid="error">{err.message}</h1>;
+        }
     }
 
     function TestWrapper(props): React.ReactElement {
@@ -59,10 +67,10 @@ test('AntdUiProvider should provide AntdUiConfig with TimePicker', () => {
         );
     }
     global.console.error = jest.fn();
-    expect(() => render(<TestWrapper />)).toThrow(/you must first configure/);
+    const { getByTestId, rerender } = render(<TestWrapper />);
+    expect(getByTestId('error')).toHaveTextContent(/you must first configure/);
     expect(countByConfigInstance.size).toBe(1);
-    // @ts-ignore
-    const { rerender, getByTestId } = render(<TestWrapper timePickerComponent={TestTimePicker} />);
+    rerender(<TestWrapper timePickerComponent={TestTimePicker} />);
     expect(getByTestId('time-picker')).toContainHTML('Test TimePicker');
     // Should return same config instance if components are the same
     rerender(<TestWrapper timePickerComponent={TestTimePicker} />);

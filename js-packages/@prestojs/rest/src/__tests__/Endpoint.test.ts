@@ -6,8 +6,8 @@ import {
     PaginatorInterface,
     PaginatorInterfaceClass,
 } from '@prestojs/util';
-import { renderHook } from '@testing-library/react-hooks';
 import { FetchMock } from 'jest-fetch-mock';
+import { renderHook } from 'presto-testing-library';
 import { useState } from 'react';
 import { act } from 'react-test-renderer';
 import Endpoint, { ApiError, MiddlewareNextReturn } from '../Endpoint';

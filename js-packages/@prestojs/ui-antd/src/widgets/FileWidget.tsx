@@ -154,12 +154,6 @@ export function useFileList(
 ): UseFileListReturn {
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const { getThumbUrl, previewImage } = options;
-    const isMounted = useRef(true);
-    useEffect(() => {
-        return (): void => {
-            isMounted.current = false;
-        };
-    }, []);
     useEffect(() => {
         const run = async (): Promise<void> => {
             setFileList(currentFileList => {
@@ -251,26 +245,18 @@ export function useFileList(
                             const resolved = (await Promise.all(promises)).map((entry, i) =>
                                 entry === null ? nextFileList[i] : entry
                             );
-                            // If component unmounted do nothing. Previously we used the cleanup
-                            // for this hook to track whether this was still 'current' but was problematic
-                            // in that the hook could re-render before this finished and the generation
-                            // of preview would essentially be lost. There might be the possibility of
-                            // a race condition here so try to avoid any issues by using callback version
-                            // of setFileList and lookup entries based on UID.
-                            if (isMounted.current) {
-                                setFileList(currentFileList => {
-                                    const nextFileList = [...currentFileList];
-                                    for (const resolvedFile of resolved) {
-                                        const index = nextFileList.findIndex(
-                                            f => f.uid === resolvedFile.uid
-                                        );
-                                        if (index !== -1) {
-                                            nextFileList[index] = resolvedFile;
-                                        }
+                            setFileList(currentFileList => {
+                                const nextFileList = [...currentFileList];
+                                for (const resolvedFile of resolved) {
+                                    const index = nextFileList.findIndex(
+                                        f => f.uid === resolvedFile.uid
+                                    );
+                                    if (index !== -1) {
+                                        nextFileList[index] = resolvedFile;
                                     }
-                                    return nextFileList;
-                                });
-                            }
+                                }
+                                return nextFileList;
+                            });
                         } catch (e) {
                             console.error('Failed to generate preview for images', e);
                         }

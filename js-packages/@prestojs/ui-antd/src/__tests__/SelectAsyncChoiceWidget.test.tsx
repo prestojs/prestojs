@@ -7,13 +7,9 @@ import {
     useViewModelCache,
     viewModelFactory,
 } from '@prestojs/viewmodel';
-import { act, fireEvent, getAllByTestId, getByText, render, waitFor } from '@testing-library/react';
+import { act, fireEvent, getAllByTestId, render, waitFor } from 'presto-testing-library';
 import React, { useState } from 'react';
 import SelectAsyncChoicesWidget from '../widgets/SelectAsyncChoicesWidget';
-
-function delay<T>(fn, timeout = 0): Promise<T> {
-    return new Promise((resolve, reject) => setTimeout(() => resolve(fn(reject)), timeout));
-}
 
 type TestDataItem = { name: string; id: number; _key: number };
 const testData: TestDataItem[] = Array.from({ length: 12 }, (_, i) => ({
@@ -29,19 +25,17 @@ const namesForRange = (start, end): string[] => testData.slice(start, end).map(i
 
 function resolveSingle(id: number[]): Promise<TestDataItem[]>;
 function resolveSingle(id: number): Promise<TestDataItem>;
-function resolveSingle(id: number | number[]): Promise<TestDataItem | TestDataItem[]> {
+async function resolveSingle(id: number | number[]): Promise<TestDataItem | TestDataItem[]> {
     if (Array.isArray(id)) {
-        return delay(() => id.map(i => testData[i]));
+        return id.map(i => testData[i]);
     }
-    return delay(reject => {
-        if (!testData[id]) {
-            return reject('Not found');
-        }
-        return testData[id];
-    });
+    if (!testData[id]) {
+        return Promise.reject('Not found');
+    }
+    return testData[id];
 }
 
-function resolveMulti(
+async function resolveMulti(
     query: Record<string, any> = {},
     paginator: PageNumberPaginator
 ): Promise<TestDataItem[]> {
@@ -63,7 +57,20 @@ function resolveMulti(
             pageSize,
         });
     }
-    return delay(() => results);
+    return results;
+}
+
+class AsyncChoicesWithPromise extends AsyncChoices<TestDataItem, number> {
+    _lastPromiseWithResult: Promise<TestDataItem[]>;
+    // React act expects promise returned to be `void` - so just wrap the actual promise and ignore return result
+    get _lastPromise(): Promise<void> {
+        if (!this._lastPromiseWithResult) {
+            return Promise.resolve();
+        }
+        return this._lastPromiseWithResult.then(() => {
+            // do nothing
+        });
+    }
 }
 
 function buildAsyncChoices<Multiple extends boolean>({
@@ -81,19 +88,31 @@ function buildAsyncChoices<Multiple extends boolean>({
 } & Pick<
     AsyncChoicesOptions<TestDataItem, number>,
     'useRetrieveProps' | 'getLabel' | 'getChoices'
->): AsyncChoices<TestDataItem, number> {
-    return new AsyncChoices({
+>): AsyncChoicesWithPromise {
+    return new AsyncChoicesWithPromise({
         multiple: multiple as Multiple,
         useListProps(): { paginator: Paginator<any, any> } {
             return { paginator: usePaginator(PageNumberPaginator) };
         },
-        list(params): Promise<TestDataItem[]> {
-            return list(params.query || {}, params.paginator);
+        async list(params): Promise<TestDataItem[]> {
+            const promise = list(params.query || {}, params.paginator);
+            // @ts-ignore
+            this._lastPromiseWithResult = Promise.allSettled([
+                this._lastPromiseWithResult,
+                promise,
+            ]);
+            return promise;
         },
         retrieve(
             value: number[] | number
         ): Promise<typeof value extends number[] ? TestDataItem[] : TestDataItem> {
-            return retrieve(value);
+            const promise = retrieve(value);
+            // @ts-ignore
+            this._lastPromiseWithResult = Promise.allSettled([
+                this._lastPromiseWithResult,
+                promise,
+            ]);
+            return promise;
         },
         getLabel(item: TestDataItem): React.ReactNode {
             return item.name;
@@ -122,13 +141,15 @@ const widgetProps = {
     },
 };
 
-async function waitForOptions(id: any, names: string[]): Promise<any> {
-    await waitFor(() =>
-        expect(getAllByTestId(id, 'select-option').map(item => item.textContent)).toEqual(names)
-    );
-    // I don't understand why but adding this avoided various 'Warning: An update to PopupInner inside a test was not wrapped in act(...).'
-    // warnings.
-    await waitFor(() => getByText(id, names[0]));
+async function waitForOptions(
+    id: any,
+    asyncChoices: AsyncChoicesWithPromise,
+    names: string[]
+): Promise<any> {
+    try {
+        await act(() => asyncChoices._lastPromise);
+    } catch (e) {}
+    expect(getAllByTestId(id, 'select-option').map(item => item.textContent)).toEqual(names);
 }
 
 function waitForSelectedValue(container, value: string | string[]): Promise<any> {
@@ -173,10 +194,6 @@ afterAll(() => {
     globalWarnSpy.mockRestore();
 });
 
-afterEach(async () => {
-    jest.useRealTimers();
-});
-
 test('should support fetching all paginated records', async () => {
     const input = buildInput();
     const list = jest.fn(resolveMulti);
@@ -192,17 +209,20 @@ test('should support fetching all paginated records', async () => {
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
     expect(list).toHaveBeenCalledTimes(2);
-    await waitForOptions(baseElement, namesForRange(0, 10));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 10));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
     expect(list).toHaveBeenCalledTimes(3);
-    await waitForOptions(baseElement, namesForRange(0, 12));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 12));
+    expect(getAllByTestId(baseElement, 'select-option').map(item => item.textContent)).toEqual(
+        namesForRange(0, 12)
+    );
     expect(queryByText('Fetch More')).toBeNull();
 });
 
@@ -223,21 +243,21 @@ test('should reset pagination on keyword changes', async () => {
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
     expect(list).toHaveBeenCalledTimes(2);
-    await waitForOptions(baseElement, namesForRange(5, 10));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(5, 10));
     act(() => {
         fireEvent.change(getByRole('combobox'), { target: { value: 'Item' } });
     });
     // Search matches all items but we should only get first page again
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
-    await waitForOptions(baseElement, namesForRange(5, 10));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(5, 10));
 });
 
 test('should support initial value', async () => {
@@ -249,21 +269,23 @@ test('should support initial value', async () => {
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, 'Item 2');
     input.value = 4;
     rerender(
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(++calledCount);
     await waitForSelectedValue(container, 'Item 4');
 
     // Now trigger a listing which will fetch the first 5 records
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalledTimes(1);
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     // Changing selected value to Item 1 should not trigger another fetch; we already
     // have it from the list call
     input.value = 1;
@@ -271,7 +293,7 @@ test('should support initial value', async () => {
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).toHaveBeenCalledTimes(1);
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, 'Item 1');
     // await waitFor(() => getByText('Item 1'));
 });
@@ -302,13 +324,15 @@ test('should support onRetrieveError', async () => {
     }
     const { container } = render(<Wrapper />);
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, 'Item 2');
     act(() => {
         input.onChange(66);
     });
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(++calledCount);
     await waitFor(() => expect(onRetrieveError).toHaveBeenCalledTimes(1));
     expect(container.querySelector('.ant-select-selection-item')).not.toBeInTheDocument();
 });
@@ -328,17 +352,17 @@ test('should call onChange with selected value', async () => {
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Item 2'));
     });
     expect(input.onChange).toHaveBeenCalledWith(2);
     openDropDown(container);
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
-    await waitForOptions(baseElement, namesForRange(0, 10));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 10));
     act(() => {
         fireEvent.click(getByText('Item 7'));
     });
@@ -392,7 +416,7 @@ test('should be able to integrate with viewmodel cache', async () => {
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalledTimes(1);
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     input.value = 4;
     rerender(
         <SelectAsyncChoicesWidget
@@ -407,7 +431,7 @@ test('should be able to integrate with viewmodel cache', async () => {
         User.cache.add({ id: 4, name: 'Item 4 New Name' });
     });
     expect(retrieve).not.toHaveBeenCalled();
-    await waitForOptions(baseElement, [...namesForRange(0, 4), 'Item 4 New Name']);
+    await waitForOptions(baseElement, asyncChoices, [...namesForRange(0, 4), 'Item 4 New Name']);
     await waitForSelectedValue(container, 'Item 4 New Name');
 
     act(() => {
@@ -427,7 +451,7 @@ test('should be able to integrate with viewmodel cache', async () => {
     act(() => {
         User.cache.delete(66);
     });
-    await waitForOptions(baseElement, [...namesForRange(0, 4), 'Item 4 New Name']);
+    await waitForOptions(baseElement, asyncChoices, [...namesForRange(0, 4), 'Item 4 New Name']);
     // Value missing, defaults to render the raw value
     await waitForSelectedValue(container, '66');
 });
@@ -472,21 +496,21 @@ test('should handle grouped choices', async () => {
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     expect(getByText('Items 0 - 5')).toBeInTheDocument();
     expect(queryByText('Items 5+')).not.toBeInTheDocument();
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
     expect(list).toHaveBeenCalledTimes(2);
-    await waitForOptions(baseElement, namesForRange(0, 10));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 10));
     expect(getByText('Items 0 - 5')).toBeInTheDocument();
     expect(getByText('Items 5+')).toBeInTheDocument();
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
     expect(list).toHaveBeenCalledTimes(3);
-    await waitForOptions(baseElement, namesForRange(0, 12));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 12));
     expect(queryByText('Fetch More')).toBeNull();
 });
 
@@ -499,6 +523,7 @@ test('should support loadingContent', async () => {
             asyncChoices={asyncChoices}
             input={input}
             virtual={false}
+            debounceWait={0}
             loadingContent={<div data-testid="loading">Loading...</div>}
             notFoundContent={<div data-testid="not-found">No matches</div>}
             {...widgetProps}
@@ -507,16 +532,17 @@ test('should support loadingContent', async () => {
     openDropDown(container);
     expect(getByTestId('loading')).toHaveTextContent('Loading...');
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
-    act(() => {
-        fireEvent.change(getByRole('combobox'), { target: { value: 'NO_MATCH' } });
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
+    await act(async () => {
+        fireEvent.change(getByRole('combobox'), { target: { value: 'NO_MATCHES' } });
+        await asyncChoices._lastPromise;
     });
     await waitFor(() => expect(getByTestId('not-found')).toHaveTextContent('No matches'));
     act(() => {
         fireEvent.change(getByRole('combobox'), { target: { value: 'Item 2' } });
     });
     await waitFor(() => expect(getByTestId('loading')).toHaveTextContent('Loading...'));
-    await waitForOptions(baseElement, namesForRange(2, 3));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(2, 3));
 });
 
 test('should support custom fetch more button', async () => {
@@ -539,18 +565,18 @@ test('should support custom fetch more button', async () => {
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     expect(getByTestId('next-page')).toHaveTextContent('Next');
     act(() => {
         fireEvent.click(getByTestId('next-page'));
     });
     expect(list).toHaveBeenCalledTimes(2);
-    await waitForOptions(baseElement, namesForRange(0, 10));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 10));
     act(() => {
         fireEvent.click(getByTestId('next-page'));
     });
     expect(list).toHaveBeenCalledTimes(3);
-    await waitForOptions(baseElement, namesForRange(0, 12));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 12));
     expect(queryByText('Next Page')).toBeNull();
 });
 
@@ -570,7 +596,7 @@ test('should support disabling fetch more button', async () => {
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     expect(queryByText('Fetch More')).toBeNull();
 });
 
@@ -587,10 +613,12 @@ test('should support triggerWhenClosed', async () => {
             {...widgetProps}
         />
     );
-    expect(list).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(list).toHaveBeenCalledTimes(calledCount);
     openDropDown(container);
-    await waitForOptions(baseElement, namesForRange(0, 5));
-    expect(list).toHaveBeenCalledTimes(1);
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
+    expect(list).toHaveBeenCalledTimes(calledCount);
 });
 
 test('should work if asyncChoices instance changes', async () => {
@@ -609,12 +637,12 @@ test('should work if asyncChoices instance changes', async () => {
     );
     openDropDown(container);
     expect(list1).toHaveBeenCalledTimes(1);
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices1, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
     expect(list1).toHaveBeenCalledTimes(2);
-    await waitForOptions(baseElement, namesForRange(0, 10));
+    await waitForOptions(baseElement, asyncChoices1, namesForRange(0, 10));
     rerender(
         <SelectAsyncChoicesWidget
             asyncChoices={asyncChoices2}
@@ -625,13 +653,13 @@ test('should work if asyncChoices instance changes', async () => {
     );
     expect(list1).toHaveBeenCalledTimes(2);
     expect(list2).toHaveBeenCalledTimes(1);
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices2, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
     expect(list1).toHaveBeenCalledTimes(2);
     expect(list2).toHaveBeenCalledTimes(2);
-    await waitForOptions(baseElement, namesForRange(0, 10));
+    await waitForOptions(baseElement, asyncChoices2, namesForRange(0, 10));
 });
 
 test('should support multi select', async () => {
@@ -643,20 +671,22 @@ test('should support multi select', async () => {
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, ['Item 2', 'Item 3']);
     input.value = [4];
     rerender(
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(++calledCount);
     await waitForSelectedValue(container, ['Item 4']);
 
     // Now trigger a listing which will fetch the first 5 records
     openDropDown(container);
     expect(list).toHaveBeenCalledTimes(1);
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     // Changing selected value to Item 1 should not trigger another fetch; we already
     // have it from the list call
     input.value = [1];
@@ -664,7 +694,7 @@ test('should support multi select', async () => {
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );
     expect(list).toHaveBeenCalledTimes(1);
-    expect(retrieve).toHaveBeenCalledTimes(2);
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, ['Item 1']);
 });
 
@@ -684,15 +714,15 @@ test('support filtering results', async () => {
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     act(() => {
         fireEvent.change(getByRole('combobox'), { target: { value: 'Item 1' } });
     });
-    await waitForOptions(baseElement, ['Item 1', 'Item 10', 'Item 11']);
+    await waitForOptions(baseElement, asyncChoices, ['Item 1', 'Item 10', 'Item 11']);
     act(() => {
         fireEvent.change(getByRole('combobox'), { target: { value: 'Item 2' } });
     });
-    await waitForOptions(baseElement, ['Item 2']);
+    await waitForOptions(baseElement, asyncChoices, ['Item 2']);
 });
 
 test('should support custom query parameter name', async () => {
@@ -711,15 +741,15 @@ test('should support custom query parameter name', async () => {
     );
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     act(() => {
         fireEvent.change(getByRole('combobox'), { target: { value: 'Item 1' } });
     });
-    await waitForOptions(baseElement, ['Item 1']);
+    await waitForOptions(baseElement, asyncChoices, ['Item 1']);
     act(() => {
         fireEvent.change(getByRole('combobox'), { target: { value: 'Item 2' } });
     });
-    await waitForOptions(baseElement, ['Item 2']);
+    await waitForOptions(baseElement, asyncChoices, ['Item 2']);
 });
 
 test('search triggered after unmount due to debounce should not error', async () => {
@@ -738,7 +768,7 @@ test('search triggered after unmount due to debounce should not error', async ()
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     jest.useFakeTimers();
     act(() => {
         fireEvent.change(getByRole('combobox'), { target: { value: 'Item 1' } });
@@ -766,17 +796,17 @@ test('should support clearOnOpen', async () => {
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
     expect(list).toHaveBeenCalled();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
     act(() => {
         fireEvent.click(getByText('Fetch More'));
     });
-    await waitForOptions(baseElement, namesForRange(0, 10));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 10));
     act(() => {
         fireEvent.click(getByText('Item 7'));
     });
     // Opening drop down again should have retained all fetched records
     openDropDown(container);
-    await waitForOptions(baseElement, namesForRange(0, 10));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 10));
     act(() => {
         fireEvent.click(getByText('Item 1'));
     });
@@ -792,7 +822,7 @@ test('should support clearOnOpen', async () => {
     );
     openDropDown(container);
     expect(getByText('Fetching results...')).toBeInTheDocument();
-    await waitForOptions(baseElement, namesForRange(0, 5));
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
 });
 
 test('should support onClear', async () => {
@@ -810,7 +840,9 @@ test('should support onClear', async () => {
         />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, 'Item 2');
     act(() => {
         fireEvent.mouseDown(getByTestId('close'));
@@ -833,7 +865,9 @@ test('should support onClear (multiple)', async () => {
         />
     );
     expect(list).not.toHaveBeenCalled();
-    expect(retrieve).toHaveBeenCalledTimes(1);
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
     await waitForSelectedValue(container, ['Item 1', 'Item 2']);
     act(() => {
         fireEvent.mouseDown(getByTestId('close'));

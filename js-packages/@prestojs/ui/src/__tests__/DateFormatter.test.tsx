@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render } from 'presto-testing-library';
 import React from 'react';
 import DateFormatter from '../formatters/DateFormatter';
 

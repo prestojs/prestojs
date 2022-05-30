@@ -110,18 +110,10 @@ export interface UseAsyncOptions<ResultT, ErrorT> {
     /**
      * Called when async function resolves successfully. Is passed a single parameter which
      * is the result from the async function.
-     *
-     * **NOTE:** If your component unmounts before the promise resolves this function
-     * will NOT be called. This is to avoid the general case of calling React
-     * state transition functions on an unmounted component. If you want the
-     * method to be called regardless then attach your own callbacks to the
-     * promise when you call `run` or in the async function definition itself.
      */
     onSuccess?: OnSuccess<ResultT>;
     /**
      * Called when async function errors. Passed the error returned from async function.
-     *
-     * See note above on `onSuccess` for behaviour when component has unmounted.
      */
     onError?: OnError<ErrorT>;
 }
@@ -415,33 +407,12 @@ function useAsync<ResultT, ErrorT = Error>(
     // =========================================================================
 
     // =========================================================================
-    // This effect tracks mount status and executes a cached callback (abortRef)
-    // when unmounting occurs.
-    const isMounted = useRef(true);
-    useEffect(() => {
-        return (): void => {
-            isMounted.current = false;
-            if (abortRef.current) {
-                abortRef.current();
-            }
-        };
-    }, []);
-    // =========================================================================
-
-    // =========================================================================
     // Create callback that is returned and can be called by the consumer. This
     // just calls `execute` but optionally supports changing the arguments it
     // is called with (if arguments are passed they override `args`, otherwise
     // `args` is used).
     const run = useCallback(
         (...executeArgs) => {
-            if (!isMounted.current) {
-                const message =
-                    "useAsync 'run' method was called after component was unmounted. This has no effect. If you are calling it in the response of a promise then ensure the component is still mounted otherwise call the function directly and don't use useAsync.";
-                // eslint-disable-next-line no-console
-                console.warn(message);
-                return Promise.reject(message);
-            }
             if (executeArgs.length === 0) {
                 executeArgs = lastValues.current.args;
             }
@@ -474,7 +445,9 @@ function useAsync<ResultT, ErrorT = Error>(
 
     return useMemo(
         () => ({
-            ...state,
+            result: state.result,
+            error: state.error,
+            isLoading: state.isLoading,
             reset,
             run,
             get response(): typeof state.result {

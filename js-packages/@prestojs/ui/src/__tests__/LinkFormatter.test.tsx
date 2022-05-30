@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/extend-expect';
-import { render } from '@testing-library/react';
+import { render } from 'presto-testing-library';
 import React from 'react';
 import LinkFormatter from '../formatters/LinkFormatter';
 

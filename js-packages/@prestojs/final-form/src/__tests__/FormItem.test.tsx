@@ -1,6 +1,6 @@
 import { UiProvider } from '@prestojs/ui';
 import { NumberField, viewModelFactory } from '@prestojs/viewmodel';
-import { render } from '@testing-library/react';
+import { render } from 'presto-testing-library';
 import React from 'react';
 import Form from '../Form';
 

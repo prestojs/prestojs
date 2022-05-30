@@ -40,6 +40,7 @@ export interface FormItemProps {
 
 export interface FormProps {
     onSubmit: (...args: any[]) => any;
+    children: React.ReactNode;
 }
 
 export interface UiContextValue {

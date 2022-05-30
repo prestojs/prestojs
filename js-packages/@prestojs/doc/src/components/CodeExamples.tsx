@@ -97,6 +97,28 @@ function useLocalStorageState(key, defaultValue) {
 
 export default function CodeExamples({ examples }: { examples: DocExample[] }) {
     const [language, setLanguage] = useLocalStorageState('codeExamplesLanguage', 'jsx');
+    // Group examples into rows of 2 or 1 if the 'wide' tag is set
+    const { rows, currentRow } = examples.reduce(
+        (acc, example, i) => {
+            if (example.header.tags.wide) {
+                if (acc.currentRow.length > 0) {
+                    acc.rows.push(acc.currentRow);
+                }
+                acc.rows.push([example]);
+            } else {
+                acc.currentRow.push(example);
+                if (acc.currentRow.length === 2) {
+                    acc.rows.push(acc.currentRow);
+                    acc.currentRow = [];
+                }
+            }
+            return acc;
+        },
+        { rows: [], currentRow: [] } as { rows: DocExample[][]; currentRow: DocExample[] }
+    );
+    if (currentRow.length > 0) {
+        rows.push(currentRow);
+    }
     return (
         <div className="my-5">
             <div className="border-b border-gray-400 mb-5 flex justify-between ">
@@ -119,14 +141,16 @@ export default function CodeExamples({ examples }: { examples: DocExample[] }) {
                     'grid-cols-2': examples.length !== 1,
                 })}
             >
-                {examples.map((example, i) => (
-                    <CodeExample
-                        key={example.name}
-                        example={example}
-                        language={language}
-                        forceWide={i === examples.length - 1 && i % 2 == 1}
-                    />
-                ))}
+                {rows.map(examples =>
+                    examples.map(example => (
+                        <CodeExample
+                            key={example.name}
+                            example={example}
+                            language={language}
+                            forceWide={examples.length === 1}
+                        />
+                    ))
+                )}
             </div>
         </div>
     );
