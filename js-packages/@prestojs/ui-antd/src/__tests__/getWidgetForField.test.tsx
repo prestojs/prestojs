@@ -68,11 +68,11 @@ import URLWidget from '../widgets/URLWidget';
 import UUIDWidget from '../widgets/UUIDWidget';
 
 test('getWidgetForField should return widget for field', async () => {
-    const UnknownWidget = getWidgetForField(new PasswordField()) as any;
+    const [UnknownWidget, props] = getWidgetForField(new PasswordField()) as any;
 
     const { getByTestId, getByText } = render(
         <React.Suspense fallback="loading...">
-            <UnknownWidget data-testid="widget" />
+            <UnknownWidget data-testid="widget" {...props} />
         </React.Suspense>
     );
 
@@ -84,11 +84,11 @@ test('getWidgetForField should return widget for field', async () => {
 test('getWidgetForField should return widget for descendant classes of same type', async () => {
     class CustomDecimal extends NumberField {}
 
-    const UnknownWidget = getWidgetForField(new CustomDecimal()) as any;
+    const [UnknownWidget, props] = getWidgetForField(new CustomDecimal()) as any;
 
     const { getByTestId, getByText } = render(
         <React.Suspense fallback="loading...">
-            <UnknownWidget data-testid="widget" />
+            <UnknownWidget data-testid="widget" {...props} />
         </React.Suspense>
     );
 

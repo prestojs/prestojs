@@ -1,6 +1,6 @@
 export { default as viewModelFactory, BaseViewModel } from './ViewModelFactory';
 export { default as ViewModelCache } from './ViewModelCache';
-export { default as Field } from './fields/Field';
+export { default as Field, ViewModelFieldWidgetProps } from './fields/Field';
 
 export { default as BooleanField } from './fields/BooleanField';
 export { default as CharField } from './fields/CharField';

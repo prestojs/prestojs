@@ -183,7 +183,7 @@ export type AntdUiProviderProps = {
  * function getWidgetForField(field) {
  *    // Add any app specific customisations here, eg
  *    // if (field instanceof BooleanField) {
- *    //    return CustomBooleanWidget;
+ *    //    return [CustomBooleanWidget, field.getWidgetProps()];
  *    // }
  *    // Otherwise fall back to specific UI library defaults
  *    let widget;

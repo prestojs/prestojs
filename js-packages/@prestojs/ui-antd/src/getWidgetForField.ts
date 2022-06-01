@@ -71,8 +71,6 @@ function splitWidgetAndProps(
  * > The widget components here are loaded using [React.lazy](https://reactjs.org/docs/code-splitting.html). Your build must support
  * > this otherwise it is recommended to implement your own version (you can copy [this implementation](https://github.com/prestojs/prestojs/blob/master/js-packages/@prestojs/ui-antd/src/getWidgetForField.ts)
  * > as a starting point).
- * >
- * > If you are using [nextjs React.lazy is not supported](https://nextjs.org/docs/advanced-features/dynamic-import) - you can [switch it out for `next/dynamic`](https://github.com/prestojs/prestojs/blob/master/doc-site/getWidgetForField.js).
  *
  * ### Simple usage:
  *
@@ -148,7 +146,7 @@ export default function getWidgetForField<
         }
         if (fieldClassName === 'ListField' && !widget) {
             const [_widget, props] = splitWidgetAndProps(
-                getWidget((field as unknown as ListField<any, any>).childField)
+                getWidget((_field as unknown as ListField<any, any>).childField)
             );
             if (_widget) {
                 return [_widget, { ...props, multiple: true }];
@@ -171,6 +169,7 @@ export default function getWidgetForField<
             const finalProps = {
                 ...props,
                 ...extraProps,
+                ..._field.getWidgetProps(),
             };
             // Only set this when necessary to avoid passing props through
             // with undefined value that may make it's way through to the DOM
@@ -180,17 +179,11 @@ export default function getWidgetForField<
             if (_field.asyncChoices) {
                 finalProps.asyncChoices = _field.asyncChoices;
             }
+
             return [finalWidget, finalProps];
         } else {
-            if (
-                widget &&
-                'maxLength' in _field &&
-                (_field as typeof _field & { maxLength: number }).maxLength > 0
-            ) {
-                return [
-                    _widget,
-                    { maxLength: (_field as typeof _field & { maxLength: number }).maxLength },
-                ];
+            if (widget) {
+                return [_widget, _field.getWidgetProps()];
             }
             return _widget;
         }

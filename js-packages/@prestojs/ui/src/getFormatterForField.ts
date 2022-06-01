@@ -75,8 +75,6 @@ const choicesMapping = new Map<string, any>([
  * > The formatter components here are loaded using [React.lazy](https://reactjs.org/docs/code-splitting.html). Your build must support
  * > this otherwise it is recommended to implement your own version (you can copy [this implementation](https://github.com/prestojs/prestojs/blob/master/js-packages/@prestojs/ui/src/getFormatterForField.ts)
  * > as a starting point).
- * >
- * > If you are using [nextjs React.lazy is not supported](https://nextjs.org/docs/advanced-features/dynamic-import) - you can [switch it out for `next/dynamic`](https://github.com/prestojs/prestojs/blob/master/doc-site/getFormatterForField.js).
  *
  * @extract-docs
  */
@@ -99,11 +97,14 @@ export default function getFormatterForField<
     ): React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>] | string => {
         if (f.choices) {
             if (Array.isArray(w)) {
-                return [w[0], { ...w[1], choices: f.choices }];
+                return [w[0], { ...w[1], choices: f.choices, ...f.getFormatterProps() }];
             } else {
-                return [w, { choices: f.choices }];
+                return [w, { choices: f.choices, ...f.getFormatterProps() }];
             }
         } else {
+            if (w) {
+                return [w, f.getFormatterProps()];
+            }
             return w;
         }
     };
