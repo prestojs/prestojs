@@ -4,6 +4,8 @@
  * This example shows the default widget that will be used in a [Form](doc:Form)
  * when using [@prestojs/ui-antd](/docs/ui-antd). See [getWidgetForField](doc:getWidgetForField).
  *
+ * The default widget is [DateWidget](doc:DateWidget)
+ *
  * Internally the Antd widget will use a third party date object like [Moment](https://momentjs.com/)
  * or [dayjs](https://day.js.org/). To support this you must specify `datePickerComponent` in the
  * [AntdUiProvider](doc:AntdUiProvider) usage.

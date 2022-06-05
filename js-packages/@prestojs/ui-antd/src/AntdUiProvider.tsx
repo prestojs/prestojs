@@ -117,7 +117,7 @@ export const AntdUiContext = React.createContext<AntdUiConfig | null>(null);
  *     const config = useAntdUiConfig();
  *     const DatePicker = config.getDatePicker();
  *
- *     return <DatePicker {...props} >
+ *     return <DatePicker {...props} />
  * }
  * ```
  *

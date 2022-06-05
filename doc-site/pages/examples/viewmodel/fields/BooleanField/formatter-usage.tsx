@@ -4,6 +4,12 @@
  * This example shows the default formatter that will be used with [FieldFormatter](doc:FieldFormatter).
  *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
+ *
+ * The default formatter for `BooleanField` is [BooleanFormatter](doc:BooleanFormatter).
+ *
+ * You can pass options for the formatter via the [Field](doc:Field) under the `formatterOptions`
+ * option. These will be passed through to the formatter component (eg. `trueLabel` & `falseLabel` in
+ * this example).
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';
 import { BooleanField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
@@ -12,7 +18,12 @@ import React from 'react';
 class ExampleModel extends viewModelFactory(
     {
         id: new IntegerField(),
-        isActive: new BooleanField(),
+        isActive: new BooleanField({
+            formatterProps: {
+                trueLabel: '✅',
+                falseLabel: '❌',
+            },
+        }),
         receiveNewsletter: new BooleanField({
             label: 'Subscribe to newsletter',
         }),

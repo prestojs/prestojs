@@ -43,7 +43,11 @@ export type FormItemProps<T> = (FormItemPropsNoField | FormItemPropsWithField<T>
  * // Fill out label, help text, required indicator and the field widget component to use based
  * // on the User email field
  * <Form.Item field={User.fields.email} />
- * // The equivalent thing writing out everything explicitly:
+ * ```
+ *
+ * The equivalent thing writing out everything explicitly:
+ *
+ * ```js
  * <Form.Item
  *     required={User.fields.email.required}
  *     label={User.fields.email.label}

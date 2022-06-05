@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { DocType, Flags, RichDescription } from '../newTypes';
+import { DocType, Flags, IndexSignatureType, RichDescription } from '../newTypes';
 import Description from './Description';
 import Table from './Table';
 import Type from './Type';
@@ -22,7 +22,7 @@ export default function TypeTable({
     attributeHeader?: React.ReactNode;
     showRequiredColumn?: boolean;
     title?: ReactNode;
-    indexSignature?: never;
+    indexSignature?: IndexSignatureType;
 }): React.ReactElement {
     const parameters: Item[] = [];
     for (const param of dataSource) {
@@ -41,6 +41,14 @@ export default function TypeTable({
         } else {
             parameters.push(param);
         }
+    }
+    if (indexSignature) {
+        parameters.push({
+            flags: {},
+            name: '...',
+            type: indexSignature.type,
+            description: indexSignature.description,
+        });
     }
     return (
         <Table
@@ -76,9 +84,6 @@ export default function TypeTable({
                         return record.flags.expandProperties ? 2 : 1;
                     },
                     render(name, prop) {
-                        if (prop === indexSignature) {
-                            return '...';
-                        }
                         if (prop.type.typeName === 'propertiesFrom') {
                             return '...';
                         }

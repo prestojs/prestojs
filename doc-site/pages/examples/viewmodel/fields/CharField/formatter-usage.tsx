@@ -6,6 +6,11 @@
  * This just outputs the string exactly as entered.
  *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
+ *
+ * The default formatter for `CharField` is [CharFormatter](doc:CharFormatter).
+ *
+ * You can pass options for the formatter via the [Field](doc:Field) under the `formatterOptions`
+ * option. These will be passed through to the formatter component (eg. `blankLabel` in this example).
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';
 import { CharField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
@@ -15,12 +20,13 @@ class ExampleModel extends viewModelFactory(
     {
         id: new IntegerField(),
         fullName: new CharField(),
+        address: new CharField({ formatterProps: { blankLabel: <em>Not supplied</em> } }),
     },
     { pkFieldName: 'id' }
 ) {}
 
 export default function FormUsage() {
-    const record = new ExampleModel({ id: 1, fullName: 'PrestoJS' });
+    const record = new ExampleModel({ id: 1, fullName: 'PrestoJS', address: '' });
     return (
         <React.Suspense fallback="Loading...">
             <UiProvider getFormatterForField={getFormatterForField}>
@@ -29,6 +35,10 @@ export default function FormUsage() {
                         <dt>{ExampleModel.fields.fullName.label}</dt>
                         <dd>
                             <FieldFormatter field={record._f.fullName} />
+                        </dd>
+                        <dt>{ExampleModel.fields.address.label}</dt>
+                        <dd>
+                            <FieldFormatter field={record._f.address} />
                         </dd>
                     </dl>
                 </div>

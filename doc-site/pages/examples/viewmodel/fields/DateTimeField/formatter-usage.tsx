@@ -4,17 +4,34 @@
  * This example shows the default formatter that will be used with [FieldFormatter](doc:FieldFormatter).
  *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
+ *
+ * The default formatter for `DateTimeField` is [DateTimeFormatter](doc:DateTimeFormatter).
+ *
+ * You can pass options for the formatter via the [Field](doc:Field) under the `formatterOptions`
+ *  option. These will be passed through to the formatter component (eg. `locales` & `localeOptions`
+ *  in this example).
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';
-import { DateField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
+import { DateTimeField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
 import React from 'react';
 
 class ExampleModel extends viewModelFactory(
     {
         id: new IntegerField(),
-        activatedAt: new DateField(),
-        deactivateAt: new DateField({
+        activatedAt: new DateTimeField({
+            formatterProps: {
+                locales: ['en-AU'],
+            },
+        }),
+        deactivateAt: new DateTimeField({
             label: 'Date deactivated',
+            formatterProps: {
+                locales: ['en-AU'],
+                localeOptions: {
+                    dateStyle: 'short',
+                    timeStyle: 'short',
+                },
+            },
         }),
     },
     { pkFieldName: 'id' }
@@ -33,12 +50,12 @@ export default function FormUsage(props) {
                     <dl>
                         <dt>{ExampleModel.fields.activatedAt.label}</dt>
                         <dd>
-                            <FieldFormatter field={record._f.activatedAt} locales={['en-AU']} />
+                            <FieldFormatter field={record._f.activatedAt} />
                         </dd>
                         <dt>{ExampleModel.fields.deactivateAt.label}</dt>
                         <dd>
                             {' '}
-                            <FieldFormatter field={record._f.deactivateAt} locales={['en-AU']} />
+                            <FieldFormatter field={record._f.deactivateAt} />
                         </dd>
                     </dl>
                 </div>

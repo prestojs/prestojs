@@ -138,6 +138,13 @@ export interface MethodType {
     signatures: Signature[];
 }
 
+export interface IndexSignatureType {
+    typeName: 'indexSignature';
+    description?: RichDescription;
+    parameters: { name: string; type: DocType }[];
+    type: DocType;
+}
+
 export interface ContainerType {
     typeName: 'container';
     name?: string;
@@ -147,6 +154,7 @@ export interface ContainerType {
         type: DocType;
         description?: RichDescription;
     }[];
+    indexSignature?: IndexSignatureType;
 }
 
 export interface UnknownType {

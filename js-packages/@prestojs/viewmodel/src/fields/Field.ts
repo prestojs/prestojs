@@ -101,7 +101,7 @@ export interface FieldProps<ValueT, SingleValueT = ValueT> {
      * It's up to the component implementations to make use of them. By default the `@prestojs/ui-antd` components
      * should support any of the underlying `antd` component props via this option.
      *
-     * ```
+     * ```js
      * new Field({ widgetProps: { placeholder: 'Enter you name' }})
      * ```
      */
@@ -114,7 +114,7 @@ export interface FieldProps<ValueT, SingleValueT = ValueT> {
      *
      * It's up to the component implementations to make use of them.
      *
-     * ```
+     * ```js
      * new BooleanField({ formatterProps: { trueLabel: '✅', falseLabel: '❌' }})
      * ```
      */
@@ -214,7 +214,7 @@ export interface ViewModelFieldFormatterProps {
  * class Person extends viewModelFactory({
  *     id: new Field(),
  *     age: new IntegerField(),
- * } {}
+ * }, { pkFieldName: "id" }) {}
  * const jo = new Person({ id: 1, age: "33" });
  * jo.age
  * // 33 (as a number - not a string)
@@ -303,7 +303,7 @@ export interface ViewModelFieldFormatterProps {
  * // You can pass through the array directly
  * new Field({ choices });
  * // Or a Map
- * new Field({ choices: new Map(choices) };
+ * new Field({ choices: new Map(choices) });
  * ```
  *
  * If you access the choices via the [choices property](#Properties-choices) it will always be a `Map`.
@@ -564,7 +564,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      *
      * ```js
      * // This might become
-     * {
+     * value = {
      *     name: 'Sam',
      *     address: {
      *         id: 5,
@@ -572,7 +572,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      *     },
      * }
      * // ...this
-     * {
+     * value = {
      *     name: 'Same',
      *     address: 5,
      * }

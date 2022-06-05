@@ -4,6 +4,8 @@
  * This example shows the default formatter that will be used with [FieldFormatter](doc:FieldFormatter).
  *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
+ *
+ * The default formatter for `DateField` is [DateFormatter](doc:DateFormatter).
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';
 import { DateField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';

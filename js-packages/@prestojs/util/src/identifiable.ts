@@ -1,11 +1,29 @@
-type SingleId = string | number;
-type CompoundId = { [fieldName: string]: SingleId };
+/**
+ * Type representing a single ID - eg. a number or string
+ */
+export type SingleId = string | number;
+/**
+ * Type representing a compound key, eg.
+ *
+ * ```js
+ * {
+ *     groupId: 5,
+ *     userId: 10,
+ * }
+ * ```
+ */
+export type CompoundId = { [fieldName: string]: SingleId };
+
+/**
+ * Either a single id as a number or a string, or a compound id as an object
+ * indexed by field name.
+ */
 export type Id = SingleId | CompoundId;
 
 /**
  * Interface for types that we can automatically extract a unique identifier from.
  *
- * To confirm to the interface provide a `_key` property or getter.
+ * To conform to the interface provide a `_key` property or getter.
  *
  * [ViewModelFactory](doc:viewModelFactory) conforms to this so anything that expects an Identifiable
  * will accept a ViewModel.
@@ -17,12 +35,24 @@ export type Id = SingleId | CompoundId;
  * @menu-group Identifiable
  */
 export interface Identifiable {
+    /**
+     * The unique identifier for this item.
+     */
     _key: Id;
 }
 
 /**
- * Check if a value conforms to Identifiable
+ * Check if a value conforms to [Identifiable](doc:Identifiable)
  *
+ * ## Usage
+ *
+ * ```js
+ * isIdentifiable({ _key: 1 }); // true
+ * isIdentifiable(null); // false
+ * isIdentifiable({ uuid: 'abc' }); // false
+ * ```
+ *
+ * @param item The value to check whether conforms to [Identifiable](doc:Identifiable)
  * @extract-docs
  * @menu-group Identifiable
  */
@@ -34,10 +64,20 @@ export function isIdentifiable(item: any): item is Identifiable {
 }
 
 /**
- * Get the id for an object. If object doesn't implement Identifiable then `fallbackGetId`
+ * Get the id for an object. If object doesn't implement [Identifiable](doc:Identifiable] then `fallbackGetId`
  * must be provided or an error will be thrown.
+ *
+ * ## Usage
+ *
+ * ```js
+ * const items = [{ _key: 1 }, { uuid: 'abc123' }];
+ * items.map(item => getId(item, obj => obj.uuid));
+ * // [1, 'abc123']
+ * ```
+ *
  * @param item Any value to get ID for
  * @param fallbackGetId Function to return id for `item` if it doesn't implement Identifiable
+ * @returns Either a single id as a number or a string, or a compound id as an object indexed by field name.
  *
  * @extract-docs
  * @menu-group Identifiable
@@ -57,6 +97,17 @@ export function getId(item: Identifiable | any, fallbackGetId?: (item: any) => I
 /**
  * Create string representation of ID suitable for strict equality
  * checking or as a key into an object / map.
+ *
+ * ## Usage
+ *
+ * ```js
+ * hashId(5);
+ * // 5
+ * hashId({ userId: 7, groupId: 5 });
+ * // '{"groupId":5,"userId":7}'
+ * hashId({ userId: 7, groupId: 5 }) === hashId({ userId: 7, groupId: 5 });
+ * // true
+ * ```
  *
  * @extract-docs
  * @menu-group Identifiable
@@ -83,6 +134,16 @@ export function hashId(id: Id): string {
  *
  * NOTE: Doesn't compare objects for equality; only their id
  *
+ * ## Usage
+ *
+ * ```js
+ * isSameById({ _key: 1}, { _key: 1 }); // true
+ * isSameById({ _key: 1}, { uuid: 1 }, item => item.uuid); // true
+ * ```
+ *
+ * @param item1 First item to compare
+ * @param item2 Second item to compare
+ * @param fallbackGetId Function to return id for `item` if it doesn't implement Identifiable
  * @extract-docs
  * @menu-group Identifiable
  */

@@ -264,7 +264,7 @@ class BatchMiddleware<BatchCallReturn, IndividualResult> {
  *     // Batch together all calls that have identical URL (including query parameters)
  *     return call.resolvedUrl;
  *   },
- *   ...
+ *   // ...
  * });
  * ```
  *

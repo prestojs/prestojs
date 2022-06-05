@@ -10,6 +10,7 @@ import type {
     ExternalReferenceType,
     Flags,
     FunctionPage,
+    IndexSignatureType,
     MethodType,
     Page,
     PageSection,
@@ -88,6 +89,24 @@ function makeDocLinksPlugin(docsJson) {
     };
 }
 
+function formatWithPrettierPlugin() {
+    return tree => {
+        visit(tree, ['code'], node => {
+            if (node.lang === 'js' && !node.meta?.includes('skipPrettier')) {
+                try {
+                    node.value = prettier.format(node.value, {
+                        semi: false,
+                        printWidth: 60,
+                        parser: 'typescript',
+                    });
+                } catch (e) {
+                    console.warn('Example not parseable: ', node.value);
+                }
+            }
+        });
+    };
+}
+
 const require = createRequire(import.meta.url);
 
 const __filename = fileURLToPath(import.meta.url);
@@ -160,7 +179,7 @@ async function compileMdx(code, docLinks) {
     try {
         return String(
             await compile(code.trim(), {
-                remarkPlugins: [docLinks],
+                remarkPlugins: [docLinks, formatWithPrettierPlugin],
                 outputFormat: 'function-body',
                 providerImportSource: '@mdx-js/react',
             })
@@ -288,7 +307,6 @@ class Converter {
         }
         const children = this._resolveChildrenFromType(type);
         this.resolvedChildren.set(type, children);
-
         return children;
     }
 
@@ -394,15 +412,25 @@ class Converter {
 
     resolveChildren(
         declaration: JSONOutput.DeclarationReflection
-    ): JSONOutput.DeclarationReflection[] | undefined {
+    ):
+        | (JSONOutput.DeclarationReflection | { indexSignature: JSONOutput.SignatureReflection })[]
+        | undefined {
+        let children;
         if (declaration.children) {
-            return orderBy(declaration.children, 'name');
+            children = orderBy(declaration.children, 'name');
+        } else {
+            const { type } = declaration;
+            if (type) {
+                return this.resolveChildrenFromType(type);
+            }
         }
-        const { type } = declaration;
-        if (!type) {
-            return undefined;
+        if (declaration.indexSignature) {
+            if (!children) {
+                children = [];
+            }
+            children.push({ indexSignature: declaration.indexSignature });
         }
-        return this.resolveChildrenFromType(type);
+        return children;
     }
 
     shouldExpand(param: JSONOutput.DeclarationReflection) {
@@ -812,9 +840,26 @@ class Converter {
         return description;
     }
 
-    resolvedContainers = new Map<JSONOutput.DeclarationReflection[], ContainerType>();
+    async createIndexSignatureType(
+        indexSignature: JSONOutput.SignatureReflection
+    ): Promise<IndexSignatureType> {
+        return {
+            typeName: 'indexSignature',
+            description: await this.convertComment(indexSignature.comment),
+            parameters: [],
+            type: await this.convertType(indexSignature.type, indexSignature),
+        };
+    }
+
+    resolvedContainers = new Map<
+        (JSONOutput.DeclarationReflection | { indexSignature: JSONOutput.SignatureReflection })[],
+        ContainerType
+    >();
     async createContainerType(
-        children: JSONOutput.DeclarationReflection[],
+        children: (
+            | JSONOutput.DeclarationReflection
+            | { indexSignature: JSONOutput.SignatureReflection }
+        )[],
         source?: JSONOutput.DeclarationReflection
     ): Promise<ContainerType> {
         const resolved = this.resolvedContainers.get(children);
@@ -826,9 +871,19 @@ class Converter {
             name: source ? this.resolveName(source) : undefined,
             children: [],
         };
+        let indexSignature = source?.indexSignature;
+        if (!indexSignature) {
+            indexSignature = children.find(child => child.indexSignature)?.indexSignature;
+        }
+        if (indexSignature) {
+            obj.indexSignature = await this.createIndexSignatureType(indexSignature);
+        }
+        const realChildren = children.filter(
+            child => !child.indexSignature
+        ) as JSONOutput.DeclarationReflection[];
         this.resolvedContainers.set(children, obj);
         obj.children = await Promise.all(
-            children.map(async child => {
+            realChildren.map(async child => {
                 return this.withTypeParameter(child.typeParameter, async () => {
                     let { comment } = child;
                     const originalChild = child;

@@ -39,7 +39,7 @@ export default function FunctionDocumentation({
             </div>
             <Description description={signature.description} />
             {parameters.length > 0 && (
-                <div className="my-5">
+                <div className="my-5 overflow-x-auto">
                     <strong className="pb-3 block">Params:</strong>
                     <TypeTable dataSource={parameters} attributeHeader="Parameter" />
                 </div>
