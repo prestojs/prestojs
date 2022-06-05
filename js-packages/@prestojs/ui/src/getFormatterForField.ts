@@ -64,6 +64,11 @@ const choicesMapping = new Map<string, any>([
     ['IntegerField', ChoiceFormatter],
 ]);
 
+type WidgetComponent<T> =
+    | React.ComponentType<T>
+    | [React.ComponentType<T> | string, Record<string, unknown>]
+    | string;
+
 /**
  * Returns the default formatter for a given [Field](doc:Field).
  *
@@ -83,29 +88,27 @@ export default function getFormatterForField<
     ParsableValueT,
     SingleValueT,
     T extends HTMLElement
->(
-    field: Field<FieldValue, ParsableValueT, SingleValueT>
-): React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>] | string | null {
+>(field: Field<FieldValue, ParsableValueT, SingleValueT>): WidgetComponent<T> | null {
     const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     const formatter: React.FunctionComponent | string | null | undefined = field.choices
         ? choicesMapping.get(fieldClassName) || mapping.get(fieldClassName)
         : mapping.get(fieldClassName);
 
     const getReturnWithChoices = (
-        w,
-        f
-    ): React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>] | string => {
+        w: WidgetComponent<T>,
+        f: Field<FieldValue, ParsableValueT, SingleValueT>
+    ): WidgetComponent<T> => {
         if (f.choices) {
             if (Array.isArray(w)) {
-                return [w[0], { ...w[1], choices: f.choices, ...f.getFormatterProps() }];
+                return [w[0], { ...f.getFormatterProps(), ...w[1], choices: f.choices }];
             } else {
                 return [w, { choices: f.choices, ...f.getFormatterProps() }];
             }
         } else {
-            if (w) {
-                return [w, f.getFormatterProps()];
+            if (Array.isArray(w)) {
+                return [w[0], { ...f.getFormatterProps(), ...w[1] }];
             }
-            return w;
+            return [w, f.getFormatterProps()];
         }
     };
 

@@ -167,9 +167,9 @@ export default function getWidgetForField<
             const finalWidget = Array.isArray(_widget) ? _widget[0] : _widget;
             const props = Array.isArray(_widget) ? _widget[1] : {};
             const finalProps = {
+                ..._field.getWidgetProps(),
                 ...props,
                 ...extraProps,
-                ..._field.getWidgetProps(),
             };
             // Only set this when necessary to avoid passing props through
             // with undefined value that may make it's way through to the DOM

@@ -15,7 +15,7 @@ type GetWidgetForFieldWithNull = <FieldValueT, ParsableValueT, SingleValueT, T e
 
 type GetFormatterForField = <FieldValueT, ParsableValueT, SingleValueT, T extends HTMLElement>(
     field: Field<FieldValueT, ParsableValueT, SingleValueT>
-) => string | React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>];
+) => string | React.ComponentType<T> | [React.ComponentType<T> | string, Record<string, unknown>];
 
 type GetFormatterForFieldWithNull = <
     FieldValueT,
@@ -24,7 +24,11 @@ type GetFormatterForFieldWithNull = <
     T extends HTMLElement
 >(
     field: Field<FieldValueT, ParsableValueT, SingleValueT>
-) => string | React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>] | null;
+) =>
+    | string
+    | React.ComponentType<T>
+    | [React.ComponentType<T> | string, Record<string, unknown>]
+    | null;
 
 export interface FormItemProps {
     children: React.ReactNode;
@@ -217,12 +221,12 @@ export default function UiProvider(props: UiProviderProps): React.ReactElement {
             ):
                 | string
                 | React.ComponentType<T>
-                | [React.ComponentType<T>, Record<string, unknown>]
+                | [React.ComponentType<T> | string, Record<string, unknown>]
                 | null {
                 let formatter:
                     | string
                     | React.ComponentType<T>
-                    | [React.ComponentType<T>, Record<string, unknown>]
+                    | [React.ComponentType<T> | string, Record<string, unknown>]
                     | null = null;
                 if (getFormatterForField) {
                     formatter = getFormatterForField(field);
