@@ -13,7 +13,7 @@ export interface ResolveOptions {
  * Usage:
  *
  * ```js
- * const url = new UrlPattern('/users/:id/'),
+ * const url = new UrlPattern('/users/:id/');
  * url.resolve({ id: 5 });
  * // /users/5/
  * url.resolve({ id: 5 }, { query: { showAddresses: true }});

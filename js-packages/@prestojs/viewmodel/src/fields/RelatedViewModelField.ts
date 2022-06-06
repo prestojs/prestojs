@@ -257,7 +257,7 @@ export abstract class BaseRelatedViewModelField<
  * ```js
  * Group.cache.add({ id: 1, name: 'Staff', ownerId: 1 });
  * User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
- * User.cache.get(['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']);
+ * User.cache.get(['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']]);
  * // {
  * //   id: 1,
  * //   name: 'Bob',

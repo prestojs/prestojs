@@ -28,16 +28,17 @@ export async function getStaticProps(context) {
         return value;
     });
     if (Object.keys(bySourceId).length > 0) {
-        data = JSON.parse(JSON.stringify(data), (key, value) => {
+        const reviver = (key, value) => {
             if (value && typeof value === 'object' && value._rid) {
                 const r = bySourceId[value._rid];
                 if (!r) {
                     throw new Error(`Unexpected: could not find circular ref ${value._rid}`);
                 }
-                return r;
+                return JSON.parse(JSON.stringify(r), reviver);
             }
             return value;
-        });
+        };
+        data = JSON.parse(JSON.stringify(data), reviver);
     }
     return {
         props: {

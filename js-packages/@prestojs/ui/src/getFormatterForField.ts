@@ -64,6 +64,11 @@ const choicesMapping = new Map<string, any>([
     ['IntegerField', ChoiceFormatter],
 ]);
 
+type WidgetComponent<T> =
+    | React.ComponentType<T>
+    | [React.ComponentType<T> | string, Record<string, unknown>]
+    | string;
+
 /**
  * Returns the default formatter for a given [Field](doc:Field).
  *
@@ -75,8 +80,6 @@ const choicesMapping = new Map<string, any>([
  * > The formatter components here are loaded using [React.lazy](https://reactjs.org/docs/code-splitting.html). Your build must support
  * > this otherwise it is recommended to implement your own version (you can copy [this implementation](https://github.com/prestojs/prestojs/blob/master/js-packages/@prestojs/ui/src/getFormatterForField.ts)
  * > as a starting point).
- * >
- * > If you are using [nextjs React.lazy is not supported](https://nextjs.org/docs/advanced-features/dynamic-import) - you can [switch it out for `next/dynamic`](https://github.com/prestojs/prestojs/blob/master/doc-site/getFormatterForField.js).
  *
  * @extract-docs
  */
@@ -85,26 +88,27 @@ export default function getFormatterForField<
     ParsableValueT,
     SingleValueT,
     T extends HTMLElement
->(
-    field: Field<FieldValue, ParsableValueT, SingleValueT>
-): React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>] | string | null {
+>(field: Field<FieldValue, ParsableValueT, SingleValueT>): WidgetComponent<T> | null {
     const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     const formatter: React.FunctionComponent | string | null | undefined = field.choices
         ? choicesMapping.get(fieldClassName) || mapping.get(fieldClassName)
         : mapping.get(fieldClassName);
 
     const getReturnWithChoices = (
-        w,
-        f
-    ): React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>] | string => {
+        w: WidgetComponent<T>,
+        f: Field<FieldValue, ParsableValueT, SingleValueT>
+    ): WidgetComponent<T> => {
         if (f.choices) {
             if (Array.isArray(w)) {
-                return [w[0], { ...w[1], choices: f.choices }];
+                return [w[0], { ...f.getFormatterProps(), ...w[1], choices: f.choices }];
             } else {
-                return [w, { choices: f.choices }];
+                return [w, { choices: f.choices, ...f.getFormatterProps() }];
             }
         } else {
-            return w;
+            if (Array.isArray(w)) {
+                return [w[0], { ...f.getFormatterProps(), ...w[1] }];
+            }
+            return [w, f.getFormatterProps()];
         }
     };
 

@@ -15,7 +15,7 @@ type GetWidgetForFieldWithNull = <FieldValueT, ParsableValueT, SingleValueT, T e
 
 type GetFormatterForField = <FieldValueT, ParsableValueT, SingleValueT, T extends HTMLElement>(
     field: Field<FieldValueT, ParsableValueT, SingleValueT>
-) => string | React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>];
+) => string | React.ComponentType<T> | [React.ComponentType<T> | string, Record<string, unknown>];
 
 type GetFormatterForFieldWithNull = <
     FieldValueT,
@@ -24,7 +24,11 @@ type GetFormatterForFieldWithNull = <
     T extends HTMLElement
 >(
     field: Field<FieldValueT, ParsableValueT, SingleValueT>
-) => string | React.ComponentType<T> | [React.ComponentType<T>, Record<string, unknown>] | null;
+) =>
+    | string
+    | React.ComponentType<T>
+    | [React.ComponentType<T> | string, Record<string, unknown>]
+    | null;
 
 export interface FormItemProps {
     children: React.ReactNode;
@@ -77,6 +81,17 @@ export type UiProviderProps = {
      * for this field. If falsey is returned then it will fall back to a parent UiProvider (if any) or if
      * no parent UiProvider an error will be thrown.
      *
+     * This function can return a 2-tuple of the form [component, props] where props is an object of
+     * any extra props to pass through to the component. It is recommended you include `field.getWidgetProps()`, eg.
+     *
+     * ```
+     * if (field instanceof BooleanField) {
+     *    return [CustomBooleanWidget, field.getWidgetProps()];
+     * }
+     * ```
+     *
+     * This allows [Field](doc:Field) definitions to supply extra props the widget can use.
+     *
      * @param field The specific field instance for a model
      */
     getWidgetForField?: GetWidgetForFieldWithNull;
@@ -117,11 +132,11 @@ export type UiProviderProps = {
  * function getWidgetForField(field) {
  *    // Add any app specific customisations here, eg
  *    // if (field instanceof BooleanField) {
- *    //    return CustomBooleanWidget;
+ *    //    return [CustomBooleanWidget, field.getWidgetProps()];
  *    // }
  *    // Otherwise return default widget. If you would prefer an error if no explicit widget defined for
  *    // a field then don't return anything.
- *    return DefaultWidget;
+ *    return [DefaultWidget, field.getWidgetProps()];
  * }
  *
  * function getFormatterForField(field) {
@@ -206,12 +221,12 @@ export default function UiProvider(props: UiProviderProps): React.ReactElement {
             ):
                 | string
                 | React.ComponentType<T>
-                | [React.ComponentType<T>, Record<string, unknown>]
+                | [React.ComponentType<T> | string, Record<string, unknown>]
                 | null {
                 let formatter:
                     | string
                     | React.ComponentType<T>
-                    | [React.ComponentType<T>, Record<string, unknown>]
+                    | [React.ComponentType<T> | string, Record<string, unknown>]
                     | null = null;
                 if (getFormatterForField) {
                     formatter = getFormatterForField(field);

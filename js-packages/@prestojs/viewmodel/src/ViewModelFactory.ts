@@ -1226,27 +1226,16 @@ export class InvalidFieldError extends Error {}
  *
  * ```js
  * const fields = {
- *     userId: new IntegerField({ label: 'User ID' })
+ *     userId: new IntegerField({ label: 'User ID' }),
  *     firstName: new CharField({ label: 'First Name' }),
  *     // label is optional; will be generated as 'Last name'
  *     lastName: new CharField(),
  * };
- * // Options are all optional and can be omitted entirely
+ * // You must supplier 'pkFieldName' - everything else are optional
  * const options = {
- *     // Only one of pkFieldName or getImplicitPkField can be defined.
- *     // If neither are provided a default field called 'id' will be created.
  *     pkFieldName: 'userId',
  *     // Multiple names can be specified for compound keys
- *     pkFieldName: ['organisationId', 'departmentId']
- *     // You can also specify a function to create the primary key
- *     getImplicitPkField(model, fields) {
- *          if ('EntityId' in fields) {
- *              return ['EntityId', fields.EntityId];
- *          }
- *          // Generate a name base on model, eg. `userId`
- *          const name = model.name[0].toLowerCase() + model.name.slice(1);
- *          return [`${name}Id`, new NumberField()];
- *      },
+ *     pkFieldName: ['organisationId', 'departmentId'],
  *      // Optionally can specify a baseClass for this model. When using `augment`
  *      // this is automatically set to the class being augmented.
  *      baseClass: BaseViewModel,

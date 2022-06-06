@@ -151,7 +151,7 @@ export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
  * ```js
  * function customFetchMiddleware(next, urlConfig, requestInit, context) {
  *   return next(new SkipToResponse(
- *       return fetch('/somewhere-else/');
+ *       fetch('/somewhere-else/')
  *   ));
  * }
  * ```
@@ -570,7 +570,7 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * ```js
  * const userDetail = new Action(new UrlPattern('/api/user/:id/'));
  * // Resolves to /api/user/1/?showAddresses=true
- * const user = await userDetail.execute({ urlArgs: { id: 1 }, query: 'showAddresses': true });
+ * const user = await userDetail.execute({ urlArgs: { id: 1 }, query: { 'showAddresses': true }});
  * ```
  *
  * You can also pass through any `fetch` options to both the constructor and calls to `execute` and `prepare`
@@ -607,7 +607,7 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * ```js
  * import useSWR from 'swr';
  *
- * ...
+ * // ...
  *
  * // prepare the action and pass it to useSWR. useSWR will then call the second parameter (the "fetcher")
  * // which executes the prepared action.

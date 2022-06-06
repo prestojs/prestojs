@@ -64,12 +64,29 @@ function FunctionDescription({ signatures }: { signatures }) {
 
 export default function Type({ type, mode = 'FULL' }: Props) {
     if (type.typeName === 'container') {
-        const el = (
-            <TypeTable
-                dataSource={type.children}
-                title={<strong>An object with these properties:</strong>}
-            />
-        );
+        let el;
+        if (type.children.length === 0 && type.indexSignature) {
+            console.log(type.indexSignature);
+            el = (
+                <span>
+                    <span className="text-gray-400">
+                        {'{[fieldName: string]: '}
+                        <span className="text-orange-400">
+                            <Type type={type.indexSignature.type} mode="COMPACT" />
+                        </span>
+                        {' }'}
+                    </span>
+                </span>
+            );
+        } else {
+            el = (
+                <TypeTable
+                    dataSource={type.children}
+                    title={<strong>An object with these properties:</strong>}
+                    indexSignature={type.indexSignature}
+                />
+            );
+        }
         return <ExpandableDescription expandedContent={el} mode={mode} title={type.name} />;
     }
     if (type.typeName === 'intrinsic') {

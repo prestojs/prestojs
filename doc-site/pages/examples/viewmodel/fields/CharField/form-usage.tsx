@@ -4,7 +4,12 @@
  * This example shows the default widget that will be used in a [Form](doc:Form)
  * when using [@prestojs/ui-antd](/docs/ui-antd). See [getWidgetForField](doc:getWidgetForField).
  *
+ * The default widget is [CharWidget](doc:CharWidget)
+ *
  * If `maxLength` is specified the widget will limit the length of entered text.
+ *
+ * Any extra widget props can be defined at the field level in the `widgetProps` option (eg.
+ * `placeholder` in this example).
  *
  * @wide
  */
@@ -22,6 +27,11 @@ class ExampleModel extends viewModelFactory(
             maxLength: 10,
             helpText: 'Enter a name in 10 characters or less',
         }),
+        notes: new CharField({
+            widgetProps: {
+                placeholder: 'Enter any extra details',
+            },
+        }),
     },
     { pkFieldName: 'id' }
 ) {}
@@ -37,6 +47,7 @@ export default function FormUsage() {
                 <div className="grid grid-cols-1 gap-4 w-full">
                     <Form onSubmit={data => console.log(data)}>
                         <Form.Item field={ExampleModel.fields.fullName} />
+                        <Form.Item field={ExampleModel.fields.notes} />
                         <Form.Item wrapperCol={{ offset: 6 }}>
                             <Button type="primary" htmlType="submit">
                                 Submit (check console)

@@ -4,6 +4,8 @@
  * This example shows the default widget that will be used in a [Form](doc:Form)
  * when using [@prestojs/ui-antd](/docs/ui-antd). See [getWidgetForField](doc:getWidgetForField).
  *
+ * The default widget is [BooleanWidget](doc:BooleanWidget)
+ *
  * `final-form` expects to be told when a field is a checkbox so it knows how to
  * handle undefined values. This example demonstrates this with the [Form.Item](doc:FormItem)
  * component.
@@ -12,6 +14,7 @@
  */
 import { Form } from '@prestojs/final-form';
 import { AntdUiProvider, FormItemWrapper, FormWrapper, getWidgetForField } from '@prestojs/ui-antd';
+import { getId, hashId } from '@prestojs/util/';
 import { BooleanField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
 import { Button } from 'antd';
 import 'antd/dist/antd.min.css';

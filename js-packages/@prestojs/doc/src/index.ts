@@ -25,4 +25,5 @@ export type {
     UnknownType,
     VariableNode,
     DocExample,
+    IndexSignatureType,
 } from './newTypes';

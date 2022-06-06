@@ -92,6 +92,33 @@ export interface FieldProps<ValueT, SingleValueT = ValueT> {
      * This isn't used by anything in PrestoJS but is useful if generating rendering values from ViewModel generically.
      */
     writeOnly?: boolean;
+    /**
+     * Any arbitrary props that should be passed to widget components
+     *
+     * These props are included in [Field.getWidgetProps](doc:Field#Method-getWidgetProps) and are
+     * passed to components by [getWidgetForField](doc:getWidgetForField).
+     *
+     * It's up to the component implementations to make use of them. By default the `@prestojs/ui-antd` components
+     * should support any of the underlying `antd` component props via this option.
+     *
+     * ```js
+     * new Field({ widgetProps: { placeholder: 'Enter you name' }})
+     * ```
+     */
+    widgetProps?: Record<string, any>;
+    /**
+     * Any arbitrary props that should be passed to formatter components
+     *
+     * These props are included in [Field.getFormatterProps](doc:Field#Method-getFormatterProps) and are
+     * passed to components by [getFormatterForField](doc:getFormatterForField).
+     *
+     * It's up to the component implementations to make use of them.
+     *
+     * ```js
+     * new BooleanField({ formatterProps: { trueLabel: '✅', falseLabel: '❌' }})
+     * ```
+     */
+    formatterProps?: Record<string, any>;
 }
 
 class UnboundFieldError<T, ParsableType, SingleType> extends Error {
@@ -99,6 +126,30 @@ class UnboundFieldError<T, ParsableType, SingleType> extends Error {
         const msg = `Field ${field} has not been bound to it's model. Check that the fields of the associated class are defined on the static '_fields' property and not 'fields'.`;
         super(msg);
     }
+}
+
+/**
+ * Props that are exposed by a specific [Field](doc:Field) for use by widget components
+ *
+ * @expand-properties
+ */
+export interface ViewModelFieldWidgetProps {
+    /**
+     * Any props passed through to the `Field` under the `widgetProps` option.
+     */
+    [propName: string]: any;
+}
+
+/**
+ * Props that are exposed by a specific [Field](doc:Field) for use by formatter components
+ *
+ * @expand-properties
+ */
+export interface ViewModelFieldFormatterProps {
+    /**
+     * Any props passed through to the `Field` under the `widgetProps` option.
+     */
+    [propName: string]: any;
 }
 
 /**
@@ -163,7 +214,7 @@ class UnboundFieldError<T, ParsableType, SingleType> extends Error {
  * class Person extends viewModelFactory({
  *     id: new Field(),
  *     age: new IntegerField(),
- * } {}
+ * }, { pkFieldName: "id" }) {}
  * const jo = new Person({ id: 1, age: "33" });
  * jo.age
  * // 33 (as a number - not a string)
@@ -252,7 +303,7 @@ class UnboundFieldError<T, ParsableType, SingleType> extends Error {
  * // You can pass through the array directly
  * new Field({ choices });
  * // Or a Map
- * new Field({ choices: new Map(choices) };
+ * new Field({ choices: new Map(choices) });
  * ```
  *
  * If you access the choices via the [choices property](#Properties-choices) it will always be a `Map`.
@@ -399,6 +450,16 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      * but can be used by components to adjust their output accordingly (eg. exclude it from a detail view on a record)
      */
     public writeOnly: boolean;
+    /**
+     * Any props for components that use this field that were passed through to the `Field`. Don't access this directly -
+     * call `getWidgetProps` instead.
+     */
+    protected widgetProps: Record<string, any>;
+    /**
+     * Any props for components that use this field that were passed through to the `Field`. Don't access this directly -
+     * call `getFormatterProps` instead.
+     */
+    protected formatterProps: Record<string, any>;
 
     /**
      * @private
@@ -416,7 +477,11 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
             asyncChoices,
             readOnly = false,
             writeOnly = false,
+            widgetProps = {},
+            formatterProps = {},
         } = options;
+        this.widgetProps = widgetProps;
+        this.formatterProps = formatterProps;
 
         if (choices && asyncChoices) {
             throw new Error("Only one of 'choices' and 'asyncChoices' should be provided");
@@ -439,6 +504,8 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
         const unknowns = Object.keys(options).filter(
             key =>
                 ![
+                    'widgetProps',
+                    'formatterProps',
                     'blank',
                     'blankAsNull',
                     'label',
@@ -497,7 +564,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      *
      * ```js
      * // This might become
-     * {
+     * value = {
      *     name: 'Sam',
      *     address: {
      *         id: 5,
@@ -505,7 +572,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      *     },
      * }
      * // ...this
-     * {
+     * value = {
      *     name: 'Same',
      *     address: 5,
      * }
@@ -639,6 +706,36 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public contributeToClass(viewModel: ViewModelConstructor<any, any>): void {
         // Do nothing by default
+    }
+
+    /**
+     * Return any props that may be used form widgets created for this field.
+     *
+     * The default implementation just returns the optional `widgetProps` [Field](doc:Field) option but
+     * specific field implementations may return additional props.
+     *
+     * [getWidgetForField](doc:getWidgetForField) will call this method in order to generate the props that
+     * should be passed to the widget.
+     */
+    public getWidgetProps(): ViewModelFieldWidgetProps {
+        return {
+            ...this.widgetProps,
+        };
+    }
+
+    /**
+     * Return any props that may be used form formatters created for this field.
+     *
+     * The default implementation just returns the optional `formatterProps` [Field](doc:Field) option but
+     * specific field implementations may return additional props.
+     *
+     * [getFormatterForField](doc:getFormatterForField) will call this method in order to generate the props that
+     * should be passed to the formatter.
+     */
+    public getFormatterProps(): ViewModelFieldFormatterProps {
+        return {
+            ...this.formatterProps,
+        };
     }
 }
 

@@ -1,4 +1,4 @@
-import Field, { FieldProps } from './Field';
+import Field, { FieldProps, ViewModelFieldWidgetProps } from './Field';
 
 /**
  * @expand-properties
@@ -53,5 +53,12 @@ export default class CharField extends Field<string> {
         super(rest);
 
         this.maxLength = maxLength;
+    }
+
+    getWidgetProps(): ViewModelFieldWidgetProps & { maxLength?: number } {
+        return {
+            ...super.getWidgetProps(),
+            maxLength: this.maxLength,
+        };
     }
 }
