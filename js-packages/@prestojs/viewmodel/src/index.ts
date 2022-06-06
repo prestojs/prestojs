@@ -1,6 +1,6 @@
 export { default as viewModelFactory, BaseViewModel } from './ViewModelFactory';
 export { default as ViewModelCache } from './ViewModelCache';
-export { default as Field, ViewModelFieldWidgetProps } from './fields/Field';
+export { default as Field } from './fields/Field';
 
 export { default as BooleanField } from './fields/BooleanField';
 export { default as CharField } from './fields/CharField';
@@ -52,7 +52,12 @@ import type {
     Choice,
     ChoicesGrouped,
 } from './fields/AsyncChoices';
-import type { FieldProps, RecordBoundField } from './fields/Field';
+import type {
+    FieldProps,
+    RecordBoundField,
+    ViewModelFieldFormatterProps,
+    ViewModelFieldWidgetProps,
+} from './fields/Field';
 import type {
     CompoundPrimaryKey,
     FieldDataMapping,
@@ -69,6 +74,8 @@ import type {
 } from './ViewModelFactory';
 
 export type {
+    ViewModelFieldWidgetProps,
+    ViewModelFieldFormatterProps,
     ViewModelInterface,
     ViewModelConstructor,
     ViewModelValues,
