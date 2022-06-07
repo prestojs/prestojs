@@ -10,3 +10,12 @@ test('DecimalField should return values as is', () => {
     expect(field.parse(null)).toBe(null);
     expect(field.parse('asdf')).toBe('asdf');
 });
+
+test('should be able to pass strings for maxValue & minValue', () => {
+    const field = new DecimalField({ minValue: '1.3', maxValue: '2.2' });
+    expect(field.minValue).toBe('1.3');
+    expect(field.maxValue).toBe('2.2');
+
+    expect(() => new DecimalField({ minValue: 'invalid' })).toThrow();
+    expect(() => new DecimalField({ maxValue: 'invalid' })).toThrow();
+});
