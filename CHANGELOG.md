@@ -2,12 +2,24 @@
 
 ## Unreleased
 
+### Added
+
+* [Field](https://prestojs.com/docs/viewmodel/fields/Field) supports `widgetProps` & `formatterProps` 
+
 ### Changed
 
 * Support for `React.StrictMode`.
   * `useAsync` will no longer prevent `setState` calls happening after component is unmounted. If you are using < React18 you can manually do this yourself
      using the `abort` method in the calling component/hook.
   * If using @prestojs/ui-antd requires antd >= 4.20
+* [IntegerField](https://prestojs.com/docs/viewmodel/fields/IntegerField) & [FloatField](https://prestojs.com/docs/viewmodel/fields/FloatField) now parses string inputs into numbers
+  when instantiating a model. Invalid values will cause an error to be thrown.
+* [IntegerField](https://prestojs.com/docs/viewmodel/fields/IntegerField), [FloatField](https://prestojs.com/docs/viewmodel/fields/FloatField) & [DecimalField](https://prestojs.com/docs/viewmodel/fields/DecimalField)
+  used with their default widgets will use `minValue` & `maxValue` to limit the input range
+* [DecimalField](https://prestojs.com/docs/viewmodel/fields/DecimalField) used with [DecimalWidget](https://prestojs.com/docs/ui-antd/widgets/DecimalWidget) will use `decimalPlaces` to limit precision
+* [DecimalWidget](https://prestojs.com/docs/ui-antd/widgets/DecimalWidget) now stores values as a string to allow high precision.
+* [IntegerWidget](https://prestojs.com/docs/ui-antd/widgets/IntegerWidget) now forces entered value to be an integer (ie. decimal places are removed)
+* [NumberField](https://prestojs.com/docs/viewmodel/fields/NumberField) now accepts either string or number for `minValue` & `maxValue` to support strings that may come from `DecimalField`.
 
 ## [0.0.30] - 2022-04-13
 
