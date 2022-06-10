@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import React, { useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -6,15 +7,17 @@ type Props = {
     title?: React.ReactNode;
     isVisible: boolean;
     onClose?: () => void;
+    className?: string;
 };
 
-export default function Modal({ children, title, isVisible, onClose }: Props) {
+export default function Modal({ children, title, isVisible, onClose, className }: Props) {
     const portalEl = useRef<HTMLDivElement | null>(null);
     if (!portalEl.current && typeof document !== 'undefined') {
         portalEl.current = document.createElement('div');
     }
+    const portalElValue = portalEl.current;
     useEffect(() => {
-        if (!portalEl.current) {
+        if (!portalElValue) {
             return () => {
                 // do nothing
             };
@@ -25,15 +28,15 @@ export default function Modal({ children, title, isVisible, onClose }: Props) {
             }
         };
         document.addEventListener('keydown', listener);
-        document.body.appendChild(portalEl.current);
+        document.body.appendChild(portalElValue);
         return () => {
             document.removeEventListener('keydown', listener);
-            if (portalEl.current) {
-                document.body.removeChild(portalEl.current);
+            if (portalElValue) {
+                document.body.removeChild(portalElValue);
                 portalEl.current = null;
             }
         };
-    }, []);
+    }, [onClose, portalElValue]);
     if (!isVisible || !portalEl.current) {
         return null;
     }
@@ -47,7 +50,10 @@ export default function Modal({ children, title, isVisible, onClose }: Props) {
             </div>
 
             <div
-                className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-screen-2xl min-w-[500px]"
+                className={cx(
+                    'bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-screen-2xl min-w-[500px]',
+                    className
+                )}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="modal-headline"

@@ -47,7 +47,7 @@ export interface NumberFieldProps<ValueT> extends FieldProps<ValueT> {
  * @extract-docs
  * @menu-group Fields
  * @typeParam ValueT The type of the numeric value. This could be `number` or `string` or some other object (eg. decimal implementation)
- * @typeParam ValueT This the type the field knows how to parse into `ValueT` when constructing a `ViewModel`.
+ * @typeParam ParsableValueT This the type the field knows how to parse into `ValueT` when constructing a `ViewModel`.
  */
 export default class NumberField<ValueT = string | number, ParsableValueT = ValueT> extends Field<
     ValueT,

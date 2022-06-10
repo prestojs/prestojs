@@ -4,7 +4,7 @@ import { AsyncChoicesInterface } from './AsyncChoices';
 /**
  * @export-in-docs
  */
-interface DefaultValueFunction<ValueT> {
+export interface DefaultValueFunction<ValueT> {
     /**
      * A function that returns the default value to use
      *

@@ -13,7 +13,8 @@ import { ClassPage, PageMetaData } from '../newTypes';
 
 type Props = {
     page: ClassPage;
-    meta: PageMetaData;
+    meta?: PageMetaData;
+    isNested?: boolean;
 };
 
 function SectionHeading({ children, id }: { children: React.ReactNode; id?: string }) {
@@ -100,7 +101,7 @@ function ClassHierarchy({ page }: { page: ClassPage }) {
     );
 }
 
-export default function ClassPageDoc({ page, meta }: Props) {
+export default function ClassPageDoc({ page, meta, isNested = false }: Props) {
     const { showInherited } = usePreferences();
     const showOnThisPage = page.pageSections.length > 0;
     const filterInherited = node => showInherited || !node.isInherited;
@@ -113,11 +114,11 @@ export default function ClassPageDoc({ page, meta }: Props) {
         <div>
             {showOnThisPage && <OnThisPage sections={page.pageSections} />}
             <div className={showOnThisPage ? 'xl:mr-[19.5rem]' : ''}>
-                <PageHeader page={page} meta={meta} />
-                <ClassHierarchy page={page} />
+                {meta && <PageHeader page={page} meta={meta} />}
+                {!isNested && <ClassHierarchy page={page} />}
                 <Description description={page.description} />
-                {meta.examples && <CodeExamples examples={meta.examples} />}
-                <ApiPreferencesBar />
+                {meta?.examples && <CodeExamples examples={meta.examples} />}
+                {!isNested && <ApiPreferencesBar />}
                 {page.constructorDefinition && (
                     <>
                         <SectionHeading>Constructor</SectionHeading>

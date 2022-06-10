@@ -7,6 +7,7 @@ export { default as PrecompiledMarkdown, mdxComponents } from './components/Prec
 export { default as AnchorLink, generateId } from './components/AnchorLink';
 export { CodeExample, default as CodeExamples } from './components/CodeExamples';
 export type {
+    InterfaceType,
     ClassConstructor,
     ClassPage,
     ContainerType,
