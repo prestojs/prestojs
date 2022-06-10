@@ -21,6 +21,19 @@ export default class DateField extends Field<Date, string | Date> {
         return new Date(value);
     }
 
+    isEqual(a?: Date, b?: Date): boolean {
+        if (!a || !b) {
+            return false;
+        }
+        return (
+            a === b ||
+            // We only compare date components as there's technically no time component for DateField
+            (a.getFullYear() === b.getFullYear() &&
+                a.getMonth() === b.getMonth() &&
+                a.getDate() === b.getDate())
+        );
+    }
+
     normalize(value: string | Date): Date | null {
         if (value instanceof Date) {
             return value;

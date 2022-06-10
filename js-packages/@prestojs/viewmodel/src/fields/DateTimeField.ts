@@ -18,6 +18,12 @@ export default class DateTimeField extends Field<Date, string | Date> {
         }
         return new Date(value);
     }
+    isEqual(a?: Date, b?: Date): boolean {
+        if (!a || !b) {
+            return false;
+        }
+        return a === b || a.getTime() === b.getTime();
+    }
     normalize(value: string | Date): Date | null {
         if (value instanceof Date) {
             return value;
