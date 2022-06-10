@@ -4,7 +4,7 @@ import { AsyncChoicesInterface } from './AsyncChoices';
 /**
  * @export-in-docs
  */
-interface DefaultValueFunction<ValueT> {
+export interface DefaultValueFunction<ValueT> {
     /**
      * A function that returns the default value to use
      *
@@ -550,7 +550,8 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      * into a `Date`.
      *
      * This implementation will often match [normalize](#Call-signature-normalize) which performs a similar function
-     * but processes the values received by the `ViewModel`.
+     * but processes the values received by the `ViewModel`. In general `parse` should not throw on invalid input (eg.
+     * user could be part way through entering a value) whereas `normalize` should.
      *
      * @param value The value received from a form widget
      */
@@ -560,26 +561,11 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
 
     /**
      * Normalize a value passed into a ViewModel constructor. This could do things like parse a date string to
-     * a `Date` or extract the id of a nested relation and only store that, eg.
-     *
-     * ```js
-     * // This might become
-     * value = {
-     *     name: 'Sam',
-     *     address: {
-     *         id: 5,
-     *         formatted: '3 Somewhere Road, Some Place',
-     *     },
-     * }
-     * // ...this
-     * value = {
-     *     name: 'Same',
-     *     address: 5,
-     * }
-     * ```
+     * a `Date`.
      *
      * This implementation will often match [parse](#Call-signature-parse) which performs a similar function
-     * but for values received from a form input.
+     * but for values received from a form input. In general `normalize` should throw on invalid input whereas
+     * `parse` should not.
      *
      * @param value The value to normalize
      */

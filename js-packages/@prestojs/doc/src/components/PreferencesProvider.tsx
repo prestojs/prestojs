@@ -17,10 +17,12 @@ export function usePreferences(): PreferencesContext {
 
 export default function PreferencesProvider({
     children,
+    initialShowInherited = true,
 }: {
     children: React.ReactNode;
+    initialShowInherited?: boolean;
 }): React.ReactElement {
-    const [showInherited, setShowInherited] = useState(false);
+    const [showInherited, setShowInherited] = useState(initialShowInherited);
     const value = useMemo(
         () => ({
             showInherited,

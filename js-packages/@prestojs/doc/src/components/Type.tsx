@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import React, { ReactNode } from 'react';
 import { DocType, IndexedAccessType, TupleType } from '../newTypes';
+import ClassPageDoc from '../pages/ClassPageDoc';
 import FunctionDocumentation from './FunctionDocumentation';
 import Modal from './Modal';
+import PreferencesProvider from './PreferencesProvider';
 
 import TypeParameterDescription from './TypeParameterDescription';
 import TypeTable from './TypeTable';
@@ -17,11 +19,13 @@ function ExpandableDescription({
     title,
     expandedContent,
     forceCompact,
+    className,
 }: {
     mode: 'FULL' | 'COMPACT';
     title?: ReactNode;
     expandedContent: ReactNode;
     forceCompact?: boolean;
+    className?: string;
 }) {
     const [showModal, setShowModal] = React.useState(false);
     if (mode === 'FULL' && !forceCompact) {
@@ -35,7 +39,7 @@ function ExpandableDescription({
             >
                 {title}
             </button>
-            <Modal isVisible={showModal} onClose={() => setShowModal(false)}>
+            <Modal isVisible={showModal} onClose={() => setShowModal(false)} className={className}>
                 {expandedContent}
             </Modal>
         </>
@@ -186,6 +190,18 @@ export default function Type({ type, mode = 'FULL' }: Props) {
     }
     if (type.typeName === 'predicate') {
         return <span className="text-purple-400">boolean</span>;
+    }
+    if (type.typeName === 'interface') {
+        return (
+            <PreferencesProvider initialShowInherited={false}>
+                <ExpandableDescription
+                    className="w-full max-w-7xl min-h-[500px]"
+                    title={<span className="text-green-400">{type.classPage.name}</span>}
+                    mode="COMPACT"
+                    expandedContent={<ClassPageDoc isNested page={type.classPage} />}
+                />
+            </PreferencesProvider>
+        );
     }
     return <>{type.typeName}</>;
 }

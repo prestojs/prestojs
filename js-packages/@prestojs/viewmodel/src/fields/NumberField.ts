@@ -1,11 +1,17 @@
-import Field, { FieldProps } from './Field';
+import Field, { FieldProps, ViewModelFieldWidgetProps } from './Field';
 
 /**
  * @expand-properties
  */
-export interface NumberFieldProps<T> extends FieldProps<T> {
-    minValue?: number;
-    maxValue?: number;
+export interface NumberFieldProps<ValueT> extends FieldProps<ValueT> {
+    /**
+     * The minimum value that should be accepted
+     */
+    minValue?: ValueT;
+    /**
+     * The maximum value that should be accepted
+     */
+    maxValue?: ValueT;
 }
 
 /**
@@ -41,27 +47,31 @@ export interface NumberFieldProps<T> extends FieldProps<T> {
  * @extract-docs
  * @menu-group Fields
  * @typeParam ValueT The type of the numeric value. This could be `number` or `string` or some other object (eg. decimal implementation)
- * @typeParam ValueT This the type the field knows how to parse into `ValueT` when constructing a `ViewModel`.
+ * @typeParam ParsableValueT This the type the field knows how to parse into `ValueT` when constructing a `ViewModel`.
  */
 export default class NumberField<ValueT = string | number, ParsableValueT = ValueT> extends Field<
     ValueT,
     ParsableValueT
 > {
     static fieldClassName = 'NumberField';
-    public minValue?: number;
-    public maxValue?: number;
+    public minValue?: ValueT;
+    public maxValue?: ValueT;
 
     constructor(values: NumberFieldProps<ValueT> = {}) {
         const { minValue, maxValue, ...rest } = values;
 
-        if (minValue != null && typeof minValue !== 'number')
+        if (minValue != null && Number.isNaN(Number(minValue)))
             throw new Error(`"minValue" should be a number, received: ${minValue}`);
-        if (maxValue != null && typeof maxValue !== 'number')
+        if (maxValue != null && Number.isNaN(Number(maxValue)))
             throw new Error(`"maxValue" should be a number, received: ${maxValue}`);
 
         super(rest);
 
         this.minValue = minValue;
         this.maxValue = maxValue;
+    }
+
+    getWidgetProps(): ViewModelFieldWidgetProps {
+        return { min: this.minValue, max: this.maxValue, ...super.getWidgetProps() };
     }
 }

@@ -185,8 +185,14 @@ export interface PredicateType {
     typeName: 'predicate';
     // TODO: For now we'll just show return as boolean but maybe in future care more
 }
+
+export interface InterfaceType {
+    typeName: 'interface';
+    classPage: ClassPage;
+}
 export type DocType =
     | UnknownType
+    | InterfaceType
     | PropertiesFromReference
     | ExternalReferenceType
     | UnionType

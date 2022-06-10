@@ -11,6 +11,7 @@ import type {
     Flags,
     FunctionPage,
     IndexSignatureType,
+    InterfaceType,
     MethodType,
     Page,
     PageSection,
@@ -498,10 +499,9 @@ class Converter {
         };
     }
 
-    currentTypeParameter: Exclude<
-        JSONOutput.DeclarationReflection['typeParameter'],
-        undefined | null
-    >[] = [];
+    currentTypeParameter: (JSONOutput.TypeParameterReflection & {
+        resolved?: JSONOutput.SomeType;
+    })[][] = [];
     async withTypeParameter<T extends (...args: any) => any>(
         typeParameter: JSONOutput.DeclarationReflection['typeParameter'],
         cb: T
@@ -780,8 +780,14 @@ class Converter {
             ...(await this.createNode(signature, 'Method')),
             parameters: await Promise.all(
                 (signature.parameters || []).map(async param => {
-                    const type = await this.convertType(param.type, param);
                     const resolvedType = this.resolveReferencedType(param);
+                    const typeArgs = this._resolveTypeArguments(resolvedType);
+                    if (param.type?.type === 'reference' && param.type.typeArguments) {
+                        typeArgs.push(...this._resolveTypeArgumentsFromType(param.type));
+                    }
+                    const type = await this.withTypeParameter(typeArgs, () =>
+                        this.convertType(param.type, param)
+                    );
                     const name = param.name === '__namedParameters' ? 'props' : param.name;
                     return {
                         name,
@@ -964,19 +970,27 @@ class Converter {
         return declaration;
     }
 
-    private matchCurrentTypeParameter(id: number | undefined) {
+    private matchCurrentTypeParameter(
+        id: number | undefined
+    ): (JSONOutput.TypeParameterReflection & { resolved?: JSONOutput.SomeType }) | null {
         if (!id) {
             return null;
         }
-        let match: JSONOutput.TypeParameterReflection | null = null;
+        let match:
+            | (JSONOutput.TypeParameterReflection & { resolved?: JSONOutput.SomeType })
+            | null = null;
         let matchIndex = -1;
         for (let i = this.currentTypeParameter.length - 1; i >= 0; i--) {
             const params = this.currentTypeParameter[i];
             const param = params.find(param => param.id === id);
             if (param) {
-                match = param;
-                matchIndex = i;
-                break;
+                if (!match || param.resolved) {
+                    match = param;
+                    matchIndex = i;
+                }
+                if (param.resolved) {
+                    break;
+                }
             }
         }
         if (match && match.comment?.shortText?.trim() === '@inherit') {
@@ -1100,191 +1114,227 @@ class Converter {
     }
 
     private async convertClass(docItem: JSONOutput.DeclarationReflection): Promise<ClassPage> {
-        function getMethod(
-            method: JSONOutput.DeclarationReflection
-        ): false | JSONOutput.DeclarationReflection {
-            if (method.kindString === 'Method') {
-                return method;
+        return this.withTypeParameter(this._resolveTypeArguments(docItem), async () => {
+            function getMethod(
+                method: JSONOutput.DeclarationReflection
+            ): false | JSONOutput.DeclarationReflection {
+                if (method.kindString === 'Method') {
+                    return method;
+                }
+                // See Paginator.setInternalState for example of this - it's assigned in constructor:
+                // this.setInternalState = () => {...}
+                if (
+                    method.kindString === 'Property' &&
+                    method.type?.type === 'reflection' &&
+                    method.type.declaration?.signatures
+                ) {
+                    return method.type.declaration;
+                }
+                return false;
             }
-            // See Paginator.setInternalState for example of this - it's assigned in constructor:
-            // this.setInternalState = () => {...}
-            if (
-                method.kindString === 'Property' &&
-                method.type?.type === 'reflection' &&
-                method.type.declaration?.signatures
-            ) {
-                return method.type.declaration;
+            function getMethods(
+                methods: JSONOutput.DeclarationReflection[],
+                isStatic: boolean
+            ): JSONOutput.DeclarationReflection[] {
+                return methods
+                    .map(getMethod)
+                    .filter(
+                        m => m && !!m.flags?.isStatic === isStatic
+                    ) as JSONOutput.DeclarationReflection[];
             }
-            return false;
-        }
-        function getMethods(
-            methods: JSONOutput.DeclarationReflection[],
-            isStatic: boolean
-        ): JSONOutput.DeclarationReflection[] {
-            return methods
-                .map(getMethod)
-                .filter(
-                    m => m && !!m.flags?.isStatic === isStatic
-                ) as JSONOutput.DeclarationReflection[];
-        }
 
-        function getProperties(
-            properties: JSONOutput.DeclarationReflection[],
-            isStatic: boolean
-        ): JSONOutput.DeclarationReflection[] {
-            return orderBy(
-                properties.filter(
-                    m =>
-                        !getMethod(m) &&
-                        ['Property', 'Accessor'].includes(m.kindString || '') &&
-                        !!m.flags?.isStatic === isStatic
+            function getProperties(
+                properties: JSONOutput.DeclarationReflection[],
+                isStatic: boolean
+            ): JSONOutput.DeclarationReflection[] {
+                return orderBy(
+                    properties.filter(
+                        m =>
+                            !getMethod(m) &&
+                            ['Property', 'Accessor'].includes(m.kindString || '') &&
+                            !!m.flags?.isStatic === isStatic
+                    ),
+                    'name'
+                );
+            }
+
+            const children = docItem.children?.filter(child => !child.flags?.isPrivate) || [];
+
+            const methods = orderBy(
+                await Promise.all(getMethods(children, false).map(m => this.convertClassMethod(m))),
+                'name'
+            );
+            const staticMethods = orderBy(
+                await Promise.all(
+                    getMethods(children || [], true).map(m => this.convertClassMethod(m))
                 ),
                 'name'
             );
-        }
+            const properties = orderBy(
+                await Promise.all(
+                    getProperties(children, false).map(m => this.convertClassProperty(m))
+                ),
+                'name'
+            );
+            const staticProperties = orderBy(
+                await Promise.all(
+                    getProperties(children, true).map(m => this.convertClassProperty(m))
+                ),
+                'name'
+            );
 
-        const children = docItem.children?.filter(child => !child.flags?.isPrivate) || [];
+            const description = await this.convertComment(docItem.comment);
 
-        const methods = orderBy(
-            await Promise.all(getMethods(children, false).map(m => this.convertClassMethod(m))),
-            'name'
-        );
-        const staticMethods = orderBy(
-            await Promise.all(
-                getMethods(children || [], true).map(m => this.convertClassMethod(m))
-            ),
-            'name'
-        );
-        const properties = orderBy(
-            await Promise.all(
-                getProperties(children, false).map(m => this.convertClassProperty(m))
-            ),
-            'name'
-        );
-        const staticProperties = orderBy(
-            await Promise.all(getProperties(children, true).map(m => this.convertClassProperty(m))),
-            'name'
-        );
+            const pageSections: PageSection[] = [
+                {
+                    title: 'Methods',
+                    anchorId: 'Methods',
+                    links: methods.map(method => ({
+                        title: method.name,
+                        anchorId: method.signatures[0].anchorId,
+                        isInherited: method.signatures[0].isInherited,
+                    })),
+                },
+                {
+                    title: 'Properties',
+                    anchorId: 'Properties',
+                    links: properties.map(prop => ({
+                        title: prop.name,
+                        anchorId: prop.anchorId,
+                        isInherited: prop.isInherited,
+                    })),
+                },
+                {
+                    title: 'Static Methods',
+                    anchorId: 'Static-Methods',
+                    links: staticMethods.map(method => ({
+                        title: method.name,
+                        anchorId: method.signatures[0].anchorId,
+                        isInherited: method.signatures[0].isInherited,
+                    })),
+                },
+                {
+                    title: 'Static Properties',
+                    anchorId: 'Static-Properties',
+                    links: staticProperties.map(prop => ({
+                        title: prop.name,
+                        anchorId: prop.anchorId,
+                        isInherited: prop.isInherited,
+                    })),
+                },
+            ].filter(section => section.links.length > 0);
+            pageSections.unshift(...(this.extractInPageLinks(docItem, description) || []));
 
-        const description = await this.convertComment(docItem.comment);
-
-        const pageSections: PageSection[] = [
-            {
-                title: 'Methods',
-                anchorId: 'Methods',
-                links: methods.map(method => ({
-                    title: method.name,
-                    anchorId: method.signatures[0].anchorId,
-                    isInherited: method.signatures[0].isInherited,
-                })),
-            },
-            {
-                title: 'Properties',
-                anchorId: 'Properties',
-                links: properties.map(prop => ({
-                    title: prop.name,
-                    anchorId: prop.anchorId,
-                    isInherited: prop.isInherited,
-                })),
-            },
-            {
-                title: 'Static Methods',
-                anchorId: 'Static-Methods',
-                links: staticMethods.map(method => ({
-                    title: method.name,
-                    anchorId: method.signatures[0].anchorId,
-                    isInherited: method.signatures[0].isInherited,
-                })),
-            },
-            {
-                title: 'Static Properties',
-                anchorId: 'Static-Properties',
-                links: staticProperties.map(prop => ({
-                    title: prop.name,
-                    anchorId: prop.anchorId,
-                    isInherited: prop.isInherited,
-                })),
-            },
-        ].filter(section => section.links.length > 0);
-        pageSections.unshift(...(this.extractInPageLinks(docItem, description) || []));
-
-        let hierarchy: {
-            parent: UnknownType | ReferenceLinkType | ExternalReferenceType | null;
-            typeArguments?: DocType[];
-            children: (ReferenceLinkType | ExternalReferenceType)[];
-        } = {
-            parent: null,
-            children: [],
-        };
-        if (docItem.extendedTypes?.length) {
-            const extendedType = docItem.extendedTypes[0];
-            if (extendedType.type === 'reference') {
-                const referencedType = extendedType.id ? this.references[extendedType.id] : null;
-                if (referencedType) {
-                    const url = getDocUrl(referencedType);
-                    if (url) {
-                        hierarchy.parent = {
-                            typeName: 'referenceLink',
-                            name: referencedType.name,
-                            url,
-                        } as ReferenceLinkType;
+            let hierarchy: {
+                parent: UnknownType | ReferenceLinkType | ExternalReferenceType | null;
+                typeArguments?: DocType[];
+                children: (ReferenceLinkType | ExternalReferenceType)[];
+            } = {
+                parent: null,
+                children: [],
+            };
+            if (docItem.extendedTypes?.length) {
+                const extendedType = docItem.extendedTypes[0];
+                if (extendedType.type === 'reference') {
+                    const referencedType = extendedType.id
+                        ? this.references[extendedType.id]
+                        : null;
+                    if (referencedType) {
+                        const url = getDocUrl(referencedType);
+                        if (url) {
+                            hierarchy.parent = {
+                                typeName: 'referenceLink',
+                                name: referencedType.name,
+                                url,
+                            } as ReferenceLinkType;
+                        } else {
+                            console.error('Could not find URL for ', referencedType.name);
+                        }
                     } else {
-                        console.error('Could not find URL for ', referencedType.name);
+                        hierarchy.parent = this.convertExternalReference(extendedType);
                     }
-                } else {
-                    hierarchy.parent = this.convertExternalReference(extendedType);
-                }
-                if (extendedType.typeArguments) {
-                    hierarchy.typeArguments = await Promise.all(
-                        extendedType.typeArguments.map(typeArg => this.convertType(typeArg))
-                    );
-                }
-            } else {
-                console.error('Extended type is not a reference', extendedType);
-            }
-        }
-        if (docItem.extendedBy?.length) {
-            for (const item of docItem.extendedBy) {
-                // @ts-ignore
-                const referencedType = this.references[item?.id];
-                if (referencedType) {
-                    const url = getDocUrl(referencedType);
-                    if (url) {
-                        hierarchy.children.push({
-                            typeName: 'referenceLink',
-                            name: referencedType.name,
-                            url,
-                        } as ReferenceLinkType);
-                    } else {
-                        console.error(
-                            'Could not find URL for extendedBy type ',
-                            referencedType.name
+                    if (extendedType.typeArguments) {
+                        hierarchy.typeArguments = await Promise.all(
+                            extendedType.typeArguments.map(typeArg => this.convertType(typeArg))
                         );
                     }
                 } else {
-                    console.error('Expected only reference types', item);
+                    console.error('Extended type is not a reference', extendedType);
                 }
             }
-        }
+            if (docItem.extendedBy?.length) {
+                for (const item of docItem.extendedBy) {
+                    // @ts-ignore
+                    const referencedType = this.references[item?.id];
+                    if (referencedType) {
+                        const url = getDocUrl(referencedType);
+                        if (url) {
+                            hierarchy.children.push({
+                                typeName: 'referenceLink',
+                                name: referencedType.name,
+                                url,
+                            } as ReferenceLinkType);
+                        } else {
+                            console.error(
+                                'Could not find URL for extendedBy type ',
+                                referencedType.name
+                            );
+                        }
+                    } else {
+                        console.error('Expected only reference types', item);
+                    }
+                }
+            }
 
-        return this.withTypeParameter(
-            docItem.typeParameter,
-            async () =>
-                ({
-                    pageType: 'class',
-                    pageSections,
-                    hierarchy,
-                    sourceLocation: this.convertSourceLocation(docItem),
-                    name: docItem.name,
-                    description,
-                    constructorDefinition: await this.convertConstructor(docItem),
-                    methods,
-                    properties,
-                    staticMethods,
-                    staticProperties,
-                    typeParameters: await this.convertTypeParameter(docItem.typeParameter),
-                } as ClassPage)
-        );
+            return this.withTypeParameter(
+                docItem.typeParameter,
+                async () =>
+                    ({
+                        pageType: 'class',
+                        pageSections,
+                        hierarchy,
+                        sourceLocation: this.convertSourceLocation(docItem),
+                        name: docItem.name,
+                        description,
+                        constructorDefinition: await this.convertConstructor(docItem),
+                        methods,
+                        properties,
+                        staticMethods,
+                        staticProperties,
+                        typeParameters: await this.convertTypeParameter(docItem.typeParameter),
+                    } as ClassPage)
+            );
+        });
+    }
+
+    _resolveTypeArgumentsFromType(type: JSONOutput.SomeType) {
+        if (type.type === 'reference') {
+            const referencedType = type.id ? this.references[type.id] : null;
+            if (referencedType) {
+                const typeArgs = (type.typeArguments ? type.typeArguments : []).map((arg, i) => ({
+                    ...referencedType.typeParameter?.[i],
+                    resolved: arg,
+                }));
+                return [...typeArgs, ...this._resolveTypeArguments(referencedType)];
+            }
+        }
+        return [];
+    }
+
+    _resolveTypeArguments(declaration: JSONOutput.DeclarationReflection) {
+        if (declaration.extendedTypes?.length === 1) {
+            const extendedType = declaration.extendedTypes[0];
+            return this._resolveTypeArgumentsFromType(extendedType);
+        }
+        if (declaration.type?.type === 'intersection') {
+            return declaration.type.types
+                .map(t => this._resolveTypeArgumentsFromType(t))
+                .reduce((acc, t) => {
+                    acc.push(...t);
+                    return acc;
+                }, []);
+        }
+        return [];
     }
 
     private async convertConstructor(
@@ -1294,9 +1344,14 @@ class Converter {
         if (!constructor) {
             return undefined;
         }
-        return {
+        const resolve = async () => ({
             signatures: await this.convertSignatures(constructor.signatures || []),
-        };
+        });
+        const resolvedTypeArgs = this._resolveTypeArguments(declaration);
+        if (resolvedTypeArgs.length > 0) {
+            return this.withTypeParameter(resolvedTypeArgs, resolve);
+        }
+        return resolve();
     }
 
     private async convertClassMethod(m: JSONOutput.DeclarationReflection) {
@@ -1327,31 +1382,43 @@ class Converter {
     private async _convertReference(type: JSONOutput.ReferenceType): Promise<DocType> {
         if (type.id && this.references[type.id]) {
             const referencedType = this.references[type.id];
-            return this.withTypeParameter(referencedType.typeParameter, async () => {
-                const url = getDocUrl(referencedType);
-                if (url) {
-                    return {
-                        typeName: 'referenceLink',
-                        name: referencedType.name,
-                        url,
-                    } as ReferenceLinkType;
-                } else if (this.shouldExpand(referencedType)) {
-                    const children = this.resolveChildren(referencedType);
-                    if (children) {
-                        return this.createContainerType(children, referencedType);
+            return this.withTypeParameter(
+                [
+                    ...this._resolveTypeArgumentsFromType(type),
+                    ...(referencedType.typeParameter || []),
+                ],
+                async () => {
+                    const url = getDocUrl(referencedType);
+                    if (url) {
+                        return {
+                            typeName: 'referenceLink',
+                            name: referencedType.name,
+                            url,
+                        } as ReferenceLinkType;
+                    } else if (this.shouldExpand(referencedType)) {
+                        const children = this.resolveChildren(referencedType);
+                        if (children) {
+                            return this.createContainerType(children, referencedType);
+                        }
                     }
+                    if (!referencedType.type) {
+                        if (referencedType.kindString === 'Interface') {
+                            return this.convertInterface(referencedType);
+                        }
+                        return {
+                            typeName: 'unknown',
+                            name: referencedType.kindString,
+                        } as UnknownType;
+                    }
+                    return this.convertType(referencedType.type, referencedType);
                 }
-                if (!referencedType.type) {
-                    return {
-                        typeName: 'unknown',
-                        name: referencedType.kindString,
-                    } as UnknownType;
-                }
-                return this.convertType(referencedType.type, referencedType);
-            });
+            );
         } else if (this.currentTypeParameter && type.id) {
             const match = this.matchCurrentTypeParameter(type.id);
             if (match) {
+                if (match.resolved) {
+                    return this.convertType(match.resolved);
+                }
                 return {
                     // TODO: probably need more info here
                     typeName: 'typeArgument',
@@ -1360,17 +1427,29 @@ class Converter {
                     description: await this.convertComment(match.comment),
                 };
             } else {
+                let match;
                 for (let i = this.currentTypeParameter.length - 1; i >= 0; i--) {
                     const params = this.currentTypeParameter[i];
                     const param = params.find(param => param.name === type.name);
                     if (param) {
-                        return {
-                            typeName: 'typeArgument',
-                            name: type.name,
-                            id: type.id,
-                            description: await this.convertComment(param.comment),
-                        };
+                        if (!match || param.resolved) {
+                            match = param;
+                        }
+                        if (param.resolved) {
+                            break;
+                        }
                     }
+                }
+                if (match) {
+                    if (match.resolved && match.resolved !== type) {
+                        return this.convertType(match.resolved);
+                    }
+                    return {
+                        typeName: 'typeArgument',
+                        name: type.name,
+                        id: type.id,
+                        description: await this.convertComment(match.comment),
+                    };
                 }
                 // console.log('TODO', type, this.currentTypeParameter);
             }
@@ -1431,6 +1510,16 @@ class Converter {
         }
         return name;
     }
+
+    private async convertInterface(referencedType: DeclarationReflection) {
+        if (referencedType.kindString === 'Interface' && referencedType.signatures) {
+            return this.createMethodType(referencedType);
+        }
+        return {
+            typeName: 'interface',
+            classPage: await this.convertClass(referencedType),
+        } as InterfaceType;
+    }
 }
 
 function getMenuGroup(docItem: DeclarationReflection) {
@@ -1441,7 +1530,7 @@ async function main() {
     const repoRoot = path.resolve(__dirname, '../../');
     const packagesRoot = path.resolve(repoRoot, 'js-packages/@prestojs/');
 
-    for (const pkg of ['util', 'viewmodel', 'ui', 'final-form', 'ui-antd', 'routing', 'rest']) {
+    for (const pkg of []) {
         const app = new TypeDoc.Application();
 
         app.options.addReader(new TypeDoc.TSConfigReader());
@@ -1591,7 +1680,7 @@ async function main() {
         if (!fs.existsSync(path.dirname(outPath))) {
             fs.mkdirSync(path.dirname(outPath), { recursive: true });
         }
-        const converter = new Converter(references, docLinks, pathMap, examples);
+        const converter = new Converter({ ...byId, ...references }, docLinks, pathMap, examples);
         const page = await converter.convert(docItem);
         const meta = {
             packageName,
