@@ -1,6 +1,6 @@
 {
   "name": "prestojs",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "main": "index.js",
   "author": "Dave Coates <david.coates@alliancesoftware.com.au>",
   "license": "MIT",
@@ -31,8 +31,8 @@
     "@babel/plugin-proposal-optional-chaining": "^7.16.0",
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
     "@babel/preset-react": "^7.16.0",
-    "@testing-library/react": "^13.2.0",
     "@testing-library/dom": "^8.13.0",
+    "@testing-library/react": "^13.2.0",
     "@testing-library/react-hooks": "^8.0.0",
     "@types/jest": "^26.0.20",
     "@types/node": "^13.7.0",
@@ -65,8 +65,8 @@
     "typedoc-plugin-missing-exports": "^0.22.6",
     "typedoc-plugin-rename-defaults": "^0.4.0",
     "typescript": "^4.5.4",
-    "yargs": "^15.1.0",
-    "webpack": "^5.67.0"
+    "webpack": "^5.67.0",
+    "yargs": "^15.1.0"
   },
   "peerDependencies": {
     "lerna": "*",
