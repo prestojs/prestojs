@@ -239,12 +239,40 @@ type ViewModelInterfaceInputData<
 /**
  * Thrown when cloning a record and requested fields cannot be found
  *
- * Gives details on missing fields and will indicate if related records are missing entirely vs
- * just some fields
+ * ```js
+ * class User extends viewModelFactory({
+ *     id: new IntegerField(),
+ *     name: new CharField(),
+ * }, { pkFieldName: 'id' }) {
+ * }
+ * const user = new User({ id: 1 });
+ * try {
+ *     const user2 = user.clone(['id', 'name'])
+ * } catch (e) {
+ *     console.log(e.missingFieldNames);
+ *     // ['name']
+ *     console.log(e.message)
+ *     // Can't clone User with fields id, name as only these fields are set: id.
+ *     // Missing fields: name
+ * }
+ * ```
+ *
+ * @extract-docs
+ * @menu-group Errors
  */
 export class MissingFieldsError extends Error {
+    /**
+     * Any field names that were missing from the record
+     */
     missingFieldNames: string[];
+    /**
+     * An array of 2-tuples: the first element is the relation field name and the second is an
+     * array of field names missing from that record
+     */
     missingRelations: [string, string[]][];
+    /**
+     * The field names that were set on the record
+     */
     assignedFields: string[];
     constructor(
         record: ViewModelInterface<any, any>,
@@ -340,6 +368,12 @@ export class BaseViewModel<
 
     /**
      * Clone this record, optionally with only a subset of the fields
+     *
+     * Will throw [MissingFieldsError](doc:MissingFieldsError) if any of the requested
+     * field names are missing.
+     *
+     * @param fieldNames The names of fields to clone. Can be specified as an array of flat field names, '*'
+     * for all fields or nested notation when dealing with relations eg. `[['relationName', 'relationFieldName']]`
      */
     clone<CloneFieldNames extends ExtractFieldNames<FieldMappingType>>(
         fieldNames?:
@@ -860,18 +894,56 @@ export type ViewModelInterface<
 
 /**
  * Check if an object is ViewModel
+ *
+ * ```js
+ * class User extends viewModelFactory({
+ *     id: new IntegerField(),
+ *     name: new CharField(),
+ * }, { pkFieldName: 'id' }) {
+ *
+ * }
+ *
+ * isViewModelInstance(new User({ id: 1 }));
+ * // true
+ * ```
+ * <Alert type="info">
+ *   If you need to check if a class (rather than an instance) is a ViewModel use [isViewModelClass](doc:isViewModelClass).
+ * </Alert>
+ *
+ * @param object The object to check
+ * @extract-docs
  */
 export function isViewModelInstance<T extends ViewModelInterface<any, any, any>>(
-    view: any
-): view is T {
-    return !!(view && view instanceof BaseViewModel);
+    object: any
+): object is T {
+    return !!(object && object instanceof BaseViewModel);
 }
 
 /**
  * Check if a class is a ViewModel
+ *
+ * ```js
+ * class User extends viewModelFactory({
+ *     id: new IntegerField(),
+ *     name: new CharField(),
+ * }, { pkFieldName: 'id' }) {
+ *
+ * }
+ *
+ * isViewModelClass(User);
+ * // true
+ * ```
+ *
+ * <Alert type="info">
+ *    If you need to check if an instance (rather than a class) is a ViewModel use [isViewModelInstance](doc:isViewModelInstance).
+ * </Alert>
+ *
+ * @param cls The class to check
+ *
+ * @extract-docs
  */
-export function isViewModelClass<T extends ViewModelConstructor<any, any>>(view: any): view is T {
-    return !!(view && view.prototype instanceof BaseViewModel);
+export function isViewModelClass<T extends ViewModelConstructor<any, any>>(cls: any): cls is T {
+    return !!(cls && cls.prototype instanceof BaseViewModel);
 }
 
 /**
@@ -1218,6 +1290,9 @@ function checkReservedFieldNames(fields): void {
 
 /**
  * Thrown when attempting to access a field that does not exist on a ViewModel
+ *
+ * @extract-docs
+ * @menu-group Errors
  */
 export class InvalidFieldError extends Error {}
 
