@@ -1,11 +1,12 @@
 import { WidgetProps } from '@prestojs/ui';
-import { Input, InputRef } from 'antd';
+import { Input, InputProps, InputRef } from 'antd';
 import React from 'react';
 
 /**
  * @expand-properties
  */
-type EmailWidgetProps = WidgetProps<string, HTMLInputElement>;
+type EmailWidgetProps = WidgetProps<string, HTMLInputElement> &
+    Omit<InputProps, 'onChange' | 'value'>;
 
 /**
  * See [Input](https://ant.design/components/input/) for props available

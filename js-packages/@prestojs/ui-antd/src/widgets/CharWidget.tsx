@@ -1,12 +1,13 @@
 import { WidgetProps } from '@prestojs/ui';
-import { Input, InputRef } from 'antd';
+import { Input, InputProps, InputRef } from 'antd';
 import React from 'react';
 
 /**
  * @expand-properties
  * @hide-properties choices asyncChoices
  */
-type CharWidgetProps = WidgetProps<string, HTMLInputElement>;
+type CharWidgetProps = WidgetProps<string, HTMLInputElement> &
+    Omit<InputProps, 'onChange' | 'value'>;
 
 /**
  *
