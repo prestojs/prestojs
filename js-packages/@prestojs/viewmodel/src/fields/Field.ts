@@ -83,13 +83,15 @@ export interface FieldProps<ValueT, SingleValueT = ValueT> {
     /**
      * True if field should be considered read only (eg. excluded from forms)
      *
-     * This isn't used by anything in PrestoJS but is useful if generating forms from a ViewModel.
+     * This isn't used by anything in PrestoJS but is useful if generating forms from a ViewModel (eg. you could exclude
+     * `readOnly` fields from a form).
      */
     readOnly?: boolean;
     /**
      * True if field should be considered write only (eg. excluded from detail views)
      *
-     * This isn't used by anything in PrestoJS but is useful if generating rendering values from ViewModel generically.
+     * This isn't used by anything in PrestoJS but is useful if rendering values from ViewModel generically (eg. you
+     * could exclude `writeOnly` fields from display).
      */
     writeOnly?: boolean;
     /**

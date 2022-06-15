@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+* [EmailWidget](https://prestojs.com/docs/ui-antd/widgets/EmailWidget) now uses `type="email"`
+
+### Types
+
+* [CharWidget](https://prestojs.com/docs/ui-antd/widgets/CharWidget) & [EmailWidget](https://prestojs.com/docs/ui-antd/widgets/EmailWidget) types now accept all props antd `Input` does (you could previously pass and it would work but type checking would fail)
+
+
 ## [0.0.31] - 2022-06-14
 
 ### Added
