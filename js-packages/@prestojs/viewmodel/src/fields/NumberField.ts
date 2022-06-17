@@ -7,11 +7,11 @@ export interface NumberFieldProps<ValueT> extends FieldProps<ValueT> {
     /**
      * The minimum value that should be accepted
      */
-    minValue?: ValueT;
+    minValue?: number | string;
     /**
      * The maximum value that should be accepted
      */
-    maxValue?: ValueT;
+    maxValue?: number | string;
 }
 
 /**
@@ -54,8 +54,8 @@ export default class NumberField<ValueT = string | number, ParsableValueT = Valu
     ParsableValueT
 > {
     static fieldClassName = 'NumberField';
-    public minValue?: ValueT;
-    public maxValue?: ValueT;
+    public minValue?: number | string;
+    public maxValue?: number | string;
 
     constructor(values: NumberFieldProps<ValueT> = {}) {
         const { minValue, maxValue, ...rest } = values;
