@@ -9,7 +9,7 @@
 ### Types
 
 * [CharWidget](https://prestojs.com/docs/ui-antd/widgets/CharWidget) & [EmailWidget](https://prestojs.com/docs/ui-antd/widgets/EmailWidget) types now accept all props antd `Input` does (you could previously pass and it would work but type checking would fail)
-
+* [NumberField](https://prestojs.com/docs/viewmodel/fields/NumberField) `minValue` and `maxValue` now accept `string` or `number`
 
 ## [0.0.31] - 2022-06-14
 

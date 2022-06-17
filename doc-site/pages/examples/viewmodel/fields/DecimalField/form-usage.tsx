@@ -20,7 +20,12 @@ import React from 'react';
 class ExampleModel extends viewModelFactory(
     {
         id: new IntegerField(),
-        total: new DecimalField({ decimalPlaces: 2, helpText: 'Enter total to 2 decimal places' }),
+        total: new DecimalField({
+            decimalPlaces: 2,
+            helpText: 'Enter total to 2 decimal places',
+            minValue: 0,
+            maxValue: '999.99',
+        }),
     },
     { pkFieldName: 'id' }
 ) {}
