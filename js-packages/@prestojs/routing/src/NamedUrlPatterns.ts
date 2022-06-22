@@ -11,11 +11,12 @@ export class NamedUrlNotFoundError extends Error {
 }
 
 /**
- * Define a lookup from a name to a URL pattern.
+ * Define a lookup from a name to a [UrlPattern](doc:UrlPattern).
  *
- * Provides shortcut to resolve a pattern based on name.
+ * This is useful to have a) a central location where all related patterns are defined
+ * and b) refer to patterns by a name rather than the URL path directly.
  *
- * Usage:
+ * ## Usage
  *
  * ```js
  * // urls.js
@@ -29,21 +30,26 @@ export class NamedUrlNotFoundError extends Error {
  * // ... elsewhere
  * import namedUrls from '../urls.js';
  *
- * namedUrls.resolve('user-list');
+ * namedUrls.reverse('user-list');
  * // /users/
- * namedUrls.resolve('user-detail', { id: 5 }, { query: { showAddresses: true }});
+ * namedUrls.reverse('user-detail', { id: 5 }, { query: { showAddresses: true }});
  * // /users/5/?showAddresses=true
  *
- * // Or to get the pattern direclty without resolving URL
+ * // Or to get the pattern directly without resolving URL
  * namedUrls.get('user-list')
  * // UrlPattern('/users/')
  * ```
  *
  * @extract-docs
+ * @typeParam Patterns The URL patterns defined as an object where keys are the names and values are a [UrlPattern](doc:UrlPattern)
  */
-export default class NamedUrlPatterns {
-    urlPatterns: UrlPatternMapping;
-    constructor(urls: UrlPatternMapping) {
+export default class NamedUrlPatterns<Patterns extends UrlPatternMapping> {
+    urlPatterns: Patterns;
+
+    /**
+     * @param urls The patterns defined as an object where keys are the names and values are a [UrlPattern](doc:UrlPattern)
+     */
+    constructor(urls: Patterns) {
         const badPatterns = Object.entries(urls).filter(
             ([, pattern]) => !(pattern instanceof UrlPattern)
         );
@@ -58,10 +64,12 @@ export default class NamedUrlPatterns {
     }
 
     /**
-     * Get the UrlPattern for the specified name
-     * @param name Name of pattern to retrieve
+     * Get the [UrlPattern](doc:UrlPattern) for the specified name
+     *
+     * @param name {string} Name of pattern to retrieve
+     * @param-type-name name string
      */
-    get(name: string): UrlPattern {
+    get(name: keyof Patterns): UrlPattern {
         const pattern = this.urlPatterns[name];
         if (!pattern) {
             throw new NamedUrlNotFoundError(name);
@@ -70,12 +78,20 @@ export default class NamedUrlPatterns {
     }
 
     /**
-     * Reverse a UrlPattern by it's name
-     * @param name Name of the pattern to resolve
+     * Reverse a [UrlPattern](doc:UrlPattern) by its name
+     *
+     * This is a shortcut for:
+     *
+     * ```js
+     * this.get(name).resolve(kwargs, options)
+     * ```
+     *
+     * @param name string Name of the pattern to resolve
      * @param kwargs Arguments to replace in pattern, if any
      * @param options Extra options to pass through to `UrlPattern.resolve`
+     * @param-type-name name string
      */
-    reverse(name: string, kwargs: {} = {}, options: ResolveOptions = {}): string {
+    reverse(name: keyof Patterns, kwargs: {} = {}, options: ResolveOptions = {}): string {
         const url = this.get(name);
         return url.resolve(kwargs, options);
     }

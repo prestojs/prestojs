@@ -776,6 +776,13 @@ class Converter {
     }
 
     async convertSignature(signature: JSONOutput.SignatureReflection): Promise<Signature> {
+        const paramTypeNameOverrides = (
+            signature?.comment?.tags?.filter(tag => tag.tag === 'param-type-name') || []
+        ).reduce((acc, tag) => {
+            const [paramName, ...rest] = tag.text.trim().split(' ');
+            acc[paramName] = rest.join(' ');
+            return acc;
+        }, {});
         return {
             ...(await this.createNode(signature, 'Method')),
             parameters: await Promise.all(
@@ -791,7 +798,12 @@ class Converter {
                     const name = param.name === '__namedParameters' ? 'props' : param.name;
                     return {
                         name,
-                        type: this.fixUnnamedFunction(type, param),
+                        type: paramTypeNameOverrides[name]
+                            ? {
+                                  typeName: 'unknown',
+                                  name: paramTypeNameOverrides[name],
+                              }
+                            : this.fixUnnamedFunction(type, param),
                         description: await this.convertComment({
                             ...resolvedType.comment,
                             ...param.comment,
