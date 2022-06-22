@@ -387,11 +387,30 @@ function mergeHeaders(headers1: Headers, headers2: Headers): Headers {
 }
 
 /**
- * Given multiple RequestInit objects merge them into a single RequestInit merging headers
- * from each one. Does not merge body. The last object passed with the value set takes
- * precedence.
+ * Given multiple fetch [init](https://developer.mozilla.org/en-US/docs/Web/API/fetch#init) objects merge them into a
+ * single object.
  *
- * @param args
+ * This will only merge headers - body will not be merged. Earlier values are replaced by later values in the case of
+ * duplicates.
+ *
+ * ## Usage
+ *
+ * ```js
+ * mergeRequestInit(
+ *     { headers: [['Accept', 'application/json']], body: 'first' },
+ *     { headers: new Headers({ 'X-Custom': '1' }), body: 'second' },
+ *     { credentials: 'include' }
+ * )
+ * // {
+ * //    body: 'second',
+ * //    headers: Headers({'accept': 'application/json', 'x-custom': '1'}),
+ * //    credentials: 'include',
+ * // }
+ * ```
+ *
+ * @param args The objects to merge
+ * @extract-docs
+ * @menu-group Endpoint
  */
 export function mergeRequestInit(
     ...args: (ExecuteInitOptions | EndpointRequestInit)[]
@@ -462,14 +481,24 @@ class PreparedAction {
 }
 
 /**
- * Indicates a response outside the 200 range
+ * Indicates a response outside the 200 range. This is thrown by [Endpoint.execute](doc:Endpoint#Method-execute).
  *
  * @menu-group Endpoint
  * @extract-docs
  */
 export class ApiError extends Error {
+    /**
+     * The [response status](https://developer.mozilla.org/en-US/docs/Web/API/Response/status)
+     */
     status: number;
+    /**
+     * The [response status text](https://developer.mozilla.org/en-US/docs/Web/API/Response/statusText)
+     */
     statusText: string;
+    /**
+     * The content of the response. This is the response after it has been passed through the `decodeBody` function
+     * on the [Endpoint](doc:Endpoint)
+     */
     content: any;
 
     /**
@@ -887,7 +916,7 @@ export default class Endpoint<ReturnT = any> {
      * If the fetch call is aborted due to a call to [AbortController.abort](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort)
      * an `AbortError` is thrown.
      *
-     * If the response is a non-2XX response an `ApiError` will be thrown.
+     * If the response is a non-2XX response an [ApiError](doc:ApiError) will be thrown.
      *
      * If the call is successful the body will be decoded using `decodeBody`. The default implementation
      * will decode JSON to an object or return text based on the content type. If the content type is
