@@ -31,6 +31,8 @@
 * [DecimalWidget](https://prestojs.com/docs/ui-antd/widgets/DecimalWidget) now stores values as a string to allow high precision.
 * [IntegerWidget](https://prestojs.com/docs/ui-antd/widgets/IntegerWidget) now forces entered value to be an integer (ie. decimal places are removed)
 * [NumberField](https://prestojs.com/docs/viewmodel/fields/NumberField) now accepts either string or number for `minValue` & `maxValue` to support strings that may come from `DecimalField`.
+* [DateField](https://prestojs.com/docs/viewmodel/fields/DateField) & [DateTimeField](https://prestojs.com/docs/viewmodel/fields/DateTimeField) now consider dates that represent the same value to be equal
+  * Without this change if a record with one of these fields was to be updated via `viewModelCachingMiddleware` and it was identical it would still always replace the existing record.
 
 ## [0.0.30] - 2022-04-13
 
