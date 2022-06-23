@@ -28,4 +28,5 @@ test('should consider distinct date instances with same date as equal', () => {
     expect(field.isEqual(a, d)).toBe(false);
     expect(field.isEqual(a, e)).toBe(false);
     expect(field.isEqual(a, f)).toBe(true);
+    expect(field.isEqual(undefined, undefined)).toBe(true);
 });

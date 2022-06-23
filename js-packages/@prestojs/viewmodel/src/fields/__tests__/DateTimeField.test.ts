@@ -28,4 +28,5 @@ test('should consider distinct datetime instances with same date + time as equal
     expect(field.isEqual(a, d)).toBe(false);
     expect(field.isEqual(a, e)).toBe(false);
     expect(field.isEqual(a, f)).toBe(false);
+    expect(field.isEqual(undefined, undefined)).toBe(true);
 });
