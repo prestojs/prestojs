@@ -25,7 +25,7 @@ type Options = {
      * single function form (just the decode function) then the encode function is the equivalent
      * of calling the toString() method on the value.
      *
-     * Both encode and decode are passed 2 arguments; the value to transform and the name of the parameter.
+     * Both decode and encode are passed 2 arguments; the value to transform and the name of the parameter.
      *
      * A special key '*' can be set to define the fallback behaviour for all keys not explicitly defined.
      */

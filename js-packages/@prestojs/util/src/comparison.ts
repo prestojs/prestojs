@@ -23,8 +23,14 @@ function equalityCustomizer(a: any, b: any): boolean | undefined {
 }
 
 /**
- * Compare to values for equality. If has an `isEqual` method this will be called
+ * Compare two values for equality. If either  value has an `isEqual` method this will be called
  * otherwise values will be compared shallowly.
+ *
+ * @param a First value to compare
+ * @param b Second value to compare
+ *
+ * @extract-docs
+ * @menu-group Comparison
  */
 export function isEqual(a: any, b: any): boolean {
     return shallowequal(a, b, equalityCustomizer);
@@ -33,6 +39,12 @@ export function isEqual(a: any, b: any): boolean {
 /**
  * Compare values deeply for equality. If an object has an `isEqual` method this
  * will be called otherwise values will be compared deeply.
+ *
+ * @param a First value to compare
+ * @param b Second value to compare
+ *
+ * @extract-docs
+ * @menu-group Comparison
  */
 export function isDeepEqual(a: any, b: any): boolean {
     return isEqualWith(a, b, equalityCustomizer);

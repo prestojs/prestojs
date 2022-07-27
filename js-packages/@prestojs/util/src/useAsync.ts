@@ -114,6 +114,18 @@ export interface UseAsyncOptions<ResultT, ErrorT> {
     onSuccess?: OnSuccess<ResultT>;
     /**
      * Called when async function errors. Passed the error returned from async function.
+     *
+     * Note that when calling `run` directly you can alternatively handle errors there:
+     *
+     * ```js
+     * try {
+     *     await run();
+     *     // success
+     *     // if onSuccess is specified it will be called as well
+     * } catch (e) {
+     *     // handle error
+     *     // if onError is specified it will be called as well
+     * }
      */
     onError?: OnError<ErrorT>;
 }

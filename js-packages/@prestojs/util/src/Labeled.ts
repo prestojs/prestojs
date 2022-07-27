@@ -37,7 +37,9 @@ export interface NodeLabeled {
 }
 
 /**
- * Check if a value conforms to TextLabeled
+ * Check if an object implements [getLabel](doc:TextLabeled#Method-getLabel)
+ *
+ * @param item The item to check if implements `getLabel`
  * @menu-group Labeled
  */
 export function isTextLabeled(item: any): item is TextLabeled {
@@ -48,7 +50,9 @@ export function isTextLabeled(item: any): item is TextLabeled {
 }
 
 /**
- * Check if a value conforms to NodeLabeled
+ * Check if an object implements [getNodeLabel](doc:NodeLabeled#Method-getNodeLabel)
+ *
+ * @param item The item to check if implements `getNodeLabel`
  * @extract-docs
  * @menu-group Labeled
  */
@@ -60,7 +64,10 @@ export function isNodeLabeled(item: any): item is NodeLabeled {
 }
 
 /**
- * Check if item supports either text or React node labels
+ * Check if item supports either [text labels](doc:TextLabeled) or [React node labels](doc:NodeLabeled)
+ *
+ * @param item The item to check if implements `getLabel` or `getNodeLabel`
+ *
  * @extract-docs
  * @menu-group Labeled
  */
@@ -69,12 +76,21 @@ export function isLabeled(item: any): item is TextLabeled | NodeLabeled {
 }
 
 /**
- * Get a React node label from an item
+ * Get a label for an item suitable for rendering with React. If you want a plain text label use [getTextLabel](doc:getTextLabel).
  *
- * If item implements `getNodeLabel` that will be used otherwise `getLabel` will be used.
+ * If item implements [getNodeLabel](doc:NodeLabeled#Method-getNodeLabel) that will be used otherwise [getLabel](doc:TextLabeled#Method-getLabel) will be used.
  *
- * If neither are defined an error is thrown. To conditional call this check if labeled first
- * with `isLabeled`.
+ * If neither method is defined an error will be thrown. To conditionally call this check if labeled first
+ * with [isLabeled](doc:isLabeled).
+ *
+ * ```js
+ * function ItemHeader({ item, defaultTitle }) {
+ *     const title = isLabeled(item) ? getNodeLabel(item) : defaultTitle;
+ *     return <h2>{title}</h2>;
+ * }
+ * ```
+ *
+ * @param item The item to get the label from
  *
  * @extract-docs
  * @menu-group Labeled
@@ -92,10 +108,19 @@ export function getNodeLabel(item: any): React.ReactNode {
 }
 
 /**
- * Get a plain text label from an item
+ * Get a plain text label from an item.
  *
- * If does not implement TextLabeled an error is thrown. To conditional call this check if labeled first
- * with `isTextLabeled`.
+ * If `item` does not implement [TextLabeled](doc:TextLabeled) an error is thrown. To conditionally call this check
+ * if `items` is labeled first with [isTextLabeled](doc:isTextLabeled).
+ *
+ * ```js
+ * const label = isTextLabeled(item) ? getTextLabel(item) : 'Item';
+ * alert(`${label} saved`);
+ * ```
+ *
+ * See also [getNodeLabeled](doc:getNodeLabel).
+ *
+ * @param item THe item to tget the label from
  *
  * @extract-docs
  * @menu-group Labeled

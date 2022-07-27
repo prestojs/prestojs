@@ -1,4 +1,5 @@
-const timeRegex = /^(([0-1]?[0-9])|2[0-3]):([0-5][0-9])(:([0-5][0-9])(.([0-9]{3})(\+([0-9]{2}):([0-9]{2}))?)?)?$/;
+const timeRegex =
+    /^(([0-1]?[0-9])|2[0-3]):([0-5][0-9])(:([0-5][0-9])(.([0-9]{3})(\+([0-9]{2}):([0-9]{2}))?)?)?$/;
 
 /**
  * @expand-properties
@@ -27,9 +28,6 @@ export class InvalidTimeError extends Error {}
  * Seconds & milliseconds are optional and will default to 0 if not in the string, timezone is optional and will be
  * left as undefined if not specified.
  *
- * NOTE: If you pass a `Date` object then the timezone offset will always be whatever the local browser/env timezone
- * is (ie. it's not possible to have a javascript `Date` object in another timezone).
- *
  * ```js
  * parseTime("3:55")
  * // { hour: 3, minute: 55, seconds: 0, milliseconds: 0 }
@@ -41,7 +39,12 @@ export class InvalidTimeError extends Error {}
  * // { hour: 3, minute: 55, seconds: 20, milliseconds: 600, timezoneOffset: -600 }
  * ```
  *
- * @param value The string value to parse
+ * <Alert type="info">
+ *   NOTE: If you pass a `Date` object then the timezone offset will always be whatever the local browser/env timezone
+ *   is (ie. it's not possible to have a javascript `Date` object in another timezone).
+ * </Alert>
+ *
+ * @param value The string or `Date` value to parse
  *
  * @extract-docs
  * @menu-group Time
@@ -107,8 +110,20 @@ type TimeFormatOptions = {
  * Format the parts of a time - as returned by [parseTime](doc:parseTime) - as a string using
  * [toLocaleString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString#using_options).
  *
- * Note that while you can pass through `options.timeZone` this may be inaccurate if `parts.timezoneOffset` isn't
- * supplied.
+ * ```js
+ * formatTime(parseTime('11:30:00.000+09:30'), {
+ *     localeOptions: { timeZone: 'Australia/Adelaide' },
+ * });
+ * // 11:30:00 AM
+ *
+ * formatTime(parseTime('11:30:00'), { localeOptions: { timeStyle: 'short' } });
+ * // 11:30 AM
+ * ```
+ *
+ * <Alert type="info">
+ *   Note that while you can pass through `options.timeZone` this may be inaccurate if `parts.timezoneOffset` isn't
+ *   supplied.
+ * </Alert>
  *
  * @extract-docs
  * @menu-group Time
