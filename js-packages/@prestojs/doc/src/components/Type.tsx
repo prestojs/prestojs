@@ -203,6 +203,47 @@ export default function Type({ type, mode = 'FULL' }: Props) {
             </PreferencesProvider>
         );
     }
+    if (type.typeName === 'componentProps') {
+        return (
+            <span>
+                Any props from <Type type={type.type} />
+            </span>
+        );
+    }
+    if (type.typeName === 'es6Map') {
+        return (
+            <ExpandableDescription
+                mode="COMPACT"
+                title="Map"
+                expandedContent={
+                    <div className="type-es6map">
+                        <p className="mb-6">
+                            A{' '}
+                            <a
+                                href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center border-b border-gray-800 hover:font-semibold"
+                            >
+                                Map
+                            </a>{' '}
+                            with the following key & value types
+                        </p>
+                        <dl>
+                            <dt>Key</dt>
+                            <dd>
+                                <Type type={type.keyType} mode="FULL" />
+                            </dd>
+                            <dt>Value</dt>
+                            <dd>
+                                <Type type={type.valueType} mode="FULL" />
+                            </dd>
+                        </dl>
+                    </div>
+                }
+            />
+        );
+    }
     return <>{type.typeName}</>;
 }
 

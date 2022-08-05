@@ -1,5 +1,6 @@
 import { run } from '@mdx-js/mdx';
 import cx from 'classnames';
+import Link from 'next/link';
 import React, { Fragment, useEffect, useState } from 'react';
 import * as runtime from 'react/jsx-runtime';
 import AnchorLink, { generateId } from './AnchorLink';
@@ -13,7 +14,7 @@ const Code = (props): React.ReactElement => {
     return <code {...props} className="bg-yellow-100" />;
 };
 
-const Alert = ({
+export const Alert = ({
     type = 'warning',
     children,
 }: {
@@ -50,6 +51,75 @@ function Heading({
     );
 }
 
+function WidgetUsage({
+    children,
+    widgetName = 'Widget',
+}: {
+    children: React.ReactNode;
+    widgetName?: string;
+}) {
+    return (
+        <>
+            <Alert type="info">
+                <p>
+                    See the <Link href="/docs/ui#Widgets">widget guide</Link> for more details on
+                    how widgets work within a form.
+                </p>
+                <div className="my-5">
+                    Most usages of a widget are selected using{' '}
+                    <Link href="/docs/ui-antd/getWidgetForField">getWidgetForField</Link> or by
+                    passing it to <Link href="/docs/final-form/FormField">FormField</Link> or{' '}
+                    <Link href="/docs/final-form/FormItem">FormItem</Link>
+                    <details>
+                        <summary className="cursor-pointer decoration-dashed underline">
+                            More Details
+                        </summary>
+                        <p className="my-5">
+                            Using <Link href="/docs/final-form/FormField">FormField</Link>
+                        </p>
+                        <CodeBlock className="my-5">{`<Form.Field
+  field={ExampleModel.fields.exampleField}
+  component={${widgetName}} 
+/>`}</CodeBlock>
+                        <CodeBlock className="my-5">{`<Form.Field
+  field={ExampleModel.fields.exampleField}
+  render={widgetProps => <${widgetName} {...fieldProps} />}
+/>`}</CodeBlock>
+                        <p className="my-5">
+                            or to <Link href="/docs/final-form/FormItem">FormItem</Link>
+                        </p>
+                        <CodeBlock className="my-5">{`<Form.Item
+  field={ExampleModel.fields.exampleField}
+  fieldProps={{ component: ${widgetName}}}
+/>`}</CodeBlock>
+                        <CodeBlock className="my-5">{`<Form.Item
+  field={ExampleModel.fields.exampleField}
+  fieldProps={{ render: widgetProps => <${widgetName} {...fieldProps} /> }}
+/>`}</CodeBlock>
+                    </details>
+                </div>
+            </Alert>
+            <p className="m-5 font-semibold">
+                To use outside of a form where state is manually tracked:
+            </p>
+            {children}
+        </>
+    );
+}
+
+function Usage({ type = 'generic', children, ...rest }) {
+    let contents = children;
+    if (type === 'widget') {
+        contents = <WidgetUsage children={children} {...rest} />;
+    }
+    return (
+        <div>
+            <Heading component="h2">Usage</Heading>
+            {contents}
+        </div>
+    );
+}
+
 export const mdxComponents = {
     wrapper: props => <span className="mdx" {...props} />,
     p: Paragraph,
@@ -76,6 +146,7 @@ export const mdxComponents = {
     },
     blockquote: Alert,
     Alert,
+    Usage,
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type

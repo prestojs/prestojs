@@ -3,20 +3,57 @@ import React from 'react';
 
 // TODO: Based on final-form currently without much thought
 /**
+ * The props that a widget can be expected to have access to. The only props
+ * that must always be provided are `onChange`, and `value` once a value
+ * has been set.
+ *
+ * When used with [@prestojs/final-form](/docs/final-form) this will be
+ * the props described in the [final-form documentation](https://final-form.org/docs/react-final-form/types/FieldRenderProps).
+ *
  * @expand-properties
+ * @extract-docs
+ * @typeParam FieldValueT The type of the value that the widget can accept
+ * @typeParam ElementT The HTML element type (where applicable). This is the type
+ * used in `FocusEvent` and `ChangeEvent`.
  */
-export interface InputProps<FieldValue, T extends HTMLElement> {
+export interface InputProps<FieldValueT, ElementT extends HTMLElement> {
     /**
      * Name of the field
      */
     name?: string;
-    onChange: (event: React.ChangeEvent<T> | any) => void;
-    onBlur?: (event?: React.FocusEvent<T>) => void;
-    onFocus?: (event?: React.FocusEvent<T>) => void;
-    type?: string;
-    value?: FieldValue;
-    checked?: boolean;
-    multiple?: boolean;
+    /**
+     * The function to be called by the widget whenever the value changes
+     *
+     * This  can be passed either the value directly or an event that the value
+     * can be extracted from (`event.target.value` or `event.target.checked`).
+     */
+    onChange: (event: React.ChangeEvent<ElementT> | any) => void;
+    /**
+     * The function to be called by the widget whenever a blur event occurs.
+     *
+     * Whether this function is supported depends on the widget.
+     *
+     * `event` may not be set if the field is blurred programmatically rather than
+     * from user interaction.
+     */
+    onBlur?: (event?: React.FocusEvent<ElementT>) => void;
+    /**
+     * The function to be called by the widget whenever a focus event occurs.
+     *
+     * Whether this function is used depends on the widget.
+     *
+     * `event` may not be set if the field is focused programmatically rather than
+     * from user interaction.
+     */
+    onFocus?: (event?: React.FocusEvent<ElementT>) => void;
+    // type?: string;
+    /**
+     * The current value of the widget. After `onChange` is called this should
+     * be the new value passed.
+     */
+    value?: FieldValueT;
+    // checked?: boolean;
+    // multiple?: boolean;
 }
 
 /**
@@ -25,19 +62,8 @@ export interface InputProps<FieldValue, T extends HTMLElement> {
  */
 export interface WidgetProps<FieldValue, T extends HTMLElement, SingleValue = FieldValue> {
     /**
-     * The input props for the widget. This should include, at minimum:
-     *
-     * - onChange
-     * - value
-     *
-     * Can also include
-     *
-     * - name
-     * - onBlur
-     * - onFocus
-     * - type
-     * - checked
-     * - multiple
+     * The input props for the widget. This is typically passed by the form (eg. [Form](doc:Form) when
+     * using [@prestojs/final-form](/docs/final-form)) but can be passed directly if used standalone.
      */
     input: InputProps<FieldValue, T>;
     /**

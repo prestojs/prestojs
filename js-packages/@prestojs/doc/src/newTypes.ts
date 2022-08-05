@@ -11,6 +11,8 @@ export interface FunctionPage {
     description?: RichDescription;
     sourceLocation?: SourceLocation;
     typeParameters?: TypeParameter[];
+    pageSections: PageSection[];
+    isTypeOnly: boolean;
 }
 
 export interface ClassConstructor {
@@ -41,6 +43,7 @@ export interface ClassPage {
         typeArguments?: DocType[];
         children: (ReferenceLinkType | ExternalReferenceType)[];
     };
+    isTypeOnly: boolean;
 }
 
 export type Page = FunctionPage | ClassPage;
@@ -78,6 +81,7 @@ export interface Flags {
     isForwardRef?: boolean;
     expandProperties?: boolean;
     deprecatedReason?: string;
+    hideProperties?: string[];
 }
 
 export interface Signature extends DocNode {
@@ -85,6 +89,7 @@ export interface Signature extends DocNode {
     returnType?: DocType;
     typeParameters?: TypeParameter[];
     sourceLocation?: SourceLocation;
+    isComponent: boolean;
 }
 
 // Types
@@ -170,6 +175,7 @@ export interface ExternalReferenceType {
 export interface PropertiesFromReference {
     typeName: 'propertiesFrom';
     type: DocType;
+    excludeProperties: string[];
 }
 export interface MappedType {
     typeName: 'mapped';
@@ -190,7 +196,21 @@ export interface InterfaceType {
     typeName: 'interface';
     classPage: ClassPage;
 }
+
+export interface ES6MapType {
+    typeName: 'es6Map';
+    keyType: DocType;
+    valueType: DocType;
+}
+
+export interface ComponentProps {
+    typeName: 'componentProps';
+    type: DocType;
+}
+
 export type DocType =
+    | ComponentProps
+    | ES6MapType
     | UnknownType
     | InterfaceType
     | PropertiesFromReference

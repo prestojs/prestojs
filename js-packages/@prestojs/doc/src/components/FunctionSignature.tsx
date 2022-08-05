@@ -18,7 +18,6 @@ export default function FunctionSignature({
     excludeParameterNames = [],
     hideTypeParameters = false,
 }: Props) {
-    // const { typeParameter } = signature;
     const parameters =
         signature.parameters?.filter(param => !excludeParameterNames.includes(param.name)) || [];
     return (

@@ -68,12 +68,27 @@ function CopyToClipboard({ text }) {
 }
 
 export default function PageHeader({ page, meta }: { page: Page; meta: PageMetaData }) {
-    const importString = `import { ${page.name} } from \"@prestojs/${meta.packageName}\";`;
+    const importString = `import ${page.isTypeOnly ? 'type' : ''} { ${
+        page.name
+    } } from \"@prestojs/${meta.packageName}\";`;
     return (
         <>
             <header className="flex justify-between items-center">
-                <h1 className="text-3xl flex justify-between items-start relative" id={page.name}>
+                <h1 className="text-3xl flex justify-between items-center relative" id={page.name}>
                     {page.name}
+                    {page.isTypeOnly && (
+                        <Tooltip
+                            className="p-0.5 bg-sky-50 border border-sky-500 text-sm ml-5"
+                            content={
+                                <span>
+                                    This is a type. If you aren't using typescript you don't need to
+                                    import this directly.
+                                </span>
+                            }
+                        >
+                            Typescript Type
+                        </Tooltip>
+                    )}
                 </h1>
                 <SourceLink sourceLocation={page.sourceLocation} />
             </header>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { Prism } from 'react-syntax-highlighter';
 
 /**
@@ -136,12 +136,13 @@ const theme = {
 export default function CodeBlock({
     children,
     className,
+    ...rest
 }: {
     children: React.ReactNode;
     className?: string;
-}): React.ReactElement {
+} & ComponentProps<typeof Prism>): React.ReactElement {
     return (
-        <Prism language="jsx" style={theme} className={className}>
+        <Prism language="jsx" style={theme} className={className} {...rest}>
             {children}
         </Prism>
     );

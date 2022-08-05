@@ -13,6 +13,7 @@ type Props = {
     excludeParameterNames?: string[];
     hideTypeParameters?: boolean;
     hideReturnType?: boolean;
+    prologue?: React.ReactNode;
 };
 
 export default function FunctionDocumentation({
@@ -20,10 +21,12 @@ export default function FunctionDocumentation({
     excludeParameterNames = [],
     hideTypeParameters,
     hideReturnType,
+    prologue,
 }: Props) {
     const parameters = signature.parameters.filter(
         param => !excludeParameterNames.includes(param.name)
     );
+
     return (
         <>
             <div className="flex items-center justify-between mb-5">
@@ -38,13 +41,23 @@ export default function FunctionDocumentation({
                 <SourceLink sourceLocation={signature.sourceLocation} />
             </div>
             <Description description={signature.description} />
+            {prologue}
             {parameters.length > 0 && (
                 <div className="my-5 overflow-x-auto">
-                    <strong className="pb-3 block">Params:</strong>
-                    <TypeTable dataSource={parameters} attributeHeader="Parameter" />
+                    <AnchorLink
+                        className="font-bold"
+                        component="h2"
+                        id={`${signature.anchorId}-props`}
+                    >
+                        {signature.isComponent ? 'Component Props' : 'Arguments'}:
+                    </AnchorLink>
+                    <TypeTable
+                        dataSource={parameters}
+                        attributeHeader={signature.isComponent ? 'Prop' : 'Argument'}
+                    />
                 </div>
             )}
-            {!hideReturnType && signature.returnType && (
+            {!signature.isComponent && !hideReturnType && signature.returnType && (
                 <div className="my-5">
                     <strong className="pb-3 block">Returns:</strong>
                     <Type type={signature.returnType} />

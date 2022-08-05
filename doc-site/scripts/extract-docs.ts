@@ -22,12 +22,13 @@ import type {
     UnknownType,
     VariableNode,
 } from '@prestojs/doc';
+import { SignatureParameter } from '@prestojs/doc/newTypes';
 import fs from 'fs';
 import { createRequire } from 'module';
 import path, { dirname } from 'path';
 
 import prettier from 'prettier';
-import TypeDoc, { JSONOutput } from 'typedoc';
+import TypeDoc, { JSONOutput, ReflectionKind } from 'typedoc';
 import { visit } from 'unist-util-visit';
 import { fileURLToPath } from 'url';
 
@@ -70,6 +71,19 @@ function getSlug(docItem) {
     return [...importPath.split('/').slice(1, -1), docItem.name].join('/');
 }
 
+function getOmitKeys(type: JSONOutput.ReferenceType) {
+    if (!type.typeArguments) {
+        return [];
+    }
+    const omitTypes = type.typeArguments[1] as JSONOutput.LiteralType | JSONOutput.UnionType;
+    if (!omitTypes) {
+        return [];
+    }
+    return omitTypes.type === 'union'
+        ? omitTypes.types.map((t: JSONOutput.LiteralType) => t.value)
+        : [omitTypes.value];
+}
+
 function makeDocLinksPlugin(docsJson) {
     return () => tree => {
         visit(tree, ['link', 'linkReference'], node => {
@@ -100,6 +114,9 @@ function formatWithPrettierPlugin() {
                         printWidth: 60,
                         parser: 'typescript',
                     });
+                    if (node.value[0] === ';') {
+                        node.value = node.value.slice(1);
+                    }
                 } catch (e) {
                     console.warn('Example not parseable: ', node.value);
                 }
@@ -275,9 +292,19 @@ function getDocUrl(declaration: JSONOutput.DeclarationReflection): string | fals
     return false;
 }
 
+function isTypeOnly(docItem: TypeDoc.JSONOutput.DeclarationReflection) {
+    return [
+        ReflectionKind.Interface,
+        ReflectionKind.TypeAlias,
+        ReflectionKind.TypeLiteral,
+        ReflectionKind.TypeParameter,
+    ].includes(docItem.kind);
+}
+
 type IntersectWithReference = {
     type: 'intersectWithReference';
     reference: JSONOutput.SomeType;
+    omitKeys: ReturnType<typeof getOmitKeys>;
 };
 
 class Converter {
@@ -302,16 +329,20 @@ class Converter {
         Exclude<JSONOutput.DeclarationReflection['type'], undefined>,
         JSONOutput.DeclarationReflection[] | undefined
     >();
-    resolveChildrenFromType(type: Exclude<JSONOutput.DeclarationReflection['type'], undefined>) {
+    async resolveChildrenFromType(
+        type: Exclude<JSONOutput.DeclarationReflection['type'], undefined>
+    ) {
         if (this.resolvedChildren.has(type)) {
             return this.resolvedChildren.get(type);
         }
-        const children = this._resolveChildrenFromType(type);
+        const children = await this._resolveChildrenFromType(type);
         this.resolvedChildren.set(type, children);
         return children;
     }
 
-    _resolveChildrenFromType(type: Exclude<JSONOutput.DeclarationReflection['type'], undefined>) {
+    async _resolveChildrenFromType(
+        type: Exclude<JSONOutput.DeclarationReflection['type'], undefined>
+    ) {
         if (type.type === 'reference' && type.id && this.references[type.id]) {
             const docUrl = getDocUrl(this.references[type.id]);
             // Shortcut it... if we want to link to them don't expand children just say it intersects with them
@@ -321,15 +352,9 @@ class Converter {
             }
         }
         if (type.type === 'reference' && type.name === 'Omit' && type.typeArguments) {
-            const children = this.resolveChildrenFromType(type.typeArguments[0]);
+            const children = await this.resolveChildrenFromType(type.typeArguments[0]);
             if (children) {
-                const omitTypes = type.typeArguments[1] as
-                    | JSONOutput.LiteralType
-                    | JSONOutput.UnionType;
-                const omitKeys =
-                    omitTypes.type === 'union'
-                        ? omitTypes.types.map((t: JSONOutput.LiteralType) => t.value)
-                        : [omitTypes.value];
+                const omitKeys = getOmitKeys(type);
                 return orderBy(
                     children.filter(child => !omitKeys.includes(child.name)),
                     'name'
@@ -339,7 +364,7 @@ class Converter {
             }
         }
         if (type.type === 'reference' && type.name === 'Pick' && type.typeArguments) {
-            const children = this.resolveChildrenFromType(type.typeArguments[0]);
+            const children = await this.resolveChildrenFromType(type.typeArguments[0]);
             if (children) {
                 const pickTypes = type.typeArguments[1] as
                     | JSONOutput.LiteralType
@@ -364,42 +389,47 @@ class Converter {
         }
         if (type.type === 'intersection') {
             return orderBy(
-                type.types
-                    .map(t => this.resolveChildrenFromType(t))
-                    .reduce(
-                        (
-                            acc: (DeclarationReflection | { type: IntersectWithReference })[],
-                            children: DeclarationReflection[] | undefined,
-                            i
-                        ) => {
-                            if (!children) {
-                                let t = type.types[i];
+                (await Promise.all(type.types.map(t => this.resolveChildrenFromType(t)))).reduce(
+                    (
+                        acc: (DeclarationReflection | { type: IntersectWithReference })[],
+                        children: DeclarationReflection[] | undefined,
+                        i
+                    ) => {
+                        if (!children) {
+                            let t = type.types[i];
+                            let omitKeys;
+                            // @ts-ignore
+                            if (t.name === 'Omit') {
                                 // @ts-ignore
-                                if (t.name === 'Omit') {
-                                    // Instead of showing 'Any properties from Omit' show the type
-                                    // omit was from. This will be very fragile.
-                                    // @ts-ignore
-                                    t = t.typeArguments[0];
-                                }
-                                acc.push({
-                                    type: { type: 'intersectWithReference', reference: t },
-                                });
-                                return acc;
+                                omitKeys = getOmitKeys(t);
+                                // Instead of showing 'Any properties from Omit' show the type
+                                // omit was from. This will be very fragile.
+                                // @ts-ignore
+                                t = t.typeArguments[0];
                             }
-                            const names = children.map(child => child.name);
-                            acc = acc.filter(item =>
-                                'name' in item ? !names.includes(item.name) : true
-                            );
-                            acc.push(...children);
+                            acc.push({
+                                type: {
+                                    type: 'intersectWithReference',
+                                    reference: t,
+                                    omitKeys,
+                                },
+                            });
                             return acc;
-                        },
-                        []
-                    ),
+                        }
+                        const names = children.map(child => child.name);
+                        acc = acc.filter(item =>
+                            'name' in item ? !names.includes(item.name) : true
+                        );
+                        acc.push(...children);
+                        return acc;
+                    },
+                    []
+                ),
                 'name'
             );
         }
         if (type.type === 'reference' && type.name === 'Partial' && type.typeArguments) {
-            const children = this.resolveChildrenFromType(type.typeArguments[0]);
+            const children = await this.resolveChildrenFromType(type.typeArguments[0]);
             if (children) {
                 return children.map(child => ({
                     ...child,
@@ -411,11 +441,12 @@ class Converter {
         }
     }
 
-    resolveChildren(
+    async resolveChildren(
         declaration: JSONOutput.DeclarationReflection
-    ):
+    ): Promise<
         | (JSONOutput.DeclarationReflection | { indexSignature: JSONOutput.SignatureReflection })[]
-        | undefined {
+        | undefined
+    > {
         let children;
         if (declaration.children) {
             children = orderBy(declaration.children, 'name');
@@ -489,13 +520,38 @@ class Converter {
     }
 
     async convertFunction(docItem: JSONOutput.DeclarationReflection): Promise<FunctionPage> {
+        const originalSig = docItem.signatures?.[0];
+        const signatures = await this.convertSignatures(docItem.signatures || []);
+        const pageSections: PageSection[] = [];
+        if (signatures.length > 0 && originalSig) {
+            const sig = signatures[0];
+            sig.description;
+            let extraSections: PageSection[] = [];
+            if (sig.parameters) {
+                extraSections.push({
+                    title: sig.isComponent ? 'Props' : 'Arguments',
+                    showEmpty: true,
+                    anchorId: `${sig.anchorId}-props`,
+                    links: [],
+                });
+            }
+            if (sig.description) {
+                pageSections.push(
+                    ...(this.extractInPageLinks(originalSig, sig.description, extraSections) || [])
+                );
+            } else {
+                pageSections.push(...extraSections);
+            }
+        }
         return {
             pageType: 'function',
             name: docItem.name,
-            signatures: await this.convertSignatures(docItem.signatures || []),
+            signatures,
             description: await this.convertComment(docItem.comment),
             sourceLocation: this.convertSourceLocation(docItem),
             typeParameters: await this.convertTypeParameter(docItem.typeParameter),
+            pageSections,
+            isTypeOnly: isTypeOnly(docItem),
         };
     }
 
@@ -561,6 +617,7 @@ class Converter {
         DocType
     >();
 
+    currentPath: any[] = [];
     async convertType(
         type:
             | JSONOutput.SomeType
@@ -572,16 +629,18 @@ class Converter {
         sourceDeclaration?: JSONOutput.DeclarationReflection,
         options?: { isReturnType?: boolean }
     ): Promise<DocType> {
+        this.currentPath.push(type);
+
         // @ts-ignore
         if (!type) {
             throw new Error('Expected a type');
         }
-        const n = this.resolvedNodes.get(type);
-        if (n) {
-            return n;
+        let node = this.resolvedNodes.get(type);
+        if (!node) {
+            node = await this._convertType(type, sourceDeclaration, options);
+            this.resolvedNodes.set(type, node);
         }
-        const node = await this._convertType(type, sourceDeclaration, options);
-        this.resolvedNodes.set(type, node);
+        this.currentPath.splice(this.currentPath.indexOf(type), 1);
         return node;
     }
 
@@ -612,6 +671,7 @@ class Converter {
             return {
                 typeName: 'propertiesFrom',
                 type: await this.convertType(type.reference, sourceDeclaration),
+                excludeProperties: type.omitKeys as string[],
             };
         }
         if (type.type === 'array') {
@@ -626,7 +686,7 @@ class Converter {
         if (type.type === 'reflection') {
             const { declaration } = type;
             if (declaration?.children) {
-                const children = this.resolveChildren(declaration);
+                const children = await this.resolveChildren(declaration);
                 if (children) {
                     return this.withTypeParameter(declaration.typeParameter, () =>
                         this.createContainerType(children, declaration)
@@ -647,7 +707,9 @@ class Converter {
             }
         }
         if (type.type === 'intersection') {
-            const children: JSONOutput.DeclarationReflection[] = this.resolveChildrenFromType(type);
+            const children: JSONOutput.DeclarationReflection[] = await this.resolveChildrenFromType(
+                type
+            );
             return this.createContainerType(children, sourceDeclaration);
         }
         if (type.type === 'literal') {
@@ -730,6 +792,9 @@ class Converter {
                 if (tag.tag === 'forward-ref') {
                     flags.isForwardRef = true;
                 }
+                if (tag.tag === 'hide-properties') {
+                    flags.hideProperties = text.split(' ');
+                }
             }
         }
 
@@ -783,42 +848,49 @@ class Converter {
             acc[paramName] = rest.join(' ');
             return acc;
         }, {});
+        const isComponent = signature.name[0] === signature.name[0].toUpperCase();
+        let parameters: SignatureParameter[] = await Promise.all(
+            (signature.parameters || []).map(async param => {
+                const resolvedType = this.resolveReferencedType(param);
+                const typeArgs = this._resolveTypeArguments(resolvedType);
+                if (param.type?.type === 'reference' && param.type.typeArguments) {
+                    typeArgs.push(...this._resolveTypeArgumentsFromType(param.type));
+                }
+                const type = await this.withTypeParameter(typeArgs, () =>
+                    this.convertType(param.type, param)
+                );
+                const name = param.name === '__namedParameters' ? 'props' : param.name;
+                return {
+                    name,
+                    type: paramTypeNameOverrides[name]
+                        ? {
+                              typeName: 'unknown',
+                              name: paramTypeNameOverrides[name],
+                          }
+                        : this.fixUnnamedFunction(type, param),
+                    description: await this.convertComment({
+                        ...resolvedType.comment,
+                        ...param.comment,
+                    }),
+                    flags: {
+                        ...(await this.convertFlags(resolvedType)),
+                        ...(await this.convertFlags(param)),
+                    },
+                };
+            })
+        );
+        if (isComponent) {
+            // If component then any additional arguments must be ref from forwardRef so get rid of them
+            parameters = parameters.slice(0, 1);
+        }
         return {
             ...(await this.createNode(signature, 'Method')),
-            parameters: await Promise.all(
-                (signature.parameters || []).map(async param => {
-                    const resolvedType = this.resolveReferencedType(param);
-                    const typeArgs = this._resolveTypeArguments(resolvedType);
-                    if (param.type?.type === 'reference' && param.type.typeArguments) {
-                        typeArgs.push(...this._resolveTypeArgumentsFromType(param.type));
-                    }
-                    const type = await this.withTypeParameter(typeArgs, () =>
-                        this.convertType(param.type, param)
-                    );
-                    const name = param.name === '__namedParameters' ? 'props' : param.name;
-                    return {
-                        name,
-                        type: paramTypeNameOverrides[name]
-                            ? {
-                                  typeName: 'unknown',
-                                  name: paramTypeNameOverrides[name],
-                              }
-                            : this.fixUnnamedFunction(type, param),
-                        description: await this.convertComment({
-                            ...resolvedType.comment,
-                            ...param.comment,
-                        }),
-                        flags: {
-                            ...(await this.convertFlags(resolvedType)),
-                            ...(await this.convertFlags(param)),
-                        },
-                    };
-                })
-            ),
+            parameters,
             typeParameters: await this.convertTypeParameter(signature.typeParameter),
             returnType: await this.convertType(signature.type, signature, { isReturnType: true }),
             sourceLocation: this.convertSourceLocation(signature),
             isInherited: !!signature.inheritedFrom,
+            isComponent,
         };
     }
 
@@ -1034,6 +1106,11 @@ class Converter {
         Error: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error',
         'Intl.DateTimeFormatOptions':
             'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#parameters',
+        CheckboxProps: 'https://ant.design/components/checkbox/#API',
+        Checkbox: 'https://ant.design/components/checkbox/#API',
+        'Checkbox.Group': 'https://ant.design/components/checkbox/#Checkbox-Group',
+        Input: 'https://ant.design/components/input/#API',
+        FocusEvent: 'https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent',
     };
 
     private convertExternalReference(
@@ -1057,7 +1134,8 @@ class Converter {
      */
     extractInPageLinks(
         declaration: JSONOutput.DeclarationReflection,
-        description?: RichDescription
+        description?: RichDescription,
+        extraSections?: PageSection[]
     ): PageSection[] {
         const inPageLinks: PageSection[] = [];
         if (description && declaration.comment) {
@@ -1085,7 +1163,10 @@ class Converter {
                                 section = {
                                     title,
                                     showEmpty: true,
-                                    anchorId: title.split(' ').join('-'),
+                                    anchorId: title
+                                        .split(' ')
+                                        .join('-')
+                                        .replace(/[^a-zA-Z0-9-]/g, ''),
                                     links: [],
                                 };
                             }
@@ -1095,7 +1176,10 @@ class Converter {
                                         anchorId:
                                             inPageLinks.length === 0
                                                 ? 'main-content'
-                                                : title.split(' ').join('-'),
+                                                : title
+                                                      .split(' ')
+                                                      .join('-')
+                                                      .replace(/[^a-zA-Z0-9-]/g, ''),
                                         title: declaration.name,
                                         showEmpty: true,
                                         links: [],
@@ -1103,16 +1187,37 @@ class Converter {
                                 }
                                 section.links.push({
                                     title: title,
-                                    anchorId: title.split(' ').join('-'),
+                                    anchorId: title
+                                        .split(' ')
+                                        .join('-')
+                                        .replace(/[^a-zA-Z0-9-]/g, ''),
                                 });
                             }
                         }
+                    }
+                    const usageMatches = value
+                        .split('\n')
+                        .map(line => line.match(/<Usage/))
+                        .filter(Boolean);
+                    if (usageMatches.length > 0) {
+                        if (section) {
+                            inPageLinks.push(section);
+                        }
+                        section = {
+                            title: 'Usage',
+                            showEmpty: true,
+                            anchorId: 'Usage',
+                            links: [],
+                        };
                     }
                 }
             }
             if (section) {
                 inPageLinks.push(section);
             }
+        }
+        if (extraSections) {
+            inPageLinks.push(...extraSections);
         }
         if (this.examples) {
             inPageLinks.push({
@@ -1314,6 +1419,7 @@ class Converter {
                         staticMethods,
                         staticProperties,
                         typeParameters: await this.convertTypeParameter(docItem.typeParameter),
+                        isTypeOnly: isTypeOnly(docItem),
                     } as ClassPage)
             );
         });
@@ -1408,7 +1514,7 @@ class Converter {
                             url,
                         } as ReferenceLinkType;
                     } else if (this.shouldExpand(referencedType)) {
-                        const children = this.resolveChildren(referencedType);
+                        const children = await this.resolveChildren(referencedType);
                         if (children) {
                             return this.createContainerType(children, referencedType);
                         }
@@ -1468,7 +1574,31 @@ class Converter {
             // if (this.currentTypeParameter) console.log('TODO', type, this.currentTypeParameter);
         }
 
-        if (type.package === 'typescript') {
+        if (type.type === 'reference' && type.name === 'ComponentProps' && type.typeArguments) {
+            if (type.typeArguments[0].type === 'query') {
+                const { queryType } = type.typeArguments[0];
+                if (queryType.type === 'reference') {
+                    return {
+                        typeName: 'componentProps',
+                        type: await this.convertReference(queryType),
+                    };
+                }
+            }
+        }
+
+        if (
+            type.package === 'typescript' &&
+            type.qualifiedName === 'Map' &&
+            type.typeArguments?.length === 2
+        ) {
+            return {
+                typeName: 'es6Map',
+                keyType: await this.convertType(type.typeArguments[0]),
+                valueType: await this.convertType(type.typeArguments[1]),
+            };
+        }
+
+        if (type.package === 'typescript' || type.package === 'antd') {
             return this.convertExternalReference(type);
         }
         return {

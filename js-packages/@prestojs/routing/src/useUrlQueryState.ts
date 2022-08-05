@@ -125,7 +125,7 @@ const buildQueryForState = (
 ): Record<string, any> => {
     return Object.entries(obj).reduce((acc, [key, value]) => {
         if (key.startsWith(prefix)) {
-            const unprefixedKey = key.substr(prefix.length);
+            const unprefixedKey = key.substring(prefix.length);
             if (
                 !controlledKeys ||
                 (Array.isArray(controlledKeys)

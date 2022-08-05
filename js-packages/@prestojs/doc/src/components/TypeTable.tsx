@@ -31,13 +31,19 @@ export default function TypeTable({
                 ? param.type.children
                 : null;
         if (children) {
-            parameters.push(param);
-            parameters.push(
-                ...children.map(child => ({
-                    ...child,
-                    name: `${param.name}.${child.name}`,
-                }))
-            );
+            const { hideProperties } = param.flags;
+            const filteredChildren = hideProperties
+                ? children.filter(child => !hideProperties.includes(child.name))
+                : children;
+            if (filteredChildren.length > 0) {
+                parameters.push(param);
+                parameters.push(
+                    ...filteredChildren.map(child => ({
+                        ...child,
+                        name: `${param.name}.${child.name}`,
+                    }))
+                );
+            }
         } else {
             parameters.push(param);
         }
@@ -134,7 +140,27 @@ export default function TypeTable({
                         if (property.type.typeName === 'propertiesFrom') {
                             return (
                                 <div>
-                                    Any properties from <Type type={property.type.type} />
+                                    Any properties from{' '}
+                                    <Type
+                                        type={
+                                            property.type.type.typeName === 'componentProps'
+                                                ? property.type.type.type
+                                                : property.type.type
+                                        }
+                                    />
+                                    {property.type.excludeProperties && (
+                                        <>
+                                            {' '}
+                                            except for these:
+                                            <ul className="m-5">
+                                                {property.type.excludeProperties.map(name => (
+                                                    <li className="list-disc m-1" key={name}>
+                                                        {name}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </>
+                                    )}
                                 </div>
                             );
                         }

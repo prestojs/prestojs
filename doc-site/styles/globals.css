@@ -9,12 +9,16 @@ html {
 .td-type-desc p:last-child, .tooltip p:last-child {
    margin-bottom: 0;
 }
+.td-type-desc .mdx {
+   display: block;
+   @apply mb-2;
+}
 
 .algolia-autocomplete {
    width: 100%;
 }
 
-.mdx a {
+.mdx a, blockquote a {
    font-weight: 600;
    @apply border-b border-cyan-500 hover:border-b-2;
 }
@@ -50,4 +54,7 @@ html {
 
 .DocSearch-Button {
    @apply bg-gray-200 float-right;
+}
+.type-es6map dt {
+   @apply font-bold mt-2;
 }
