@@ -13,6 +13,10 @@
 * Fix bug in view model caching when retrieving nested records with many related fields with no values set. Previously
   if it was initialised with an empty array retrieving from the cache explicitly naming those fields (or using *) would
   result in a cache miss.
+* [UrlPattern](https://prestojs.com/docs/routing/UrlPattern#UrlPattern) now supports specifying options in the constructor. All options can be overridden in the call to `resolve`.
+  * `baseUrl` - if specified this will be prefixed to resolved pattern
+  * `query` - any query parameters to be included in any urls resolved from this pattern
+  * `mergeQuery` - If true (the default) then any query parameters provided to the constructor will be merged with any provided to resolve.
 
 ### Types
 

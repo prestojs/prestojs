@@ -4,7 +4,7 @@ import qs from 'query-string';
 /**
  * @expand-properties
  */
-export interface ResolveOptions {
+export interface UrlPatternResolveOptions {
     /**
      * Any query parameters to include in the URL
      *
@@ -12,6 +12,33 @@ export interface ResolveOptions {
      * `?showAddresses=true&section=billing`
      */
     query?: { [key: string]: any };
+    /**
+     * If `true` (the default) then any query parameters provided to the constructor will be
+     * merged with any provided to `resolve`.
+     *
+     * ```
+     * const pattern = new UrlPattern('/users/:id/', { query: { token: 'abc123'}});
+     * pattern.resolve({ id: '123' });
+     * // /users/5/?token=abc123
+     * pattern.resolve({ id: '123' }, { query: { showAddresses: 1 } });
+     * // /users/5/?token=abc123&showAddresses=1'
+     * pattern.resolve({ id: '123' }, { query: { showAddresses: 1 }, mergeQuery: false });
+     * // /users/5/?showAddresses=1'
+     * ```
+     */
+    mergeQuery?: boolean;
+    /**
+     * The base URL to use when resolving the URL.
+     *
+     * If this is specified it will be prefixed to the resolved URL. For example:
+     *
+     * ```js
+     * const pattern = new UrlPattern('/users/:id/', { baseUrl: 'https://example.com' });
+     * pattern.resolve({ id: '123' });
+     * // https://example.com/users/5/
+     * ```
+     */
+    baseUrl?: string | null;
 }
 
 /**
@@ -56,14 +83,21 @@ export default class UrlPattern {
      * `['id']`
      */
     requiredArgNames: string[];
+    /**
+     * The original options passed to `UrlPattern` (if any)
+     */
+    resolveOptions: UrlPatternResolveOptions;
+
     private toPath: PathFunction;
     private keys: Key[];
 
     /**
      * @param pattern See [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) for the accepted
      * values that can be passed.
+     * @param options Options to use for this pattern. Note that any values provided here can be overridden in the
+     * call to `resolve`.
      */
-    constructor(pattern: string) {
+    constructor(pattern: string, options: UrlPatternResolveOptions = {}) {
         this.keys = [];
         pathToRegexp(pattern, this.keys);
         this.validArgNames = this.keys.map(key => key.name.toString());
@@ -72,6 +106,7 @@ export default class UrlPattern {
             .map(key => key.name.toString());
         this.pattern = pattern;
         this.toPath = compile(pattern);
+        this.resolveOptions = options;
     }
 
     /**
@@ -88,9 +123,14 @@ export default class UrlPattern {
      * @param kwargs The arguments to resolve in the pattern. For example if the pattern was
      * `/users/:id/:section?` you would need to pass at least `id` and optionally `section`:
      * `pattern.resolve({id: 5})`
+     * @param options Options to use for this resolution. Any options provided here will override an option
+     * of the same name provided to the constructor.
      */
-    resolve(kwargs: {} = {}, options: ResolveOptions = {}): string {
-        const { query } = options;
+    resolve(kwargs: {} = {}, options: UrlPatternResolveOptions = {}): string {
+        let { baseUrl, mergeQuery = true } = { ...this.resolveOptions, ...options };
+        const query = mergeQuery
+            ? { ...this.resolveOptions.query, ...options.query }
+            : options.query || this.resolveOptions.query;
         if (kwargs) {
             const invalidArgs = Object.keys(kwargs).filter(
                 arg => !this.validArgNames.includes(arg)
@@ -121,6 +161,12 @@ export default class UrlPattern {
             // Default option does what we want currently
             // https://github.com/prestojs/prestojs/issues/61
             url = `${url}?${qs.stringify(query)}`;
+        }
+        if (baseUrl) {
+            if (baseUrl[baseUrl.length - 1] === '/') {
+                baseUrl = baseUrl.slice(0, -1);
+            }
+            return `${baseUrl}${url}`;
         }
         return url;
     }
