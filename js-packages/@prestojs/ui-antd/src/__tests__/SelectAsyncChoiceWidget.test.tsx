@@ -85,6 +85,7 @@ function buildAsyncChoices<Multiple extends boolean>({
         value: number[] | number,
         deps?: any
     ) => Promise<typeof value extends number[] ? TestDataItem[] : TestDataItem>;
+    parseValue?: (value: any) => number;
 } & Pick<
     AsyncChoicesOptions<TestDataItem, number>,
     'useRetrieveProps' | 'getLabel' | 'getChoices'
@@ -125,7 +126,7 @@ function buildAsyncChoices<Multiple extends boolean>({
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function buildInput(value: number | null | number[] = null) {
+function buildInput(value: string | number | null | number[] = null) {
     return {
         name: 'test',
         onChange: jest.fn(),
@@ -289,6 +290,50 @@ test('should support initial value', async () => {
     // Changing selected value to Item 1 should not trigger another fetch; we already
     // have it from the list call
     input.value = 1;
+    rerender(
+        <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
+    );
+    expect(list).toHaveBeenCalledTimes(1);
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
+    await waitForSelectedValue(container, 'Item 1');
+    // await waitFor(() => getByText('Item 1'));
+});
+
+test('should support initial value string', async () => {
+    const input = buildInput('2');
+    const list = jest.fn(resolveMulti);
+    const retrieve = jest.fn(resolveSingle);
+    const asyncChoices = buildAsyncChoices({
+        list,
+        retrieve,
+        parseValue(value) {
+            return Number(value);
+        },
+    });
+    const { container, baseElement, getByText, rerender } = render(
+        <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
+    );
+    expect(list).not.toHaveBeenCalled();
+    // Start at 2 because StrictMode adds extra one at beginning
+    let calledCount = 2;
+    expect(retrieve).toHaveBeenCalledTimes(calledCount);
+    await waitForSelectedValue(container, 'Item 2');
+    input.value = 4;
+    rerender(
+        <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
+    );
+    expect(list).not.toHaveBeenCalled();
+    expect(retrieve).toHaveBeenCalledTimes(++calledCount);
+    await waitForSelectedValue(container, 'Item 4');
+
+    // Now trigger a listing which will fetch the first 5 records
+    openDropDown(container);
+    expect(getByText('Fetching results...')).toBeInTheDocument();
+    expect(list).toHaveBeenCalledTimes(1);
+    await waitForOptions(baseElement, asyncChoices, namesForRange(0, 5));
+    // Changing selected value to Item 1 should not trigger another fetch; we already
+    // have it from the list call
+    input.value = '1';
     rerender(
         <SelectAsyncChoicesWidget asyncChoices={asyncChoices} input={input} {...widgetProps} />
     );

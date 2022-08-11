@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+### Added
+
+* Added [AsyncChoices.parseValue](https://prestojs.com/docs/viewmodel/fields/AsyncChoices#Method-parseValue)
+
 ### Changed
 
 * [EmailWidget](https://prestojs.com/docs/ui-antd/widgets/EmailWidget) now uses `type="email"`
+* Fixed useAsyncValue `existingValues` to work with complex keys
 
 ### Types
 
