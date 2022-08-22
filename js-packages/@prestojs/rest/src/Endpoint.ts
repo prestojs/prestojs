@@ -585,7 +585,14 @@ function defaultResolveUrl(
     if (baseUrl[baseUrl.length - 1] === '/') {
         baseUrl = baseUrl.slice(0, -1);
     }
-    return baseUrl + this.urlPattern.resolve(urlArgs, { query });
+    const finalOptions: UrlPatternResolveOptions = {};
+    if (query) {
+        finalOptions.query = query;
+    }
+    if (!this.urlPattern.resolveOptions.baseUrl) {
+        finalOptions.baseUrl = baseUrl;
+    }
+    return this.urlPattern.resolve(urlArgs, finalOptions);
 }
 
 /**
