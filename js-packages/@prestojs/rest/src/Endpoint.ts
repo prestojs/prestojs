@@ -450,34 +450,62 @@ export function mergeRequestInit(
 
 /**
  * @extract-docs
- * @menu-group Endpoint
  */
-class PreparedAction {
-    action: Endpoint;
-    options: EndpointExecuteOptions;
+type PreparedEndpoint<ReturnT> = {
+    /**
+     * Executes the endpoint. If `options` is provided they will override the options
+     * used in the call to [Endpoint.prepare](doc:Endpoint#Method-prepare)
+     */
+    (options?: EndpointExecuteOptions): Promise<ExecuteReturnVal<ReturnT>>;
+
+    /**
+     * The endpoint this function was created from
+     */
+    endpoint: Endpoint<ReturnT>;
+    /**
+     * The '`options' passed to [Endpoint.prepare](doc:Endpoint#Method-prepare)
+     */
+    options: ExecuteInitOptions;
+    /**
+     * The `urlResolveOptions` passed to [Endpoint.prepare](doc:Endpoint#Method-prepare)
+     */
     urlResolveOptions: UrlResolveOptions;
 
-    constructor(
-        action: Endpoint,
-        urlResolveOptions: UrlResolveOptions,
-        options: ExecuteInitOptions
-    ) {
-        this.action = action;
-        this.options = options;
-        this.urlResolveOptions = urlResolveOptions;
-    }
+    /**
+     * @deprecated Exists for backwards compatability only. Call the prepared endpoint function
+     * directly instead.
+     */
+    execute(init?: ExecuteInitOptions): Promise<ExecuteReturnVal<ReturnT>>;
+};
 
-    execute(init: ExecuteInitOptions = {}): Promise<any> {
+function prepareEndpoint<ReturnT>(
+    endpoint: Endpoint<ReturnT>,
+    urlResolveOptions: UrlResolveOptions,
+    options: ExecuteInitOptions
+): PreparedEndpoint<ReturnT> {
+    function execute(_options: EndpointExecuteOptions = {}): Promise<ExecuteReturnVal<ReturnT>> {
         // TODO: This means that if this.options or init tries to remove
         // a default header by setting it to undefined it will not work
         // as the resulting object is a `Headers` instance that has had
         // the key removed from it already... but then in execute in Endpoint
         // we merge it with the defaultConfig
-        return this.action.execute({
-            ...this.urlResolveOptions,
-            ...mergeRequestInit(this.options, init),
+        return endpoint.execute({
+            ...urlResolveOptions,
+            ...mergeRequestInit(options, _options),
         });
     }
+    execute.endpoint = endpoint;
+    execute.urlResolveOptions = urlResolveOptions;
+    execute.options = options;
+
+    execute.execute = (_options: EndpointExecuteOptions = {}) => {
+        console.warn(
+            "'execute' on a prepared endpoint is deprecated - just call the returned function directly"
+        );
+        return execute(_options);
+    };
+
+    return execute;
 }
 
 /**
@@ -870,20 +898,41 @@ export default class Endpoint<ReturnT = any> {
     }
 
     /**
-     * Prepare an action for execution. Given the same parameters returns the same object. This is useful
-     * when using libraries like `useSWR` that accept a parameter that identifies a request and is used
-     * for caching but execution is handled by a separate function.
-     *
-     * For example to use with `useSWR` you can do:
+     * Prepare an endpoint for execution. Given the same parameters returns the same function. This is
+     * useful when you want a function to call that only changes when parameters to `prepare` change.
+     * For example, you can use this with [useAsync](doc:useAsync) to call the endpoint whenever the
+     * `urlArgs` change:
      *
      * ```js
-     * const { data } = useSWR([action.prepare()], (preparedAction) => preparedAction.execute());
+     * // Cache getUser based on `id`. When `id` changes the endpoint will be re-executed
+     * // by `useAsync`.
+     * const getUser = getUserEndpoint.prepare({ urlArgs: { id } });
+     * const { result } = useAsync(getUser, { trigger: 'SHALLOW' });
      * ```
      *
-     * If you just want to call the action directly then you can bypass `prepare` and just call `execute`
-     * directly.
+     * It can also be useful with third party libraries [SWR](https://swr.vercel.app/) where it
+     * expects a key for caching purposes:
+     *
+     * ```js
+     * const preparedEndpoint = endpoint.prepare();
+     * const { data } = useSWR([preparedEndpoint], preparedEndpoint);
+     * ```
+     *
+     * If you just want to call the endpoint directly then you can bypass `prepare` and just call `execute`
+     * directly. e.g. these are equivalent:
+     *
+     * ```js
+     * endpoint.prepare()()
+     * // equivalent to
+     * endpoint.execute()
+     * ```
+     *
+     * @param options Any options to use when the endpoint is executed. Note that any options
+     * used here can be overridden at call time.
+     * @returns A function that can be called to execute the endpoint. Any of the arguments passed
+     * to `prepare` will be used here but can be overridden with arguments to this function.
      */
-    prepare(options: EndpointExecuteOptions = {}): PreparedAction {
+    prepare(options: EndpointExecuteOptions = {}): PreparedEndpoint<ReturnT> {
         for (const middleware of this.middleware) {
             if (typeof middleware !== 'function' && middleware.prepare) {
                 options = middleware.prepare(options);
@@ -901,7 +950,7 @@ export default class Endpoint<ReturnT = any> {
                 return value;
             }
         }
-        const execute = new PreparedAction(this, { urlArgs, query }, init);
+        const execute = prepareEndpoint(this, { urlArgs, query }, init);
         cache.set(init, execute);
         return execute;
     }

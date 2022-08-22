@@ -71,16 +71,16 @@ test('prepare should maintain equality based on inputs', () => {
 test('should resolve URLs', () => {
     fetchMock.mockResponse('');
     const action = new Endpoint(new UrlPattern('/whatever/:id?/'));
-    action.prepare().execute();
+    action.prepare()();
     expect(fetchMock.mock.calls.length).toEqual(1);
     expect(fetchMock.mock.calls[0][0]).toEqual('/whatever/');
-    action.prepare({ urlArgs: { id: 2 } }).execute();
+    action.prepare({ urlArgs: { id: 2 } })();
     expect(fetchMock.mock.calls.length).toEqual(2);
     expect(fetchMock.mock.calls[1][0]).toEqual('/whatever/2/');
-    action.prepare({ urlArgs: { id: 2 }, query: { a: 'b' } }).execute();
+    action.prepare({ urlArgs: { id: 2 }, query: { a: 'b' } })();
     expect(fetchMock.mock.calls.length).toEqual(3);
     expect(fetchMock.mock.calls[2][0]).toEqual('/whatever/2/?a=b');
-    action.prepare({ query: { a: 'b' } }).execute();
+    action.prepare({ query: { a: 'b' } })();
     expect(fetchMock.mock.calls.length).toEqual(4);
     expect(fetchMock.mock.calls[3][0]).toEqual('/whatever/?a=b');
 });
@@ -107,6 +107,24 @@ test('should respect baseUrl', () => {
     });
     endpoint2.execute();
     expect(fetchMock.mock.calls[4][0]).toEqual('http://elsewhere.com/whatever/');
+
+    // Should not override baseUrl if set on the UrlPattern
+    const endpoint3 = new Endpoint(
+        new UrlPattern('/whatever/:id?/', { baseUrl: 'http://example.com' }),
+        {
+            baseUrl: 'http://elsewhere.com',
+        }
+    );
+    endpoint3.execute();
+    expect(fetchMock.mock.calls[5][0]).toEqual('http://example.com/whatever/');
+});
+
+test('should accept string rather than url pattern', () => {
+    fetchMock.mockResponse('');
+    const endpoint = new Endpoint('/whatever/:id?/');
+    endpoint.execute();
+    expect(fetchMock.mock.calls.length).toEqual(1);
+    expect(fetchMock.mock.calls[0][0]).toEqual('/whatever/');
 });
 
 test('should support calling execute without prepare', () => {
@@ -139,7 +157,7 @@ test('should support middleware function', async () => {
             },
         ],
     });
-    expect((await action1.prepare().execute()).result).toBe('HELLO WORLD');
+    expect((await action1.prepare()()).result).toBe('HELLO WORLD');
     const action2 = new Endpoint(new UrlPattern('/whatever/'), {
         middleware: [
             async (next, urlConfig, requestInit): Promise<Record<string, any>> => {
@@ -153,7 +171,7 @@ test('should support middleware function', async () => {
             'Content-Type': 'application/json',
         },
     });
-    expect((await action2.prepare().execute()).result).toEqual({ b: 'a', d: 'c' });
+    expect((await action2.prepare()()).result).toEqual({ b: 'a', d: 'c' });
 });
 
 test('should support merging endpoint options and execute options', async () => {
@@ -190,17 +208,17 @@ test('should support merging global headers with action specific headers', async
         expect([...headers1.entries()]).toEqual([...headers2.entries()]);
     };
     const action1 = new Endpoint(new UrlPattern('/whatever/:id?/'));
-    action1.prepare({ headers: { c: 'd' } }).execute({
+    action1.prepare({ headers: { c: 'd' } })({
         headers: { a: 'b' },
     });
     expectHeadersEqual({ a: 'b', c: 'd' });
 
-    action1.prepare({ headers: new Headers({ c: 'd' }) }).execute({
+    action1.prepare({ headers: new Headers({ c: 'd' }) })({
         headers: { a: 'b' },
     });
     expectHeadersEqual({ a: 'b', c: 'd' });
 
-    action1.prepare({ headers: new Headers({ c: 'd' }) }).execute({
+    action1.prepare({ headers: new Headers({ c: 'd' }) })({
         headers: [
             ['a', 'b'],
             ['e', 'f'],
@@ -208,29 +226,27 @@ test('should support merging global headers with action specific headers', async
     });
     expectHeadersEqual({ a: 'b', c: 'd', e: 'f' });
 
-    action1
-        .prepare({
-            headers: [
-                ['a', '1'],
-                ['b', '2'],
-            ],
-        })
-        .execute({
-            headers: new Headers({
-                // This will take precedence over config above
-                b: '5',
-                c: '10',
-            }),
-        });
+    action1.prepare({
+        headers: [
+            ['a', '1'],
+            ['b', '2'],
+        ],
+    })({
+        headers: new Headers({
+            // This will take precedence over config above
+            b: '5',
+            c: '10',
+        }),
+    });
     expectHeadersEqual({ a: '1', b: '5', c: '10' });
 
     const action2 = new Endpoint(new UrlPattern('/whatever/:id?/'), { headers: { a: 'one' } });
-    action2.prepare({ headers: { b: 'two' } }).execute({
+    action2.prepare({ headers: { b: 'two' } })({
         headers: { c: 'three' },
     });
     expectHeadersEqual({ a: 'one', b: 'two', c: 'three' });
 
-    action2.prepare({ headers: { b: 'two' } }).execute({
+    action2.prepare({ headers: { b: 'two' } })({
         headers: { b: undefined, c: 'three' },
     });
     expectHeadersEqual({ a: 'one', c: 'three' });
@@ -242,7 +258,7 @@ test('should support merging global headers with action specific headers', async
         },
     };
 
-    action2.prepare().execute({
+    action2.prepare()({
         headers: { c: 'three' },
     });
     expectHeadersEqual({ a: 'one', c: 'three', token: 'abc123', extra: '5' });
@@ -340,7 +356,7 @@ test('should update paginator state on response', async () => {
     const prepared = action1.prepare({ paginator: hookResult.current });
 
     await act(async () => {
-        const { result: result2 } = await prepared.execute();
+        const { result: result2 } = await prepared();
 
         expect((hookResult.current as InferredPaginator).paginator).toBeInstanceOf(
             LimitOffsetPaginator
@@ -389,16 +405,16 @@ test('should support custom URL resolve function', () => {
             return urlPattern.resolve(urlArgs, { query: { ...query, always: 1 } });
         },
     });
-    endpoint.prepare().execute();
+    endpoint.prepare()();
     expect(fetchMock.mock.calls.length).toEqual(1);
     expect(fetchMock.mock.calls[0][0]).toEqual('/whatever/?always=1');
-    endpoint.prepare({ urlArgs: { id: 2 } }).execute();
+    endpoint.prepare({ urlArgs: { id: 2 } })();
     expect(fetchMock.mock.calls.length).toEqual(2);
     expect(fetchMock.mock.calls[1][0]).toEqual('/whatever/2/?always=1');
-    endpoint.prepare({ urlArgs: { id: 2 }, query: { a: 'b' } }).execute();
+    endpoint.prepare({ urlArgs: { id: 2 }, query: { a: 'b' } })();
     expect(fetchMock.mock.calls.length).toEqual(3);
     expect(fetchMock.mock.calls[2][0]).toEqual('/whatever/2/?a=b&always=1');
-    endpoint.prepare({ query: { a: 'b' } }).execute();
+    endpoint.prepare({ query: { a: 'b' } })();
     expect(fetchMock.mock.calls.length).toEqual(4);
     expect(fetchMock.mock.calls[3][0]).toEqual('/whatever/?a=b&always=1');
 
@@ -480,7 +496,7 @@ test('should be possible to implement auth replay middleware', async () => {
     ];
     fetchMock.mockResponseOnce('', { status: 401 });
     const action1 = new Endpoint(new UrlPattern('/whatever/'));
-    const p = action1.prepare().execute();
+    const p = action1.prepare()();
     await outer;
     expect(middleware1Start).toHaveBeenCalledTimes(1);
     expect(middleware1End).not.toHaveBeenCalled();
@@ -548,12 +564,12 @@ test('middleware should be able to de-dupe requests', async () => {
         },
     });
     const action1 = new Endpoint(new UrlPattern('/whatever/'), { middleware });
-    const p1 = action1.prepare().execute();
-    const p2 = action1.prepare().execute();
+    const p1 = action1.prepare()();
+    const p2 = action1.prepare()();
     expect((await p1).result).toBe('hello world');
     expect((await p2).result).toBe('hello world');
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect((await action1.prepare().execute()).result).toBe('hello world');
+    expect((await action1.prepare()()).result).toBe('hello world');
     expect(fetchMock).toHaveBeenCalledTimes(2);
 });
 
