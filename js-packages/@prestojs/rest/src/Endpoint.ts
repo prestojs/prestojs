@@ -1140,6 +1140,15 @@ export default class Endpoint<ReturnT = any> {
     public async fetch(url: string, requestInit: RequestInit | undefined): Promise<Response> {
         return fetch(url, requestInit);
     }
+
+    /**
+     * Not implemented by default. Include [paginationMiddleware](doc:paginationMiddleware) to enable this functionality.
+     */
+    public getPaginatorClass<T extends PaginatorInterface>(): PaginatorInterfaceClass<T> | null {
+        throw new Error(
+            'getPaginatorClass not implemented - did you forget to include `paginationMiddleware`?'
+        );
+    }
 }
 
 // Initialisation is not done inline in class as doc extractor doesn't handle object literals well
