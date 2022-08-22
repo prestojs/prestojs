@@ -871,9 +871,11 @@ export default class Endpoint<ReturnT = any> {
     }
 
     /**
-     * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint
+     * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint. If a plain `string`
+     * is passed it will be converted to a [UrlPattern](doc:UrlPattern).
+     * @param options The options to use for this endpoint.
      */
-    constructor(urlPattern: UrlPattern, options: EndpointOptions<ReturnT> = {}) {
+    constructor(urlPattern: UrlPattern | string, options: EndpointOptions<ReturnT> = {}) {
         const {
             decodeBody = defaultDecodeBody,
             resolveUrl = defaultResolveUrl,
@@ -884,7 +886,8 @@ export default class Endpoint<ReturnT = any> {
         } = options;
 
         this._baseUrl = baseUrl;
-        this.urlPattern = urlPattern;
+        this.urlPattern =
+            urlPattern instanceof UrlPattern ? urlPattern : new UrlPattern(urlPattern);
         this.urlCache = new Map();
         this.decodeBody = decodeBody;
         this.requestInit = requestInit;
