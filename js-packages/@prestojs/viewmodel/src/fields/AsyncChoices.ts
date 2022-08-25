@@ -140,7 +140,15 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
     getValue(item: ItemType): ValueType;
 
     /**
-     * Resolve the specific instance of an item to use. By default this should just return `item`
+     * Given a value parse it into the expected type.
+     *
+     * For example, if the value comes in as a string (e.g. from a URL query parameter) then this could
+     * parse the value as a `number` so it matches the id returned from the server.
+     */
+    parseValue(value: any): ValueType;
+
+    /**
+     * Resolve the specific instance of an item to use. By default, this should just return `item`
      * but can be used to resolve a specific instance of a class from a cache for example.
      */
     useResolveItems<T extends ItemType | ItemType[] | null>(item: T): T;
@@ -160,6 +168,7 @@ export type AsyncChoicesOptions<ItemType, ValueType> = Omit<
     | 'getValue'
     | 'useResolveItems'
     | 'multiple'
+    | 'parseValue'
 > &
     Partial<
         Pick<
@@ -172,6 +181,7 @@ export type AsyncChoicesOptions<ItemType, ValueType> = Omit<
             | 'getValue'
             | 'useResolveItems'
             | 'multiple'
+            | 'parseValue'
         >
     >;
 
@@ -249,6 +259,12 @@ class AsyncChoices<ItemType, ValueType> implements AsyncChoicesInterface<ItemTyp
         throw new Error(
             'getValue must be provided to AsyncChoices if item does not have a `_key` property'
         );
+    }
+    parseValue(value: any) {
+        if (this.options.parseValue) {
+            return this.options.parseValue.call(this, value);
+        }
+        return value;
     }
     useResolveItems<T extends ItemType | ItemType[] | null>(items: T): T {
         if (this.options.useResolveItems) {

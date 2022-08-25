@@ -1,4 +1,5 @@
 import { act, renderHook } from 'presto-testing-library';
+import { hashId } from '../identifiable';
 import useAsyncValue from '../useAsyncValue';
 
 function delay<T>(fn): Promise<T> {
@@ -62,7 +63,7 @@ test('useAsyncValue should resolve individual values', async () => {
     jest.useFakeTimers();
     const resolve = jest.fn(resolveSingle);
     const { result, rerender } = renderHook(
-        ({ id }: { id: number | null }) =>
+        ({ id }: { id: string | number | null }) =>
             useAsyncValue({
                 id,
                 resolve,
@@ -87,6 +88,15 @@ test('useAsyncValue should resolve individual values', async () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toEqual({ name: 'Item 5', _key: 5 });
 
+    rerender({ id: '6' });
+    expect(resolve).toHaveBeenCalledTimes(++calledCount);
+    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual({ name: 'Item 6', _key: 6 });
+
     rerender({ id: null });
     expect(resolve).toHaveBeenCalledTimes(calledCount);
     expect(result.current.isLoading).toBe(false);
@@ -95,6 +105,79 @@ test('useAsyncValue should resolve individual values', async () => {
 
     rerender({ id: 500 });
     expect(resolve).toHaveBeenCalledTimes(++calledCount);
+    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toBe(null);
+    expect(result.current.error).toBe('Not found');
+});
+
+test('useAsyncValue should resolve individual values with complex keys', async () => {
+    type ComplexKey = { id1: number; id2: string };
+    type TestDataComplexItem = { name: string; _key: ComplexKey };
+    const makeComplexId = (i: number) => ({ id1: i, id2: `ID:${i}` });
+    const testDataComplex: Record<string, TestDataComplexItem> = Array.from(
+        { length: 20 },
+        (_, i) => ({
+            name: `Item ${i}`,
+            _key: makeComplexId(i),
+        })
+    ).reduce((acc, item) => {
+        acc[hashId(item._key)] = item;
+        return acc;
+    }, {});
+    function resolveSingleComplex(id: ComplexKey): Promise<TestDataComplexItem> {
+        if (Array.isArray(id)) {
+            return delay(() => id.map(i => testData[i]));
+        }
+        return delay(reject => {
+            if (!testDataComplex[hashId(id)]) {
+                return reject('Not found');
+            }
+            return testDataComplex[hashId(id)];
+        });
+    }
+
+    jest.useFakeTimers();
+    const resolve = jest.fn(resolveSingleComplex);
+    const defaultExistingValues = Object.values(testDataComplex).slice(0, 5);
+    const { result, rerender } = renderHook(
+        ({
+            id,
+            existingValues,
+        }: {
+            id: ComplexKey | null;
+            existingValues?: TestDataComplexItem[];
+        }) =>
+            useAsyncValue({
+                id,
+                resolve,
+                existingValues,
+            }),
+        {
+            initialProps: {
+                id: makeComplexId(1),
+                existingValues: defaultExistingValues,
+            },
+        }
+    );
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual({ name: 'Item 1', _key: makeComplexId(1) });
+    rerender({ id: makeComplexId(4), existingValues: defaultExistingValues });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual({ name: 'Item 4', _key: makeComplexId(4) });
+
+    rerender({ id: makeComplexId(5), existingValues: defaultExistingValues });
+    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+        await jest.runAllTimers();
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toEqual({ name: 'Item 5', _key: makeComplexId(5) });
+
+    rerender({ id: makeComplexId(500), existingValues: defaultExistingValues });
     expect(result.current.isLoading).toBe(true);
     await act(async () => {
         await jest.runAllTimers();

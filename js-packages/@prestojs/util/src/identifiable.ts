@@ -112,7 +112,7 @@ export function getId(item: Identifiable | any, fallbackGetId?: (item: any) => I
  * @extract-docs
  * @menu-group Identifiable
  */
-export function hashId(id: Id): string {
+export function hashId(id: string | number | Record<string, any>): string {
     if (id == null) {
         return id;
     }

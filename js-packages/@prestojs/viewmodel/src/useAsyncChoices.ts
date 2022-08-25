@@ -124,10 +124,12 @@ export default function useAsyncChoices<ItemT, ValueT>(
         execute,
         paginator: listProps?.paginator,
     });
+    const ids = Array.isArray(value) ? value.map(v => asyncChoices.parseValue(v)) : undefined;
+    const id = !Array.isArray(value) ? asyncChoices.parseValue(value) : undefined;
     const retrieveProps =
         asyncChoices.useRetrieveProps({
-            ids: Array.isArray(value) ? value : undefined,
-            id: !Array.isArray(value) ? value : undefined,
+            id,
+            ids,
             existingValues: list.result,
             retrieveOptions,
         }) || {};
@@ -146,8 +148,8 @@ export default function useAsyncChoices<ItemT, ValueT>(
         // Haven't been able to workout typing on this yet
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        ids: Array.isArray(value) ? value : undefined,
-        id: !Array.isArray(value) ? value : undefined,
+        ids,
+        id,
         resolve,
         onError: onRetrieveError,
         onSuccess: onRetrieveSuccess,

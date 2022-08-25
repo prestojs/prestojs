@@ -198,9 +198,9 @@ export default function useAsyncValue<T, U extends Id>(
             if (valueInChoices.length !== ids.length) {
                 valueInChoices = null;
             }
-        } else {
+        } else if (id) {
             for (const item of existingValues) {
-                if (identifiableGetId(item, getId) === id) {
+                if (hashId(identifiableGetId(item, getId)) == hashId(id)) {
                     valueInChoices = item;
                     break;
                 }
@@ -208,15 +208,18 @@ export default function useAsyncValue<T, U extends Id>(
         }
     }
     const isValueMissing = (id || ids) && !valueInChoices;
-    const { run, reset, isLoading, error, result: resolvedValue } = useAsync<T | T[], Error>(
-        resolve,
-        {
-            args: [id || ids],
-            trigger: isValueMissing ? trigger : useAsync.MANUAL,
-            onSuccess,
-            onError,
-        }
-    );
+    const {
+        run,
+        reset,
+        isLoading,
+        error,
+        result: resolvedValue,
+    } = useAsync<T | T[], Error>(resolve, {
+        args: [id || ids],
+        trigger: isValueMissing ? trigger : useAsync.MANUAL,
+        onSuccess,
+        onError,
+    });
 
     useEffect(() => {
         if (!isEqual(id || ids, idRef.current) && trigger === useAsync.MANUAL) {
