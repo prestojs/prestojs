@@ -13,17 +13,25 @@ export interface FunctionPage {
     typeParameters?: TypeParameter[];
     pageSections: PageSection[];
     isTypeOnly: boolean;
+    hideApi: boolean;
 }
 
 export interface ClassConstructor {
     signatures: Signature[];
 }
 
+export interface PageSectionLink {
+    title: string;
+    anchorId: string;
+    isInherited?: boolean;
+    links: PageSectionLink[];
+}
+
 export interface PageSection {
     title: string;
     anchorId: string;
     showEmpty?: boolean;
-    links: { title: string; anchorId: string; isInherited?: boolean }[];
+    links: PageSectionLink[];
 }
 
 export interface ClassPage {
@@ -160,6 +168,7 @@ export interface ContainerType {
         description?: RichDescription;
     }[];
     indexSignature?: IndexSignatureType;
+    signatures?: Signature[];
 }
 
 export interface UnknownType {

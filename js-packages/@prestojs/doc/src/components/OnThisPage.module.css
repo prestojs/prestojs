@@ -4,6 +4,6 @@
 .activeSection > a {
    @apply border-b border-cyan-500;
 }
-.section ul > li.activeMenu {
+.section ul > li.activeMenu > a {
     @apply bg-gray-100;
 }

@@ -103,7 +103,7 @@ function ClassHierarchy({ page }: { page: ClassPage }) {
 
 export default function ClassPageDoc({ page, meta, isNested = false }: Props) {
     const { showInherited } = usePreferences();
-    const showOnThisPage = page.pageSections.length > 0;
+    const showOnThisPage = page.pageSections.length > 0 && !isNested;
     const filterInherited = node => showInherited || !node.isInherited;
     const filterInheritedMethod = node => showInherited || !node.signatures?.[0]?.isInherited;
     const properties = page.properties.filter(filterInherited);

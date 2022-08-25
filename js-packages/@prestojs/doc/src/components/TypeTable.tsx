@@ -168,6 +168,7 @@ export default function TypeTable({
                             <Description
                                 description={property.description}
                                 flags={property.flags}
+                                shortOnly={property.type.typeName === 'referenceLink'}
                             />
                         );
                     },

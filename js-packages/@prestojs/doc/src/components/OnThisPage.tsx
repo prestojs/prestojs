@@ -1,8 +1,53 @@
+import cx from 'classnames';
 import debounce from 'lodash/debounce';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { PageSection } from '../newTypes';
+import { PageSection, PageSectionLink } from '../newTypes';
 import styles from './OnThisPage.module.css';
 import { usePreferences } from './PreferencesProvider';
+
+function OnThisPageLinks({ links, level }: { links: PageSectionLink[]; level: number }) {
+    if (links.length === 0) {
+        return null;
+    }
+    return (
+        <ul>
+            {links.map(({ title, anchorId, links }, i) => (
+                <li
+                    className={cx('block py-1 font-medium hover:text-gray-900', {
+                        'py-0': level > 1,
+                    })}
+                    key={i}
+                >
+                    <a
+                        href={`#${anchorId}`}
+                        className={cx('block', {
+                            'ml-5 pl-2': level > 1,
+                            'mb-2': links.length > 0,
+                            'border-l-2 border-gray-200': level > 1,
+                        })}
+                    >
+                        {level === 1 && (
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 inline text-gray-400"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                        )}{' '}
+                        {title}
+                    </a>
+                    <OnThisPageLinks links={links} level={level + 1} />
+                </li>
+            ))}
+        </ul>
+    );
+}
 
 export function OnThisPageSection({ section }: { section: PageSection }) {
     const { showInherited } = usePreferences();
@@ -11,29 +56,7 @@ export function OnThisPageSection({ section }: { section: PageSection }) {
         <>
             <li className={styles.section}>
                 <a href={`#${section.anchorId}`}>{section.title}</a>
-                {filteredLinks.length > 0 && (
-                    <ul>
-                        {filteredLinks.map(({ title, anchorId }, i) => (
-                            <li className="block py-1 font-medium hover:text-gray-900" key={i}>
-                                <a href={`#${anchorId}`}>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-4 w-4 inline text-gray-400"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                    >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>{' '}
-                                    {title}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                <OnThisPageLinks links={filteredLinks} level={1} />
             </li>
         </>
     );

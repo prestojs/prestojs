@@ -18,7 +18,12 @@ export default function FunctionPageDoc({ page, meta }: Props) {
             <div className={showOnThisPage ? 'xl:mr-[19.5rem]' : ''}>
                 <PageHeader page={page} meta={meta} />
                 {page.signatures.map((sig, i) => (
-                    <FunctionDocumentation key={i} signature={sig} />
+                    <FunctionDocumentation
+                        key={i}
+                        signature={sig}
+                        hideParameters={page.hideApi}
+                        hideReturnType={page.hideApi}
+                    />
                 ))}
                 {meta.examples && <CodeExamples examples={meta.examples} />}
             </div>

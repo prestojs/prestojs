@@ -23,6 +23,7 @@ export type {
     MethodType,
     Page,
     PageSection,
+    PageSectionLink,
     ReferenceLinkType,
     RichDescription,
     Signature,
