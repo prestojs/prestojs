@@ -16,7 +16,7 @@ export interface UrlPatternResolveOptions {
      * If `true` (the default) then any query parameters provided to the constructor will be
      * merged with any provided to `resolve`.
      *
-     * ```
+     * ```js
      * const pattern = new UrlPattern('/users/:id/', { query: { token: 'abc123'}});
      * pattern.resolve({ id: '123' });
      * // /users/5/?token=abc123

@@ -809,7 +809,7 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  *    page size and total number of records) and return the `results` to the next middleware in the chain.
  * 4) `execute` will finish processing the remaining middleware and return `result`; from the example above that would
  *    be `[{ id: 1, name: 'Jo' }]`
- * 5) The `paginator` state will reflect what was returned: `paginator.pageSize === 10` and `paginator.total === 1
+ * 5) The `paginator` state will reflect what was returned: `paginator.pageSize === 10` and `paginator.total === 1`
  *
  * To make it easy to instantiate and have a React component re-render when pagination state changes use the
  * [usePaginator](doc:usePaginator) hook. This can accept either a paginator class or the endpoint itself. For example:

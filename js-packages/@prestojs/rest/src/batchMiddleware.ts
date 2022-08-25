@@ -300,7 +300,7 @@ class BatchMiddleware<BatchCallReturn, IndividualResult> {
  * > This allows you to have multiple conditional batching middleware for example. All `batchMiddleware` must appear
  * > last in the chain (ie. `batchingMiddleware` can only be proceeded by another `batchMiddleware`).
  *
- * @returns Middleware function to pass to [Endpoint](doc:Endpoint) or set on [Endpoint.defaultConfig.middleware](http://localhost:3000/docs/rest/Endpoint#static-var-defaultConfig)
+ * @returns Middleware function to pass to [Endpoint](doc:Endpoint) or set on [Endpoint.defaultConfig.middleware](doc:Endpoint#Property-defaultConfig)
  * @extract-docs
  * @menu-group Middleware
  * @return-type-name Middleware function
