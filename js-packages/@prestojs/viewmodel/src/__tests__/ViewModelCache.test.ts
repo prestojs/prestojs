@@ -1,6 +1,7 @@
 import process from 'process';
 import { recordEqualTo } from '../../../../../js-testing/matchers';
 import Field from '../fields/Field';
+import IntegerField from '../fields/IntegerField';
 import ListField from '../fields/ListField';
 import { ManyRelatedViewModelField, RelatedViewModelField } from '../fields/RelatedViewModelField';
 import ViewModelCache from '../ViewModelCache';
@@ -4216,4 +4217,90 @@ test('changes to nested records should reflect in parent record with recursive r
             })
         );
     }
+});
+
+test('nested empty many related fields should match *', () => {
+    class RemovalistQuoteSpecialItem extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class RemovalistQuoteInterimStop extends viewModelFactory(
+        {
+            id: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class RemovalistQuote extends viewModelFactory(
+        {
+            id: new Field(),
+            specialItemIds: new ListField({ childField: new IntegerField() }),
+            specialItems: new ManyRelatedViewModelField({
+                to: RemovalistQuoteSpecialItem,
+                sourceFieldName: 'specialItemIds',
+            }),
+            interimStopIds: new ListField({ childField: new IntegerField() }),
+            interimStops: new ManyRelatedViewModelField({
+                to: RemovalistQuoteInterimStop,
+                sourceFieldName: 'interimStopIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Booking extends viewModelFactory(
+        {
+            id: new Field(),
+            removalistQuoteIds: new ListField({ childField: new IntegerField() }),
+            removalistQuotes: new ManyRelatedViewModelField({
+                to: RemovalistQuote,
+                sourceFieldName: 'removalistQuoteIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+
+    const data = {
+        id: 1,
+        removalistQuoteIds: [1, 2],
+        removalistQuotes: [
+            {
+                id: 1,
+                interimStopIds: [1],
+                interimStops: [{ id: 1 }],
+                specialItemIds: [],
+                specialItems: [],
+            },
+            {
+                id: 2,
+                interimStops: [],
+                interimStopIds: [],
+                specialItemIds: [],
+                specialItems: [],
+            },
+        ],
+    };
+
+    Booking.cache.add(data);
+    expect(Booking.cache.get(1, '*')?.toJS()).toEqual({
+        id: 1,
+        removalistQuoteIds: [1, 2],
+        removalistQuotes: [
+            {
+                id: 1,
+                specialItemIds: [],
+                specialItems: [],
+                interimStopIds: [1],
+                interimStops: [{ id: 1 }],
+            },
+            {
+                id: 2,
+                specialItemIds: [],
+                // Previous bug results in this value being omitted
+                specialItems: [],
+                interimStopIds: [],
+                interimStops: [],
+            },
+        ],
+    });
 });

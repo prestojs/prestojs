@@ -1004,6 +1004,9 @@ test('_assignedFieldDeep should handle related view model data', async () => {
     });
     expect(record5._assignedFieldsDeep).toEqual([
         'groupIds',
+        // The groups nested fields are assumed as no nested data was available to derive the actual fields from
+        ['groups', 'id'],
+        ['groups', 'name'],
         ['subscription', 'id'],
         ['subscription', 'user', 'group', 'id'],
         ['subscription', 'user', 'groupId'],
