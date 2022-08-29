@@ -575,37 +575,29 @@ export class BaseViewModel<
                         );
                     }
                     if (field.many) {
-                        if (assignedData[key].length > 0) {
-                            const [first, ...rest] = assignedData[key];
-                            // These are the paths common to all records
-                            const normalizedPaths = normalizeFields(
-                                field.to,
-                                first.fieldPathIntersection(rest)
-                            );
-                            for (const index in assignedData[key]) {
-                                // Clone any records that have extra fields so has same fields as `paths`. Without
-                                // this caching can be inconsistent. In practice this would be unusual.
-                                const r = assignedData[key][index];
-                                if (r._assignedFieldPaths !== normalizedPaths) {
-                                    assignedData[key][index] = r.clone(normalizedPaths.fieldPaths);
-                                }
+                        const [first, ...rest] = assignedData[key];
+                        // These are the paths common to all records. In the case where there are _no_ records we have
+                        // to assume all fields otherwise it results in cache misses later when requesting that field
+                        // Previously we excluded the nested field entirely but cause subtle bugs when retrieving records
+                        // from the cache that had been created with an empty list of values
+                        const normalizedPaths = normalizeFields(
+                            field.to,
+                            first ? first.fieldPathIntersection(rest) : '*'
+                        );
+                        for (const index in assignedData[key]) {
+                            // Clone any records that have extra fields so has same fields as `paths`. Without
+                            // this caching can be inconsistent. In practice this would be unusual.
+                            const r = assignedData[key][index];
+                            if (r._assignedFieldPaths !== normalizedPaths) {
+                                assignedData[key][index] = r.clone(normalizedPaths.fieldPaths);
                             }
+                        }
 
-                            for (const path of normalizedPaths.fieldPaths) {
-                                assignedFieldsDeep.push([
-                                    key,
-                                    ...(Array.isArray(path) ? path : [path]),
-                                ] as FieldPath<
-                                    ViewModelConstructor<FieldMappingType, PkFieldType>
-                                >);
-                            }
-                        } else {
-                            // Many to many field but no data - can only push the sourcefield name
-                            assignedFieldsDeep.push(
-                                field.sourceFieldName as FieldPath<
-                                    ViewModelConstructor<FieldMappingType, PkFieldType>
-                                >
-                            );
+                        for (const path of normalizedPaths.fieldPaths) {
+                            assignedFieldsDeep.push([
+                                key,
+                                ...(Array.isArray(path) ? path : [path]),
+                            ] as FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>);
                         }
                     } else if (assignedData[key]) {
                         for (const path of assignedData[key]._assignedFieldsDeep) {

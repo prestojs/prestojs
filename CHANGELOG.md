@@ -10,6 +10,9 @@
 
 * [EmailWidget](https://prestojs.com/docs/ui-antd/widgets/EmailWidget) now uses `type="email"`
 * Fixed useAsyncValue `existingValues` to work with complex keys
+* Fix bug in view model caching when retrieving nested records with many related fields with no values set. Previously
+  if it was initialised with an empty array retrieving from the cache explicitly naming those fields (or using *) would
+  result in a cache miss.
 
 ### Types
 
