@@ -60,7 +60,9 @@ function FunctionDescription({ signatures }: { signatures }) {
                 Function
             </button>
             <Modal isVisible={showModal} onClose={() => setShowModal(false)}>
-                <FunctionDocumentation signature={signatures[0]} />
+                {signatures.map((sig, i) => (
+                    <FunctionDocumentation key={i} signature={sig} />
+                ))}
             </Modal>
         </span>
     );
@@ -70,7 +72,6 @@ export default function Type({ type, mode = 'FULL' }: Props) {
     if (type.typeName === 'container') {
         let el;
         if (type.children.length === 0 && type.indexSignature) {
-            console.log(type.indexSignature);
             el = (
                 <span>
                     <span className="text-gray-400">
@@ -81,6 +82,20 @@ export default function Type({ type, mode = 'FULL' }: Props) {
                         {' }'}
                     </span>
                 </span>
+            );
+        } else if (type.signatures?.length) {
+            el = (
+                <div>
+                    <strong>A function with the following signature:</strong>
+                    <div className="border-l pl-5 my-5">
+                        <FunctionDocumentation signature={type.signatures[0]} />
+                    </div>
+                    <TypeTable
+                        dataSource={type.children}
+                        title={<p>In addition the function has these properties attached to it:</p>}
+                        indexSignature={type.indexSignature}
+                    />
+                </div>
             );
         } else {
             el = (

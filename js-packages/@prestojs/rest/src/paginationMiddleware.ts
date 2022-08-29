@@ -82,9 +82,11 @@ export class PaginationMiddleware<T> {
         this.resultPath = resultPath;
     }
     init(endpoint: Endpoint): void {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        if (endpoint.getPaginatorClass) {
+        if (
+            endpoint.getPaginatorClass &&
+            // There's a default implementation that just throws an error - ignore that
+            endpoint.getPaginatorClass !== Endpoint.prototype.getPaginatorClass
+        ) {
             throw new Error(
                 "Endpoint already has 'getPaginatorClass'. This could be because paginationMiddleware is included twice."
             );

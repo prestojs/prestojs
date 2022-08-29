@@ -552,6 +552,7 @@ class Converter {
             typeParameters: await this.convertTypeParameter(docItem.typeParameter),
             pageSections,
             isTypeOnly: isTypeOnly(docItem),
+            hideApi: !!getTagByName(docItem, 'hide-api'),
         };
     }
 
@@ -769,7 +770,7 @@ class Converter {
     }
 
     async convertFlags(declaration: JSONOutput.DeclarationReflection) {
-        const { comment } = declaration;
+        const comment = getComment(declaration);
         const flags: Flags = {};
         if (declaration.flags?.isOptional || 'defaultValue' in declaration) {
             flags.isOptional = true;
@@ -848,7 +849,10 @@ class Converter {
             acc[paramName] = rest.join(' ');
             return acc;
         }, {});
-        const isComponent = signature.name[0] === signature.name[0].toUpperCase();
+        const isComponent =
+            signature.name[0].match(/[a-zA-Z]/) && !this.isInterface
+                ? signature.name[0] === signature.name[0].toUpperCase()
+                : false;
         let parameters: SignatureParameter[] = await Promise.all(
             (signature.parameters || []).map(async param => {
                 const resolvedType = this.resolveReferencedType(param);
@@ -967,6 +971,14 @@ class Converter {
         }
         if (indexSignature) {
             obj.indexSignature = await this.createIndexSignatureType(indexSignature);
+        }
+        if (source?.type?.type === 'reflection' && source.type.declaration?.signatures) {
+            obj.signatures = await this.convertSignatures(source.type.declaration?.signatures);
+            obj.signatures.forEach(sig => {
+                if (source.name) {
+                    sig.name = source.name[0].toLowerCase() + source.name.slice(1);
+                }
+            });
         }
         const realChildren = children.filter(
             child => !child.indexSignature
@@ -1102,6 +1114,7 @@ class Converter {
 
     externalReferences = {
         RequestInit: 'https://developer.mozilla.org/en-US/docs/Web/API/fetch#init',
+        HeadersInit: 'https://developer.mozilla.org/en-US/docs/Web/API/fetch#headers',
         Date: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date',
         Error: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error',
         'Intl.DateTimeFormatOptions':
@@ -1148,13 +1161,24 @@ class Converter {
                 if (value && description[descAttr]) {
                     const matches = value
                         .split('\n')
-                        .map(line => line.match(/^(#+) (.*)$/))
+                        .map(line => line.match(/^(#+) (.*)$/) || line.match(/^<Usage/))
                         .filter(Boolean);
                     if (matches.length > 0) {
-                        for (const [, hashes, title] of matches) {
-                            const heading = `h${hashes.length}`;
-                            if (heading !== 'h2' && heading !== 'h3') {
+                        for (const [str, hashes, title] of matches) {
+                            const heading = `h${hashes?.length}`;
+                            if (!['h2', 'h3', 'h4'].includes(heading) && str !== '<Usage') {
                                 throw new Error(`Dunno how to handle ${heading} - update logic`);
+                            }
+                            if (str === '<Usage') {
+                                if (section) {
+                                    inPageLinks.push(section);
+                                }
+                                section = {
+                                    title: 'Usage',
+                                    showEmpty: true,
+                                    anchorId: 'Usage',
+                                    links: [],
+                                };
                             }
                             if (heading === 'h2') {
                                 if (section) {
@@ -1191,24 +1215,36 @@ class Converter {
                                         .split(' ')
                                         .join('-')
                                         .replace(/[^a-zA-Z0-9-]/g, ''),
+                                    links: [],
+                                });
+                            }
+                            if (heading === 'h4') {
+                                if (!section) {
+                                    section = {
+                                        anchorId:
+                                            inPageLinks.length === 0
+                                                ? 'main-content'
+                                                : title
+                                                      .split(' ')
+                                                      .join('-')
+                                                      .replace(/[^a-zA-Z0-9-]/g, ''),
+                                        title: declaration.name,
+                                        showEmpty: true,
+                                        links: [],
+                                    };
+                                }
+                                const links =
+                                    section.links[section.links.length - 1]?.links || section.links;
+                                links.push({
+                                    title: title,
+                                    anchorId: title
+                                        .split(' ')
+                                        .join('-')
+                                        .replace(/[^a-zA-Z0-9-]/g, ''),
+                                    links: [],
                                 });
                             }
                         }
-                    }
-                    const usageMatches = value
-                        .split('\n')
-                        .map(line => line.match(/<Usage/))
-                        .filter(Boolean);
-                    if (usageMatches.length > 0) {
-                        if (section) {
-                            inPageLinks.push(section);
-                        }
-                        section = {
-                            title: 'Usage',
-                            showEmpty: true,
-                            anchorId: 'Usage',
-                            links: [],
-                        };
                     }
                 }
             }
@@ -1232,6 +1268,7 @@ class Converter {
 
     private async convertClass(docItem: JSONOutput.DeclarationReflection): Promise<ClassPage> {
         return this.withTypeParameter(this._resolveTypeArguments(docItem), async () => {
+            const references = this.references;
             function getMethod(
                 method: JSONOutput.DeclarationReflection
             ): false | JSONOutput.DeclarationReflection {
@@ -1246,6 +1283,27 @@ class Converter {
                     method.type.declaration?.signatures
                 ) {
                     return method.type.declaration;
+                }
+                if (
+                    method.type?.type === 'reference' &&
+                    method.type.id &&
+                    references[method.type.id]
+                ) {
+                    const ref = references[method.type.id];
+                    if (
+                        ref.kindString === 'Interface' &&
+                        ref.signatures &&
+                        ref.signatures.length > 0
+                    ) {
+                        return {
+                            ...ref,
+                            name: method.name,
+                            signatures: ref.signatures.map(sig => ({
+                                ...sig,
+                                name: method.name,
+                            })),
+                        };
+                    }
                 }
                 return false;
             }
@@ -1304,40 +1362,50 @@ class Converter {
 
             const pageSections: PageSection[] = [
                 {
-                    title: 'Methods',
-                    anchorId: 'Methods',
-                    links: methods.map(method => ({
-                        title: method.name,
-                        anchorId: method.signatures[0].anchorId,
-                        isInherited: method.signatures[0].isInherited,
-                    })),
-                },
-                {
-                    title: 'Properties',
-                    anchorId: 'Properties',
-                    links: properties.map(prop => ({
-                        title: prop.name,
-                        anchorId: prop.anchorId,
-                        isInherited: prop.isInherited,
-                    })),
-                },
-                {
-                    title: 'Static Methods',
-                    anchorId: 'Static-Methods',
-                    links: staticMethods.map(method => ({
-                        title: method.name,
-                        anchorId: method.signatures[0].anchorId,
-                        isInherited: method.signatures[0].isInherited,
-                    })),
-                },
-                {
-                    title: 'Static Properties',
-                    anchorId: 'Static-Properties',
-                    links: staticProperties.map(prop => ({
-                        title: prop.name,
-                        anchorId: prop.anchorId,
-                        isInherited: prop.isInherited,
-                    })),
+                    title: 'API',
+                    anchorId: 'api',
+                    links: [
+                        {
+                            title: 'Methods',
+                            anchorId: 'Methods',
+                            links: methods.map(method => ({
+                                title: method.name,
+                                anchorId: method.signatures[0].anchorId,
+                                isInherited: method.signatures[0].isInherited,
+                                links: [],
+                            })),
+                        },
+                        {
+                            title: 'Properties',
+                            anchorId: 'Properties',
+                            links: properties.map(prop => ({
+                                title: prop.name,
+                                anchorId: prop.anchorId,
+                                isInherited: prop.isInherited,
+                                links: [],
+                            })),
+                        },
+                        {
+                            title: 'Static Methods',
+                            anchorId: 'Static-Methods',
+                            links: staticMethods.map(method => ({
+                                title: method.name,
+                                anchorId: method.signatures[0].anchorId,
+                                isInherited: method.signatures[0].isInherited,
+                                links: [],
+                            })),
+                        },
+                        {
+                            title: 'Static Properties',
+                            anchorId: 'Static-Properties',
+                            links: staticProperties.map(prop => ({
+                                title: prop.name,
+                                anchorId: prop.anchorId,
+                                isInherited: prop.isInherited,
+                                links: [],
+                            })),
+                        },
+                    ].filter(section => section.links.length > 0),
                 },
             ].filter(section => section.links.length > 0);
             pageSections.unshift(...(this.extractInPageLinks(docItem, description) || []));
@@ -1610,10 +1678,10 @@ class Converter {
     private async convertClassProperty(
         property: JSONOutput.DeclarationReflection
     ): Promise<VariableNode> {
-        let type = property.type;
-        if (!type && property.getSignature) {
-            type = property.getSignature[0]?.type;
+        if (!property.type && property.getSignature) {
+            property = property.getSignature[0] as JSONOutput.DeclarationReflection;
         }
+        const { type } = property;
         return {
             ...(await this.createNode(property, 'Property')),
             type: await this.convertType(type, property),
@@ -1653,14 +1721,20 @@ class Converter {
         return name;
     }
 
+    isInterface = false;
     private async convertInterface(referencedType: DeclarationReflection) {
-        if (referencedType.kindString === 'Interface' && referencedType.signatures) {
-            return this.createMethodType(referencedType);
+        this.isInterface = true;
+        try {
+            if (referencedType.kindString === 'Interface' && referencedType.signatures) {
+                return await this.createMethodType(referencedType);
+            }
+            return {
+                typeName: 'interface',
+                classPage: await this.convertClass(referencedType),
+            } as InterfaceType;
+        } finally {
+            this.isInterface = false;
         }
-        return {
-            typeName: 'interface',
-            classPage: await this.convertClass(referencedType),
-        } as InterfaceType;
     }
 }
 
@@ -1759,11 +1833,21 @@ async function main() {
                     if (obj.name !== 'default') {
                         obj.id = byName[obj.name].id;
                     } else {
-                        console.log(
-                            "Reference had name of 'default' and so couldn't be resolved",
-                            obj,
-                            path[path.length - 1]
-                        );
+                        let match = false;
+                        for (let i = path.length - 1; i >= 0; i--) {
+                            if (byName[defaultNameMapping[path[i].name]]) {
+                                obj.id = byName[defaultNameMapping[path[i].name]].id;
+                                match = true;
+                                break;
+                            }
+                        }
+                        if (!match) {
+                            console.log(
+                                "Reference had name of 'default' and so couldn't be resolved",
+                                obj,
+                                path[path.length - 1]
+                            );
+                        }
                     }
                 }
             }
@@ -1804,7 +1888,9 @@ async function main() {
         const packageDir = `${docsPath}/${packageName}`;
         const outPath = path.resolve(packageDir, `${slug.split('/').slice(1).join('/')}.json`);
         const exampleKey = importPath.replace('@prestojs/', '');
-        const examples: undefined | DocExample[] = exampleFiles[exampleKey];
+        // Only the default export gets examples
+        const examples: undefined | DocExample[] =
+            docItem.name === importPath.split('/').pop() ? exampleFiles[exampleKey] : undefined;
         if (examples) {
             await Promise.all(
                 examples.map(async example => {

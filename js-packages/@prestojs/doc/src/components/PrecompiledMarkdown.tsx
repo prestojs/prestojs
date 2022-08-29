@@ -144,6 +144,12 @@ export const mdxComponents = {
         }
         return <Heading component="h3">{props.children}</Heading>;
     },
+    h4: props => {
+        if (typeof props.children != 'string') {
+            return <h3 {...props} />;
+        }
+        return <Heading component="h4">{props.children}</Heading>;
+    },
     blockquote: Alert,
     Alert,
     Usage,

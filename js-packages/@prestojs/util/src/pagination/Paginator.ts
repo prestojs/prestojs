@@ -70,6 +70,11 @@ export type PaginationRequestDetails = {
 };
 
 /**
+ * The interface a paginator class should conform to.
+ *
+ * See [PageNumberPaginator](doc:PageNumberPaginator), [CursorPaginator](doc:CursorPaginator), [LimitOffsetPaginator](doc:LimitOffsetPaginator),
+ * and [InferredPaginator](doc:InferredPaginator) for concrete implementations.
+ *
  * @typeParam State Type representing the state of the pagination
  * @typeParam InternalState Type representing the internal state of the pagination. Internal state refers to state that does not need to be restored (eg. pagination details from the URL for example)
  */

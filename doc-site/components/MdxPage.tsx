@@ -36,6 +36,7 @@ function extractHeadings(children) {
             section.links.push({
                 title: title,
                 anchorId,
+                links: [],
             });
         }
         return <div />;

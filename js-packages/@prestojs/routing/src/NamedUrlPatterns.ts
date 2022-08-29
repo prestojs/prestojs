@@ -1,4 +1,4 @@
-import UrlPattern, { ResolveOptions } from './UrlPattern';
+import UrlPattern, { UrlPatternResolveOptions } from './UrlPattern';
 
 type UrlPatternMapping = {
     [urlName: string]: UrlPattern;
@@ -91,7 +91,7 @@ export default class NamedUrlPatterns<Patterns extends UrlPatternMapping> {
      * @param options Extra options to pass through to `UrlPattern.resolve`
      * @param-type-name name string
      */
-    reverse(name: keyof Patterns, kwargs: {} = {}, options: ResolveOptions = {}): string {
+    reverse(name: keyof Patterns, kwargs: {} = {}, options: UrlPatternResolveOptions = {}): string {
         const url = this.get(name);
         return url.resolve(kwargs, options);
     }

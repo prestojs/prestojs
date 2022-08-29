@@ -51,7 +51,7 @@ type DedupeOptions = {
 
 /**
  * Middleware that will dedupe simultaneous identical in flight requests. All requests that are matched
- * as duplicates will all resolve to the same value with only a single `fetch` call having occured.
+ * as duplicates will all resolve to the same value with only a single `fetch` call having occurred.
  *
  * To use this globally set the following somewhere that executes when your app starts:
  *
@@ -61,7 +61,7 @@ type DedupeOptions = {
  * ];
  * ```
  *
- * @returns Middleware function to pass to [Endpoint](doc:Endpoint) or set on [Endpoint.defaultConfig.middleware](http://localhost:3000/docs/rest/Endpoint#static-var-defaultConfig)
+ * @returns Middleware function to pass to [Endpoint](doc:Endpoint) or set on [Endpoint.defaultConfig.middleware](doc:Endpoint#Property-defaultConfig)
  * @extract-docs
  * @menu-group Middleware
  */

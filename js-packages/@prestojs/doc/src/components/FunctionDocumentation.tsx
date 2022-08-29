@@ -13,6 +13,7 @@ type Props = {
     excludeParameterNames?: string[];
     hideTypeParameters?: boolean;
     hideReturnType?: boolean;
+    hideParameters?: boolean;
     prologue?: React.ReactNode;
 };
 
@@ -21,6 +22,7 @@ export default function FunctionDocumentation({
     excludeParameterNames = [],
     hideTypeParameters,
     hideReturnType,
+    hideParameters,
     prologue,
 }: Props) {
     const parameters = signature.parameters.filter(
@@ -42,11 +44,11 @@ export default function FunctionDocumentation({
             </div>
             <Description description={signature.description} />
             {prologue}
-            {parameters.length > 0 && (
+            {!hideParameters && parameters.length > 0 && (
                 <div className="my-5 overflow-x-auto">
                     <AnchorLink
                         className="font-bold"
-                        component="h2"
+                        component="h3"
                         id={`${signature.anchorId}-props`}
                     >
                         {signature.isComponent ? 'Component Props' : 'Arguments'}:

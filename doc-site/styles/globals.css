@@ -51,6 +51,9 @@ html {
 .mdx hr {
    @apply my-10;
 }
+.mdx ol {
+   @apply ml-5 my-5;
+}
 
 .DocSearch-Button {
    @apply bg-gray-200 float-right;

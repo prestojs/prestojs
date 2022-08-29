@@ -1,12 +1,16 @@
+import type { UrlPatternResolveOptions } from '@prestojs/routing';
 import { UrlPattern } from '@prestojs/routing';
-import { PaginatorInterface } from '@prestojs/util';
+import { PaginatorInterface, PaginatorInterfaceClass } from '@prestojs/util';
 import isEqual from 'lodash/isEqual';
 import requestDefaultsMiddleware from './requestDefaultsMiddleware';
 
+/**
+ * @export-in-docs
+ */
 type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
     /**
      * Any headers to add to the request. You can unset default headers that might be specified in the default
-     * `Endpoint.defaultConfig.requestInit` by setting the value to `undefined`.
+     * [Endpoint.defaultConfig.requestInit](#Property-defaultConfig) by setting the value to `undefined`.
      */
     headers?: HeadersInit | Record<string, undefined | string>;
     /**
@@ -27,7 +31,7 @@ export type EndpointRequestInit = { headers: Headers; method: string } & Omit<
     'headers' | 'method'
 >;
 
-interface Query {
+interface QueryStringParams {
     [key: string]: any;
 }
 
@@ -36,10 +40,19 @@ interface Query {
  */
 export type EndpointOptions<ReturnT> = ExecuteInitOptions & {
     /**
-     * Method to decode body based on response. The default implementation looks at the content type of the
-     * response and processes it accordingly (eg. handles JSON and text responses) and is suitable for most cases.
-     * If you just need to transform the decoded body (eg. change the decoded JSON object) then use `middleware`
-     * instead.
+     * Method used to decode the response body.
+     *
+     * The default implementation works as follows:
+     *
+     * 1) If the response code is `204` or `205` it will return null
+     * 2) If type includes 'json' (eg. application/json) returns [response.json()](https://developer.mozilla.org/en-US/docs/Web/API/Response/json)
+     * 3) If type includes 'text' (eg. text/plain, text/html) returns [response.text()](https://developer.mozilla.org/en-US/docs/Web/API/Response/text)
+     * 4) Otherwise returns response unchanged
+     *
+     * If you just need to transform the decoded body (e.g. change the decoded JSON object) then either use `middleware`
+     * or transform the `result` value returned from `execute`.
+     *
+     * @param res The [response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object returned by fetch.
      */
     decodeBody?: (res: Response) => any;
     /**
@@ -51,40 +64,65 @@ export type EndpointOptions<ReturnT> = ExecuteInitOptions & {
      * If not provided defaults to:
      *
      * ```js
-     * function defaultResolveUrl(urlPattern, urlArgs, query, baseUrl) {
-     *      if (baseUrl[baseUrl.length - 1] === '/') {
-     *          baseUrl = baseUrl.slice(0, -1);
-     *      }
-     *      return baseUrl + this.urlPattern.resolve(urlArgs, { query });
-     *  }
+     * function defaultResolveUrl(
+     *     urlPattern: UrlPattern,
+     *     urlArgs: Record<string, any>,
+     *     query: Query | undefined,
+     *     baseUrl: string
+     * ): string {
+     *     if (baseUrl[baseUrl.length - 1] === '/') {
+     *         baseUrl = baseUrl.slice(0, -1);
+     *     }
+     *     const finalOptions: UrlPatternResolveOptions = {};
+     *     if (query) {
+     *         finalOptions.query = query;
+     *     }
+     *     if (!this.urlPattern.resolveOptions.baseUrl) {
+     *         finalOptions.baseUrl = baseUrl;
+     *     }
+     *     return this.urlPattern.resolve(urlArgs, finalOptions);
+     * }
      * ```
+     *
+     * @param urlPattern The url pattern from the endpoint
+     * @param urlArgs The `urlArgs` passed to `execute`
+     * @param query The `query` passed to `execute`
+     * @param baseUrl The `baseUrl` which was passed to `Endpoint` or [Endpoint.defaultConfig.baseUrl](doc:Endpoint#Property-defaultConfig)
+     * if not provided. Note that middleware can also modify this.
      */
     resolveUrl?: (
         urlPattern: UrlPattern,
         urlArgs: Record<string, any>,
-        query: Query | undefined,
+        query: QueryStringParams | undefined,
         baseUrl: string
     ) => string;
     /**
      * Base URL to use. This is prepended to the return value of `urlPattern.resolve(...)` and can be used
      * to change the call to occur to a different domain.
      *
-     * If not specified defaults to [Endpoint.defaultConfig.baseUrl](doc:Endpoint#static-var-defaultConfig)
+     * If not specified defaults to [Endpoint.defaultConfig.baseUrl](doc:Endpoint#Property-defaultConfig)
+     *
+     * <Alert>NOTE: If `urlPattern` defines a `baseUrl` that will always be used regardless of this setting.</Alert>
      */
     baseUrl?: string;
     /**
      * Middleware to apply for this endpoint. By default `getMiddleware` concatenates this with the global
-     * [Endpoint.defaultConfig.middleware](doc:Endpoint#static-var-defaultConfig)
+     * [Endpoint.defaultConfig.middleware](doc:Endpoint#Property-defaultConfig)
      *
      * See [middleware](#Middleware) for more details
      */
     middleware?: Middleware<ReturnT>[];
     /**
-     * Get the final middleware to apply for this endpoint. This combines the global middleware and the middleware
-     * specific to this endpoint. Defaults to [Endpoint.defaultConfig.getMiddleware](doc:Endpoint#static-var-defaultConfig)
+     * Get the final middleware to apply for this endpoint. This should combine the global middleware and the middleware
+     * specific to this endpoint.
+     *
+     * Defaults to [Endpoint.defaultConfig.getMiddleware](doc:Endpoint#Property-defaultConfig)
      * which applies the global middleware followed by the endpoint specific middleware.
      *
      * See [middleware](#Middleware) for more details
+     *
+     * @param middleware The middleware that was passed to the `endpoint`
+     * @param endpoint The endpoint the middleware is being created for.
      */
     getMiddleware?: (
         middleware: Middleware<ReturnT>[],
@@ -92,10 +130,19 @@ export type EndpointOptions<ReturnT> = ExecuteInitOptions & {
     ) => MiddlewareFunction<ReturnT>[];
 };
 
-type UrlResolveOptions = {
+/**
+ * @export-in-docs
+ */
+interface UrlResolveOptions {
+    /**
+     * Any arguments to be passed through to [UrlPattern.resolve](doc:UrlPattern#resolve)
+     */
     urlArgs?: Record<string, any>;
-    query?: Query;
-};
+    /**
+     * Optional query string parameters to be passed through to [UrlPattern.resolve](doc:UrlPattern#resolve)
+     */
+    query?: QueryStringParams;
+}
 
 /**
  * @expand-properties
@@ -112,7 +159,7 @@ export type ExecuteReturnVal<T> = {
     /**
      * Any query string parameters
      */
-    query: Query;
+    query: QueryStringParams;
     /**
      * The options used to execute the endpoint with
      */
@@ -204,7 +251,7 @@ export class MiddlewareContext<T> {
     /**
      * The state as of when the last middleware in the chain was processed.
      *
-     * This contains the `url`, `response`, `decodedBody` and `result`.
+     * This object contains `url`, `response`, `decodedBody` and `result`.
      */
     lastState: null | MiddlewareNextReturn<T>;
 
@@ -300,47 +347,85 @@ export type MiddlewareNextReturn<ReturnT> = {
 export type MiddlewareReturn<ReturnT> = Promise<ReturnT | MiddlewareNextReturn<ReturnT>>;
 
 export type MiddlewareUrlConfig = {
+    /**
+     * The URL pattern passed to the endpoint
+     */
     pattern: UrlPattern;
+    /**
+     * Any arguments that will be passed to [UrlPattern.resolve](doc:UrlPattern#Method-resolve)
+     */
     args: Record<string, any>;
-    query: Query;
+    /**
+     * Any query string arguments that will be added to the URL
+     */
+    query: QueryStringParams;
+    /**
+     * The base URL that will be prepended to the URL returned by [UrlPattern.resolve](doc:UrlPattern#Method-resolve)
+     */
     baseUrl: string;
 };
 
 /**
+ * Middleware process function
+ *
  * @param next The next function in the middleware chain. Must be passed the `url` and `requestInit` objects. Alternatively
  * you can pass an instance of [SkipToResponse](doc:SkipToResponse) instead of `url` and `requestInit`.
  * @param urlConfig The URL config
  * @param requestInit See [fetch parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
  * @param context The context for the current execute. This gives you access to the original options and a function to re-execute the command.
  * @returns Returns the value from `fetch` after it has been transformed by each middleware further down the chain
+ *
+ * @extract-docs
  */
-export type MiddlewareFunction<T> = (
-    next: MiddlewareNextFunction<T>,
-    urlConfig: MiddlewareUrlConfig,
-    requestInit: EndpointRequestInit,
-    context: MiddlewareContext<T>
-) => MiddlewareReturn<T>;
+export interface MiddlewareFunction<T> {
+    (
+        next: MiddlewareNextFunction<T>,
+        urlConfig: MiddlewareUrlConfig,
+        requestInit: EndpointRequestInit,
+        context: MiddlewareContext<T>
+    ): MiddlewareReturn<T>;
+}
 
-type MiddlewareNextFunction<T> = {
+/**
+ * @extract-docs
+ */
+interface MiddlewareNextFunction<T> {
+    /**
+     * Middleware functions should call this to allow processing to continue to the next middleware in the chain. Must
+     * be passed the `url` and `requestInit` objects. Alternatively you can pass an instance of [SkipToResponse](doc:SkipToResponse)
+     * (shown below)
+     * @param urlConfig The URL config that may have been modified by the middleware
+     * @param requestInit The request init object that may have been modified by the middleware
+     */
     (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit): Promise<MiddlewareNextReturn<T>>;
+
+    /**
+     * Alternate way to call `next` is to pass an instance of [SkipToResponse](doc:SkipToResponse)
+     * @param skipToResponse Passing this indicates the middleware should skip to the response bypassing any subsequent
+     * middleware in the chain
+     */
     (skipToResponse: SkipToResponse): Promise<MiddlewareNextReturn<T>>;
-};
+}
 
 /**
  * Object form of middleware. This allows more control over what the middleware can do. Specifically allows middleware
  * to define how it interacts with `Endpoint.prepare` and allows modifications to the `Endpoint` via `init`.
- *
- * @param prepare Function that is called in `Endpoint.prepare` to modify the options used. Specifically this allows middleware
- * to apply it's changes to the options used (eg. change URL etc) such that `Endpoint` correctly caches the call.
- * @param process Process the request through the middleware
- * @param init Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
- * class or otherwise do some kind of initialisation.
- *
- * @export-in-docs
  */
 export interface MiddlewareObject<T> {
+    /**
+     * Function that is called in `Endpoint.prepare` to modify the options used. Specifically this allows middleware
+     * to apply its changes to the options used (eg. change URL etc) such that `Endpoint` correctly caches the call.
+     */
     prepare?: (options: EndpointExecuteOptions) => EndpointExecuteOptions;
+    /**
+     * Process the request through the middleware
+     */
     process?: MiddlewareFunction<T>;
+    /**
+     * Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
+     * class or otherwise do some kind of initialisation.
+     * @param endpoint The endpoint that this middleware is attached to
+     */
     init?: (endpoint: Endpoint) => void;
 }
 
@@ -450,34 +535,62 @@ export function mergeRequestInit(
 
 /**
  * @extract-docs
- * @menu-group Endpoint
  */
-class PreparedAction {
-    action: Endpoint;
-    options: EndpointExecuteOptions;
+type PreparedEndpoint<ReturnT> = {
+    /**
+     * Executes the endpoint. If `options` is provided they will override the options
+     * used in the call to [Endpoint.prepare](doc:Endpoint#Method-prepare)
+     */
+    (options?: EndpointExecuteOptions): Promise<ExecuteReturnVal<ReturnT>>;
+
+    /**
+     * The endpoint this function was created from
+     */
+    endpoint: Endpoint<ReturnT>;
+    /**
+     * The '`options' passed to [Endpoint.prepare](doc:Endpoint#Method-prepare)
+     */
+    options: ExecuteInitOptions;
+    /**
+     * The `urlResolveOptions` passed to [Endpoint.prepare](doc:Endpoint#Method-prepare)
+     */
     urlResolveOptions: UrlResolveOptions;
 
-    constructor(
-        action: Endpoint,
-        urlResolveOptions: UrlResolveOptions,
-        options: ExecuteInitOptions
-    ) {
-        this.action = action;
-        this.options = options;
-        this.urlResolveOptions = urlResolveOptions;
-    }
+    /**
+     * @deprecated Exists for backwards compatability only. Call the prepared endpoint function
+     * directly instead.
+     */
+    execute(init?: ExecuteInitOptions): Promise<ExecuteReturnVal<ReturnT>>;
+};
 
-    execute(init: ExecuteInitOptions = {}): Promise<any> {
+function prepareEndpoint<ReturnT>(
+    endpoint: Endpoint<ReturnT>,
+    urlResolveOptions: UrlResolveOptions,
+    options: ExecuteInitOptions
+): PreparedEndpoint<ReturnT> {
+    function execute(_options: EndpointExecuteOptions = {}): Promise<ExecuteReturnVal<ReturnT>> {
         // TODO: This means that if this.options or init tries to remove
         // a default header by setting it to undefined it will not work
         // as the resulting object is a `Headers` instance that has had
         // the key removed from it already... but then in execute in Endpoint
         // we merge it with the defaultConfig
-        return this.action.execute({
-            ...this.urlResolveOptions,
-            ...mergeRequestInit(this.options, init),
+        return endpoint.execute({
+            ...urlResolveOptions,
+            ...mergeRequestInit(options, _options),
         });
     }
+    execute.endpoint = endpoint;
+    execute.urlResolveOptions = urlResolveOptions;
+    execute.options = options;
+
+    execute.execute = (_options: EndpointExecuteOptions = {}) => {
+        console.warn(
+            "'execute' on a prepared endpoint is deprecated - just call the returned function directly"
+        );
+        return execute(_options);
+    };
+
+    return execute;
 }
 
 /**
@@ -551,13 +664,20 @@ export function defaultDecodeBody(
 function defaultResolveUrl(
     urlPattern: UrlPattern,
     urlArgs: Record<string, any>,
-    query: Query | undefined,
+    query: QueryStringParams | undefined,
     baseUrl: string
 ): string {
     if (baseUrl[baseUrl.length - 1] === '/') {
         baseUrl = baseUrl.slice(0, -1);
     }
-    return baseUrl + this.urlPattern.resolve(urlArgs, { query });
+    const finalOptions: UrlPatternResolveOptions = {};
+    if (query) {
+        finalOptions.query = query;
+    }
+    if (!this.urlPattern.resolveOptions.baseUrl) {
+        finalOptions.baseUrl = baseUrl;
+    }
+    return this.urlPattern.resolve(urlArgs, finalOptions);
 }
 
 /**
@@ -575,38 +695,44 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
 }
 
 /**
- * Describe an REST API endpoint that can then be executed.
+ * `Endpoint` is a class that wraps a call to [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch)
+ * and provides a middleware API to handling transforming the request (e.g. setting headers, adding query params) or
+ * transforming the response (e.g. decoding the body, caching results).
  *
- * * Accepts a [UrlPattern](doc:UrlPattern) to define the URL used. Any arguments & query parameters can be passed at execution time
- * * Accepts a `decodeBody` function that decodes the `Response` body as returned from [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). The
- *   default `decodeBody` will interpret the response based on the content type
- *   * If type includes 'json' (eg. application/json) returns decoded json
- *   * If type includes 'text (eg. text/plain, text/html) returns text
- *   * If status is 204 or 205 will return null
- * * [middleware](#Middleware) can be passed to transform the request before it is passed to `fetch` and/or the response after
- *   it has passed through `decodeBody`.
- * * All options accepted by `fetch` and these will be used as defaults to any call to `execute` or `prepare`.
+ * Global configuration can be set on [Endpoint.defaultConfig](#Property-defaultConfig) to apply site wide settings such as the base URL to use
+ * or default middleware to apply.
  *
- * Usage:
+ * <Usage>
+ *
+ * The most basic usage is to instantiate the class with the URL pattern to use:
  *
  * ```js
- * const userList = new Action(new UrlPattern('/api/users/'));
- * const users = await userList.execute();
+ * const userList = new Endpoint('/api/users/');
+ * // Equivalent to
+ * const userList = new Endpoint(new UrlPattern('/api/users/'));
+ * ```
+ *
+ * See [UrlPattern](doc:UrlPattern) for more details on the pattern syntax.
+ *
+ * To make the call use `execute`:
+ *
+ * ```js
+ * const { result } = await userList.execute();
  * ```
  *
  * You can pass `urlArgs` and `query` to resolve the URL:
  *
  * ```js
- * const userDetail = new Action(new UrlPattern('/api/user/:id/'));
+ * const userDetail = new Endpoint('/api/user/:id/');
  * // Resolves to /api/user/1/?showAddresses=true
- * const user = await userDetail.execute({ urlArgs: { id: 1 }, query: { 'showAddresses': true }});
+ * const { result } = await userDetail.execute({ urlArgs: { id: 1 }, query: { 'showAddresses': true }});
  * ```
  *
  * You can also pass through any `fetch` options to both the constructor and calls to `execute` and `prepare`
  *
  * ```js
  * // Always pass through Content-Type header to all calls to userDetail
- * const userDetail = new Action(new UrlPattern('/api/user/:id/'), {
+ * const userDetail = new Endpoint('/api/user/:id/', {
  *     'Content-Type': 'application/json'
  * });
  * // Set other fetch options at execution time
@@ -623,127 +749,224 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  *     'X-CSRFToken': getCsrfToken(),
  *   },
  * };
- *
- * // All actions will now use the default headers specified
- * userDetail.execute({ urlArgs: { id: 1 } });
  * ```
  *
- * You can also "prepare" an action for execution by calling the `prepare` method. Each call to prepare will
- * return the same object (ie. it passes strict equality checks) given the same parameters. This is useful when
- * you need to have a stable cache key for an action. For example you may have a React hook that executes
- * your action when things change:
+ * ### Prepared endpoints
+ *
+ * You can also "prepare" an endpoint for execution by calling the `prepare` method. Each call to prepare will
+ * return the same object given the same parameters. This is useful when you need to have a stable cache key for an
+ * endpoint. For example, [useAsync](doc:useAsync) can handle calling your function for you while handling loading, error
+ * and success states:
  *
  * ```js
- * import useSWR from 'swr';
+ * const endpoint = new Endpoint('/api/users/');
  *
- * // ...
- *
- * // prepare the action and pass it to useSWR. useSWR will then call the second parameter (the "fetcher")
- * // which executes the prepared action.
- * const { data } = useSWR([action.prepare()], (preparedAction) => preparedAction.execute());
- * ```
- *
- * You can wrap this up in a custom hook to make usage more ergonomic:
- *
- * ```js
- * import { useCallback } from 'react';
- * import useSWR from 'swr';
- *
- * // Wrapper around useSWR for use with `Endpoint`
- * // @param action Endpoint to execute. Can be null if not yet ready to execute
- * // @param args Any args to pass through to `prepare`
- * // @return Object Same values as returned by useSWR with the addition of `execute` which
- * // can be used to execute the action directly, optionally with new arguments.
- * export default function useEndpoint(action, args) {
- *   const preparedAction = action ? action.prepare(args) : null;
- *   const execute = useCallback(init => preparedAction.execute(init), [preparedAction]);
- *   return {
- *     execute,
- *     ...useSWR(preparedAction && [preparedAction], act => act.execute()),
- *   };
+ * export default function Basic() {
+ *     const { result } = useAsync(endpoint.prepare(), { trigger: 'SHALLOW' });
+ *     return (
+ *         <div>
+ *             {result?.result.map(user => (
+ *                 <div key={user.id}>{user.name}</div>
+ *             ))}
+ *         </div>
+ *     );
  * }
  * ```
  *
- * ## Pagination
+ * If the endpoint needed to be re-executed whenever a filter changed you could do this:
  *
- * Pagination for an endpoint is handled by [paginationMiddleware](doc:paginationMiddleware). This middleware
- * will add a `getPaginatorClass` method to the `Endpoint` which makes it compatible with [usePaginator](doc:usePaginator).
- * The default implementation chooses a paginator based on the shape of the response (eg. if the response looks like
- * cursor based paginator it will use `CursorPaginator`, if page number based `PageNumberPaginator` or if limit/offset
- * use `LimitOffsetPaginator` - see [InferredPaginator](doc:InferredPaginator). The pagination state as returned by the
- * backend is stored on the instance of the paginator:
+ * ```js
+ * const [filter, setFilter] = React.useState('');
+ * const { result, isLoading } = useAsync(endpoint.prepare({ query: { filter } }), {
+ *     trigger: 'SHALLOW',
+ * });
+ * ```
+ *
+ * Whenever `filter` changes `prepare` will return a new object and `useAsync` will detect the change and call the
+ * prepared function.
+ *
+ * ### Pagination
+ *
+ * Pagination for an endpoint is handled by [paginationMiddleware](doc:paginationMiddleware). When this middleware
+ * is added [getPaginatorClass](doc:Endpoint#Method-getPaginatorClass) will return the paginator class specified by the
+ * middleware.
+ *
+ * The default paginator is [InferredPaginator](doc:InferredPaginator) which chooses a paginator based on the shape of
+ * the response (e.g. if the response looks like cursor based paginator it will use `CursorPaginator`, if page number
+ * based `PageNumberPaginator` or if limit/offset use `LimitOffsetPaginator`). The pagination state as returned by the
+ * backend is stored on the instance of the paginator and the `result` key returned by execute will contain the _current
+ * page_ of results. The other pagination details (e.g. total number of pages) are retrieved from the paginator.
+ *
+ * Paginators work as follows when used with an `Endpoint`:
+ *
+ * 1) The paginator is created with the initial pagination state
+ * 2) The endpoint `execute` is called and [paginationMiddleware](doc:paginationMiddleware) processes the request. This
+ *    adds the necessary pagination headers or query parameters to the request. For example [PageNumberPaginator](doc:PageNumberPaginator)
+ *    will add `page` and `pageSize` (if they are set) to the query parameters (e.g. `?page=1&pageSize=10`).
+ * 3) The request will be made and the response will be processed by the middleware. In the case of [PageNumberPaginator](doc:PageNumberPaginator)
+ *    the response could look like `{ results: [{ id: 1, name: 'Jo' }], total: 1, pageSize: 10 }` (see the individual paginator class
+ *    documentation for the expected response shape). The paginator will update it's internal state (e.g. set the current
+ *    page size and total number of records) and return the `results` to the next middleware in the chain.
+ * 4) `execute` will finish processing the remaining middleware and return `result`; from the example above that would
+ *    be `[{ id: 1, name: 'Jo' }]`
+ * 5) The `paginator` state will reflect what was returned: `paginator.pageSize === 10` and `paginator.total === 1`
+ *
+ * To make it easy to instantiate and have a React component re-render when pagination state changes use the
+ * [usePaginator](doc:usePaginator) hook. This can accept either a paginator class or the endpoint itself. For example:
  *
  * ```js
  * const paginator = usePaginator(endpoint);
- * // This returns the page of results
- * const results = await endpoint.execute({ paginator });
- * // This now has the total number of records (eg. if the paginator was PageNumberPaginator)
- * paginator.total
+ * const { result, isLoading } = useAsync(endpoint.prepare({ paginator }), {
+ *   trigger: 'SHALLOW',
+ * });
  * ```
  *
- * You can calculate the next request state by mutating the paginator:
+ * Calling a paginator state transition function would cause the endpoint to be re-executed:
  *
  * ```js
- * paginator.next()
- * // The call to endpoint here will include the modified page request data, eg. ?page=2
- * const results = await endpoint.execute({ paginator });
+ * paginator.next();
  * ```
  *
- * See [usePaginator](doc:usePaginator) for more details about how to use a paginator in React.
+ * This would call `endpoint` with query string of `?page=2&pageSize=10`.
  *
- * If your backend returns data in a different shape or uses headers instead of putting details in the response body
- * you can handle this by a) implementing your own paginator that extends one of the base classes and customising
- * the `getPaginationState` function or b) passing the `getPaginationState` method to [usePaginator](doc:usePaginator).
- * This function can return the data in the shape expected by the paginator.
+ * See [paginationMiddleware](doc:paginationMiddleware) for more details.
  *
- * ## Middleware
+ * ### Middleware
  *
- * Middleware functions can be provided to alter the `url` or fetch options and transform the
- * response in some way.
+ * Middleware functions can be provided to alter the `urlConfig` or other options passed to `fetch`
+ * and transform the response in some way.
  *
- * Middleware can be defined as either an object or as a function that is passed the url, the fetch options, the next
- * middleware function and a context object. The function can then make changes to the `url` or `requestInit` and pass
+ * Middleware can be defined as either an object or as a function that is passed the url config, the fetch options, the next
+ * middleware function and a context object. The function can then make changes to the `urlConfig` or `requestInit` and pass
  * it through to the next middleware function. The call to `next` returns a `Promise` that resolves to the response of
  * the endpoint after it's been processed by any middleware further down the chain. You can return a modified response here.
  *
- * This middleware sets a custom header on a request but does nothing with the response:
+ * #### Middleware function arguments
+ *
+ * Middleware functions are passed the following arguments:
+ *
+ * * `next` - The next function in the middleware chain. Must be passed the `url` and `requestInit` objects. Alternatively
+ * an instance of [SkipToResponse](doc:SkipToResponse) instead of `url` and `requestInit`. This function _must_ be called
+ * by each middleware.
+ * * `urlConfig` - An object containing the URL config. Details of each key on this object are expanded below.
+ * * `urlConfig.pattern` - The [UrlPattern](doc:UrlPattern) that will be resolved to a URL
+ * * `urlConfig.args` - The arguments to pass to `pattern`
+ * * `urlConfig.query` - Any query string parameters to add to the resolved URL
+ * * `urlConfig.baseUrl` - The base URL to prepend to the URL resolved from the `pattern`
+ * * `requestInit` - See [fetch parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
+ * * `context` - The [context](doc:MiddlewareContext) for the current execute. This gives you access to the original options and a function to re-execute the command.
+ *
+ * Each middleware can be split into 2 phases - the _request phase_ which happens before calling `next` the _response phase_
+ * which happens after `next` has resolved:
+ *
+ * ```js
+ * function exampleMiddleware(next, urlConfig, requestInit) {
+ *     // Request phase - modify `urlConfig` or `requestInit` here before handing off to `next`
+ *     // NOTE: Make sure you `await` the call to `next` - it returns a Promise
+ *     const { result } = await next(urlConfig, requestInit);
+ *     // Response phase - modify the `result` before returning it
+ *     return result;
+ * }
+ * ```
+ *
+ * #### Middleware lifecycle
+ *
+ * The lifecycle of a call looks like:
+ *
+ * * [Endpoint.execute](#Method-execute) is called. `urlConfig` is constructed from the pattern & baseUrl
+ * passed to the endpoint and the `urlArgs` and `query` passed to `execute`.
+ * * `requestInit` is constructed by combining [Endpoint.defaultConfig.requestInit](#Property-defaultConfig), any
+ * options provided to the `Endpoint` constructor and any options passed to `execute`
+ * * The first middleware in the chain is called and receives `next`, `urlConfig`, `requestInit` and `context`.
+ * * Once the middleware calls `next` the same process is repeated for all middleware until none remains.
+ * * After the final middleware calls `next` the url is resolved by calling [resolveUrl](#api)
+ * * [fetch](#Method-fetch) is called and `notifyFetchStart` is called (see [Advanced](#Advanced))
+ * * Once the fetch promise resolves [decodeBody](#api) is called
+ * * If [response.ok](https://developer.mozilla.org/en-US/docs/Web/API/Response/ok) is false then an
+ * [ApiError](doc:ApiError) will be thrown.
+ * * Otherwise, [context.lastState](doc:MiddlewareContext#Property-lastState) will be set and the last middleware in the chain will receive the result
+ * * Each middleware receives the result as returned by the middleware that was after in the chain.
+ * * Once the entire middleware chain has processed the result the final value is returned from `execute`.
+ *
+ * #### Middleware examples
+ *
+ * This first example adds a custom header:
  *
  * ```js
  * function clientHeaderMiddleware(next, urlConfig, requestInit, context) {
  *   requestInit.headers.set('X-ClientId', 'ABC123');
- *   // Return response unmodified
- *   return next(url.toUpperCase(), requestInit)
+ *   // This middleware doesn't need to do anything to the response so return it directly
+ *   return next(urlConfig, requestInit);
  * }
  * ```
  *
- * This middleware just transforms the response - converting it to uppercase.
+ * This middleware just converts the response to uppercase.
  *
  * ```js
  * function upperCaseResponseMiddleware(next, urlConfig, requestInit, context) {
- *   const { result } = await next(url.toUpperCase(), requestInit)
+ *   const { result } = await next(urlConfig, requestInit)
  *   return result.toUpperCase();
  * }
  * ```
  *
  * Note that `next` will return an object containing `url`, `response`, `decodedBody` and `result`.
- * As a convenience you can return this object directly when you do not need to modify the result
- * in any way (the first example above). `result` contains the value returned from any middleware
- * that handled the response before this one or otherwise `decodedBody` for the first middleware.
+ * `result` contains the value returned from the middleware next in the chain (i.e. the one that handled the response
+ * before this one). Otherwise, it will be the value returned from `decodedBody` for the middleware last in the chain
+ * (i.e. the first middleware to handle the response).
+ *
+ * As a convenience you can return the object returned by `next` directly when you do not need to modify the result
+ * (the first example above). If you need to modify the result you can return the modified result as in the second example
+ * above.
  *
  * The [context object](doc:MiddlewareContext) can be used to retrieve the original options from the [Endpoint.execute](doc:Endpoint#method-execute)
  * call and re-execute the command. This is useful for middleware that may replay a request after an initial failure,
- * eg. if user isn't authenticated on initial attempt.
+ * e.g. if user isn't authenticated on initial attempt.
  *
  * ```js
- * // Access the original parameters passed to execute
- * context.executeOptions
- * // Re-execute the endpoint.
- * context.execute()
+ * async function authReplayMiddleware(next, url, requestInit, context) {
+ *     try {
+ *         return await next(url, requestInit);
+ *     } catch (e) {
+ *         if (e.status === 401) {
+ *             auth.setUserData(null);
+ *             // New promise only resolves once successful login occurs
+ *             return new Promise(resolve => {
+ *                 const unsub = auth.onAuthStateChanged(async user => {
+ *                     if (user) {
+ *                     // When user has logged in re-execute endpoint
+ *                         const result = await context.execute();
+ *                         resolve(result);
+ *                         unsub();
+ *                     }
+ *                 });
+ *             });
+ *         }
+ *         throw e;
+ *     }
+ * }
  * ```
  *
- * **NOTE:** Calling `context.execute()` will go through all the middleware again
+ * **NOTE:** Calling `context.execute()` from within middleware will go through all the middleware again
  *
- * Middleware can be set globally for all [Endpoint](doc:Endpoint)'s on the [Endpoint.defaultConfig.middleware](doc:Endpoint#static-var-defaultConfig)
+ * It is also useful just to get access to the endpoint. This middleware adds a header when the [paginationMiddleware](doc:paginationMiddleware)
+ * is present:
+ *
+ * ```js
+ * function detectPaginationMiddleware(next, urlConfig, requestInit, context) {
+ *     const paginationMiddleware = context.endpoint.middleware.find(
+ *         middleware => middleware instanceof PaginationMiddleware
+ *     );
+ *     requestInit.headers.set(
+ *         'X-HANDLES-PAGINATED-RESPONSE',
+ *         paginationMiddleware ? 'True' : 'False'
+ *     );
+ *     return next(urlConfig, requestInit);
+ * }
+ * ```
+ *
+ * #### Middleware configuration
+ *
+ * Middleware can be set globally for all [Endpoint](doc:Endpoint)'s on the [Endpoint.defaultConfig.middleware](doc:Endpoint#Property-defaultConfig)
  * option or individually for each Endpoint by passing the `middleware` as an option when creating the endpoint.
  *
  * Set globally:
@@ -760,8 +983,8 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * new Endpoint('/users/', { middleware: [csrfTokenMiddleware] })
  * ```
  *
- * When middleware is passed to the `Endpoint` it is _appended_ to the default
- * middleware specified in `Endpoint.defaultConfig.middleware`.
+ * When middleware is passed to the `Endpoint` the default behaviour is to _append_ it to the default
+ * middleware specified in [Endpoint.defaultConfig.middleware](#Property-defaultConfig).
  *
  * To change how middleware is combined per `Endpoint` you can specify the
  * `getMiddleware` option. This is passed the middleware for the `Endpoint` and
@@ -776,17 +999,34 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * ]
  * ```
  *
- * You can change the default implementation on [Endpoint.defaultConfig.getMiddleware](doc:Endpoint#static-var-defaultConfig)
+ * You can change the default implementation on [Endpoint.defaultConfig.getMiddleware](doc:Endpoint#Property-defaultConfig)
+ *
+ * #### Middleware object form
  *
  * Middleware can also be defined as an object with any of the following properties:
  *
  * * `init` - Called when the `Endpoint` is initialised and allows the middleware to modify the endpoint
  *   class or otherwise do some kind of initialisation.
  * * `prepare` - A function that is called in `Endpoint.prepare` to modify the options used. Specifically this allows middleware
- *   to apply its changes to the options used (eg. change URL etc) such that `Endpoint` correctly caches the call.
+ *   to apply its changes to the options used (e.g. change URL etc.) such that `Endpoint` correctly caches the call.
  * * `process` - Process the middleware. This behaves the same as the function form described above.
  *
- * ### Advanced
+ * Here's an example of middleware that checks that `method` is uppercase:
+ *
+ * ```js
+ * function checkEndpointSettingsMiddleware() {
+ *     return {
+ *         init(endpoint) {
+ *             const { method } = endpoint.requestInit;
+ *             if (method && method.toUpperCase() !== method) {
+ *                 throw new Error(`'method' must be uppercase`);
+ *             }
+ *         },
+ *     };
+ * }
+ * ```
+ *
+ * #### Advanced
  *
  * For advanced use cases there's some additional hooks available.
  *
@@ -794,17 +1034,44 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  *   when the call to `fetch` starts and get access to the `Promise`. [dedupeInFlightRequestsMiddleware](doc:dedupeInFlightRequestsMiddleware)
  *   uses this to cache an in flight request and return the same response for duplicate calls using [SkipToResponse](doc:SkipToResponse)
  * * [SkipToResponse](doc:SkipToResponse) - This allows middleware to skip the rest of the middleware chain and the call
- *   to `fetch`. Instead it is passed a promise that resolves to `Response` and this is used instead of doing the call
+ *   to `fetch`. Instead, it is passed a promise that resolves to `Response` and this is used instead of doing the call
  *   to `fetch` for you.
+ *
+ * #### Available Middleware
+ *
+ * * [paginationMiddleware](doc:paginationMiddleware) - handle paginated responses
+ * * [dedupeInFlightRequestsMiddleware](doc:dedupeInFlightRequestsMiddleware) - Middleware that will dedupe simultaneous identical in flight requests
+ * * [detectBadPaginationMiddleware](doc:detectBadPaginationMiddleware) - Middleware that detects if paginationMiddleware isn't present when it should be or if `pagination` option to `Endpoint.execute` hasn't been supplied.
+ * * [batchMiddleware](doc:batchMiddleware) - This can be used to batch together multiple calls to an endpoint (or endpoints) to make it more efficient.
+ * * [requestDefaultsMiddleware](doc:requestDefaultsMiddleware) - Middleware to set defaults on `requestInit` (included by default)
+ * * [viewModelCachingMiddleware](doc:viewModelCachingMiddleware) - Middleware to transform and cache a response for a [view model](/docs/viewmodel)
+ *
+ * </Usage>
+ *
  *
  * @menu-group Endpoint
  * @extract-docs
+ * @typeParam ReturnT The type of the result returned by the endpoint.
  */
 export default class Endpoint<ReturnT = any> {
     /**
      * This defines the default settings to use on an endpoint globally.
      *
      * All these options can be customised on individual Endpoints.
+     *
+     * The default setup is:
+     *
+     * ```js
+     * Endpoint.defaultConfig = {
+     *     baseUrl: '',
+     *     requestInit: {},
+     *     middleware: [requestDefaultsMiddleware],
+     *     getMiddleware: (middleware) => [
+     *         ...Endpoint.defaultConfig.middleware,
+     *         ...middleware,
+     *     ],
+     * };
+     * ```
      */
     // Init for this is after class definition
     static defaultConfig: DefaultConfig;
@@ -813,15 +1080,42 @@ export default class Endpoint<ReturnT = any> {
      * The [UrlPattern](doc:UrlPattern) this endpoint hits when executed.
      */
     urlPattern: UrlPattern;
+    /**
+     * The default options used when executing the endpoint. These can be overridden
+     * by the call to `execute`.
+     */
     public requestInit: ExecuteInitOptions;
-    private urlCache: Map<string, Map<{}, PreparedAction>>;
+    private urlCache: Map<string, Map<{}, PreparedEndpoint<ReturnT>>>;
+    /**
+     * @private
+     */
     public decodeBody: (res: Response) => any;
+
+    /**
+     * Resolves the URL to use.
+     *
+     * @param urlPattern The url pattern from the endpoint
+     * @param urlArgs The `urlArgs` passed to `execute`
+     * @param query The `query` passed to `execute`
+     * @param baseUrl The `baseUrl` which was passed to `Endpoint` or [Endpoint.defaultConfig.baseUrl](doc:Endpoint#Property-defaultConfig)
+     * if not provided. Note that middleware can also modify this.
+     *
+     *
+     * This is set to the `resolveUrl` passed in the constructor
+     *
+     * @private
+     */
     public resolveUrl: (
         urlPattern: UrlPattern,
         urlArgs: Record<string, any>,
-        query: Query | undefined,
+        query: QueryStringParams | undefined,
         baseUrl: string
     ) => string;
+    /**
+     * The middleware specified for this Endpoint. This is set when the `Endpoint` is
+     * constructed by calling `getMiddleware` (default implementation is
+     * [Endpoint.defaultConfig.getMiddleware](doc:Endpoint#Property-defaultConfig))
+     */
     public middleware: Middleware<ReturnT>[];
 
     private _baseUrl?: string;
@@ -829,7 +1123,7 @@ export default class Endpoint<ReturnT = any> {
     /**
      * The base URL to use for this endpoint. This is prepended to the URL returned from `urlPattern.resolve`.
      *
-     * If not specified then it defaults to [Endpoint.defaultConfig.baseUrl](doc:Endpoint#static-var-defaultConfig).
+     * If not specified then it defaults to [Endpoint.defaultConfig.baseUrl](doc:Endpoint#Property-defaultConfig).
      *
      * Note that middleware can override this as well.
      */
@@ -843,9 +1137,11 @@ export default class Endpoint<ReturnT = any> {
     }
 
     /**
-     * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint
+     * @param urlPattern The [UrlPattern](doc:UrlPattern) to use to resolve the URL for this endpoint. If a plain `string`
+     * is passed it will be converted to a [UrlPattern](doc:UrlPattern).
+     * @param options The options to use for this endpoint.
      */
-    constructor(urlPattern: UrlPattern, options: EndpointOptions<ReturnT> = {}) {
+    constructor(urlPattern: UrlPattern | string, options: EndpointOptions<ReturnT> = {}) {
         const {
             decodeBody = defaultDecodeBody,
             resolveUrl = defaultResolveUrl,
@@ -856,7 +1152,8 @@ export default class Endpoint<ReturnT = any> {
         } = options;
 
         this._baseUrl = baseUrl;
-        this.urlPattern = urlPattern;
+        this.urlPattern =
+            urlPattern instanceof UrlPattern ? urlPattern : new UrlPattern(urlPattern);
         this.urlCache = new Map();
         this.decodeBody = decodeBody;
         this.requestInit = requestInit;
@@ -870,20 +1167,41 @@ export default class Endpoint<ReturnT = any> {
     }
 
     /**
-     * Prepare an action for execution. Given the same parameters returns the same object. This is useful
-     * when using libraries like `useSWR` that accept a parameter that identifies a request and is used
-     * for caching but execution is handled by a separate function.
-     *
-     * For example to use with `useSWR` you can do:
+     * Prepare an endpoint for execution. Given the same parameters returns the same function. This is
+     * useful when you want a function to call that only changes when parameters to `prepare` change.
+     * For example, you can use this with [useAsync](doc:useAsync) to call the endpoint whenever the
+     * `urlArgs` change:
      *
      * ```js
-     * const { data } = useSWR([action.prepare()], (preparedAction) => preparedAction.execute());
+     * // Cache getUser based on `id`. When `id` changes the endpoint will be re-executed
+     * // by `useAsync`.
+     * const getUser = getUserEndpoint.prepare({ urlArgs: { id } });
+     * const { result } = useAsync(getUser, { trigger: 'SHALLOW' });
      * ```
      *
-     * If you just want to call the action directly then you can bypass `prepare` and just call `execute`
-     * directly.
+     * It can also be useful with third party libraries [SWR](https://swr.vercel.app/) where it
+     * expects a key for caching purposes:
+     *
+     * ```js
+     * const preparedEndpoint = endpoint.prepare();
+     * const { data } = useSWR([preparedEndpoint], preparedEndpoint);
+     * ```
+     *
+     * If you just want to call the endpoint directly then you can bypass `prepare` and just call `execute`
+     * directly. e.g. these are equivalent:
+     *
+     * ```js
+     * endpoint.prepare()()
+     * // equivalent to
+     * endpoint.execute()
+     * ```
+     *
+     * @param options Any options to use when the endpoint is executed. Note that any options
+     * used here can be overridden at call time.
+     * @returns A function that can be called to execute the endpoint. Any of the arguments passed
+     * to `prepare` will be used here but can be overridden with arguments to this function.
      */
-    prepare(options: EndpointExecuteOptions = {}): PreparedAction {
+    prepare(options: EndpointExecuteOptions = {}): PreparedEndpoint<ReturnT> {
         for (const middleware of this.middleware) {
             if (typeof middleware !== 'function' && middleware.prepare) {
                 options = middleware.prepare(options);
@@ -901,13 +1219,13 @@ export default class Endpoint<ReturnT = any> {
                 return value;
             }
         }
-        const execute = new PreparedAction(this, { urlArgs, query }, init);
+        const execute = prepareEndpoint(this, { urlArgs, query }, init);
         cache.set(init, execute);
         return execute;
     }
 
     /**
-     * Triggers the `fetch` call for an action
+     * Triggers the `fetch` call for an endpoint
      *
      * This can be called directly or indirectly via `prepare`.
      *
@@ -924,12 +1242,15 @@ export default class Endpoint<ReturnT = any> {
      *
      * ```js
      * // Via prepare
-     * const preparedAction = action.prepare({ urlArgs: { id: '1' }});
-     * preparedAction.execute();
+     * const preparedEndpoint = endpoint.prepare({ urlArgs: { id: '1' }});
+     * preparedEndpoint();
      *
      * // Directly
-     * action.execute({ urlArgs: { id: '1' }});
+     * endpoint.execute({ urlArgs: { id: '1' }});
      * ```
+     *
+     * See [middleware lifecycle](#Middleware-lifecycle) for details about the execution lifecycle.
+     *
      *
      * @param options.urlArgs args to pass through to `urlPattern.resolve`
      * @param options.query query params to pass through to `urlPattern.resolve`
@@ -1073,13 +1394,23 @@ export default class Endpoint<ReturnT = any> {
     }
 
     /**
-     * Calls [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+     * Calls [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with the
+     * arguments provided.
      *
      * You can extend `Endpoint` and override this if you need to customise something that isn't
      * possible with middleware.
      */
-    public async fetch(url: string, requestInit: RequestInit | undefined): Promise<Response> {
+    public async fetch(url: string, requestInit?: RequestInit): Promise<Response> {
         return fetch(url, requestInit);
+    }
+
+    /**
+     * Not implemented by default. Include [paginationMiddleware](doc:paginationMiddleware) to enable this functionality.
+     */
+    public getPaginatorClass<T extends PaginatorInterface>(): PaginatorInterfaceClass<T> | null {
+        throw new Error(
+            'getPaginatorClass not implemented - did you forget to include `paginationMiddleware`?'
+        );
     }
 }
 

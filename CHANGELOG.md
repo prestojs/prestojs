@@ -13,6 +13,14 @@
 * Fix bug in view model caching when retrieving nested records with many related fields with no values set. Previously
   if it was initialised with an empty array retrieving from the cache explicitly naming those fields (or using *) would
   result in a cache miss.
+* [UrlPattern](https://prestojs.com/docs/routing/UrlPattern#UrlPattern) now supports specifying options in the constructor. All options can be overridden in the call to `resolve`.
+  * `baseUrl` - if specified this will be prefixed to resolved pattern
+  * `query` - any query parameters to be included in any urls resolved from this pattern
+  * `mergeQuery` - If true (the default) then any query parameters provided to the constructor will be merged with any provided to resolve.
+* [Endpoint.prepare](https://prestojs.com/docs/rest/Endpoint#Method-prepare) now returns a function that can be called directly (previously it was an object with an `execute` method). 
+  * This changes usage from `endpoint.prepare().execute()` to `endpoint.prepare()()` (but the former will still work with a deprecation notice)
+  * This makes usage with useAsync much easier, eg. `useAsync(endpoint.prepare(), { trigger: 'SHALLOW' })` will work now
+* [Endpoint](https://prestojs.com/docs/rest/Endpoint#api) now accepts a `string` or `UrlPattern` as the URL. If a `string` is passed it will be converted to a `UrlPattern`.
 
 ### Types
 
