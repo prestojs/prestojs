@@ -178,17 +178,18 @@ export default abstract class Paginator<State extends {}, InternalState extends 
             // immediately when `setCurrentState` is called. This ensures any reads
             // use the latest value until it's replaced by the next call to
             // `replaceStateControllers`.
+            // TODO: https://github.com/prestojs/prestojs/issues/176
             this.currentState = nextState;
             setCurrentState(nextState);
         };
         this.internalState = internalState || {};
         this.setInternalState = (nextState): void => {
             // See explanation above `this.currentState = nextState`
-            this.internalState = nextState;
-            setInternalState({
+            this.internalState = {
                 ...nextState,
                 responseIsSet: true,
-            });
+            };
+            setInternalState(this.internalState);
         };
     }
 
