@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.33] - 2022-08-31
+
+### Changed
+
+* Fix to paginators that meant `responseIsSet` was stale due to React 18 batching causing problems (eg. in `useAsyncListing`). 
+
 ## [0.0.32] - 2022-08-29
 
 ### Added
