@@ -21,7 +21,7 @@ test('DateTimeFormatter should format values', () => {
                 }}
             />
         ).container.innerHTML
-    ).toBe('Wednesday, January 1, 2020, 11:00 AM');
+    ).toBe('Wednesday, January 1, 2020 at 11:00 AM');
     expect(render(<DateTimeFormatter value="" />).container.innerHTML).toBe('');
     expect(render(<DateTimeFormatter value="" blankLabel="-" />).container.innerHTML).toBe('-');
     expect(render(<DateTimeFormatter value="bad" invalidDateLabel="" />).container.innerHTML).toBe(
