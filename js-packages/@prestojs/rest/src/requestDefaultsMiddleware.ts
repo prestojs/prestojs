@@ -30,7 +30,7 @@ import { EndpointRequestInit, MiddlewareReturn, MiddlewareUrlConfig } from './En
  *      requestDefaultsMiddleware,
  *      customGlobalDefaultMiddleware,
  *     ...middleware,
- * ],
+ * ];
  * ```
  * </Usage>
  *

@@ -28,7 +28,7 @@ export function CodeExample({ example, language, forceWide }) {
         return () => window.removeEventListener('message', listener);
     }, []);
     const {
-        header: { title, description, tags },
+        header: { title, anchorId, description, tags },
     } = example;
     let minHeight = 100;
     if (tags['min-height']) {
@@ -53,17 +53,17 @@ export function CodeExample({ example, language, forceWide }) {
                     minHeight: Math.max(minHeight, height || 0),
                 }}
             />
-            {description && (
-                <div className="px-5 relative border-t mb-5">
-                    <h3
-                        className="relative bg-white inline-block px-1 font-semibold text-lg"
-                        style={{ top: -15 }}
-                    >
-                        {title}
-                    </h3>
-                    <PrecompiledMarkdown code={description} />
-                </div>
-            )}
+            <div className="px-5  border-t mb-5">
+                <AnchorLink
+                    id={anchorId}
+                    component="h3"
+                    className="relative bg-white inline-flex px-1 font-semibold text-lg"
+                    style={{ top: -15 }}
+                >
+                    {title}
+                </AnchorLink>
+                {description && <PrecompiledMarkdown code={description} />}
+            </div>
             <div className="relative">
                 <button
                     onClick={() => setOpen(!open)}

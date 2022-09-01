@@ -1,7 +1,7 @@
 import { MDXProvider } from '@mdx-js/react';
 import { mdxComponents } from '@prestojs/doc';
 import type { AppProps } from 'next/app';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import Layout from '../components/Layout';
 import '../styles/globals.css';
 
@@ -29,12 +29,12 @@ function MyApp({ Component, pageProps, router, ...rest }: AppProps) {
     }, [isExample]);
     if (isExample) {
         return (
-            <>
+            <Suspense fallback={null}>
                 <div className="p-10 code-examples" id="code-example-root">
                     <Component {...pageProps} />
                 </div>
                 <div id="tooltip-container" />
-            </>
+            </Suspense>
         );
     }
     return (

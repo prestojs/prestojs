@@ -113,6 +113,7 @@ export default function TypeTable({
                 {
                     title: 'Type',
                     key: 'type',
+                    className: 'type-table-type',
                     shouldExclude(property) {
                         return !!property.flags.expandProperties;
                     },

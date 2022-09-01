@@ -61,3 +61,16 @@ html {
 .type-es6map dt {
    @apply font-bold mt-2;
 }
+
+.type-table-type .type-union {
+   display: flex;
+   flex-direction: column;
+}
+.type-table-type .type-union:before {
+   content: 'One of:';
+   font-size: 0.8em;
+   text-decoration: underline;
+}
+.type-table-type .type-union .union-separator {
+   display: none;
+}

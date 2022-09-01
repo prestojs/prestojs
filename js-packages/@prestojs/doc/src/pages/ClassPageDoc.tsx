@@ -118,8 +118,8 @@ export default function ClassPageDoc({ page, meta, isNested = false }: Props) {
                 {!isNested && <ClassHierarchy page={page} />}
                 <Description description={page.description} />
                 {meta?.examples && <CodeExamples examples={meta.examples} />}
-                {!isNested && <ApiPreferencesBar />}
-                {page.constructorDefinition && (
+                {!isNested && <ApiPreferencesBar classPage={page} />}
+                {page.constructorDefinition && !page.hideConstructor && (
                     <>
                         <SectionHeading>Constructor</SectionHeading>
                         {page.constructorDefinition.signatures.map((sig, i) => (

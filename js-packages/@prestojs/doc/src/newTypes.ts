@@ -52,6 +52,7 @@ export interface ClassPage {
         children: (ReferenceLinkType | ExternalReferenceType)[];
     };
     isTypeOnly: boolean;
+    hideConstructor: boolean;
 }
 
 export type Page = FunctionPage | ClassPage;
@@ -246,6 +247,7 @@ export type DocExample = {
         title: string;
         description?: string;
         tags: Record<string, any>;
+        anchorId: string;
     };
     name: string;
     url: string;

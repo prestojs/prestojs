@@ -15,6 +15,9 @@ type TimeParts = {
     timezoneOffset?: number;
 };
 
+/**
+ * Thrown by `parseTime` if invalid time string is passed
+ */
 export class InvalidTimeError extends Error {}
 
 /**
@@ -27,6 +30,8 @@ export class InvalidTimeError extends Error {}
  *
  * Seconds & milliseconds are optional and will default to 0 if not in the string, timezone is optional and will be
  * left as undefined if not specified.
+ *
+ * Throws [InvalidTimeError](doc:InvalidTimeError) if string cannot be parsed
  *
  * ```js
  * parseTime("3:55")

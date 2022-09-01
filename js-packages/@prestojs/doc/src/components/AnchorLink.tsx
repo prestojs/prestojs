@@ -17,6 +17,7 @@ export default function AnchorLink({
     component: Component,
     id,
     className,
+    style,
     ...rest
 }: {
     children: React.ReactNode;
@@ -29,6 +30,7 @@ export default function AnchorLink({
         | 'h4'
         | 'h5';
     id: string;
+    style?: Record<string, any>;
     className?: string;
 }) {
     return (
@@ -36,9 +38,10 @@ export default function AnchorLink({
             id={id}
             {...rest}
             className={cx(
-                'group flex whitespace-pre-wrap -ml-4 pl-4 mb-2 scroll-mt-20 items-center',
-                className
+                className,
+                'group flex whitespace-pre-wrap -ml-4 pl-4 mb-2 scroll-mt-20 items-center'
             )}
+            style={style}
         >
             <a
                 href={`#${id}`}

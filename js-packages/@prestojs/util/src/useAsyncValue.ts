@@ -14,7 +14,7 @@ function identifiableGetId(item: Identifiable | any, fallbackGetId?: (item: any)
     }
 }
 
-type CommonProps<T, U extends Id> = {
+export type UseAsyncValueCommonProps<T, U extends Id> = {
     /**
      * An optional array of existing values to try and find the value in.
      *
@@ -58,7 +58,7 @@ type CommonProps<T, U extends Id> = {
 /**
  * @expand-properties
  */
-export type UseAsyncValuePropsSingle<T, U extends Id> = CommonProps<T, U> & {
+export type UseAsyncValuePropsSingle<T, U extends Id> = UseAsyncValueCommonProps<T, U> & {
     /**
      * Single `id` for value to fetch or null if nothing yet to resolve.
      *
@@ -80,7 +80,7 @@ export type UseAsyncValuePropsSingle<T, U extends Id> = CommonProps<T, U> & {
 /**
  * @expand-properties
  */
-export type UseAsyncValuePropsMulti<T, U extends Id> = CommonProps<T, U> & {
+export type UseAsyncValuePropsMulti<T, U extends Id> = UseAsyncValueCommonProps<T, U> & {
     /**
      * Array of ids to resolve values for or null if nothing yet to resolve
      *
@@ -166,7 +166,7 @@ export default function useAsyncValue<T, U extends Id>(
     props: UseAsyncValuePropsMulti<T, U>
 ): UseAsyncValueReturn<T[]>;
 export default function useAsyncValue<T, U extends Id>(
-    props: CommonProps<T, U> & {
+    props: UseAsyncValueCommonProps<T, U> & {
         id?: U | null;
         ids?: U[] | null;
         resolve: (idOrIds: U | U[]) => Promise<T[] | T>;

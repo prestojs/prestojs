@@ -5,6 +5,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import * as runtime from 'react/jsx-runtime';
 import AnchorLink, { generateId } from './AnchorLink';
 import CodeBlock from './CodeBlock';
+import Tooltip from './Tooltip';
 
 const Paragraph = (props): React.ReactElement => <p {...props} className="mb-6" />;
 const Code = (props): React.ReactElement => {
@@ -153,6 +154,7 @@ export const mdxComponents = {
     blockquote: Alert,
     Alert,
     Usage,
+    Tooltip,
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type

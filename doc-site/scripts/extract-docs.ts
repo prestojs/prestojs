@@ -147,14 +147,24 @@ const examplesDir = path.resolve(__dirname, '../pages/examples/');
 const exampleFiles = readDirRecursive(examplesDir).reduce((acc, fn) => {
     const relativePath = fn.replace(examplesDir, '').split('.')[0].replace(/^\//, '');
     const parts = relativePath.split('/');
-    const exampleName = parts.pop();
+    const exampleName = parts.pop() || '';
     const key = parts.join('/');
     if (!acc[key]) {
         acc[key] = [];
     }
     let source = fs.readFileSync(fn).toString();
     const match = source.match(/^\/\*\*(.*)\n(( \*.*\n)*) \*\/((.*\n)*)/);
-    let header = { title: exampleName, description: '', tags: {} };
+    let header = {
+        title: exampleName,
+        description: '',
+        tags: {},
+        anchorId:
+            'example-' +
+            exampleName
+                .split(' ')
+                .join('-')
+                .replace(/[^a-zA-Z0-9-]/g, ''),
+    };
     if (match) {
         const headerText = match[2].trim().replace(/^[ ]*\*/gm, '');
         const [title, ...body] = headerText.split('\n');
@@ -169,7 +179,7 @@ const exampleFiles = readDirRecursive(examplesDir).reduce((acc, fn) => {
                 break;
             }
         }
-        header = { title, description: body.join('\n').trim(), tags };
+        Object.assign(header, { title: title.trim(), description: body.join('\n').trim(), tags });
         source = match[4];
     }
     acc[key].push({
@@ -1260,7 +1270,11 @@ class Converter {
                 title: 'Examples',
                 showEmpty: true,
                 anchorId: 'examples',
-                links: [],
+                links: this.examples.map(({ header }) => ({
+                    title: header.title,
+                    anchorId: header.anchorId,
+                    links: [],
+                })),
             });
         }
         return inPageLinks;
@@ -1488,6 +1502,7 @@ class Converter {
                         staticProperties,
                         typeParameters: await this.convertTypeParameter(docItem.typeParameter),
                         isTypeOnly: isTypeOnly(docItem),
+                        hideConstructor: !!getTagByName(docItem, 'hide-constructor'),
                     } as ClassPage)
             );
         });

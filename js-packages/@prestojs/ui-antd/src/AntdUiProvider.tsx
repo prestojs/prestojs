@@ -44,15 +44,18 @@ interface AntdUiConfigComponents {
 }
 
 /**
- * Class to store current antd config created by [AntdUiProvider](doc:AntdUiProvider).
+ * The configuration for Antd.
+ *
+ * You don't need to instantiate this directly - it is created by [AntdUiProvider](doc:AntdUiProvider) for you.
  *
  * To get the current config use [useAntdUiConfig](doc:useAntdUiConfig).
  *
  * @extract-docs
  * @menu-group Configuration
+ * @hide-constructor
  */
 export class AntdUiConfig {
-    components: AntdUiConfigComponents;
+    private components: AntdUiConfigComponents;
 
     constructor(components: AntdUiConfigComponents) {
         this.components = components;
@@ -60,6 +63,15 @@ export class AntdUiConfig {
 
     /**
      * Get the `DatePicker` component to use. This is used by all date/datetime based widgets (eg. [DateWidget](doc:DateWidget)).
+     *
+     * ```js
+     * function MyComponent(props) {
+     *     const config = useAntdUiConfig();
+     *     const DatePicker = config.getDatePicker();
+     *
+     *     return <DatePicker {...props} />
+     * }
+     * ```
      *
      * @return-type-name DatePickerComponent
      * @returns {DatePickerComponent} This returns the `datePickerComponent` passed to [AntdUiProvider](doc:AntdUiProvider) or throws an error if no `datePickerComponent` has been defined.
@@ -84,6 +96,15 @@ consider using one of the suggested alternatives instead.
 
     /**
      * Get the `TimePicker` component to use. This is used by all time based widgets (eg. [TimeWidget](doc:TimeWidget)).
+     *
+     * ```js
+     * function MyComponent(props) {
+     *     const config = useAntdUiConfig();
+     *     const TimePicker = config.getTimePicker();
+     *
+     *     return <TimePicker {...props} />
+     * }
+     * ```
      *
      * @return-type-name DatePickerComponent
      * @returns {DatePickerComponent} This returns the `timePickerComponent` passed to [AntdUiProvider](doc:AntdUiProvider) or throws an error if no `timePickerComponent` has been defined.
@@ -110,8 +131,9 @@ consider using one of the suggested alternatives instead.
 export const AntdUiContext = React.createContext<AntdUiConfig | null>(null);
 
 /**
- * Get the current [AntdUiConfig](doc:AntdUiConfig) provided by [AntdUiProvider](doc:AntdUiProvider)
+ * Get the current [AntdUiConfig](doc:AntdUiConfig) provided by [AntdUiProvider](doc:AntdUiProvider).
  *
+ * <Usage>
  * ```js
  * function MyComponent(props) {
  *     const config = useAntdUiConfig();
@@ -120,6 +142,7 @@ export const AntdUiContext = React.createContext<AntdUiConfig | null>(null);
  *     return <DatePicker {...props} />
  * }
  * ```
+ * </Usage>
  *
  * @extract-docs
  * @menu-group Configuration

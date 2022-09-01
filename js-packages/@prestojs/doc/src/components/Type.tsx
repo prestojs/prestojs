@@ -128,14 +128,16 @@ export default function Type({ type, mode = 'FULL' }: Props) {
     }
     if (type.typeName === 'union') {
         return (
-            <>
+            <span className="type-union">
                 {type.types.map((t, i) => (
                     <React.Fragment key={i}>
                         <Type type={t} mode={mode} />
-                        {i < type.types.length - 1 && <span className="text-gray-300">|</span>}
+                        {i < type.types.length - 1 && (
+                            <span className="text-gray-300 union-separator">|</span>
+                        )}
                     </React.Fragment>
                 ))}
-            </>
+            </span>
         );
     }
     if (type.typeName === 'propertiesFrom') {
