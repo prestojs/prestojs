@@ -77,8 +77,9 @@ const DEEP = 'DEEP';
  * @expand-properties
  * @typeParam ResultT @inherit
  * @typeParam ErrorT @inherit
+ * @typeParam ArgsT @inherit
  */
-export interface UseAsyncOptions<ResultT, ErrorT> {
+export interface UseAsyncOptions<ResultT, ErrorT, ArgsT> {
     /**
      * Determines when the function is called. Defaults to `MANUAL`.
      *
@@ -106,31 +107,35 @@ export interface UseAsyncOptions<ResultT, ErrorT> {
      * and will trigger a call to `fn` when a change is detected according to the comparison logic of the
      * selected `trigger`.
      */
-    args?: Array<any>;
+    args?: ArgsT;
     /**
      * Called when async function resolves successfully. Is passed a single parameter which
-     * is the result from the async function.
+     * is the result from the async function `fn`.
      */
     onSuccess?: OnSuccess<ResultT>;
     /**
-     * Called when async function errors. Passed the error returned from async function.
-     *
-     * Note that when calling `run` directly you can alternatively handle errors there:
-     *
-     * ```js
-     * try {
-     *     await run();
-     *     // success
-     *     // if onSuccess is specified it will be called as well
-     * } catch (e) {
-     *     // handle error
-     *     // if onError is specified it will be called as well
-     * }
+     * Called when async function errors. It is passed the error returned from the async function `fn.
      */
     onError?: OnError<ErrorT>;
 }
 
 /**
+ * Called when the async function resolves. It is passed the result returned from
+ * the async function `fn`.
+ *
+ * Note that when calling `run` directly you can alternatively handle the success case there:
+ *
+ * ```js
+ * try {
+ *     await run();
+ *     // success
+ *     // if onSuccess is specified it will be called as well
+ * } catch (e) {
+ *     // handle error
+ *     // if onError is specified it will be called as well
+ * }
+ * ```
+ *
  * @export-in-docs
  * @typeParam ResultT @inherit
  */
@@ -145,6 +150,19 @@ interface OnSuccess<ResultT> {
 interface OnError<ErrorT> {
     /**
      * Called when the async function errors
+     *
+     * Note that when calling `run` directly you can alternatively handle errors there:
+     *
+     * ```js
+     * try {
+     *     await run();
+     *     // success
+     *     // if onSuccess is specified it will be called as well
+     * } catch (e) {
+     *     // handle error
+     *     // if onError is specified it will be called as well
+     * }
+     * ```
      *
      * @param error The error thrown by the async function
      */
@@ -180,7 +198,7 @@ export type UseAsyncReturnObject<ResultT, ErrorT> = {
      */
     response: ResultT | null;
     /**
-     * A function to manually trigger the function. If `options.trigger` is `useAsync.MANUAL`
+     * Call this to manually trigger `fn`. If `options.trigger` is `"MANUAL"`
      * calling this function is the only way to trigger the function. You can pass
      * arguments to `run` which will override the defaults. If no arguments are passed then
      * `options.args` will be passed by default (if supplied).
@@ -197,6 +215,18 @@ export type UseAsyncReturnObject<ResultT, ErrorT> = {
     reset: () => void;
 };
 
+/**
+ * @extract-docs
+ */
+interface AsyncFunction<ResultT, ArgsT extends any[]> {
+    /**
+     * The function that `useAsync` will call. It should return a Promise.
+     *
+     * @param args Any arguments that were passed to the `args` option
+     */
+    (...args: ArgsT): Promise<ResultT>;
+}
+
 const comparisonByTrigger = {
     [DEEP]: isEqual,
     [SHALLOW]: isEqualShallow,
@@ -205,72 +235,237 @@ const comparisonByTrigger = {
 };
 
 /**
- * Hook to deal with triggering async function calls and handling result / errors and loading states.
+ * A general utility hook to deal with triggering async function calls and handling result / errors and loading states.
  *
- * This can be used in two distinct modes:
- *  - _manual_ (`useAsync.MANUAL`) - the function is only triggered explicitly
- *  - _automatic_ (`useAsync.DEEP` or `useAsync.SHALLOW`) - the function is triggered initially
- * and then automatically when argument values change (using a shallow or deep comparison).
+ * At it's most basic this hook works to abstract a common pattern when dealing with calling async
+ * functions in react: tracking the loading state and the result or error.
  *
- * For mutations you usually want _manual_ as it is triggered in response to some user action
- * like pressing a button.
+ * A basic example without useAsync is:
  *
- * For data fetching you usually want _automatic_ mode as you retrieve some data
- * initially and then refetch it when some arguments change (eg. the id for a single
- * record or the filters for a list).
+ * ```js
+ * function Example1() {
+ *     const [loading, setLoading] = useState(false);
+ *     const [result, setResult] = useState(null);
+ *     const [error, setError] = useState(null);
  *
- * ## Examples
- *
- * Fetch and render a specified github profile
- *
- * ```js live horizontal
- * function FollowerCount() {
- *     const [user, setUser] = React.useState('octocat')
- *     const { result, isLoading, error, run, reset } = useAsync(() => getGithubUser(user));
- *     return (
- *         <div>
- *             <input value={user} onChange={e => setUser(e.target.value)} />
- *             <div className="my-2 justify-between flex">
- *             <button onClick={run} disabled={isLoading} className="btn-blue">Query follower count</button>
- *             <button className="btn" onClick={reset}>Clear</button>
- *             </div>
- *             {result && (
- *                 <p>
- *                     <img src={result.avatar_url} /><br />
- *                     {result.name} has {result.followers} followers
- *                 </p>
- *             )}
- *             {error && (<p>Failed with status: {error.status} {error.statusText}</p>)}
- *         </div>
- *     );
- * }
- * // we don't define this inside FollowerCount() because that will create a new function on
- * // every render, causing useAsync() to re-run and triggering an infinite render loop
- * function getGithubUser(user) {
- *   return fetch(`https://api.github.com/users/${user}`).then(r => {
- *      if (r.ok) {
- *          return r.json();
- *      }
- *      throw r;
- *   });
+ *     const run = async () => {
+ *        setLoading(true);
+ *        try {
+ *           setResult(await doSomething());
+ *        } catch (e) {
+ *           setError(e);
+ *        } finally {
+ *           setLoading(false);
+ *        }
+ *     }
+ *     return <button onClick={run}>Run</button>;
  * }
  * ```
+ *
+ * This is almost<Tooltip content="It doesn't handle things like clearing the previous error / result when re-running"><sup>^</sup></Tooltip> equivalent to the `useAsync` version:
+ *
+ * ```js
+ * function Example2() {
+ *     const { isLoading, result, error, run } = useAsync(doSomething);
+ *     return <button onClick={run}>Run</button>;
+ * }
+ * ```
+ *
+ * Sometimes you want to execute the function immediately and then again whenever some
+ * parameters change. For example if you were fetching records to display in a table
+ * and had some user entered filters you would want the records to be re-fetched with
+ * whenever the filters changed. In the original example you might do that with something like:
+ *
+ * ```js
+ * function Example3({ filters }) {
+ *     const [loading, setLoading] = useState(false);
+ *     const [result, setResult] = useState(null);
+ *     const [error, setError] = useState(null);
+ *
+ *     const run = async (filters) => {
+ *        setLoading(true);
+ *        try {
+ *           setResult(await doSomething(filters));
+ *        } catch (e) {
+ *           setError(e);
+ *        } finally {
+ *           setLoading(false);
+ *        }
+ *     }
+ *     useEffect(() => {
+ *        run(filters);
+ *     }, [filters])
+ *     return <button onClick={run}>Run</button>;
+ * }
+ * ```
+ *
+ * With `useAsync` we can have it control when to call the function by setting trigger option to `"SHALLOW"` or `"DEEP"`
+ * (this refers to how values are compared - more on this below). Any arguments to pass to the function go in `args`:
+ *
+ * ```js
+ * function Example4({ filters }) {
+ *     const { isLoading, result, error, run } = useAsync(doSomething, { trigger: 'SHALLOW', args: [filters] });
+ *     return <button onClick={run}>Run</button>;
+ * }
+ * ```
+ *
+ * `"SHALLOW"` means the arguments to `doSomething` (in this case `filters`) will be shallowly compared to the
+ * previous value and if they differ `doSomething` would be called again. If `filters` was a nested object
+ * then `"DEEP"` would be more appropriate. This has an advantage over `Example3` in that if it was rendered
+ * as `<Example3 filters={{ foo: 'bar' }} />` then `useEffect` would be called every time it rendered even
+ * though the contents of `filters` has not changed.
+ *
+ * ### Trigger: Automatic vs Manual
+ *
+ * We consider `useAsync` to have two execution modes: 'manual' (called explicitly by you) or 'automatic' (called
+ * by `useAsync` when the arguments change). This is controlled with the `trigger` option.
+ *
+ *  - _manual_ (`trigger="MANUAL"`) - This is the default. The function is only triggered explicitly by calling `run`
+ *  - _automatic_ (`trigger="DEEP"` or `trigger="SHALLOW"`) - the function is called by `useAsync` when it's
+ *  first called and then whenever argument values change (changes detected using either deep or shallow comparison).
+ *
+ * For mutations (e.g. update or delete a record) you usually want `"MANUAL"` as it is triggered in response to some
+ * user action like pressing a button.
+ *
+ * For data fetching you typically want `"DEEP"` or `"SHALLOW"` as you retrieve some data
+ * when the component first renders. You then want it to call the function again when some arguments change (eg. the id
+ * for a single record or the filters for a list of records).
+ *
+ * ### Manual Trigger
+ *
+ * In manual mode (`trigger="MANUAL"` - the default) you must call `run` whenever you want the function to be called.
+ *
+ * ```js
+ * const { run, isLoading, result, error, reset } = useAsync(() => doSomething());
+ * // .....
+ * <Button onClick={() => run()}>Click me</Button>
+ * ```
+ *
+ * Nothing will happen until the button is pressed. Once it's pressed `isLoading` will be
+ * true until the promise returned by `doSomething` resolves. Once the promise resolves
+ * one of `result` or `error` will be set depending on whether the promise resolved or rejected.
+ *
+ * `reset` can be called to clear the `result` and `error`.
+ *
+ * ### Automatic Trigger
+ *
+ * The other two `trigger` values  are `trigger="SHALLOW"` and `trigger="DEEP"`. These refer to how arguments are compared
+ * to detect any change.
+ *
+ * `"SHALLOW"` will compare an object 1 level deep (e.g. `{ name: 'Bob' }` will shallowly equal `{ name: 'Bob' }`).
+ *
+ * `"DEEP"` will deeply compare objects (e.g. `{ name: 'Bob', address: { country: 'AU' } }` will deeply equal
+ * `{ name: 'Bob', address: { country: 'AU' } }`). `"DEEP"` will be slower in some cases.
+ *
+ * When using either of these `useAsync` does the following:
+ *
+ * * When the hook first runs it will always execute the function
+ * * When either the function changes, or any value in the `args` array changes (as determined by the equality check described
+ *    above), then the function will be called again.
+ *
+ * You can also manually call the function at any time.
+ *
+ * ```js
+ * function AutoExample() {
+ *     const { run, isLoading, result, error, reset } = useAsync(doSomething, { trigger: 'SHALLOW', args: [1, 2]});
+ *
+ *     if (error) {
+ *         return <Error error={error} />;
+ *     }
+ *     if (isLoading && !result) {
+ *         return <Loading />;
+ *     }
+ *
+ *     return (
+ *      <>
+ *          <Results result={result} />
+ *          <Button onClick={() => run()}>Refresh</Button>
+ *      </>
+ *     );
+ * }
+ * ```
+ *
+ * <Alert>
+ *     NOTE: Both the function and arguments are checked for changes. This means the following would always be
+ *     detected as a change as the function is defined inline:
+ *
+ *     ```js
+ *     useAsync(() => doSomething("my argument"), { trigger: 'SHALLOW' });
+ *     ```
+ *
+ *     Make sure you memoize these as required:
+ *
+ *     ```js
+ *     // Use useMemo to avoid redefining the method each time
+ *     useAsync(useMemo(() => doSomething("my argument"), []))
+ *     // Or use `args` to pass arguments and remove the need for an arrow function
+ *     useAsync(doSomething, { args: ["my argument", trigger: 'SHALLOW' ]});
+ *     ```
+ *
+ *     This only applies to a `trigger` value of "SHALLOW" or "DEEP" - for "MANUAL" it doesn't matter.
+ * </Alert>
+ *
+ * ### Dynamic Trigger
+ *
+ * You can also change the trigger mode as required. For example, you may want the function to be
+ * called when a certain value is present but otherwise do nothing:
+ *
+ * ```js
+ * function RecordDetail({ id }) {
+ *     const { result, isLoading, error } = useAsync(
+ *       getRecord,
+ *       {
+ *          args: [id],
+ *          // Don't trigger the call until we have an id
+ *          trigger: id != null ? 'SHALLOW' : 'MANUAL'
+ *       }
+ *     );
+ *     if (id == null) {
+ *         return null;
+ *     }
+ *     if (isLoading) return <Loading />
+ *     if (error) return <Error error={error} />;
+
+ *     return <Details record={result} />;
+ * }
+ * ```
+ *
+ * You can use this to avoid having to add the conditional logic into `getRecord`.
+ *
+ * <Alert type="info">
+ *     ### useAsync* flavours
+ *
+ *     Presto offers 3 hooks for dealing with async functions. In most cases you
+ *     want [useAsync](doc:useAsync) but the other 2 hooks are useful for very
+ *     specific use cases:
+ *
+ *     * [useAsyncValue](doc:useAsyncValue) - use this if you have id(s) that
+ *       you need to resolve to value(s) from a local cache (`existingValues`) if
+ *       available, otherwise resolve the value by calling the provided async function.
+ *     * [useAsyncListing](doc:useAsyncListing) - use this when you want to fetch
+ *       paginated data and "accumulate" the results as each page is retrieved. For
+ *       instance implementing an infinite scroll list.
+ *
+ *     Otherwise, just stick with [useAsync](doc:useAsync).
+ * </Alert>
+ *
  * @param fn A function that returns a promise. When `trigger` is `MANUAL` this is only
  * called when you manually call the returned `run` function, otherwise it's called
  * initially and then whenever an equality comparison fails between previous arguments and new
  * arguments. Note that when `trigger` is `SHALLOW` or `DEEP` changes to this function will
- * cause it to be called again so you must memoize it (eg. with `useCallback`) if it's defined
+ * cause it to be called again, so you must memoize it (e.g. with `useCallback`) if it's defined
  * in your component or hook. To help detect runaway effects caused by this automatically
  * consider using [stop-runaway-react-effects](https://github.com/kentcdodds/stop-runaway-react-effects).
  *
  * @typeParam ResultT The type of the result returned by `fn`.
  * @typeParam ErrorT The type of the error in the case the promise returned by `fn` rejects
+ * @typeParam ArgsT The type of the arguments passed to `fn`.
  *
  * @extract-docs
  */
-function useAsync<ResultT, ErrorT = Error>(
-    fn: (...args: Array<any>) => Promise<ResultT>,
-    options: UseAsyncOptions<ResultT, ErrorT> = {}
+function useAsync<ResultT, ErrorT = any, ArgsT extends any[] = any[]>(
+    fn: AsyncFunction<ResultT, ArgsT>,
+    options: UseAsyncOptions<ResultT, ErrorT, ArgsT> = {}
 ): UseAsyncReturnObject<ResultT, ErrorT> {
     const { trigger = MANUAL, args = [], onSuccess, onError } = options;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
