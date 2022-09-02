@@ -396,8 +396,8 @@ const comparisonByTrigger = {
  *     Make sure you memoize these as required:
  *
  *     ```js
- *     // Use useMemo to avoid redefining the method each time
- *     useAsync(useMemo(() => doSomething("my argument"), []))
+ *     // Use useCallback to avoid redefining the method each time
+ *     useAsync(useCallback(() => doSomething("my argument"), []))
  *     // Or use `args` to pass arguments and remove the need for an arrow function
  *     useAsync(doSomething, { args: ["my argument", trigger: 'SHALLOW' ]});
  *     ```
