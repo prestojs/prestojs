@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+* Fix to `InferredPaginator` that meant accessing state could be stale due to React 18 batching causing problems (eg. in `useAsyncListing`). 
+
 ## [0.0.33] - 2022-08-31
 
 ### Changed
