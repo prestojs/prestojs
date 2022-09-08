@@ -14,7 +14,11 @@ function identifiableGetId(item: Identifiable | any, fallbackGetId?: (item: any)
     }
 }
 
-export type UseAsyncValueCommonProps<T, U extends Id> = {
+/**
+ * @typeParam ItemType @inherit
+ * @typeParam IdType @inherit
+ */
+export type UseAsyncValueCommonProps<ItemType, IdType extends Id> = {
     /**
      * An optional array of existing values to try and find the value in.
      *
@@ -26,16 +30,27 @@ export type UseAsyncValueCommonProps<T, U extends Id> = {
      * eg.
      *
      * ```js
-     * const existingValues = useViewModelCache(User, cache => cache.get(id, fieldNames));
+     * const existingValues = useViewModelCache(User, cache => cache.getAll(fieldNames));
      * const { value } = useAsyncValue({ id, existingValues, resolve: fetchUser });
      * ```
+     *
+     * <Alert>
+     *   This is never updated by `useAsyncValue` - if a value is resolved using `resolve`
+     *   and then is requested again it will go through `resolve` once more unless `existingValues`
+     *   is changed. When using [useViewModelCache](doc:useViewModelCache) this would happen
+     *   automatically so long as `resolve` adds the value to the cache (e.g. by using an [Endpoint](doc:Endpoint) with
+     *   [viewModelCachingMiddleware](doc:viewModelCachingMiddleware)).
+     * </Alert>
      */
-    existingValues?: T[];
+    existingValues?: ItemType[];
     /**
      * A function that returns a unique ID for each item in `existingValues`. Only
      * required if each item does not implement [Identifiable](doc:Identifiable).
+     *
+     * Note that [ViewModel](doc:viewModelFactory) implements this and so isn't required
+     * when passing `ViewModel` records.
      */
-    getId?: (item: T) => U;
+    getId?: (item: ItemType) => IdType;
     /**
      * When to trigger the fetch. Defaults to `DEEP` which means whenever `id`
      * or `ids` changed it will refetch if the value hasn't already been resolved.
@@ -48,7 +63,7 @@ export type UseAsyncValueCommonProps<T, U extends Id> = {
      * Called when `resolve` resolves successfully. Is passed a single parameter which
      * is the value returned from `resolve`
      */
-    onSuccess?: (response: T) => void;
+    onSuccess?: (response: ItemType) => void;
     /**
      * Called when `resolve` errors. Passed the error returned from `resolve`.
      */
@@ -57,48 +72,60 @@ export type UseAsyncValueCommonProps<T, U extends Id> = {
 
 /**
  * @expand-properties
+ * @typeParam ItemType @inherit
+ * @typeParam IdType @inherit
  */
-export type UseAsyncValuePropsSingle<T, U extends Id> = UseAsyncValueCommonProps<T, U> & {
+export interface UseAsyncValuePropsSingle<ItemType, IdType extends Id>
+    extends UseAsyncValueCommonProps<ItemType, IdType> {
     /**
      * Single `id` for value to fetch or null if nothing yet to resolve.
      *
      * If you need to resolve multiple values use the other form documented
      * below passing `ids` instead.
      */
-    id: U | null;
+    id: IdType | null;
     /**
      * Resolve the value for the provided ID. Function is passed a single parameter
      * being `id`.
      *
      * Note that when `trigger` is `DEEP` changes to this function will cause it
-     * to be called again so you must memoize it (eg. with `useCallback`) if it's
+     * to be called again, so you must memoize it (.eg. with `useCallback`) if it's
      * defined in your component or hook.
      */
-    resolve: (id: U) => Promise<T>;
-};
+    resolve: (id: IdType) => Promise<ItemType>;
+}
 
 /**
  * @expand-properties
+ * @typeParam ItemType @inherit
+ * @typeParam IdType @inherit
  */
-export type UseAsyncValuePropsMulti<T, U extends Id> = UseAsyncValueCommonProps<T, U> & {
+export interface UseAsyncValuePropsMulti<ItemType, IdType extends Id>
+    extends UseAsyncValueCommonProps<ItemType, IdType> {
     /**
      * Array of ids to resolve values for or null if nothing yet to resolve
      *
      * If you need to resolve a single value use the other form documented above
      * passing `id` instead
      */
-    ids: U[] | null;
+    ids: IdType[] | null;
     /**
      * Resolve the value for the provided IDs. Function is passed a single parameter
-     * being `ids`
+     * being `ids`. Note that if this function is called it will be passed _all_ ids, even
+     * if they could be resolved from `existingValues`. If you only want to resolve values
+     * not already in `existingValues` you need to handle that here. See [Multiple ViewModel records](#example-02-multiple-values)
+     * for an example of doing that.
      */
-    resolve: (ids: U[]) => Promise<T[]>;
-};
+    resolve: (ids: IdType[]) => Promise<ItemType[]>;
+}
 
-export type UseAsyncValueReturn<T> = {
+/**
+ * @typeParam ReturnItemType The type of the return item(s). If `id` is passed it will be a singular type otherwise if `ids` was passed it will be array type.
+ */
+export type UseAsyncValueReturn<ReturnItemType> = {
     /**
      * Set to the rejected value of the promise. Only one of `error` and `value` can be set. If
-     * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
+     * `isLoading` is true consider this stale (i.e. based on _previous_ props). This can be useful
      * when you want the UI to show the previous value until the next value is ready.
      */
     error: null | Error;
@@ -107,9 +134,9 @@ export type UseAsyncValueReturn<T> = {
      */
     isLoading: boolean;
     /**
-     * The resolved value
+     * The resolved item(s) that match the supplied id(s).
      */
-    value: T | null;
+    value: ReturnItemType | null;
     /**
      * A function to manually trigger the action. If `options.trigger` is `MANUAL`
      * calling this function is the only way to trigger the action.
@@ -131,6 +158,15 @@ export type UseAsyncValueReturn<T> = {
 };
 
 /**
+ * Specialised version of [useAsync](doc:useAsync) for retrieving value(s) from a local cache (`existingValues`) if
+ * available otherwise resolving them from some external source.
+ *
+ * <Alert>
+ *     Unless you are passing `existingValues`, or are writing a hook/component
+ *     that may use that option based on its props, you don't need this hook and
+ *     should just use [useAsync](doc:useAsync).
+ * </Alert>
+ *
  * Resolve a value from an id using an async function.
  *
  * For the specified `id` the `resolve` function will be called and should
@@ -144,12 +180,14 @@ export type UseAsyncValueReturn<T> = {
  * For multiple values see documentation below.
  *
  * @extract-docs
+ * @typeParam ItemType The type of the item that matches the id
+ * @typeParam IdType The type of the ID (e.g. `number`)
  */
-export default function useAsyncValue<T, U extends Id>(
-    props: UseAsyncValuePropsSingle<T, U>
-): UseAsyncValueReturn<T>;
+export default function useAsyncValue<ItemType, IdType extends Id>(
+    props: UseAsyncValuePropsSingle<ItemType, IdType>
+): UseAsyncValueReturn<ItemType>;
 /**
- * Resolve values from an array of ids using an async function.
+ * The second form of `useAsyncValue` that accepts an array of `ids`.
  *
  * For the specified array of `ids` the `resolve` function will be called
  * and should return an array of the same size with each entry being the resolved
@@ -161,17 +199,20 @@ export default function useAsyncValue<T, U extends Id>(
  * be returned immediately. Note that if any of the ids are missing from
  * `existingValues` then it will be ignored and a call to `resolve` will be made
  * requesting values for all `ids`.
+ *
+ * @typeParam ItemType The type of each item that matches the ids
+ * @typeParam IdType The type of the ID (e.g. `number`)
  */
-export default function useAsyncValue<T, U extends Id>(
-    props: UseAsyncValuePropsMulti<T, U>
-): UseAsyncValueReturn<T[]>;
-export default function useAsyncValue<T, U extends Id>(
-    props: UseAsyncValueCommonProps<T, U> & {
-        id?: U | null;
-        ids?: U[] | null;
-        resolve: (idOrIds: U | U[]) => Promise<T[] | T>;
+export default function useAsyncValue<ItemType, IdType extends Id>(
+    props: UseAsyncValuePropsMulti<ItemType, IdType>
+): UseAsyncValueReturn<ItemType[]>;
+export default function useAsyncValue<ItemType, IdType extends Id>(
+    props: UseAsyncValueCommonProps<ItemType, IdType> & {
+        id?: IdType | null;
+        ids?: IdType[] | null;
+        resolve: (idOrIds: IdType | IdType[]) => Promise<ItemType[] | ItemType>;
     }
-): UseAsyncValueReturn<T | T[]> {
+): UseAsyncValueReturn<ItemType | ItemType[]> {
     const { id, ids, getId, resolve, trigger = useAsync.DEEP, onSuccess, onError } = props;
     if (id && ids) {
         throw new Error("Only one of 'id' and 'ids' should be provided");
@@ -214,7 +255,7 @@ export default function useAsyncValue<T, U extends Id>(
         isLoading,
         error,
         result: resolvedValue,
-    } = useAsync<T | T[], Error>(resolve, {
+    } = useAsync<ItemType | ItemType[], Error>(resolve, {
         args: [id || ids],
         trigger: isValueMissing ? trigger : useAsync.MANUAL,
         onSuccess,
@@ -231,7 +272,7 @@ export default function useAsyncValue<T, U extends Id>(
     // If we don't have id/ids we should never return a value
     // Otherwise return the value if it exists in existingChoices otherwise value
     // returned from `resolve` (if any)
-    let finalValue: T | T[] | null = null;
+    let finalValue: ItemType | ItemType[] | null = null;
     if (id || ids) {
         if (valueInChoices) {
             finalValue = valueInChoices;
