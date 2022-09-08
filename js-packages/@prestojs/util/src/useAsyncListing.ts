@@ -22,7 +22,7 @@ type UseAsyncListingExecuteProps = {
  * @expand-properties
  * @export-in-docs
  */
-export type UseAsyncListingProps<T> = {
+export type UseAsyncListingProps<ResultT> = {
     /**
      * When to trigger the fetch. Defaults to `DEEP` which means whenever a deep
      * equality check on `query` or `paginator` state fails it will refetch.
@@ -64,13 +64,13 @@ export type UseAsyncListingProps<T> = {
      * to be called again so you must memoize it (eg. with `useCallback`) if it's
      * defined in your component or hook.
      */
-    execute: (props: UseAsyncListingExecuteProps) => Promise<T>;
+    execute: (props: UseAsyncListingExecuteProps) => Promise<ResultT>;
 };
 
 /**
  * @export-in-docs
  */
-type UseAsyncListingReturnCommon<T> = {
+export type UseAsyncListingReturn<T> = {
     /**
      * True while `execute` call is in progress.
      */
@@ -94,56 +94,70 @@ type UseAsyncListingReturnCommon<T> = {
      * to the value of `trigger`.
      */
     reset: () => void;
+    /**
+     * Set to the rejected value of the promise. Only one of `error` and `result` can be set. If
+     * `isLoading` is true consider this stale (i.e. it's the error from the _previous_ props). This can
+     * be useful when you want the UI to show the previous value until the next value is ready.
+     *
+     * Until first call has resolved neither error nor result will be set
+     */
+    error: null | Error;
+    /**
+     * The value returned from execute.
+     *
+     * Only one of `error` and `result` can be set. If `isLoading` is true consider this stale
+     * (i.e. it's the result from the _previous_ props). This can be useful when you want the UI to show
+     * the previous value until the next value is ready.
+     *
+     * Until first call has resolved neither error nor result will be set
+     */
+    result: null | T;
 };
 
 /**
- * @export-in-docs
- */
-export type UseAsyncListingReturn<T> =
-    | (UseAsyncListingReturnCommon<T> & {
-          /**
-           * Until first call has resolved neither error nor result will be set
-           */
-          error: null;
-          result: null;
-      })
-    | (UseAsyncListingReturnCommon<T> & {
-          /**
-           * Set to the rejected value of the promise. Only one of `error` and `result` can be set. If
-           * `isLoading` is true consider this stale (ie. based on _previous_ props). This can be useful
-           * when you want the UI to show the previous value until the next value is ready.
-           */
-          error: Error;
-          /**
-           * Result will not be set when error is set
-           */
-          result: null;
-      })
-    | (UseAsyncListingReturnCommon<T> & {
-          /**
-           * Error will not be set when result is set
-           */
-          error: null;
-          /**
-           * The value returned from execute
-           */
-          result: T;
-      });
-
-/**
- * Execute an asynchronous call and return the value which can optionally be paginated.
+ * Specialised version of [useAsync](doc:useAsync) for retrieving a list of paginated values and optionally
+ * accumulating them as the next page is retrieved (e.g. for things like [infinite scroll](#example-01-list)).
  *
- * If the result is paginated you can pass `paginator`. Whenever the paginator state
- * is changed the function will be called unless `trigger` is `MANUAL`. You can pass
- * `accumulatePages` to accumulate results for sequential pages returned from `execute`.
- * This is useful to implement things like infinite scroll. If a non-sequential page
- * is accessed or `query` changes then accumulated results will be cleared.
+ * <Alert>
+ *     Unless you are using `paginator` with `accumulatePages`, or are writing a hook/component
+ *     that may use those options based on its props, you don't need this hook and
+ *     should just use [useAsync](doc:useAsync).
+ * </Alert>
+ *
+ * <Usage>
+ * While it can work with any async function the typical usage would be to use it with an [Endpoint](doc:Endpoint)
+ * that has [paginationMiddleware](doc:paginationMiddleware) applied.
+ *
+ * ```js
+ *  const list = new Endpoint('/list', { middleware: [paginationMiddleware()] });
+ *
+ *  function Example() {
+ *   const paginator = usePaginator(list);
+ *   const execute = useCallback(async args => {
+ *       return (await list.execute(args)).result;
+ *   }, []);
+ *   const { result, isLoading, error } = useAsyncListing({
+ *       execute,
+ *       paginator,
+ *       accumulatePages: true,
+ *   });
+ *
+ *   if (isLoading) return <Loading />
+ *   if (error) return <Error error={error} />;
+ *
+ *   return <List items={result} paginator={paginator} />;
+ * }
+ * ```
+ *
+ * See [the infinite scroll demo](#example-01-list) for a full working example.
+ * </Usage>
  *
  * @extract-docs
+ * @typeParam ResultT The type of the result returned by `execute`.
  */
-export default function useAsyncListing<T extends Array<any>>(
-    props: UseAsyncListingProps<T>
-): UseAsyncListingReturn<T> {
+export default function useAsyncListing<ResultT extends Array<any>>(
+    props: UseAsyncListingProps<ResultT>
+): UseAsyncListingReturn<ResultT> {
     const {
         trigger = 'DEEP',
         query = {},
@@ -174,7 +188,7 @@ export default function useAsyncListing<T extends Array<any>>(
         result,
         isLoading,
         error,
-    } = useAsync(async (): Promise<T> => {
+    } = useAsync(async (): Promise<ResultT> => {
         // If paginator state has changed to anything except the next value we have to reset accumulator
         if (
             paginator &&
@@ -204,7 +218,7 @@ export default function useAsyncListing<T extends Array<any>>(
             accumulatePages &&
             !shouldResetAccumulatedValues.current
         ) {
-            return [...(result || []), ...executeResult] as unknown as T;
+            return [...(result || []), ...executeResult] as unknown as ResultT;
         }
         shouldResetAccumulatedValues.current = false;
         return executeResult;
@@ -284,5 +298,5 @@ export default function useAsyncListing<T extends Array<any>>(
         isLoading,
         paginator,
         error,
-    } as UseAsyncListingReturn<T>;
+    } as UseAsyncListingReturn<ResultT>;
 }

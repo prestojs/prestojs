@@ -22,10 +22,11 @@ export type PaginatorState =
  * @extract-docs
  */
 export default class InferredPaginator
-    implements PaginatorInterface<PaginatorState, Record<string, any>> {
+    implements PaginatorInterface<PaginatorState, Record<string, any>>
+{
     __paginator?: CursorPaginator | PageNumberPaginator | LimitOffsetPaginator;
     get responseIsSet(): boolean {
-        return !!this.internalState.responseIsSet;
+        return !!this.internalState?.responseIsSet;
     }
 
     /**
@@ -188,17 +189,29 @@ export default class InferredPaginator
         [internalState, setInternalState]
     ): void {
         this.currentState = currentState || {};
-        this.setCurrentState = setCurrentState;
+        this.setCurrentState = (nextState): void => {
+            // If multiple setCurrentState occur before the first is committed then
+            // any reads of `this.currentState` will return the previous value (the
+            // last time `replaceStateControllers` was called). Update the `currentState`
+            // immediately when `setCurrentState` is called. This ensures any reads
+            // use the latest value until it's replaced by the next call to
+            // `replaceStateControllers`.
+            // TODO: https://github.com/prestojs/prestojs/issues/176
+            this.currentState = nextState;
+            setCurrentState(nextState);
+        };
         this.internalState = internalState || {};
         this.setInternalState = (nextState): void => {
             // As the paginator can be recreated at any time all persistent state has to be in internalState. As such
             // we just store the class to use in internalState. When we access `paginator` we create a new instance
             // as required.
             const paginatorClass = this.paginator ? this.paginator.constructor : null;
-            setInternalState({
+            this.internalState = {
                 ...nextState,
+                responseIsSet: true,
                 paginatorClass,
-            });
+            };
+            setInternalState(this.internalState);
         };
         if (this.paginator) {
             this.paginator.replaceStateControllers(
