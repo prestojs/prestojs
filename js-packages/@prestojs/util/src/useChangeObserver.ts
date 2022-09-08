@@ -9,7 +9,7 @@ export type ChangeObserverOptions<T> = {
      * Function to determine equality between items. If not provided the default will do shallow
      * equality checks with specific support for an `isEqual` function on objects (eg. if an object
      * implements `isEqual` it will be called instead of doing any other comparisons. This is
-     * supported by [ViewModel](doc:viewModelFactory).
+     * supported by [ViewModel](doc:viewModelFactory)).
      */
     isEqual?: (a: T, b: T) => boolean;
     /**
@@ -42,6 +42,10 @@ const NOT_SET = Symbol.for('useChangeObserver/NOT_SET');
  *   </>;
  * }
  * ```
+ *
+ * <Alert type="info">
+ *     For more advanced monitoring of lists of values see [useListChangeObserver](doc:useListChangeObserver).
+ * </Alert>
  *
  * @param value The value to monitor for changes. This can be any type but for complex
  * types you will need to provide your own `isEqual` function. For simple shallow
