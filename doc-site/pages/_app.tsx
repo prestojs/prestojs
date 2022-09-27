@@ -16,10 +16,14 @@ function MyApp({ Component, pageProps, router, ...rest }: AppProps) {
             const resizeObserver = new ResizeObserver(entries => {
                 // Notify parent when height changes. CodeExamples.js uses this to adjust
                 // size of frame.
+                const { clientHeight } = entries[0].target;
+                if (clientHeight === 0) {
+                    return;
+                }
                 window.parent.postMessage(
                     JSON.stringify({
                         type: 'height-change',
-                        height: entries[0].target.clientHeight,
+                        height: clientHeight,
                     }),
                     '*'
                 );
