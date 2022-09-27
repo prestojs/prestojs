@@ -62,7 +62,7 @@ type TimeFormatterProps = {
  *
  * This is the [default formatter](doc:getFormatterForField) used for [TimeField](doc:TimeField)
  *
- * See also [parseTime](doc:parseTime) and [formatTime])(doc:formatTime)
+ * See also [parseTime](doc:parseTime) and [formatTime](doc:formatTime)
  *
  * @extract-docs
  * @menu-group Formatters
