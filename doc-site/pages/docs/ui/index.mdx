@@ -102,7 +102,9 @@ import { getFormatterForField as defaultGetFormatterForField } from '@prestojs/u
 function getFormatterForField(field) {
     if (field instanceof BooleanField) {
         // You can just return the formatter component directly but it's good practice to return
-        // the component & `field.getFormatterProps` which allows per field customisations.
+        // the component & `field.getFormatterProps` which allows per field customisations. See
+        // example further below where `formatterProps` are passed to a field for how this can
+        // be used.
         return [BooleanEmojiFormatter, field.getFormatterProps()];
     }
     // Fall back to the default implementation
@@ -124,7 +126,13 @@ function getFormatterForField(field) {
     if (field instanceof BooleanField) {
         return [
             BooleanFormatter,
-            { trueLabel: '✅', falseLabel: '❌', blankLabel: '❓', ...field.getFormatterProps() },
+            {
+                trueLabel: '✅',
+                falseLabel: '❌',
+                blankLabel: '❓',
+                // Include this last so individual fields can override that above defaults
+                ...field.getFormatterProps(),
+            },
         ];
     }
     // Fall back to the default implementation

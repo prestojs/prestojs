@@ -25,7 +25,7 @@ function getFormatterForField(field): FormatterComponentDefinition | null {
             {
                 localeOptions: { style: 'currency', currency: 'USD', currencyDisplay: 'code' },
                 // It's good practice to always pass this through so any per field customisations
-                // are respected
+                // are respected. Include this last so individual fields can override the above defaults
                 ...field.getFormatterProps(),
             },
         ];
