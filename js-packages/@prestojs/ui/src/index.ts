@@ -21,6 +21,7 @@ import type {
     WidgetProps,
 } from './FieldWidgetInterface';
 import type {
+    FormatterComponentDefinition,
     FormItemProps,
     FormProps,
     TopLevelUiContextValue,
@@ -38,4 +39,5 @@ export type {
     UiContextValue,
     UiProviderProps,
     TopLevelUiContextValue,
+    FormatterComponentDefinition,
 };

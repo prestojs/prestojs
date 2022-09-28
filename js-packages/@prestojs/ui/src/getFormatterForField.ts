@@ -1,5 +1,6 @@
 import { Field } from '@prestojs/viewmodel';
 import React from 'react';
+import type { FormatterComponentDefinition } from './UiProvider';
 
 const LinkFormatter = React.lazy(() => import('./formatters/LinkFormatter'));
 const RangeFormatter = React.lazy(() => import('./formatters/RangeFormatter'));
@@ -83,21 +84,18 @@ type WidgetComponent<T> =
  *
  * @extract-docs
  */
-export default function getFormatterForField<
-    FieldValue,
-    ParsableValueT,
-    SingleValueT,
-    T extends HTMLElement
->(field: Field<FieldValue, ParsableValueT, SingleValueT>): WidgetComponent<T> | null {
+export default function getFormatterForField<FieldValue, ParsableValueT, SingleValueT>(
+    field: Field<FieldValue, ParsableValueT, SingleValueT>
+): FormatterComponentDefinition<FieldValue> | null {
     const { fieldClassName } = Object.getPrototypeOf(field).constructor;
     const formatter: React.FunctionComponent | string | null | undefined = field.choices
         ? choicesMapping.get(fieldClassName) || mapping.get(fieldClassName)
         : mapping.get(fieldClassName);
 
     const getReturnWithChoices = (
-        w: WidgetComponent<T>,
+        w: FormatterComponentDefinition<FieldValue>,
         f: Field<FieldValue, ParsableValueT, SingleValueT>
-    ): WidgetComponent<T> => {
+    ): FormatterComponentDefinition<FieldValue> => {
         if (f.choices) {
             if (Array.isArray(w)) {
                 return [w[0], { ...f.getFormatterProps(), ...w[1], choices: f.choices }];
