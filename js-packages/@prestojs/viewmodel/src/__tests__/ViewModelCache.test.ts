@@ -2970,7 +2970,7 @@ test('should support manual nested batching', async () => {
 });
 
 test('many fields should work with empty list of ids', async () => {
-    const { User, Group } = createTestModels(true, true);
+    const { User } = createTestModels(true, true);
     await User.fields.group.resolveViewModel();
 
     const cb = jest.fn();

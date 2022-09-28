@@ -65,11 +65,6 @@ const choicesMapping = new Map<string, any>([
     ['IntegerField', ChoiceFormatter],
 ]);
 
-type WidgetComponent<T> =
-    | React.ComponentType<T>
-    | [React.ComponentType<T> | string, Record<string, unknown>]
-    | string;
-
 /**
  * Returns the default formatter for a given [Field](doc:Field).
  *
