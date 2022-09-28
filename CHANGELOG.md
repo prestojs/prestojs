@@ -5,6 +5,7 @@
 ### Changed
 
 * Fix to `InferredPaginator` that meant accessing state could be stale due to React 18 batching causing problems (eg. in `useAsyncListing`). 
+* Fix types for `getFormatterForField`. Previously required props to extend `HTMLElement` which didn't make sense - see [#179](https://github.com/prestojs/prestojs/issues/179)
 
 ## [0.0.33] - 2022-08-31
 

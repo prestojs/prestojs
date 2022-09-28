@@ -1,4 +1,13 @@
-import { FieldFormatter, NumberFormatter, UiProvider } from '@prestojs/ui';
+/**
+ * FieldFormatter usage
+ */
+import {
+    FieldFormatter,
+    FormatterComponentDefinition,
+    getFormatterForField as defaultGetFormatterForField,
+    NumberFormatter,
+    UiProvider,
+} from '@prestojs/ui';
 import {
     BooleanField,
     CharField,
@@ -7,17 +16,18 @@ import {
     viewModelFactory,
 } from '@prestojs/viewmodel';
 import React from 'react';
-// You can replace this with
-// import { getFormatterForField } from '@prestojs/ui';
-// We use custom version here to support nextjs (which is what doc site is written in)
-import defaultGetFormatterForField from '../../../../getFormatterForField';
 
-function getFormatterForField(field) {
+function getFormatterForField(field): FormatterComponentDefinition | null {
     // Provide override for CurrencyField
     if (field instanceof CurrencyField) {
         return [
             NumberFormatter,
-            { localeOptions: { style: 'currency', currency: 'USD', currencyDisplay: 'code' } },
+            {
+                localeOptions: { style: 'currency', currency: 'USD', currencyDisplay: 'code' },
+                // It's good practice to always pass this through so any per field customisations
+                // are respected. Include this last so individual fields can override the above defaults
+                ...field.getFormatterProps(),
+            },
         ];
     }
     // Otherwise fall back to defaults
@@ -29,7 +39,10 @@ class Product extends viewModelFactory(
         id: new NumberField(),
         name: new CharField(),
         price: new CurrencyField(),
-        active: new BooleanField({ label: 'Active?' }),
+        active: new BooleanField({
+            label: 'Active?',
+            formatterProps: { trueLabel: 'Active', falseLabel: 'In-active' },
+        }),
     },
     { pkFieldName: 'id' }
 ) {}

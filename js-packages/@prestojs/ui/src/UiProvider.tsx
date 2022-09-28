@@ -2,6 +2,20 @@ import { Field } from '@prestojs/viewmodel';
 import React, { useContext, useMemo } from 'react';
 import { FieldWidgetType } from './FieldWidgetInterface';
 
+interface FormatterComponentProps<ValueT> {
+    value?: ValueT;
+}
+
+/**
+ * A formatter component definition is either a regular component or a 2-element array where
+ * the first element is the component function and the second are the props that should be passed
+ * to that component.
+ */
+export type FormatterComponentDefinition<ValueT = any> =
+    | string
+    | React.ComponentType<FormatterComponentProps<ValueT>>
+    | [React.ComponentType<FormatterComponentProps<ValueT>> | string, Record<string, unknown>];
+
 type GetWidgetForField = <FieldValueT, ParsableValueT, SingleValueT, T extends HTMLElement>(
     field: Field<FieldValueT, ParsableValueT, SingleValueT>
 ) => FieldWidgetType<FieldValueT, T> | [FieldWidgetType<FieldValueT, T>, Record<string, unknown>];
@@ -13,22 +27,13 @@ type GetWidgetForFieldWithNull = <FieldValueT, ParsableValueT, SingleValueT, T e
     | [FieldWidgetType<FieldValueT, T>, Record<string, unknown>]
     | null;
 
-type GetFormatterForField = <FieldValueT, ParsableValueT, SingleValueT, T extends HTMLElement>(
+type GetFormatterForField = <FieldValueT, ParsableValueT, SingleValueT>(
     field: Field<FieldValueT, ParsableValueT, SingleValueT>
-) => string | React.ComponentType<T> | [React.ComponentType<T> | string, Record<string, unknown>];
+) => FormatterComponentDefinition;
 
-type GetFormatterForFieldWithNull = <
-    FieldValueT,
-    ParsableValueT,
-    SingleValueT,
-    T extends HTMLElement
->(
+type GetFormatterForFieldWithNull = <FieldValueT, ParsableValueT, SingleValueT>(
     field: Field<FieldValueT, ParsableValueT, SingleValueT>
-) =>
-    | string
-    | React.ComponentType<T>
-    | [React.ComponentType<T> | string, Record<string, unknown>]
-    | null;
+) => FormatterComponentDefinition | null;
 
 export interface FormItemProps {
     children: React.ReactNode;
@@ -123,7 +128,7 @@ export type UiProviderProps = {
  *
  * ```jsx
  * import React from 'react';
- * import { UiProvider, getFormatterForField } from '@prestojs/ui';
+ * import { UiProvider, getFormatterForField as defaultGetFormatterForField } from '@prestojs/ui';
  * import { Input } from 'antd';
  *
  * const DefaultWidget = ({ input }) => <input {...input} />;
@@ -144,7 +149,11 @@ export type UiProviderProps = {
  *     // if (field instanceof BooleanField) {
  *     //    return CustomBooleanFormatter;
  *     // }
- *     return DefaultFormatter;
+ *     const formatter = defaultGetFormatterForField(field)
+ *     if (!formatter) {
+ *         return DefaultFormatter;
+ *     }
+ *     return formatter;
  * }
  *
  * function FormItemWrapper({ children, label, help, required }) {
@@ -216,17 +225,23 @@ export default function UiProvider(props: UiProviderProps): React.ReactElement {
                 }
                 return widget;
             },
-            getFormatterForField<FieldValueT, ParsableValueT, SingleValueT, T extends HTMLElement>(
+            getFormatterForField<FieldValueT, ParsableValueT, SingleValueT>(
                 field: Field<FieldValueT, ParsableValueT, SingleValueT>
             ):
                 | string
-                | React.ComponentType<T>
-                | [React.ComponentType<T> | string, Record<string, unknown>]
+                | React.ComponentType<FormatterComponentProps<FieldValueT>>
+                | [
+                      React.ComponentType<FormatterComponentProps<FieldValueT>> | string,
+                      Record<string, unknown>
+                  ]
                 | null {
                 let formatter:
                     | string
-                    | React.ComponentType<T>
-                    | [React.ComponentType<T> | string, Record<string, unknown>]
+                    | React.ComponentType<FormatterComponentProps<FieldValueT>>
+                    | [
+                          React.ComponentType<FormatterComponentProps<FieldValueT>> | string,
+                          Record<string, unknown>
+                      ]
                     | null = null;
                 if (getFormatterForField) {
                     formatter = getFormatterForField(field);
