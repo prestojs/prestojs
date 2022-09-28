@@ -128,7 +128,7 @@ export type UiProviderProps = {
  *
  * ```jsx
  * import React from 'react';
- * import { UiProvider, getFormatterForField } from '@prestojs/ui';
+ * import { UiProvider, getFormatterForField as defaultGetFormatterForField } from '@prestojs/ui';
  * import { Input } from 'antd';
  *
  * const DefaultWidget = ({ input }) => <input {...input} />;
@@ -149,7 +149,11 @@ export type UiProviderProps = {
  *     // if (field instanceof BooleanField) {
  *     //    return CustomBooleanFormatter;
  *     // }
- *     return DefaultFormatter;
+ *     const formatter = defaultGetFormatterForField(field)
+ *     if (!formatter) {
+ *         return DefaultFormatter;
+ *     }
+ *     return formatter;
  * }
  *
  * function FormItemWrapper({ children, label, help, required }) {

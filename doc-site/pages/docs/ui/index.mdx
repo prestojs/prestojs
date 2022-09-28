@@ -5,25 +5,22 @@ export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
 
 # UI
 
-This package is concerned with providing high level components and a standard interface for customising form widgets
-and field formatters throughout the system. It doesn't provide much in terms of concrete implementations for the UI. Using the interfaces
-defined you can implement your own UI library or use a provided implementation (currently [@prestojs/ui-antd](/docs/ui-antd/) which
-integrates with [antd](https://ant.design)).
+This package is concerned with providing high level components and a standard interface for specifying how to render
+UI elements for [ViewModel](/docs/viewmodel) [Field's](doc:Field). For example, creating a form to collect data for
+a ViewModel or rendering the values of a ViewModel record.
 
-At the top level is [UiProvider](doc:UiProvider) which allows you to define the various UI specific components to use throughout
-the system. For example you can define the `formItemComponent` which is used by [@prestojs/final-form](/docs/final-form)
-or `getWidgetForField` which is used by [FieldWidget](doc:FieldWidget) to render the widget for a specific field.
+The UI components this package deals with are:
 
-[FieldFormatter](doc:FieldFormatter) is used for rendering the _value_ of a field on a form. For example the [ChoiceFormatter](doc:ChoiceFormatter)
-component renders the label for a selected choice field. This is generally used with a [ViewModel](doc:viewModelFactory) but
-doesn't have to be. `@prestojs/ui` provides implementations for this formatters as they generally just involve formatting a string
-or using standard HTML elements. To get the default implementation for a field see [getFormatterForField](doc:getFormatterForField).
+-   `formComponent` - The main form component that is used by form implementations (e.g. see [@prestojs/final-form](/docs/final-form))
+-   `formItemComponent` - The component to use for form 'items'. A form item is the input to collect a value for a field and any
+    relate information (e.g. the label for the field, help text, errors etc.).
+-   `widget` - a widget is a component used in a form to collect input from a user (e.g. a select or checkbox). This package provides a way
+    to map a [Field](doc:Field) to the widget component that should be used to render its value.
+-   `formatter` - a formatter is a component that takes a value and formats it for display. This package provides a way
+    to map a [Field](doc:Field) to the formatter component that should be used to render its value.
 
-[FieldWidget](doc:FieldWidget) is used for rendering the _input_ used to set the value in a form based on the type of a field.
-For example a [DateField](doc:DateField) may render as a calendar input widget as implemented by [DateWidget](doc:DateWidget).
-[FieldWidget](doc:FieldWidget) resolves the UI specific widget to use for a [Field](doc:Field). `@prestojs/ui` doesn't
-currently provide a default implementation for these as they tend to be highly specific. `@prestojs/ui-antd` provides an implementation
-for [antd](https://ant.design) or you can implement your own.
+This package provides concrete implementations for formatters (see [getFormatterForField](doc:getFormatterForField)). For
+form components you either need to provide an implementation or use [@prestojs/ui-antd](/docs/ui-antd) and [@prestojs/final-form](/docs/final-form).
 
 ---
 
@@ -33,25 +30,158 @@ for [antd](https://ant.design) or you can implement your own.
 yarn add @prestojs/ui
 ```
 
-Then you will need to add the [UiProvider](doc:UiProvider) at the top of your app. See [it's documentation](doc:UiProvider)
-for an example of this.
-
 ## Usage
 
-### Formatters
-
-A field formatter is just a component that accepts a `value` prop and renders it:
+At the top level is [UiProvider](doc:UiProvider) which allows you to define the various UI specific components to use throughout
+the system. For example you can define the `formItemComponent` which is used by [@prestojs/final-form](/docs/final-form)
+or `getWidgetForField` which is used by [FieldWidget](doc:FieldWidget) to render the widget for a specific field.
 
 ```js
-function UpperCaseFormatter({ value }) {
-    if (!value) {
-        return value;
-    }
-    return value.toUpperCase();
+function RootView() {
+    return (
+        <UiProvider
+            getFormatterForField={getFormatterForField}
+            getWidgetForField={getWidgetForField}
+            formItemComponent={FormItemWrapper}
+        >
+            <App />
+        </UiProvider>
+    );
 }
 ```
 
-When you use [FieldFormatter](doc:FieldFormatter) it just works out what formatter component to use based on what the
-`getFormatterForField` function on your [UiProvider](doc:UiProvider) returns.
+See [UiProvider](doc:UiProvider) for more details.
+
+### Formatters
+
+[FieldFormatter](doc:FieldFormatter) is used for rendering the _value_ of a field. For example the [ChoiceFormatter](doc:ChoiceFormatter)
+component renders the label for a selected choice field. This is generally used with a [ViewModel](doc:viewModelFactory) but
+doesn't have to be.
+
+```js
+class Person extends viewModelFactory(
+    {
+        id: new Field(),
+        isActive: new BooleanField({ label: 'Active?' }),
+    },
+    { pkFieldName: 'id' }
+) {}
+
+function PersonDetail({ person }) {
+    return (
+        <dl>
+            <dt>{Person.fields.isActive.label}</dt>
+            <dd>
+                <FieldFormatter field={person._f.isActive} />
+            </dd>
+        </dl>
+    );
+}
+```
+
+In the above example [BooleanFormatter](doc:BooleanFormatter) will be used as that's the default formatter for [BooleanField](doc:BooleanField).
+The advantage of this over hard-coding the formatter everywhere is you can change how a particular field type is formatted
+in a central location. If you wanted to change how `BooleanField` is formatted you could implement your own formatter. All
+a formatter is is a component that accepts, at minimum, a `value` prop:
+
+```js
+function BooleanEmojiFormatter({ value }) {
+    if (value == null || value == '') {
+        return <>'❓'</>;
+    }
+    return <>{value ? '✅' : '❌'}</>;
+}
+```
+
+To use this formatter everywhere a [BooleanField](doc:BooleanField) appears provide you own implementation of
+`getFormatterForField`:
+
+```js
+import { getFormatterForField as defaultGetFormatterForField } from '@prestojs/ui';
+
+function getFormatterForField(field) {
+    if (field instanceof BooleanField) {
+        // You can just return the formatter component directly but it's good practice to return
+        // the component & `field.getFormatterProps` which allows per field customisations.
+        return [BooleanEmojiFormatter, field.getFormatterProps()];
+    }
+    // Fall back to the default implementation
+    return defaultGetFormatterForField(field);
+}
+
+// Then pass this to the `UiProvider` that wraps your app
+<UiProvider getFormatterForField={getFormatterForField}>{...}</UiProvider>
+```
+
+As shown in the above example `getFormatterForField` can return a 2-element array of the form `[component, defaultProps]`.
+This allows you to inject props used on a component based on the field. We could rewrite the above to use the options
+provided by the existing [BooleanFormatter](doc:BooleanFormatter) component:
+
+```js
+import { getFormatterForField as defaultGetFormatterForField } from '@prestojs/ui';
+
+function getFormatterForField(field) {
+    if (field instanceof BooleanField) {
+        return [
+            BooleanFormatter,
+            { trueLabel: '✅', falseLabel: '❌', blankLabel: '❓', ...field.getFormatterProps() },
+        ];
+    }
+    // Fall back to the default implementation
+    return defaultGetFormatterForField(field);
+}
+```
+
+See [getFormatterForField](doc:getFormatterForField) for the default implementation.
+
+If you just need to override formatter props for a specific field you can pass that through to the field constructor
+itself using the `formatterProps` option. This is then returned by `field.getFormatterProps()`:
+
+```js
+new BooleanField({
+    label: 'Active?',
+    formatterProps: {
+        trueLabel: '✅',
+        falseLabel: '❌',
+        blankLabel: '❓',
+    },
+});
+```
 
 ### Widgets
+
+Widgets are conceptually similar to formatters but instead of rendering a value they are used to collect a value.
+For example a [DateField](doc:DateField) may render as a calendar input widget as implemented by [DateWidget](doc:DateWidget).
+
+[FieldWidget](doc:FieldWidget) resolves the UI specific widget to use for a [Field](doc:Field). `@prestojs/ui` doesn't
+currently provide a default implementation for these as they tend to be highly specific. `@prestojs/ui-antd` provides an implementation
+for [antd](https://ant.design) or you can implement your own.
+
+### Generic components
+
+With this structure in place you can write generic components that don't need to know the type of the field.
+
+For example, here's a view that renders all the fields on a record without know anything about the ViewModel.
+
+```js
+function RecordDetailView({ record }) {
+    return (
+        <dl>
+            {record._assignedFields.map(fieldName => {
+                const field = record._f[fieldName];
+                if (field.writeOnly || record._model.pkFieldNames.includes(fieldName)) {
+                    return null;
+                }
+                return (
+                    <React.Fragment key={fieldName}>
+                        <dt>{field.label}</dt>
+                        <dd>
+                            <FieldFormatter field={field} />
+                        </dd>
+                    </React.Fragment>
+                );
+            })}
+        </dl>
+    );
+}
+```
