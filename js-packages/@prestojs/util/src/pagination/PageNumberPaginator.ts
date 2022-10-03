@@ -224,6 +224,10 @@ export default class PageNumberPaginator extends Paginator<
      */
     setResponse({ total, pageSize }: { total: number; pageSize?: number }): void {
         this.setInternalState({ total });
+        if (!this.currentState.page) {
+            // If page hasn't been set do so now so `currentState` always contains it after response received.
+            this.setPage(1);
+        }
         if (pageSize && this.currentState.pageSize !== pageSize) {
             this.setPageSize(pageSize);
         }
