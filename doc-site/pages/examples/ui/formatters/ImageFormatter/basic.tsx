@@ -1,3 +1,6 @@
+/**
+ * Basic usage
+ */
 import { ImageFormatter } from '@prestojs/ui';
 import { useAsync } from '@prestojs/util';
 import React, { useState } from 'react';

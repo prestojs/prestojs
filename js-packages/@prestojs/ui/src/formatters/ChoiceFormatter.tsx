@@ -17,7 +17,7 @@ type ChoiceFormatterProps<T> = {
      */
     blankLabel?: ReactNode;
     /**
-     * What to render if `value` is not found in `choices`. By default this is considered a programming error and a warning
+     * What to render if `value` is not found in `choices`. By default, this is considered a programming error and a warning
      * is logged. If your use case supports invalid values pass `warnOnInvalidChoice={false}` to suppress the warning.
      */
     invalidChoiceLabel?: ReactNode;

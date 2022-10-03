@@ -1,3 +1,6 @@
+/**
+ * Basic usage
+ */
 import { NumberFormatter } from '@prestojs/ui';
 import React from 'react';
 

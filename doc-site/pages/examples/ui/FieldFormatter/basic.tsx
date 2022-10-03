@@ -1,5 +1,5 @@
 /**
- * FieldFormatter usage
+ * Basic usage
  */
 import {
     FieldFormatter,
@@ -41,6 +41,7 @@ class Product extends viewModelFactory(
         price: new CurrencyField(),
         active: new BooleanField({
             label: 'Active?',
+            // Specify props to pass through to formatter for this field
             formatterProps: { trueLabel: 'Active', falseLabel: 'In-active' },
         }),
     },

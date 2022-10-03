@@ -35,12 +35,26 @@ type BooleanFormatterProps = {
  *
  * This is the [default formatter](doc:getFormatterForField) used for [BooleanField](doc:BooleanField) and [NullableBooleanField](doc:NullableBooleanField).
  *
+ * <Usage>
+ *     Basic usage just requires passing the value through:
+ *
+ *    ```js
+ *    <BooleanFormatter value={false} />
+ *    ```
+ *
+ *    You can control what label is rendered each possible value (including blank values, e.g. `null` or `undefined`):
+ *
+ *    ```js
+ *    <BooleanFormatter blankLabel="❓" trueLabel={'✅'} falseLabel={'❌'} value={false} />
+ *    ```
+ * </Usage>
+ *
  * @extract-docs
  * @menu-group Formatters
  */
 export default function BooleanFormatter(props: BooleanFormatterProps): ReactElement {
     const { value, blankLabel = '', trueLabel = 'Yes', falseLabel = 'No' } = props;
-    if (value == null || ((value as unknown) as string) === '') {
+    if (value == null || (value as unknown as string) === '') {
         return <>{blankLabel}</>;
     }
     return <>{value ? trueLabel : falseLabel}</>;

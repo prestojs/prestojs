@@ -1,3 +1,6 @@
+/**
+ * Basic usage
+ */
 import { CharFormatter } from '@prestojs/ui';
 import React from 'react';
 

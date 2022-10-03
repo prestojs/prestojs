@@ -21,6 +21,21 @@ type ImageFormatterProps = {
  *
  * This is the [default formatter](doc:getFormatterForField) used for [ImageField](doc:ImageField)
  *
+ * <Usage>
+ *    Basic usage just requires passing the image URL through:
+ *
+ *    ```js
+ *    <ImageFormatter value="https://picsum.photos/200/300" />
+ *    ```
+ *    If no value is passed then, by default, nothing will be rendered. You can pass `blankLabel` to render a default
+ *    when no value is present:
+ *
+ *    ```js
+ *    <ImageFormatter blankLabel={<em>Not set</em>} />
+ *    ```
+ *
+ * </Usage>
+ *
  * @extract-docs
  * @menu-group Formatters
  */

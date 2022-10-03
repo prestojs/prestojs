@@ -1,5 +1,9 @@
+/**
+ * Basic usage
+ */
 import { LinkFormatter } from '@prestojs/ui';
 import { Button } from 'antd';
+import 'antd/es/button/style/index.css';
 import React from 'react';
 
 export default function Basic() {
@@ -16,7 +20,7 @@ export default function Basic() {
                 Specify <code>linkComponent</code> to change what component is used to render the
                 link
             </strong>
-            <LinkFormatter linkComponent={Button} value="https://prestojs.com">
+            <LinkFormatter linkComponent={Button} value="https://prestojs.com" type="primary">
                 Presto
             </LinkFormatter>
         </div>

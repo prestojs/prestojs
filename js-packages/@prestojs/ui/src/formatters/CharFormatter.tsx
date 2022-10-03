@@ -23,6 +23,22 @@ type CharFormatterProps = {
  * [TextField](doc:TextField), [SlugField](doc:SlugField), [IPAddressField](doc:IPAddressField), [UUIDField](doc:UUIDField) and
  * [JSONField](doc:JsonField)
  *
+ * <Usage>
+ *     Basic usage requires URL to be passed through in the `value` prop
+ *
+ *     ```js
+ *     <CharFormatter value="Cheese" />
+ *     ```
+ *
+ *     If no value is passed then, by default, nothing will be rendered. You can pass `blankLabel` to render a default
+ *     when no value is present:
+ *
+ *     ```js
+ *     <CharFormatter value={null} blankLabel={<em>Not set</em>} />
+ *     ```
+ *
+ * </Usage>
+ *
  * @extract-docs
  * @menu-group Formatters
  */

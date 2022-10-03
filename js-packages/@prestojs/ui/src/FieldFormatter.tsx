@@ -14,19 +14,70 @@ type FieldFormatterProps<FieldValueT, ParsableValueT, SingleValueT> = {
     /**
      * Value to format. If `field` is a [record bound field](doc:viewModelFactory#Accessors-_f) then this is not required.
      */
-    value?: FieldValueT;
+    value?: any;
     [rest: string]: any;
 };
 
 /**
- * For the given `Field` and `value` render the relevant Formatter for it.
+ * For the given [Field](doc:Field) and `value` render the relevant [Formatter](/docs/ui#Formatters) for it.
  *
- * Usage of this component requires [UiProvider](doc:UiProvider) to appear somewhere above it in the component hierarchy. You
- * must pass the `getFormatterForField` prop through which is what determines which component to use for a specific field.
+ * <Usage>
  *
- * `getFormatterForField` can return either a component directly or a 2-element array of the component and some props to pass
- * through to it. `FieldFormatter` handles rendering the returned component and passing through any extra props returned from
- * `getFormatterForField` or passed through to `Formatter`.
+ *     <Alert>
+ *        Usage of this component requires [UiProvider](doc:UiProvider) to appear somewhere above it in the component hierarchy
+ *     </Alert>
+ *
+ *     This component works by calling `getFormatterForField` provided by [UiProvider](doc:UiProvider) to get the component
+ *     to use and then will render that component passing `value` and any additional props passed to `FieldFormatter`.
+ *
+ *     There are two ways to pass the value through.
+ *
+ *     ### Pass field and value
+ *
+ *     For the below examples `Person` will be:
+ *
+ *     ```js
+ *     class Person extends viewModelFactory({
+ *         id: new Field(),
+ *         email: new EmailField(),
+ *     }, { pkFieldName: 'id' }) {
+ *
+ *     }
+ *     ```
+ *
+ *     You can pass the field class and value as separate props:
+ *
+ *     ```js
+ *     <FieldFormatter field={Person.fields.email} value="test@example.com" />
+ *     ```
+ *
+ *     ### Pass bound field
+ *
+ *     The other way to pass the value is using a [bound field](doc:viewModelFactory#Accessors-_f) which is the easiest
+ *     option if are dealing with an instance of a ViewModel, e.g.
+ *
+ *     ```js
+ *     person = new Person({ id: 1, email: 'test@example.com' });
+ *     ```
+ *
+ *     The usage then becomes:
+ *
+ *     ```js
+ *     <FieldFormatter field={person._f.email} />
+ *     ```
+ *
+ *     which is the equivalent of the previous example passing `field` and `value` separately. This works as `person._f`
+ *     contains versions of all `Person` fields with the `value` prop set to the value of that record. This is a convenient
+ *     way to pass around the `field` and `value` as a single prop.
+ *
+ *     Any additional arguments a formatter accepts can be passed through directly:
+ *
+ *     ```js
+ *     <FieldFormatter field={person._f.email} blankLabel={<em>No email</em>} />
+ *     ```
+ *
+ *     Note that it's up to the underlying formatter returned by `getFormatterForField` to support any extra props.
+ * </Usage>
  *
  * @extract-docs
  */
