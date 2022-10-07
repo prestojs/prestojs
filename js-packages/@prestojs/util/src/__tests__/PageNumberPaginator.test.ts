@@ -122,7 +122,7 @@ test('should handle changing page size', () => {
     expect(result.current.pageSizeState(10)).toEqual({ pageSize: 10 });
     expect(result.current.currentState).toEqual({ pageSize: 10 });
     act(() => result.current.setResponse({ total: 20 }));
-    expect(result.current.currentState).toEqual({ pageSize: 10 });
+    expect(result.current.currentState).toEqual({ page: 1, pageSize: 10 });
     act(() => result.current.setPageSize(5));
     expect(result.current.currentState).toEqual({ page: 1, pageSize: 5 });
     act(() => result.current.setPage(2));
@@ -149,6 +149,7 @@ test('should set responseIsSet', () => {
     expect(result.current.responseIsSet).toBe(false);
     act(() => result.current.setResponse({ total: 30, pageSize: 10 }));
     expect(result.current.responseIsSet).toBe(true);
+    expect(result.current.currentState).toEqual({ pageSize: 10, page: 1 });
 });
 
 test('should support hasNextPage', () => {
