@@ -199,7 +199,7 @@ export default function Type({ type, mode = 'FULL' }: Props) {
     }
     if (type.typeName === 'tuple') {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        return <Tuple type={type} />;
+        return <Tuple type={type} mode={mode} />;
     }
     if (type.typeName === 'indexedAccess') {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -264,7 +264,7 @@ export default function Type({ type, mode = 'FULL' }: Props) {
     return <>{type.typeName}</>;
 }
 
-function Tuple({ type }: { type: TupleType }) {
+function Tuple({ type, mode = 'FULL' }: { type: TupleType; mode: 'FULL' | 'COMPACT' }) {
     if (type.elements?.length) {
         const length = type.elements.length;
         return (
@@ -272,7 +272,7 @@ function Tuple({ type }: { type: TupleType }) {
                 [
                 {type.elements.map((t, i) => (
                     <React.Fragment key={i}>
-                        <Type type={t} />
+                        <Type type={t} mode={mode} />
                         {i < length - 1 && ', '}
                     </React.Fragment>
                 ))}
