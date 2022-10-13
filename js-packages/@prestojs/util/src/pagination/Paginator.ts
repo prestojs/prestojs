@@ -105,20 +105,79 @@ export interface PaginatorInterfaceClass<T extends PaginatorInterface = Paginato
     getPaginationState(requestDetails: PaginationRequestDetails): Record<string, any> | false;
 }
 
+export type PaginatorStatePair<State> = [
+    State,
+    (value: State | ((prevState: State) => State)) => void
+];
+
 /**
  * Base class for a paginator.
  *
+ * This class provides implementations for `isResponseSet` and `replaceStateControllers` - all other methods must be implemented
+ * by the descendant class.
+ *
+ * See [PageNumberPaginator](doc:PageNumberPaginator), [CursorPaginator](doc:CursorPaginator), [LimitOffsetPaginator](doc:LimitOffsetPaginator),
+ * and [InferredPaginator](doc:InferredPaginator) for full implementations.
+ *
+ * <Usage>
+ *     Internally a paginator class splits state storage into two separate buckets - `state` and `internalState`. `state` is
+ *     the state necessary to restore a paginator (e.g. from query parameters on a URL). `internalState` is the state necessary
+ *     for a paginator to function after receiving a response from a backend. For example, the total number of results may
+ *     be stored here.
+ *
+ *     The implementation of a Paginator doesn't depend on any library (e.g. React) and so can be used standalone:
+ *
+ *     ```js
+ *     let state = {};
+ *     const setState = (nextState) => {
+ *         state = nextState;
+ *     };
+ *     let internalState = {};
+ *     const setInternalState = (nextState) => {
+ *         internalState = nextState;
+ *     };
+ *     const paginator = new PageNumberPaginator([state, setState], [internalState, setInternalState]);
+ *     // This would be set after calling the backend
+ *     paginator.setResponse({ pageSize: 20, total: 100 });
+ *     // state == {page: 1, pageSize: 20}
+ *     // internalState == {total: 100, responseIsSet: true}
+ *     paginator.next()
+ *     // You would call the backend again and pass `state`
+ *     // state == {page: 2, pageSize: 20}
+ *     paginator.setPage(5)
+ *     // You would call the backend again and pass `state`
+ *     // state == {page: 5, pageSize: 20}
+ *     ```
+ *
+ *     `paginator.setResponse` should be called with the response from the backend. Each paginator has it's expected shape
+ *     for this response, so you may need to convert the value returned from a backend into the value expected by the paginator.
+ *
+ *     See [usePaginator](doc:usePaginator) for using a paginator within a React component.
+ * </Usage>
+ *
  * @menu-group Pagination
  * @extract-docs
- * @typeParam State Type representing the state of the pagination. This is the state that would be serialized (eg. to the URL) and restored when the paginator is created (contrast this to `InternalState` which isn't (contrast this to `InternalState` which isn't).
+ * @typeParam State Type representing the state of the pagination. This is the state that would be serialized (eg. to the URL) and restored when the paginator is created (contrast this to `InternalState` which isn't).
  * @typeParam InternalState Type representing the internal state of the pagination. Internal state refers to state that does not need to be restored (eg. pagination details from the URL for example)
  */
 export default abstract class Paginator<State extends {}, InternalState extends {}>
     implements PaginatorInterface<State, InternalState>
 {
+    /**
+     * The current state of the pagination. This is the state that would be serialized (eg. to the URL) and restored when the paginator is created (contrast this to `internalState` which isn't).
+     */
     currentState: State;
+    /**
+     * The current internal state of the pagination. Internal state refers to state that does not need to be restored (eg. pagination details from the URL for example)
+     */
     internalState: InternalState & { responseIsSet?: boolean };
+    /**
+     * Changes the current state to the specified value
+     */
     setCurrentState: (set: State) => void;
+    /**
+     * Changes the internal state to the specified value
+     */
     setInternalState: (set: InternalState) => void;
 
     /**
@@ -129,9 +188,12 @@ export default abstract class Paginator<State extends {}, InternalState extends 
     }
 
     /**
-     * @see documentation for `replaceStateControllers` for what `currentStatePair` and `internalStatePair` are
+     * See the documentation for [replaceStateControllers](#Method-replaceStateControllers) for what `currentStatePair` and `internalStatePair` are
      */
-    constructor(currentStatePair = null, internalStatePair = null) {
+    constructor(
+        currentStatePair: PaginatorStatePair<State> | null = null,
+        internalStatePair: PaginatorStatePair<InternalState> | null = null
+    ) {
         if ((currentStatePair || internalStatePair) && !(currentStatePair && internalStatePair)) {
             throw new Error(
                 'If one of `currentStatePair` and `internalStatePair` are specified both must be'
@@ -167,10 +229,13 @@ export default abstract class Paginator<State extends {}, InternalState extends 
      * to store things like the total number of results or the current cursor. Passing `useState` here is
      * fine.
      */
-    replaceStateControllers(currentStatePair, internalStatePair): void {
+    replaceStateControllers(
+        currentStatePair: PaginatorStatePair<State>,
+        internalStatePair: PaginatorStatePair<InternalState>
+    ): void {
         const [currentState, setCurrentState] = currentStatePair;
         const [internalState, setInternalState] = internalStatePair;
-        this.currentState = currentState || {};
+        this.currentState = currentState || ({} as State);
         this.setCurrentState = (nextState: State): void => {
             // If multiple setCurrentState occur before the first is committed then
             // any reads of `this.currentState` will return the previous value (the
@@ -182,7 +247,7 @@ export default abstract class Paginator<State extends {}, InternalState extends 
             this.currentState = nextState;
             setCurrentState(nextState);
         };
-        this.internalState = internalState || {};
+        this.internalState = internalState || ({} as InternalState);
         this.setInternalState = (nextState): void => {
             // See explanation above `this.currentState = nextState`
             this.internalState = {
@@ -207,7 +272,7 @@ export default abstract class Paginator<State extends {}, InternalState extends 
 
     /**
      * This is called when an `Endpoint` has resolved and is passed the response from the
-     * endpoint. This is used to update the relevant paginator state  - eg. the total
+     * endpoint. This is used to update the relevant paginator state  - e.g. the total
      * number of records, next & previous cursors etc.
      * @param response The response as returned by the endpoint this paginator is used with.
      */
@@ -268,6 +333,35 @@ export default abstract class Paginator<State extends {}, InternalState extends 
      * Returns true if there's more results after the current page
      */
     hasNextPage(): boolean {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * Returns true if there's a previous page
+     */
+    hasPreviousPage(): boolean {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * This function is used by [paginationMiddleware](doc:paginationMiddleware) to extract
+     * the state to pass to [setResponse](#Method-setResponse) from the details returned
+     * by [Endpoint.execute](doc:Endpoint#method-execute). For example, if pagination state
+     * was stored in response headers this function could extract that into an object that
+     * `setResponse` can then deal with.
+     *
+     * If you are using a paginator class directly you can just call `setResponse` without
+     * going via this function.
+     *
+     * Each paginator provided by Presto supports a specific request response. If this response
+     * differs from your backend you can either extend the pagination class and provide your
+     * own or pass the `getPaginationState` option to [paginationMiddleware](doc:paginationMiddleware).
+     *
+     * @param requestDetails The value returned by [Endpoint.execute](doc:Endpoint#method-execute)
+     */
+    static getPaginationState(
+        requestDetails: PaginationRequestDetails
+    ): Record<string, any> | false {
         throw new Error('Not implemented');
     }
 }

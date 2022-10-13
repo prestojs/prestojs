@@ -5,18 +5,57 @@ export type PageNumberPaginationState = {
     pageSize?: string | number;
 };
 export type InternalPageNumberPaginationState = {
-    total: number | null;
+    total?: number | null;
 };
 
 /**
  * Page number based paginator
  *
- * Expects a `total` or `count` key and optional `pageSize` key in the response. `total` or `count` should be the total
- * number of records available.
+ * See [Paginator](doc:Paginator) for an overview of how state is managed for paginator classes.
  *
- * If your backend differs from this (for example by storing the values in different named keys or in headers instead of
- * the response body) you can handle that by extending this class and implementing `getPaginationState` or
- * by passing `getPaginationState` to [usePaginator](doc:usePaginator).
+ * <Alert type="info">
+ *    The default response shape supported by `PageNumberPaginator` is:
+ *
+ *    ```json
+ *    {
+ *         // Can also be called 'count'
+ *         total: 100,
+ *         results: Array,
+ *         pageSize: 20,
+ *     }
+ *     ```
+ *
+ *    `pageSize` is optional but lets the backend specify what the pageSize used was.
+ * /Alert>
+ *
+ * Usage>
+ *    The basic usage outside of React is:
+ *
+ *    ```js
+ *    let state = {};
+ *    const setState = nextState => {
+ *        state = nextState;
+ *    };
+ *    let internalState = {};
+ *    const setInternalState = nextState => {
+ *        internalState = nextState;
+ *    };
+ *    const paginator = new PageNumberPaginator([state, setState], [internalState, setInternalState]);
+ *    // This would be set after calling the backend
+ *    paginator.setResponse({ pageSize: 20, total: 100 });
+ *    // state == {page: 1, pageSize: 20}
+ *    // internalState == {total: 100, responseIsSet: true}
+ *    paginator.next()
+ *    // You would call the backend and pass `state`
+ *    // state == {page: 2, pageSize: 20}
+ *    paginator.setPage(5)
+ *    // You would call the backend and pass `state`
+ *    // state == {page: 5, pageSize: 20}
+ *    ```
+ *
+ *    To use in a component use the [usePaginator](doc:usePaginator) hook with [paginationMiddleware](doc:paginationMiddleware)
+ *    instead. See the [Use with usePaginator & paginationMiddleware](#example-01-use-paginator) example.
+ * /Usage>
  *
  * @menu-group Pagination
  * @extract-docs
@@ -246,8 +285,28 @@ export default class PageNumberPaginator extends Paginator<
     }
 
     /**
+     * Returns true if there's a previous page (i.e. page > 1)
+     */
+    hasPreviousPage(): boolean {
+        const { page = 1 } = this.currentState;
+        return page > 1;
+    }
+
+    /**
+     * See [Paginator.getPaginationState](doc:Paginator#Method-getPaginationState) for details about how this
+     * method is used.
+     *
      * Expects `decodedBody` to include a key `results` which should be an array of return records and a variable
-     * `count` or `total` that contains the total number of records available.
+     * `count` or `total` that contains the total number of records available. Can optionally include `pageSize` which
+     * allows the backend to specify what the size of the page is if not explicitly passed. e.g.
+     *
+     * ```json
+     * {
+     *     results: Array,
+     *     total: 100,
+     *     pageSize: 20,
+     * }
+     * ```
      *
      * @param requestDetails
      */

@@ -399,7 +399,7 @@ const comparisonByTrigger = {
  *     // Use useCallback to avoid redefining the method each time
  *     useAsync(useCallback(() => doSomething("my argument"), []))
  *     // Or use `args` to pass arguments and remove the need for an arrow function
- *     useAsync(doSomething, { args: ["my argument", trigger: 'SHALLOW' ]});
+ *     useAsync(doSomething, { args: ["my argument"], trigger: 'SHALLOW' });
  *     ```
  *
  *     This only applies to a `trigger` value of "SHALLOW" or "DEEP" - for "MANUAL" it doesn't matter.

@@ -1,7 +1,12 @@
 import CursorPaginator, { CursorPaginationState } from './CursorPaginator';
 import LimitOffsetPaginator, { LimitOffsetPaginationState } from './LimitOffsetPaginator';
 import PageNumberPaginator, { PageNumberPaginationState } from './PageNumberPaginator';
-import { PaginationRequestDetails, PaginatorInterface, PaginatorRequestOptions } from './Paginator';
+import {
+    PaginationRequestDetails,
+    PaginatorInterface,
+    PaginatorRequestOptions,
+    PaginatorStatePair,
+} from './Paginator';
 
 export type PaginatorState =
     | PageNumberPaginationState
@@ -21,10 +26,12 @@ export type PaginatorState =
  * @menu-group Pagination
  * @extract-docs
  */
-export default class InferredPaginator
-    implements PaginatorInterface<PaginatorState, Record<string, any>>
+export default class InferredPaginator<
+    InferredPaginatorT extends CursorPaginator | PageNumberPaginator | LimitOffsetPaginator
+> implements
+        PaginatorInterface<InferredPaginatorT['currentState'], InferredPaginatorT['internalState']>
 {
-    __paginator?: CursorPaginator | PageNumberPaginator | LimitOffsetPaginator;
+    __paginator?: InferredPaginatorT;
     get responseIsSet(): boolean {
         return !!this.internalState?.responseIsSet;
     }
@@ -32,7 +39,7 @@ export default class InferredPaginator
     /**
      * The underlying inferred paginator instance (if known). Only available after `setResponse` has been called.
      */
-    get paginator(): undefined | CursorPaginator | PageNumberPaginator | LimitOffsetPaginator {
+    get paginator(): undefined | InferredPaginatorT {
         if (!this.__paginator && this.internalState.paginatorClass) {
             this.paginator = new this.internalState.paginatorClass(
                 [this.currentState, this.setCurrentState],
@@ -44,9 +51,7 @@ export default class InferredPaginator
         }
     }
 
-    set paginator(
-        paginator: undefined | CursorPaginator | PageNumberPaginator | LimitOffsetPaginator
-    ) {
+    set paginator(paginator: undefined | InferredPaginatorT) {
         this.__paginator = paginator;
     }
 
@@ -162,10 +167,13 @@ export default class InferredPaginator
         return this.paginator.pageSize;
     }
 
-    currentState: PaginatorState;
-    internalState: Record<string, any>;
-    setCurrentState: (nextValue: PaginatorState) => void;
-    setInternalState: (set: (internalState: Record<string, any>) => Record<any, string>) => void;
+    currentState: InferredPaginatorT['currentState'];
+    internalState: InferredPaginatorT['internalState'] & {
+        paginatorClass?: any;
+        responseIsSet?: boolean;
+    };
+    setCurrentState: (nextValue: InferredPaginatorT['currentState']) => void;
+    setInternalState: (set: InferredPaginatorT['internalState']) => void;
 
     /**
      * @see documentation for `replaceStateControllers` for what `currentStatePair` and `internalStatePair` are
@@ -185,8 +193,8 @@ export default class InferredPaginator
      * @see `Paginator.replaceStateControllers`
      */
     replaceStateControllers(
-        [currentState, setCurrentState],
-        [internalState, setInternalState]
+        [currentState, setCurrentState]: PaginatorStatePair<InferredPaginatorT['currentState']>,
+        [internalState, setInternalState]: PaginatorStatePair<InferredPaginatorT['internalState']>
     ): void {
         this.currentState = currentState || {};
         this.setCurrentState = (nextState): void => {
@@ -215,6 +223,7 @@ export default class InferredPaginator
         };
         if (this.paginator) {
             this.paginator.replaceStateControllers(
+                // @ts-ignore
                 [this.currentState, this.setCurrentState],
                 [this.internalState, this.setInternalState]
             );

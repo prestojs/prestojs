@@ -14,9 +14,55 @@ export type InternalCursorPaginatorState = {
 /**
  * Cursor based paginator
  *
- * Expects a `nextCursor`, `previousCursor` and optional `pageSize` key in the response. See
- * [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation
- * differs.
+ * See [Paginator](doc:Paginator) for an overview of how state is managed for paginator classes.
+ *
+ * <Alert type="info">
+ *     There are two supported response shapes by default. The first assumes `next` and `previous` are URLs
+ *     with a 'cursor' query parameter. If this shape is encountered the 'cursor' query parameter will be extracted:
+ *
+ *     ```json
+ *     {
+ *          next: null|'http://example.com/?cursor=abc123',
+ *          previous: null|'http://example.com/?cursor=abc123',
+ *          results: Array,
+ *          pageSize: 20,
+ *      }
+ *      ```
+ *
+ *     The other assumes `nextCursor` and `previousCursor` are the cursor values directly.
+ *
+ *     ```json
+ *     { pageSize: 20, next: 'abc123', previous: 'abc456', results: Array }
+ *     ```
+ *
+ *     `pageSize` in both is optional.
+ *
+ *     If there's no next or previous page those values should be `null`.
+ * </Alert>
+ *
+ * <Usage>
+ *     The basic usage outside of React is:
+ *
+ *     ```js
+ *     let state = {};
+ *     const setState = nextState => {
+ *         state = nextState;
+ *     };
+ *     let internalState = {};
+ *     const setInternalState = nextState => {
+ *         internalState = nextState;
+ *     };
+ *     const paginator = new CursorPaginator([state, setState], [internalState, setInternalState]);
+ *     paginator.setResponse({ pageSize: 20, nextCursor: 'abc123', previousCursor: 'abc456' });
+ *     // state == { pageSize: 20 }
+ *     // internalState == { next: 'abc123', previous: 'abc456' }
+ *     paginator.next();
+ *     // state == { pageSize: 20, cursor: 'abc123' }
+ *     ```
+ *
+ *     To use in a component use the [usePaginator](doc:usePaginator) hook with [paginationMiddleware](doc:paginationMiddleware)
+ *     instead. See the [Use with usePaginator & paginationMiddleware](#example-01-use-paginator) example.
+ * </Usage>
  *
  * @menu-group Pagination
  * @extract-docs
@@ -202,12 +248,32 @@ export default class CursorPaginator extends Paginator<
     }
 
     /**
-     * Expected pagination state in the shape:
+     * Returns true if there's more results after the current page
+     */
+    hasPreviousPage(): boolean {
+        return !!this.internalState.previousCursor;
+    }
+
+    /**
+     * See [Paginator.getPaginationState](doc:Paginator#Method-getPaginationState) for details about how this
+     * method is used.
+     *
+     * Supports the following response shapes:
      *
      * ```json
      * {
      *     next: null|'http://example.com/?cursor=abc123',
      *     previous: null|'http://example.com/?cursor=abc123',
+     *     results: Array
+     * }
+     * ```
+     *
+     * or
+     *
+     * ```json
+     * {
+     *     nextCursor: 'abc123',
+     *     previousCursor: 'abc123',
      *     results: Array
      * }
      * ```
@@ -223,21 +289,33 @@ export default class CursorPaginator extends Paginator<
             return false;
         }
 
+        // If there's a count then it can't be a cursor pagination - probably it's LimitOffset instead
+        if ('count' in decodedBody || 'total' in decodedBody) {
+            return false;
+        }
+
         // Cursor pagination responses should contain a next and previous link that includes
         // a query parameter with name 'cursor' containing the next/previous cursor value. Results
         // should be an array under the `results` key.
-        if (
-            ('next' in decodedBody || 'previous' in decodedBody) &&
-            // If there's a count then it can't be a cursor pagination - probably it's LimitOffset instead
-            !('count' in decodedBody) &&
-            !('total' in decodedBody)
-        ) {
+        if ('next' in decodedBody || 'previous' in decodedBody) {
             const state: Record<string, any> = {
                 results: decodedBody.results,
                 nextCursor: decodedBody.next ? qs.parse(qs.extract(decodedBody.next)).cursor : null,
                 previousCursor: decodedBody.previous
                     ? qs.parse(qs.extract(decodedBody.previous)).cursor
                     : null,
+            };
+            if (decodedBody.pageSize) {
+                state.pageSize = decodedBody.pageSize;
+            }
+            return state;
+        }
+
+        if ('nextCursor' in decodedBody || 'previousCursor' in decodedBody) {
+            const state: Record<string, any> = {
+                results: decodedBody.results,
+                nextCursor: decodedBody.nextCursor,
+                previousCursor: decodedBody.previousCursor,
             };
             if (decodedBody.pageSize) {
                 state.pageSize = decodedBody.pageSize;
