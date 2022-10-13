@@ -169,6 +169,24 @@ test('should support hasNextPage', () => {
     expect(result.current.hasNextPage()).toBe(true);
 });
 
+test('should support hasPreviousPage', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+
+    expect(result.current.hasPreviousPage()).toBe(false);
+
+    act(() => result.current.setResponse({ total: 30, pageSize: 10 }));
+
+    expect(result.current.hasPreviousPage()).toBe(false);
+    act(() => result.current.next());
+    expect(result.current.hasPreviousPage()).toBe(true);
+    act(() => result.current.next());
+    expect(result.current.hasPreviousPage()).toBe(true);
+    act(() => result.current.first());
+    expect(result.current.hasPreviousPage()).toBe(false);
+});
+
 test.each`
     paginatorClass
     ${PageNumberPaginator}

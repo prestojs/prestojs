@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+* Paginator classes now have `hasPreviousPage` to match `hasNextPage`
+
 ## [0.0.34] - 2022-10-07
 
 ### Changed

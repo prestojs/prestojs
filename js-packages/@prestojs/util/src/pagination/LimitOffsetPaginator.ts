@@ -238,6 +238,17 @@ export default class LimitOffsetPaginator extends Paginator<
         }
         return nextState.offset < this.internalState.total;
     }
+
+    /**
+     * Returns true if there's a previous page
+     */
+    hasPreviousPage(): boolean {
+        if (this.currentState.offset == null || this.internalState.total == null) {
+            return false;
+        }
+        return this.currentState.offset > 0;
+    }
+
     static getPaginationState(
         requestDetails: PaginationRequestDetails
     ): Record<string, any> | false {

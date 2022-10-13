@@ -27,7 +27,10 @@ export type PaginatorState =
  * @extract-docs
  */
 export default class InferredPaginator<
-    InferredPaginatorT extends CursorPaginator | PageNumberPaginator | LimitOffsetPaginator
+    InferredPaginatorT extends CursorPaginator | PageNumberPaginator | LimitOffsetPaginator =
+        | CursorPaginator
+        | PageNumberPaginator
+        | LimitOffsetPaginator
 > implements
         PaginatorInterface<InferredPaginatorT['currentState'], InferredPaginatorT['internalState']>
 {
@@ -489,6 +492,16 @@ export default class InferredPaginator<
             return false;
         }
         return this.paginator.hasNextPage();
+    }
+
+    /**
+     * Returns true if there's a previous page
+     */
+    hasPreviousPage(): boolean {
+        if (!this.paginator) {
+            return false;
+        }
+        return this.paginator.hasPreviousPage();
     }
 
     getRequestInit(currentInit): PaginatorRequestOptions {

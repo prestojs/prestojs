@@ -145,6 +145,23 @@ test('should support hasNextPage', () => {
     expect(result.current.hasNextPage()).toBe(false);
 });
 
+test('should support hasPreviousPage', () => {
+    const { result } = renderHook(() => useTestHook());
+
+    expect(result.current.currentState).toEqual({});
+
+    expect(result.current.hasPreviousPage()).toBe(false);
+
+    act(() => result.current.setResponse({ nextCursor: 'abc123', pageSize: 10 }));
+
+    expect(result.current.hasPreviousPage()).toBe(false);
+    act(() => result.current.next());
+    act(() => result.current.setResponse({ pageSize: 10, previousCursor: 'abc012' }));
+    expect(result.current.hasPreviousPage()).toBe(true);
+    act(() => result.current.setResponse({ pageSize: 10, previousCursor: null }));
+    expect(result.current.hasPreviousPage()).toBe(false);
+});
+
 test.each`
     paginatorClass
     ${CursorPaginator}
