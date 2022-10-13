@@ -34,15 +34,31 @@ type Cache<T> = {
 export type ComparisonFn = (newInputs: any[], lastInputs: any[]) => boolean;
 
 /**
- * useMemo but with a stable cache and support for custom comparison operator
+ * `useMemo` but with a stable cache and support for custom comparison operator
  *
  * Based on https://github.com/alexreardon/use-memo-one but supports custom
  * comparison operator. See https://github.com/alexreardon/use-memo-one/issues/11
  *
+ * <Usage>
+ *     Usage is the same as [useMemo](https://reactjs.org/docs/hooks-reference.html#usememo) but
+ *     optionally supports changing the comparison operator.
+ *
+ *     ```js
+ *     const obj = { firstName: 'Jo', lastName: 'Ab' };
+ *     // This will change every render as `obj` is re-created each time
+ *     const alwaysChanges = useMemo(() => ({ name: `${obj.firstName} ${obj.lastName}` }), [obj]);
+ *     // This won't as a shallow equality check on `obj` will pass
+ *     const memoObj = useMemoOne(() => ({ name: `${obj.firstName} ${obj.lastName}` }), [obj]);
+ *     ```
+ * </Usage>
+ *
  * @param getResult Function that returns value to memoize
- * @param inputs Dependency array. When values in this change getResult is called again
- * @param compare Custom comparision operator. Defaults to shallow strict equality.
- * @returns {T}
+ * @param inputs Dependency array. When values in this change `getResult` is called again
+ * @param compare Custom comparison operator. Defaults to [isEqual](doc:isEqual). To compare values deeply use [isDeepEqual](doc:isDeepEqual)
+ *
+ * @returns The memoized value
+ *
+ * @extract-docs
  */
 export default function useMemoOne<T>(
     // getResult changes on every call,
