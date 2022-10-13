@@ -158,6 +158,14 @@ export default class PageNumberPaginator extends Paginator<
 
     /**
      * Change to the specified page size
+     *
+     * > NOTE: This will alter `page` so that it is still valid. For example if
+     * > `pageSize` was 10 and you were on page `4`, and then page size was changed
+     * > to `20` then page would be adjusted to `2`.
+     * >
+     * > If you want to change `page` and `pageSize` together call `setPageSize`
+     * > first.
+     *
      */
     setPageSize(pageSize: null | number): void {
         this.setCurrentState(this.pageSizeState(pageSize));

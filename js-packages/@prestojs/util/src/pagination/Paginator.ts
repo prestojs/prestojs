@@ -85,6 +85,7 @@ export interface PaginatorInterface<State = {}, InternalState = {}> {
     setInternalState: (set: InternalState) => void;
     responseIsSet: boolean;
     hasNextPage(): boolean;
+    hasPreviousPage(): boolean;
     first(): void;
     firstState(): State | null;
     next(): void;
