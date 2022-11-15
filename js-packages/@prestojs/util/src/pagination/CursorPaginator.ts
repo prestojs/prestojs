@@ -61,7 +61,7 @@ export type InternalCursorPaginatorState = {
  *     ```
  *
  *     To use in a component use the [usePaginator](doc:usePaginator) hook with [paginationMiddleware](doc:paginationMiddleware)
- *     instead. See the [Use with usePaginator & paginationMiddleware](#example-01-use-paginator) example.
+ *     instead. See the [Use with usePaginator & paginationMiddleware](#example-02-use-paginator) example.
  * </Usage>
  *
  * @menu-group Pagination

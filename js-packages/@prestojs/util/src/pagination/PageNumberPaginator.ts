@@ -26,9 +26,9 @@ export type InternalPageNumberPaginationState = {
  *     ```
  *
  *    `pageSize` is optional but lets the backend specify what the pageSize used was.
- * /Alert>
+ * </Alert>
  *
- * Usage>
+ * <Usage>
  *    The basic usage outside of React is:
  *
  *    ```js
@@ -54,8 +54,8 @@ export type InternalPageNumberPaginationState = {
  *    ```
  *
  *    To use in a component use the [usePaginator](doc:usePaginator) hook with [paginationMiddleware](doc:paginationMiddleware)
- *    instead. See the [Use with usePaginator & paginationMiddleware](#example-01-use-paginator) example.
- * /Usage>
+ *    instead. See the [Use with usePaginator & paginationMiddleware](#example-02-use-paginator) example.
+ * </Usage>
  *
  * @menu-group Pagination
  * @extract-docs

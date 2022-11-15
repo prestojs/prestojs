@@ -13,8 +13,60 @@ export type InternalLimitOffsetPaginationState = {
 /**
  * Limit & offset based paginator
  *
- * Expects a `limit` key in the response. See [getPaginationState](doc:getPaginationState) for how
- * to customise this if your backend implementation differs.
+ * See [Paginator](doc:Paginator) for an overview of how state is managed for paginator classes.
+ *
+ * <Alert type="info">
+ *     There are two supported response shapes by default. The first assumes `next` and `previous` are URLs
+ *     with a 'offset' query parameter. If this shape is encountered the 'offset' query parameter will be extracted:
+ *
+ *     ```json
+ *     {
+ *          next: null|'http://example.com/?offset=20',
+ *          previous: null|'http://example.com/?offset=10',
+ *          results: Array,
+ *          limit: 10,
+ *          total: 100,
+ *      }
+ *      ```
+ *
+ *     The other assumes `nextOffset` and `previousOffset` are the offset values directly.
+ *
+ *     ```json
+ *     { limit: 10, next: 20, previous: 10, results: Array, total: 100 }
+ *     ```
+ *
+ *     If there's no next or previous page those values should be `null`.
+ *
+ *     `limit` in both is optional.
+ *
+ *     `total` or `count` is required and should be the total number of available records.
+ * </Alert>
+ *
+ * <Usage>
+ *     The basic usage outside of React is:
+ *
+ *     ```js
+ *     let state = {};
+ *     const setState = nextState => {
+ *         state = nextState;
+ *     };
+ *     let internalState = {};
+ *     const setInternalState = nextState => {
+ *         internalState = nextState;
+ *     };
+ *     const paginator = new LimitOffsetPaginator([state, setState], [internalState, setInternalState]);
+ *     paginator.setResponse({ limit: 10, total: 10 });
+ *     // state == { limit: 10 }
+ *     // internalState == { total: 10, responseIsSet: true }
+ *     paginator.next();
+ *     // state == { limit: 10, offset: 10 }
+ *     paginator.setOffset(50);
+ *     // state == { limit: 10, offset: 50 }
+ *     ```
+ *
+ *     To use in a component use the [usePaginator](doc:usePaginator) hook with [paginationMiddleware](doc:paginationMiddleware)
+ *     instead. See the [Use with usePaginator & paginationMiddleware](#example-02-use-paginator) example.
+ * </Usage>
  *
  * @menu-group Pagination
  * @extract-docs
@@ -221,7 +273,7 @@ export default class LimitOffsetPaginator extends Paginator<
      * See [getPaginationState](doc:getPaginationState) for how to customise this if your backend implementation
      * differs.
      */
-    setResponse({ limit, total }): void {
+    setResponse({ limit, total }: { limit?: number; total: number }): void {
         this.setInternalState({ total });
         if (limit && this.currentState.limit !== limit) {
             this.setLimit(limit);
@@ -300,6 +352,32 @@ export default class LimitOffsetPaginator extends Paginator<
                 r.limit = Number(limit);
             }
 
+            return r;
+        }
+        if (
+            ('nextOffset' in decodedBody || 'previousOffset' in decodedBody) &&
+            // There should be a count or total as well - otherwise it's probably CursorPaginator
+            ('count' in decodedBody || 'total' in decodedBody)
+        ) {
+            const r: Record<string, any> = {
+                total: decodedBody.count ?? decodedBody.total,
+                results: decodedBody.results,
+                limit: decodedBody.limit,
+            };
+            const offset = decodedBody.nextOffset;
+            if (!r.limit) {
+                // Infer limit if we are on first page and there's now next/previous link
+                if (
+                    r.total >= decodedBody.results.length &&
+                    !offset &&
+                    !decodedBody.previous &&
+                    !decodedBody.next
+                ) {
+                    r.limit = decodedBody.results.length;
+                } else {
+                    r.limit = Number(decodedBody.limit);
+                }
+            }
             return r;
         }
 

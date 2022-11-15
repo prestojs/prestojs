@@ -150,7 +150,7 @@ export type PaginatorStatePair<State> = [
  *     // state == {page: 5, pageSize: 20}
  *     ```
  *
- *     `paginator.setResponse` should be called with the response from the backend. Each paginator has it's expected shape
+ *     `paginator.setResponse` should be called with the response from the backend. Each paginator has its expected shape
  *     for this response, so you may need to convert the value returned from a backend into the value expected by the paginator.
  *
  *     See [usePaginator](doc:usePaginator) for using a paginator within a React component.

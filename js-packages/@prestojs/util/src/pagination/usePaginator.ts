@@ -11,24 +11,12 @@ function isPaginatorClassProvider<T extends PaginatorInterface>(
     return item && typeof item.getPaginatorClass === 'function';
 }
 
-/**
- * Hook to help manage paginator state. An instance of the specified paginator is created with provided
- * state setter or a default setter if none provided. You only need to provide a state setter if you
- * want to store the state somewhere external eg. from URL query parameters.
- *
- * @param paginatorClassOrProvider Must either be an object with a `getPaginatorClass` method (eg.
- * [Endpoint](doc:Endpoint)) or a [Paginator](doc:Paginator) class. This class defines how pagination is
- * handled.
- * @param currentStatePair A tuple of current state and a state setter function. If not provided state
- * is handled internally in usePaginator. You can pass `useState()` to this parameter.
- *
- * @menu-group Pagination
- * @extract-docs
- */
-export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrProvider: PaginatorInterfaceClass<T> | PaginatorClassProvider<T>,
+export default function usePaginator<PaginatorT extends PaginatorInterface, PaginatorState>(
+    paginatorClassOrProvider:
+        | PaginatorInterfaceClass<PaginatorT>
+        | PaginatorClassProvider<PaginatorT>,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
-): T;
+): PaginatorT;
 export default function usePaginator<PaginatorState>(
     paginatorClassOrProvider: null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
@@ -38,14 +26,40 @@ export default function usePaginator<PaginatorState>(
 // export function ExampleComponent({ endpoint }: { endpoint: Endpoint | null }) {
 //     usePaginator(endpoint && endpoint.getPaginatorClass());
 // }
-export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrProvider: PaginatorInterfaceClass<T> | PaginatorClassProvider<T> | null,
+export default function usePaginator<PaginatorT extends PaginatorInterface, PaginatorState>(
+    paginatorClassOrProvider:
+        | PaginatorInterfaceClass<PaginatorT>
+        | PaginatorClassProvider<PaginatorT>
+        | null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
-): T | null;
-export default function usePaginator<T extends PaginatorInterface, PaginatorState>(
-    paginatorClassOrProvider: PaginatorInterfaceClass<T> | PaginatorClassProvider<T> | null,
+): PaginatorT | null;
+/**
+ * Hook to help manage paginator state. An instance of the specified paginator is created with provided
+ * state setter or a default setter if none provided. You only need to provide a state setter if you
+ * want to store the state somewhere external e.g. from URL query parameters.
+ *
+ * See examples for [CursorPaginator](doc:CursorPaginator#example-02-use-paginator), [PageNumberPaginator](doc:PageNumberPaginator#example-02-use-paginator)
+ * or [LimitOffsetPaginator](doc:LimitOffsetPaginator#example-02-use-paginator)
+ *
+ * @param paginatorClassOrProvider Must either be an object with a `getPaginatorClass` method (eg.
+ * [Endpoint](doc:Endpoint)) or a [Paginator](doc:Paginator) class. This class defines how pagination is
+ * handled. This value can be `null` in which case nothing will be returned.
+ * @param currentStatePair A tuple of current state and a state setter function. If not provided state
+ * is handled internally in usePaginator. You can pass `useState()` to this parameter.
+ *
+ * @returns The paginator class instance
+ *
+ * @menu-group Pagination
+ * @extract-docs
+ * @exclude-overload-docs
+ */
+export default function usePaginator<PaginatorT extends PaginatorInterface, PaginatorState>(
+    paginatorClassOrProvider:
+        | PaginatorInterfaceClass<PaginatorT>
+        | PaginatorClassProvider<PaginatorT>
+        | null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
-): T | null {
+): PaginatorT | null {
     // Only used if currentStatePair is not provided. We have to create this regardless
     // as hooks can't be conditional.
     const defaultState = useState<PaginatorState>();
@@ -67,7 +81,7 @@ export default function usePaginator<T extends PaginatorInterface, PaginatorStat
     }
 
     // Only recreate the paginator class instance when necessary (eg. if the type changes)
-    const paginatorInstance = useMemo<T | null>(
+    const paginatorInstance = useMemo<PaginatorT | null>(
         () => (paginatorClass ? new paginatorClass() : null),
         [paginatorClass]
     );

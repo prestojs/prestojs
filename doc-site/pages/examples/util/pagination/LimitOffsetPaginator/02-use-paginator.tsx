@@ -1,15 +1,15 @@
 /**
- * Store pagination state in the URL.
+ * Use with usePaginator & paginationMiddleware
  *
- * This example is the same as the previous except it stores the state in the URL. This allows the page
- * to be restored on refresh.
+ * This example shows the standard usage of a paginator with `usePaginator` and an Endpoint with
+ * `paginationMiddleware`.
  *
- * [Open the example](/examples/util/pagination/PageNumberPaginator/03-url-state) in a new window to see it
- * in action.
+ * The big difference when using `paginationMiddleware` is that the `result` returned no longer includes
+ * the pagination state - it only includes the records for that page. Pagination state is stored in the
+ * `paginator` instead.
  */
 import { Endpoint, paginationMiddleware, viewModelCachingMiddleware } from '@prestojs/rest';
-import { useUrlQueryState } from '@prestojs/routing';
-import { PageNumberPaginator, useAsync, usePaginator } from '@prestojs/util';
+import { LimitOffsetPaginator, useAsync, usePaginator } from '@prestojs/util';
 import { CharField, DateField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
 import { List, Pagination } from 'antd';
 import 'antd/dist/antd.css';
@@ -20,18 +20,17 @@ class User extends viewModelFactory(
     { pkFieldName: 'id' }
 ) {
     static endpoints = {
-        list: new Endpoint<User[]>('/api/pagination/page-number', {
+        list: new Endpoint<User[]>('/api/pagination/limit-offset', {
             middleware: [
                 viewModelCachingMiddleware(User),
-                paginationMiddleware(PageNumberPaginator),
+                paginationMiddleware(LimitOffsetPaginator),
             ],
         }),
     };
 }
 
-export default function PageNumberPaginatorUsePaginator() {
-    const statePair = useUrlQueryState({});
-    const paginator = usePaginator(User.endpoints.list, statePair) as PageNumberPaginator;
+export default function LimitOffsetPaginatorUsePaginator() {
+    const paginator = usePaginator(User.endpoints.list) as LimitOffsetPaginator;
     // `result` is the list of users _without_ the pagination state. pagination state is available via the `paginator`.
     const { result, isLoading } = useAsync(User.endpoints.list.prepare({ paginator }), {
         trigger: 'SHALLOW',
@@ -45,8 +44,8 @@ export default function PageNumberPaginatorUsePaginator() {
                 <Pagination
                     total={paginator.total ?? 0}
                     onChange={(page, pageSize) => {
-                        paginator.setPage(page);
-                        paginator.setPageSize(pageSize);
+                        paginator.setOffset((page - 1) * pageSize);
+                        paginator.setLimit(pageSize);
                     }}
                 />
             }

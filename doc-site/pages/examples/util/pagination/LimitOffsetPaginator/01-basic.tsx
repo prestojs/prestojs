@@ -8,24 +8,24 @@
  * See the next example for the recommended usage.
  */
 import { Endpoint } from '@prestojs/rest';
-import { PageNumberPaginator, useAsync } from '@prestojs/util';
+import { LimitOffsetPaginator, useAsync } from '@prestojs/util';
 import { List, Pagination } from 'antd';
 import 'antd/dist/antd.css';
 import React, { useMemo, useState } from 'react';
 
-const listEndpoint = new Endpoint('/api/pagination/page-number');
+const listEndpoint = new Endpoint('/api/pagination/limit-offset');
 
-export default function PageNumberPaginatorManual() {
+export default function LimitOffsetPaginatorManual() {
     const internalStatePair = useState({});
     const statePair = useState({});
-    const paginator = useMemo(() => new PageNumberPaginator(statePair, internalStatePair), []);
+    const paginator = useMemo(() => new LimitOffsetPaginator(statePair, internalStatePair), []);
     const { result, isLoading } = useAsync(
         listEndpoint.prepare({ query: paginator.currentState }),
         {
             trigger: 'SHALLOW',
             onSuccess(executeReturnVal) {
                 // Here result is in the expected shape - if it wasn't you would transform it
-                // e.g. paginator.setResponse({ total: result.total_count, pageSize: result.page_size });
+                // e.g. paginator.setResponse({ limit: result.Limit, total: result.Count });
                 // Note that you can also call `PageNumberPaginator.getPaginationState(executeReturnVal)` and
                 // it will extract the state from the `Execute` return value. This isn't necessary if you
                 // are dealing with the `result` directly. See the documentation for `getPaginationState`
@@ -44,8 +44,8 @@ export default function PageNumberPaginatorManual() {
                 <Pagination
                     total={paginator.total ?? 0}
                     onChange={(page, pageSize) => {
-                        paginator.setPage(page);
-                        paginator.setPageSize(pageSize);
+                        paginator.setOffset((page - 1) * pageSize);
+                        paginator.setLimit(pageSize);
                     }}
                 />
             }

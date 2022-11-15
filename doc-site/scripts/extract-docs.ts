@@ -814,6 +814,9 @@ class Converter {
 
     async convertSignatures(signatures: JSONOutput.SignatureReflection[]): Promise<Signature[]> {
         const transformed: Signature[] = [];
+        if (getTagByName(signatures[signatures.length - 1], 'exclude-overload-docs')) {
+            signatures = signatures.slice(-1);
+        }
         for (const signature of signatures) {
             transformed.push(
                 await this.withTypeParameter(signature.typeParameter, () =>
@@ -1476,6 +1479,7 @@ class Converter {
                         } else {
                             console.error(
                                 'Could not find URL for extendedBy type ',
+                                item.name,
                                 referencedType.name
                             );
                         }
