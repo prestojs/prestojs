@@ -1,5 +1,5 @@
 import { Form } from 'antd';
-import React from 'react';
+import React, { ComponentProps } from 'react';
 
 /**
  * Form component that can be passed to UiProvider.
@@ -10,7 +10,11 @@ import React from 'react';
  * @extract-docs
  * @menu-group Form
  */
-export default function FormWrapper(props): React.ReactElement {
+export default function FormWrapper(
+    props: ComponentProps<typeof Form> & {
+        onSubmit: (data: Record<string, any>, ...args: any[]) => Promise<unknown>;
+    }
+): React.ReactElement {
     const { layout = 'horizontal', ...rest } = props;
     const formItemLayout =
         layout === 'horizontal'
