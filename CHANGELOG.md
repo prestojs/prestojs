@@ -13,6 +13,8 @@
 * Fix to `InferredPaginator` that meant accessing state could be stale due to React 18 batching causing problems (eg. in `useAsyncListing`). 
 * Fix types for `getFormatterForField`. Previously required props to extend `HTMLElement` which didn't make sense - see [#179](https://github.com/prestojs/prestojs/issues/179)
 * Fix `Paginator` to ensure current page is set after response received
+* `Form` no longer pretends to accept a ViewModel in `initialValues` (it claimed it did but would break if passed).
+* Update types for `Form` to accept prop type for `formProps`
 
 ## [0.0.33] - 2022-08-31
 
