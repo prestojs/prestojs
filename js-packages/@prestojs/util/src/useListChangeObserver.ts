@@ -77,7 +77,7 @@ type OnChange<T> = (change: Change<T>, lastValue: T, nextValue: T) => void;
  * allowing you to choose what changes you get (additions, updates, deletions) and to be passed the
  * changed items in the callback. In order to achieve this each item in the array needs to have a
  * unique ID which is obtained by calling the `options.getId` function. The default implementation will
- * look for a `_key` or `id` property and return this, otherwise it return the value as is. This default
+ * look for a `_key` or `id` property and return this, otherwise it returns the value as is. This default
  * implementation is compatible with [ViewModel](doc:viewModelFactory) so you can pass lists of
  * records returned from [useViewModelCache](doc:useViewModelCache).
  *

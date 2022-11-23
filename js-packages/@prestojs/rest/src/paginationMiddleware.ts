@@ -58,10 +58,13 @@ type PaginationMiddlewareOptions = {
      * ```json
      * {
      *   records: {
-     *       users: [...],    // pagination state extracted, `results` set
-     *       products: [...], // unchanged
+     *       // pagination state extracted, `results` set
+     *       users: [...],
+     *       // unchanged
+     *       products: [...],
      *   }
-     *   extra: { ... }       // unchanged
+     *   // unchanged
+     *   extra: { ... }
      * }
      * ```
      *
@@ -204,10 +207,13 @@ Data received:\n`,
 /**
  * Middleware to activate pagination on an endpoint.
  *
- * This should not be added globally. It should be added to each Endpoint
+ * See [Endpoint pagination](doc:Endpoint#Pagination) for details on how pagination works.
+ *
+ * This should not be added globally. It should be added to each [Endpoint](doc:Endpoint)
  * that requires pagination.
  *
- * Usage:
+ * <Usage>
+ * The default usage with no explicit paginator class passed will use [InferredPaginator](doc:InferredPaginator).
  *
  * ```js
  * new Endpoint(new UrlPattern('/users/'), {
@@ -215,15 +221,17 @@ Data received:\n`,
  * })
  * ```
  *
- * Or to customise the paginatorClass
+ * You can explicitly specify the paginator to use as follows:
  *
  * ```js
  * new Endpoint(new UrlPattern('/users/'), {
  *   middleware: [paginationMiddleware(PageNumberPaginator)]
  * })
  * ```
+ * </Usage>
  *
  * @param paginatorClass The pagination class to use. Defaults to [InferredPaginator](doc:InferredPaginator).
+ * @returns The middleware object to be passed to the [Endpoint](doc:Endpoint) `middleware` option.
  *
  * @extract-docs
  * @menu-group Middleware
