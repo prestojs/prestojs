@@ -5,37 +5,37 @@ test('useListChangeObserver should detect multiple changes', async () => {
     // This isn't done with a ViewModel as right now it's not possible to batch changes
     // to ViewModelCache.
     const cb = jest.fn();
-    let records: { id: number; name?: string }[] = [];
+    let records: { _key: number; name?: string }[] = [];
     function useTestEffect(options = {}): void {
         useListChangeObserver(records, cb, options);
     }
     const { rerender } = renderHook(() => useTestEffect(), {
         initialProps: { options: {} },
     });
-    records = [{ id: 1 }];
+    records = [{ _key: 1 }];
     rerender();
     expect(cb).toHaveBeenCalledWith(
-        { ADD: [{ id: 1 }], UPDATE: false, DELETE: false },
+        { ADD: [{ _key: 1 }], UPDATE: false, DELETE: false },
         [],
-        [{ id: 1 }]
+        [{ _key: 1 }]
     );
-    records = [{ id: 2 }, { id: 3 }];
+    records = [{ _key: 2 }, { _key: 3 }];
     rerender();
     expect(cb).toHaveBeenLastCalledWith(
-        { ADD: [{ id: 2 }, { id: 3 }], UPDATE: false, DELETE: [{ id: 1 }] },
-        [{ id: 1 }],
-        [{ id: 2 }, { id: 3 }]
+        { ADD: [{ _key: 2 }, { _key: 3 }], UPDATE: false, DELETE: [{ _key: 1 }] },
+        [{ _key: 1 }],
+        [{ _key: 2 }, { _key: 3 }]
     );
-    records = [{ id: 1 }, { id: 2, name: 'test' }];
+    records = [{ _key: 1 }, { _key: 2, name: 'test' }];
     rerender();
     expect(cb).toHaveBeenLastCalledWith(
         {
-            ADD: [{ id: 1 }],
-            UPDATE: [[{ id: 2 }, { id: 2, name: 'test' }]],
-            DELETE: [{ id: 3 }],
+            ADD: [{ _key: 1 }],
+            UPDATE: [[{ _key: 2 }, { _key: 2, name: 'test' }]],
+            DELETE: [{ _key: 3 }],
         },
-        [{ id: 2 }, { id: 3 }],
-        [{ id: 1 }, { id: 2, name: 'test' }]
+        [{ _key: 2 }, { _key: 3 }],
+        [{ _key: 1 }, { _key: 2, name: 'test' }]
     );
 });
 

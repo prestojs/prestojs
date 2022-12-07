@@ -1,4 +1,5 @@
 import { isEqual as defaultIsEqual } from './comparison';
+import { getId as defaultGetId, hashId } from './identifiable';
 import useChangeObserver, { ChangeObserverOptions } from './useChangeObserver';
 
 export const ADD = 'ADD';
@@ -35,23 +36,12 @@ type ListChangeObserverOptions<T> = ChangeObserverOptions<T> & {
     getId?: (item: T) => string | number;
 };
 
-function defaultGetId(item: any): any {
-    if (item != null && typeof item == 'object' && ('_key' in item || 'id' in item)) {
-        const pk = item._key || item.id;
-        if (Array.isArray(pk)) {
-            return pk.join('|');
-        }
-        return pk;
-    }
-    return item;
-}
-
 function buildById<T extends any[]>(
     data: T,
-    getId: (item: any) => string | number
+    getId?: (item: any) => string | number
 ): Record<string, T> {
     return data.reduce((acc, item) => {
-        acc[getId(item)] = item;
+        acc[hashId(defaultGetId(item, getId))] = item;
         return acc;
     }, {});
 }
@@ -73,17 +63,21 @@ type Change<T> = {
 type OnChange<T> = (change: Change<T>, lastValue: T, nextValue: T) => void;
 
 /**
- * Call a function whenever values in a list change. This differs from `useChangeObserver` by
- * allowing you to choose what changes you get (additions, updates, deletions) and to be passed the
- * changed items in the callback. In order to achieve this each item in the array needs to have a
- * unique ID which is obtained by calling the `options.getId` function. The default implementation will
- * look for a `_key` or `id` property and return this, otherwise it returns the value as is. This default
- * implementation is compatible with [ViewModel](doc:viewModelFactory) so you can pass lists of
+ * Call a function whenever values in a list change. This differs from [useChangeObserver](doc:useChangeObserver) by
+ * allowing you to choose what changes trigger a call (additions, updates, deletions). In addition, the callback is passed
+ * the changed items. In order to achieve this each item in the array needs to have a
+ * unique ID which is obtained by calling the `options.getId` function. If the `item` implements the [Identifiable](doc:Identifiable)
+ * interface then `getId` is optional. This default implementation is compatible with [ViewModel](doc:viewModelFactory) so you can pass lists of
  * records returned from [useViewModelCache](doc:useViewModelCache).
+ *
+ * <Usage>
+ *
+ * A common use case is to call a list endpoint whenever the cache for that view model changes as it could mean
+ * a new record was added / modified / deleted which could change the list of records that should be displayed.
  *
  * ```jsx
  * export default function UserListView() {
- *   const { data, revalidate, isValidating } = useEndpoint(User.endpoints.list);
+ *   const { result, run, isLoading } = useAsync(User.endpoints.list.prepare(), { trigger: 'SHALLOW' });
  *   // Refetch data whenever underlying cache changes
  *   const allRecords = useViewModelCache(User, cache => cache.getAll(fieldList));
  *   // NOTE: Usually you don't want multiple useListChangeObserver's on the exact same
@@ -93,10 +87,11 @@ type OnChange<T> = (change: Change<T>, lastValue: T, nextValue: T) => void;
  *   // to trigger the useEndpoint() revalidate because that record update may have changed the
  *   // order of records or caused it to [no longer] appear in a filtered list of data.
  *   // Also note that we pass false while data is being fetched from the backend
- *   useListChangeObserver(!isValidating && allRecords, revalidate);
+ *   useListChangeObserver(!isLoading && allRecords, run);
  *   return <ListView records={data} />;
  * }
  * ```
+ * </Usage>
  *
  * @param value An array of values to monitor for changes. A falsey value can be passed to disable
  * checks. This is the same as passing `options.disabled`. This is convenient for cases where no value
@@ -127,7 +122,7 @@ export default function useListChangeObserver<T extends any[]>(
         runOnAdd = true,
         runOnDelete = true,
         runOnUpdate = true,
-        getId = defaultGetId,
+        getId,
         ...otherOptions
     } = options || {};
     // false/null can be passed to disable
