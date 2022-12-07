@@ -52,7 +52,12 @@ export interface InputProps<FieldValueT, ElementT extends HTMLElement> {
      * be the new value passed.
      */
     value?: FieldValueT;
-    // checked?: boolean;
+    /**
+     * For `checkbox` fields this may be set to indicate checked status. The usage of
+     * this depends on the form library - @prestojs/final-form will set this when
+     * `type="checkbox"` is passed to `Field`.
+     */
+    checked?: boolean;
     // multiple?: boolean;
 }
 

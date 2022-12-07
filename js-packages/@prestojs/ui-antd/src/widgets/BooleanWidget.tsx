@@ -35,8 +35,10 @@ type BooleanWidgetProps = Omit<
  */
 function BooleanWidget(props: BooleanWidgetProps, ref): React.ReactElement {
     const { input, meta, ...rest } = props;
-    const { value, ...restInput } = input;
-    return <Checkbox ref={ref} {...restInput} {...rest} checked={!!value} />;
+    const { value, checked, ...restInput } = input;
+    // If checked is provided use that otherwise use value. react-final-form will
+    // set `checked` but only if Field is passed type="checkbox"
+    return <Checkbox ref={ref} {...restInput} {...rest} checked={checked ?? !!value} />;
 }
 
 export default React.forwardRef(BooleanWidget);
