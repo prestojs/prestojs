@@ -41,7 +41,7 @@ type NumberFormatterProps = {
  * If an invalid value is provided `invalidValueLabel` is returned.
  *
  * This is the [default formatter](doc:getFormatterForField) used for [NumberField](doc:NumberField), [DecimalField](doc:DecimalField),
- * [CurrencyField](doc:CurrencyField), [FloatField](doc:FloatField) and [IntegerField](doc:IntegerField)
+ * [FloatField](doc:FloatField) and [IntegerField](doc:IntegerField)
  *
  * <Usage>
  *     Basic usage just requires passing the number through in the `value` prop:

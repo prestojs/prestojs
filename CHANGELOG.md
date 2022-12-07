@@ -11,7 +11,8 @@
 * `useListChangeObserver` now uses the `Identifiable` interface and as such by default expects items to have a `_key` property. Previously
   it worked with `_key` or `id`. You can pass `getId` if you need the old behaviour.
 * Passing `type="checkbox"` to `Field` will now work properly when using `BooleanWidget`.
-* `NullableBooleanField` has been removed. Use `BooleanField({ blank: true })` instead.
+* `NullableBooleanField` has been removed. Use `BooleanField({ blank: true })` instead. `NullableBooleanWidget` still exists and is used
+  for `BooleanField` when `blank` is `true`.
 * Removed `DurationField`, `UUIDField`, `IPAddressField` and `SlugField`. You can replace usage of these with `CharField` or a custom field. These were
   removed as Presto provided no extra functionality for these.
 * Removed `DurationWidget`, `UUIDWidget`, `IPAddressWidget` and `SlugWidget`. Usages of these can be replaced with `CharWidget` or a custom widget.

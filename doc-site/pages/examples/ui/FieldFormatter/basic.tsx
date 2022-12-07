@@ -11,11 +11,13 @@ import {
 import {
     BooleanField,
     CharField,
-    CurrencyField,
+    DecimalField,
     NumberField,
     viewModelFactory,
 } from '@prestojs/viewmodel';
 import React from 'react';
+
+class CurrencyField extends DecimalField {}
 
 function getFormatterForField(field): FormatterComponentDefinition | null {
     // Provide override for CurrencyField
