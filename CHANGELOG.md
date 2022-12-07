@@ -12,6 +12,12 @@
   it worked with `_key` or `id`. You can pass `getId` if you need the old behaviour.
 * Passing `type="checkbox"` to `Field` will now work properly when using `BooleanWidget`.
 * `NullableBooleanField` has been removed. Use `BooleanField({ blank: true })` instead.
+* Removed `DurationField`, `UUIDField`, `IPAddressField` and `SlugField`. You can replace usage of these with `CharField` or a custom field. These were
+  removed as Presto provided no extra functionality for these.
+* Removed `DurationWidget`, `UUIDWidget`, `IPAddressWidget` and `SlugWidget`. Usages of these can be replaced with `CharWidget` or a custom widget.
+* Removed `CurrencyField`. You can replace usage of this with `DecimalField` or a custom field. This were removed as Presto provided no extra functionality
+  over the base field.
+* Removed `CurrencyWidget`. Usages of this can be replaced with `DecimalWidget` or a custom widget.
 
 ## [0.0.34] - 2022-10-07
 

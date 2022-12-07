@@ -34,13 +34,11 @@ const TimeFormatter = React.lazy(() => import('./formatters/TimeFormatter'));
 const mapping = new Map<string, any>([
     ['BooleanField', BooleanFormatter],
     ['CharField', CharFormatter],
-    ['CurrencyField', NumberFormatter],
     ['DateField', DateFormatter],
     ['DateRangeField', [RangeFormatter, { baseFormatter: DateFormatter }]],
     ['DateTimeField', DateTimeFormatter],
     ['DateTimeRangeField', [RangeFormatter, { baseFormatter: DateTimeFormatter }]],
     ['DecimalField', NumberFormatter],
-    ['DurationField', TimeFormatter],
     ['EmailField', CharFormatter],
     ['FileField', LinkFormatter],
     ['FloatField', NumberFormatter],
@@ -48,14 +46,11 @@ const mapping = new Map<string, any>([
     ['ImageField', ImageFormatter],
     ['IntegerField', NumberFormatter],
     ['IntegerRangeField', [RangeFormatter, { baseFormatter: NumberFormatter }]],
-    ['IPAddressField', CharFormatter],
     ['JsonField', CharFormatter],
     ['NumberField', NumberFormatter],
-    ['SlugField', CharFormatter],
     ['TextField', CharFormatter],
     ['TimeField', TimeFormatter],
     ['URLField', LinkFormatter],
-    ['UUIDField', CharFormatter],
 ]);
 
 // choices -> select/radio widgets; only accepting integer(for enum) and char for now

@@ -6,14 +6,12 @@ import React from 'react';
 // RangeField is not included: its not meant to be used directly - TODO: mark it abstract?
 const mapping = new Map<string, FieldWidgetType<any, any>>([
     ['CharField', React.lazy(() => import('./widgets/CharWidget'))],
-    ['CurrencyField', React.lazy(() => import('./widgets/CurrencyWidget'))],
     ['DateField', React.lazy(() => import('./widgets/DateWidget'))],
     ['DateRangeField', React.lazy(() => import('./widgets/DateRangeWidget'))],
     ['DateTimeField', React.lazy(() => import('./widgets/DateTimeWidget'))],
     ['DateTimeRangeField', React.lazy(() => import('./widgets/DateTimeRangeWidget'))],
     ['DecimalField', React.lazy(() => import('./widgets/DecimalWidget'))],
     ['DecimalRangeField', React.lazy(() => import('./widgets/DecimalRangeWidget'))],
-    ['DurationField', React.lazy(() => import('./widgets/DurationWidget'))],
     ['EmailField', React.lazy(() => import('./widgets/EmailWidget'))],
     ['FileField', React.lazy(() => import('./widgets/FileWidget'))],
     ['FloatField', React.lazy(() => import('./widgets/FloatWidget'))],
@@ -21,15 +19,12 @@ const mapping = new Map<string, FieldWidgetType<any, any>>([
     ['ImageField', React.lazy(() => import('./widgets/ImageWidget'))],
     ['IntegerField', React.lazy(() => import('./widgets/IntegerWidget'))],
     ['IntegerRangeField', React.lazy(() => import('./widgets/IntegerRangeWidget'))],
-    ['IPAddressField', React.lazy(() => import('./widgets/IPAddressWidget'))],
     ['JsonField', React.lazy(() => import('./widgets/JsonWidget'))],
     ['NumberField', React.lazy(() => import('./widgets/NumberWidget'))],
     ['PasswordField', React.lazy(() => import('./widgets/PasswordWidget'))],
-    ['SlugField', React.lazy(() => import('./widgets/SlugWidget'))],
     ['TextField', React.lazy(() => import('./widgets/TextWidget'))],
     ['TimeField', React.lazy(() => import('./widgets/TimeWidget'))],
     ['URLField', React.lazy(() => import('./widgets/URLWidget'))],
-    ['UUIDField', React.lazy(() => import('./widgets/UUIDWidget'))],
 ]);
 
 // choices -> select/radio widgets; only accepting integer(for enum) and char for now - might want to expand to currency type of currency later.
