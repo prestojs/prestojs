@@ -22,7 +22,6 @@ import {
     IPAddressField,
     JsonField,
     ListField,
-    NullableBooleanField,
     NumberField,
     PasswordField,
     SlugField,
@@ -99,6 +98,7 @@ test('getWidgetForField should return widget for descendant classes of same type
 test.each(
     [
         [BooleanField, BooleanWidget],
+        [new BooleanField({ blank: true }), NullableBooleanWidget],
         [CharField, CharWidget],
         [new CurrencyField({ decimalPlaces: 2 }), CurrencyWidget],
         [DateField, DateWidget],
@@ -118,7 +118,6 @@ test.each(
         [IPAddressField, IPAddressWidget],
         [JsonField, JsonWidget],
         [NumberField, NumberWidget],
-        [NullableBooleanField, NullableBooleanWidget],
         [PasswordField, PasswordWidget],
         [SlugField, SlugWidget],
         [TextField, TextWidget],

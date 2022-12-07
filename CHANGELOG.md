@@ -11,6 +11,7 @@
 * `useListChangeObserver` now uses the `Identifiable` interface and as such by default expects items to have a `_key` property. Previously
   it worked with `_key` or `id`. You can pass `getId` if you need the old behaviour.
 * Passing `type="checkbox"` to `Field` will now work properly when using `BooleanWidget`.
+* `NullableBooleanField` has been removed. Use `BooleanField({ blank: true })` instead.
 
 ## [0.0.34] - 2022-10-07
 

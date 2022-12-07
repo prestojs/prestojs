@@ -50,7 +50,6 @@ const mapping = new Map<string, any>([
     ['IntegerRangeField', [RangeFormatter, { baseFormatter: NumberFormatter }]],
     ['IPAddressField', CharFormatter],
     ['JsonField', CharFormatter],
-    ['NullableBooleanField', BooleanFormatter],
     ['NumberField', NumberFormatter],
     ['SlugField', CharFormatter],
     ['TextField', CharFormatter],

@@ -33,7 +33,7 @@ type BooleanFormatterProps = {
  *
  * Displays truthy value as `Yes`, falsy as `No` and null/undefined/empty string as `blankLabel` (defaults to empty string).
  *
- * This is the [default formatter](doc:getFormatterForField) used for [BooleanField](doc:BooleanField) and [NullableBooleanField](doc:NullableBooleanField).
+ * This is the [default formatter](doc:getFormatterForField) used for [BooleanField](doc:BooleanField).
  *
  * <Usage>
  *     Basic usage just requires passing the value through:
