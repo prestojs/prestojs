@@ -2,14 +2,12 @@ import {
     AsyncChoices,
     BooleanField,
     CharField,
-    CurrencyField,
     DateField,
     DateRangeField,
     DateTimeField,
     DateTimeRangeField,
     DecimalField,
     DecimalRangeField,
-    DurationField,
     EmailField,
     Field,
     FieldProps,
@@ -19,17 +17,13 @@ import {
     ImageField,
     IntegerField,
     IntegerRangeField,
-    IPAddressField,
     JsonField,
     ListField,
-    NullableBooleanField,
     NumberField,
     PasswordField,
-    SlugField,
     TextField,
     TimeField,
     URLField,
-    UUIDField,
 } from '@prestojs/viewmodel';
 import '@testing-library/jest-dom/extend-expect';
 import { DatePicker, TimePicker } from 'antd';
@@ -41,14 +35,12 @@ import BooleanWidget from '../widgets/BooleanWidget';
 import ChoicesWidget from '../widgets/CharChoicesWidget';
 import CharChoicesWidget from '../widgets/CharChoicesWidget';
 import CharWidget from '../widgets/CharWidget';
-import CurrencyWidget from '../widgets/CurrencyWidget';
 import DateRangeWidget from '../widgets/DateRangeWidget';
 import DateTimeRangeWidget from '../widgets/DateTimeRangeWidget';
 import DateTimeWidget from '../widgets/DateTimeWidget';
 import DateWidget from '../widgets/DateWidget';
 import DecimalRangeWidget from '../widgets/DecimalRangeWidget';
 import DecimalWidget from '../widgets/DecimalWidget';
-import DurationWidget from '../widgets/DurationWidget';
 import EmailWidget from '../widgets/EmailWidget';
 import FileWidget from '../widgets/FileWidget';
 import FloatRangeWidget from '../widgets/FloatRangeWidget';
@@ -56,16 +48,13 @@ import FloatWidget from '../widgets/FloatWidget';
 import ImageWidget from '../widgets/ImageWidget';
 import IntegerRangeWidget from '../widgets/IntegerRangeWidget';
 import IntegerWidget from '../widgets/IntegerWidget';
-import IPAddressWidget from '../widgets/IPAddressWidget';
 import JsonWidget from '../widgets/JsonWidget';
 import NullableBooleanWidget from '../widgets/NullableBooleanWidget';
 import NumberWidget from '../widgets/NumberWidget';
 import PasswordWidget from '../widgets/PasswordWidget';
-import SlugWidget from '../widgets/SlugWidget';
 import TextWidget from '../widgets/TextWidget';
 import TimeWidget from '../widgets/TimeWidget';
 import URLWidget from '../widgets/URLWidget';
-import UUIDWidget from '../widgets/UUIDWidget';
 
 test('getWidgetForField should return widget for field', async () => {
     const [UnknownWidget, props] = getWidgetForField(new PasswordField()) as any;
@@ -99,15 +88,14 @@ test('getWidgetForField should return widget for descendant classes of same type
 test.each(
     [
         [BooleanField, BooleanWidget],
+        [new BooleanField({ blank: true }), NullableBooleanWidget],
         [CharField, CharWidget],
-        [new CurrencyField({ decimalPlaces: 2 }), CurrencyWidget],
         [DateField, DateWidget],
         [DateRangeField, DateRangeWidget],
         [DateTimeField, DateTimeWidget],
         [DateTimeRangeField, DateTimeRangeWidget],
         [new DecimalField({ decimalPlaces: 2 }), DecimalWidget],
         [DecimalRangeField, DecimalRangeWidget],
-        [DurationField, DurationWidget],
         [EmailField, EmailWidget],
         [FileField, FileWidget],
         [FloatField, FloatWidget],
@@ -115,16 +103,12 @@ test.each(
         [ImageField, ImageWidget],
         [IntegerField, IntegerWidget],
         [IntegerRangeField, IntegerRangeWidget],
-        [IPAddressField, IPAddressWidget],
         [JsonField, JsonWidget],
         [NumberField, NumberWidget],
-        [NullableBooleanField, NullableBooleanWidget],
         [PasswordField, PasswordWidget],
-        [SlugField, SlugWidget],
         [TextField, TextWidget],
         [TimeField, TimeWidget],
         [URLField, URLWidget],
-        [UUIDField, UUIDWidget],
         [new CharField({ choices: [['1', 'One']] }), ChoicesWidget],
         [new IntegerField({ choices: [[1, 'One']] }), ChoicesWidget],
         [new ListField({ childField: new IntegerField({ choices: [[1, 'One']] }) }), ChoicesWidget],
