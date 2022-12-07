@@ -42,7 +42,7 @@ export type ChoicesGrouped<T> = [string, Choice<T>[]];
  *    value(s) and need label(s) to show (eg. when displaying a choice on a detail
  *    view or rendering the value selected on a select widget).
  * 2) A function to list & filter the available  choices. This is used when selecting
- *    a value (eg. the options shown in a select widget).
+ *    a value (e.g. the options shown in a select widget).
  *
  * Both of these functions may need to store state (eg. pagination for a listing)
  * or access things from context (eg. read values from a cache). This can be done

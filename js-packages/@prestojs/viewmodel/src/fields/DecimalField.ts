@@ -17,8 +17,7 @@ type DecimalFieldProps = NumberFieldProps<string> & {
  * This class accepts all the props of [NumberField](doc:NumberField) as well as the optional
  * `decimalPlaces` properties which can be used by form widgets to limit the accepted values.
  *
- * ## Usage
- *
+ * <Usage>
  * Use with [viewModelFactory](doc:viewModelFactory).
  *
  * ```js
@@ -46,6 +45,7 @@ type DecimalFieldProps = NumberFieldProps<string> & {
  *
  * See also: [FloatField](doc:FloatField)
  *
+ * </Usage>
  *
  * @extract-docs
  * @menu-group Fields

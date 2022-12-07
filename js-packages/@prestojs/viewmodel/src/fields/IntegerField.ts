@@ -7,7 +7,7 @@ import NumberField from './NumberField';
  * `minValue` & `maxValue` properties which can be used by form widgets to limit the accepted
  * values.
  *
- * ## Usage
+ * <Usage>
  *
  * Use with [viewModelFactory](doc:viewModelFactory).
  *
@@ -30,6 +30,8 @@ import NumberField from './NumberField';
  *   }),
  * }, { pkFieldName: 'id' });
  * ```
+ *
+ * </Usage>
  *
  * @extract-docs
  * @menu-group Fields

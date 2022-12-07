@@ -5,8 +5,7 @@ import NumberField from './NumberField';
  *
  * This class accepts all the props of [NumberField](doc:NumberField).
  *
- * ## Usage
- *
+ * <Usage>
  * Use with [viewModelFactory](doc:viewModelFactory).
  *
  * ```js
@@ -31,6 +30,7 @@ import NumberField from './NumberField';
  * This field stores the value as a [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number). If
  * you need arbitrary precision use [DecimalField](doc:DecimalField)
  * </Alert>
+ * </Usage>
  *
  * @extract-docs
  * @menu-group Fields

@@ -53,6 +53,10 @@ type DedupeOptions = {
  * Middleware that will dedupe simultaneous identical in flight requests. All requests that are matched
  * as duplicates will all resolve to the same value with only a single `fetch` call having occurred.
  *
+ * Duplicate calls are detected based on the `getKey` option described below. Only calls that pass `test`
+ * will be de-duplicated.
+ *
+ * <Usage>
  * To use this globally set the following somewhere that executes when your app starts:
  *
  * ```js
@@ -60,6 +64,7 @@ type DedupeOptions = {
  *   dedupeInFlightRequestsMiddleware(),
  * ];
  * ```
+ * </Usage>
  *
  * @returns Middleware function to pass to [Endpoint](doc:Endpoint) or set on [Endpoint.defaultConfig.middleware](doc:Endpoint#Property-defaultConfig)
  * @extract-docs

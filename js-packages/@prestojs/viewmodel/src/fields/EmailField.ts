@@ -6,8 +6,7 @@ import CharField from './CharField';
  * This class accepts the same props as [CharField](doc:CharField). The only difference is in
  * the default widget used (see [EmailWidget](doc:EmailWidget) & [getWidgetForField](doc:getWidgetForField)).
  *
- * ## Usage
- *
+ * <Usage>
  * Use with [viewModelFactory](doc:viewModelFactory).
  *
  * ```js
@@ -16,6 +15,8 @@ import CharField from './CharField';
  *   emailAddress: new EmailField(),
  * }, { pkFieldName: 'id' });
  * ```
+ *
+ * </Usage>
  *
  * @extract-docs
  * @menu-group Fields

@@ -82,11 +82,13 @@ function defaultIsPaginated<T>(
 
 /**
  * Middleware that detects if paginationMiddleware isn't present when it should be or if
- * `pagination` option to `Endpoint.execute` hasn't been supplied.
+ * `pagination` option to `Endpoint.execute` hasn't been supplied. If either of these cases
+ * are detected an error will be logged to the console.
  *
  * This helps avoid cryptic errors when a response is paginated but other middleware expects
- * to receive just the results (eg. [viewModelCachingMiddleware](doc:viewModelCachingMiddleware)).
+ * to receive just the results (e.g. [viewModelCachingMiddleware](doc:viewModelCachingMiddleware)).
  *
+ * <Usage>
  * It is recommended you add this to the global list of middleware:
  *
  * ```js
@@ -95,8 +97,9 @@ function defaultIsPaginated<T>(
  *      detectBadPaginationMiddleware(),
  * ];
  * ```
+ * </Usage>
  *
- * @param isPaginated Function that returns `true` if a response is paginated. By default this uses
+ * @param isPaginated Function that returns `true` if a response is paginated. By default, this uses
  * `InferredPaginator.getPaginationState` to determine this. If you use custom pagination class(es) you
  * should provide this function.
  *
