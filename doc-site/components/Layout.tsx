@@ -1,11 +1,10 @@
 import { PreferencesProvider } from '@prestojs/doc';
-import { UiProvider } from '@prestojs/ui';
+import { getFormatterForField, UiProvider } from '@prestojs/ui';
+import { getWidgetForField } from '@prestojs/ui-antd';
 import FormItemWrapper from '@prestojs/ui-antd/FormItemWrapper';
 import FormWrapper from '@prestojs/ui-antd/FormWrapper';
 import Head from 'next/head';
 import React, { ReactNode, useState } from 'react';
-import getFormatterForField from '../getFormatterForField';
-import getWidgetForField from '../getWidgetForField';
 import Header from './Header';
 import MainMenuSidebar from './MainMenuSidebar';
 
