@@ -24,7 +24,7 @@ const mapping = new Map<string, FieldWidgetType<any, any>>([
     ['PasswordField', React.lazy(() => import('./widgets/PasswordWidget'))],
     ['TextField', React.lazy(() => import('./widgets/TextWidget'))],
     ['TimeField', React.lazy(() => import('./widgets/TimeWidget'))],
-    ['URLField', React.lazy(() => import('./widgets/URLWidget'))],
+    ['URLField', React.lazy(() => import('./widgets/CharWidget'))],
 ]);
 
 // choices -> select/radio widgets; only accepting integer(for enum) and char for now - might want to expand to currency type of currency later.
