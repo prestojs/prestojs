@@ -54,7 +54,6 @@ import NumberWidget from '../widgets/NumberWidget';
 import PasswordWidget from '../widgets/PasswordWidget';
 import TextWidget from '../widgets/TextWidget';
 import TimeWidget from '../widgets/TimeWidget';
-import URLWidget from '../widgets/URLWidget';
 
 test('getWidgetForField should return widget for field', async () => {
     const [UnknownWidget, props] = getWidgetForField(new PasswordField()) as any;
@@ -108,7 +107,7 @@ test.each(
         [PasswordField, PasswordWidget],
         [TextField, TextWidget],
         [TimeField, TimeWidget],
-        [URLField, URLWidget],
+        [URLField, CharWidget],
         [new CharField({ choices: [['1', 'One']] }), ChoicesWidget],
         [new IntegerField({ choices: [[1, 'One']] }), ChoicesWidget],
         [new ListField({ childField: new IntegerField({ choices: [[1, 'One']] }) }), ChoicesWidget],

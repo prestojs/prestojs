@@ -31,7 +31,6 @@ export { default as RangeWidget } from './widgets/RangeWidget';
 export { default as SelectChoicesWidget } from './widgets/SelectChoicesWidget';
 export { default as TextWidget } from './widgets/TextWidget';
 export { default as TimeWidget } from './widgets/TimeWidget';
-export { default as URLWidget } from './widgets/URLWidget';
 export { default as SelectAsyncChoicesWidget } from './widgets/SelectAsyncChoicesWidget';
 
 export { default as getWidgetForField } from './getWidgetForField';

@@ -21,8 +21,8 @@ export interface NumberFieldProps<ValueT> extends FieldProps<ValueT> {
  * `minValue` and `maxValue` properties which can be used by form widgets to validate
  * the inputted value
  *
- * ## Usage
  *
+ * <Usage>
  * Use with [viewModelFactory](doc:viewModelFactory).
  *
  * ```js
@@ -43,6 +43,7 @@ export interface NumberFieldProps<ValueT> extends FieldProps<ValueT> {
  *   }),
  * }, { pkFieldName: 'id' });
  * ```
+ * </Usage>
  *
  * @extract-docs
  * @menu-group Fields
