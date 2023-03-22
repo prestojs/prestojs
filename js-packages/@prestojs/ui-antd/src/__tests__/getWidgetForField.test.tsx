@@ -57,10 +57,16 @@ import TimeWidget from '../widgets/TimeWidget';
 
 test('getWidgetForField should return widget for field', async () => {
     const [UnknownWidget, props] = getWidgetForField(new PasswordField()) as any;
+    const input = {
+        value: null,
+        onChange(nextValue) {
+            // intentionally blank
+        },
+    };
 
     const { getByTestId, getByText } = render(
         <React.Suspense fallback="loading...">
-            <UnknownWidget data-testid="widget" {...props} />
+            <UnknownWidget data-testid="widget" {...props} input={input} />
         </React.Suspense>
     );
 

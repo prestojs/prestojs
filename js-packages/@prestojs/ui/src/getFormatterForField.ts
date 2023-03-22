@@ -30,6 +30,9 @@ const NumberFormatter = React.lazy(() => import('./formatters/NumberFormatter'))
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const TimeFormatter = React.lazy(() => import('./formatters/TimeFormatter'));
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const JsonFormatter = React.lazy(() => import('./formatters/JsonFormatter'));
 
 const mapping = new Map<string, any>([
     ['BooleanField', BooleanFormatter],
@@ -46,7 +49,7 @@ const mapping = new Map<string, any>([
     ['ImageField', ImageFormatter],
     ['IntegerField', NumberFormatter],
     ['IntegerRangeField', [RangeFormatter, { baseFormatter: NumberFormatter }]],
-    ['JsonField', CharFormatter],
+    ['JsonField', JsonFormatter],
     ['NumberField', NumberFormatter],
     ['TextField', CharFormatter],
     ['TimeField', TimeFormatter],

@@ -1,22 +1,65 @@
-import CharField from './CharField';
+import Field from './Field';
 
 export type JSON<T> = string & { ' __JSON': T };
 
 /**
- * JSON Field.
+ * Field for JSON values.
  *
- * Parses valid json string into json objects. Invalid input will be treated as if they're already an object and returned as is.
+ * The `parse` implementation will parse strings with ``JSON.parse``. If it's not a valid JSON string then the unparsed
+ * string will be returned.
+ *
+ * `normalize` will do the same, except it will throw in the case of an invalid JSON string. As such once a record is
+ * constructed the value is guaranteed to be the normalized value.
+ *
+ * `format` will format the value as a nicely indented JSON string.
+ *
+ * This class accepts all the props of [Field](doc:Field).
+ *
+ * <Usage>
+ * Use with [viewModelFactory](doc:viewModelFactory).
+ *
+ * ```js
+ * viewModelFactory({
+ *   id: new Field(),
+ *   data: new JsonField(),
+ * }, { pkFieldName: 'id' });
+ * ```
+ *
+ * Optionally provide any options from [Field](doc:Field):
+ *
+ * ```js
+ * viewModelFactory({
+ *   id: new Field(),
+ *   data: new JsonField({
+ *     helpText: 'Paste JSON data here',
+ *   }),
+ * }, { pkFieldName: 'id' });
+ * ```
+ * </Usage>
+ *
  *
  * @extract-docs
  * @menu-group Fields
  */
-export default class JsonField extends CharField {
+export default class JsonField<T> extends Field<T, JSON<T> | T> {
     static fieldClassName = 'JsonField';
-    parse<T>(json: JSON<T>): T {
-        try {
-            return JSON.parse(json as string) as any;
-        } catch (e) {
-            return json as any;
+    normalize(value: JSON<T> | T): T | null {
+        if (null == value) {
+            return value;
         }
+        if (typeof value == 'string') {
+            return JSON.parse(value as string) as T;
+        }
+        return value;
+    }
+    parse(value: JSON<T> | T): T | null {
+        try {
+            return this.normalize(value);
+        } catch (e) {
+            return value as any;
+        }
+    }
+    public format(value: T): any {
+        return JSON.stringify(value, null, 2);
     }
 }

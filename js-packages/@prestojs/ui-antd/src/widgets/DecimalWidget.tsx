@@ -1,28 +1,39 @@
-import { WidgetProps } from '@prestojs/ui';
-import { InputNumber } from 'antd';
-import { InputNumberProps } from 'antd/lib/input-number';
 import React from 'react';
+import NumberWidget, { NumberWidgetProps } from './NumberWidget';
 
 /**
  * @expand-properties
- * @hide-properties choices asyncChoices
+ * @hide-properties meta
  */
-type DecimalWidgetProps = WidgetProps<string, HTMLInputElement> &
-    Omit<InputNumberProps, 'onChange' | 'value'>;
+type DecimalWidgetProps = Omit<NumberWidgetProps<string>, 'stringMode'>;
 
 /**
- * See [InputNumber](https://ant.design/components/input-number/) for props available
+ * Form widget for string values that renders as a [InputNumber](https://4x.ant.design/components/input-number/) with
+ * `stringMode` enabled.
+ *
+ * This is the [default widget](doc:getWidgetForField) used for [DecimalField](doc:DecimalField)
+ *
+ * <Usage type="widget" widgetName="DecimalWidget">
+ * ```js
+ * function DecimalWidgetExample() {
+ * const [value, setValue] = useState(null);
+ *  return <DecimalNumberWidget input={{ onChange(nextValue) {
+ *  setValue(nextValue)
+ * }, value}} />
+ * }
+ * ```
+ * </Usage>
  *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
+ * @hide-properties meta
  */
 function DecimalWidget(
     props: DecimalWidgetProps,
     ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
-    const { input, meta, ...rest } = props;
-    return <InputNumber ref={ref} stringMode {...input} {...rest} />;
+    return <NumberWidget<string> ref={ref} stringMode {...props} />;
 }
 
 export default React.forwardRef(DecimalWidget);

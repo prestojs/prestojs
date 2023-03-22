@@ -13,6 +13,7 @@ export { default as LinkFormatter } from './formatters/LinkFormatter';
 export { default as NumberFormatter } from './formatters/NumberFormatter';
 export { default as RangeFormatter } from './formatters/RangeFormatter';
 export { default as TimeFormatter } from './formatters/TimeFormatter';
+export { default as JsonFormatter } from './formatters/JsonFormatter';
 
 import type {
     FieldWidgetType,

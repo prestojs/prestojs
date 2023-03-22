@@ -1132,10 +1132,12 @@ class Converter {
         Error: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error',
         'Intl.DateTimeFormatOptions':
             'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#parameters',
-        CheckboxProps: 'https://ant.design/components/checkbox/#API',
-        Checkbox: 'https://ant.design/components/checkbox/#API',
-        'Checkbox.Group': 'https://ant.design/components/checkbox/#Checkbox-Group',
-        Input: 'https://ant.design/components/input/#API',
+        CheckboxProps: 'https://4x.ant.design/components/checkbox/#API',
+        Checkbox: 'https://4x.ant.design/components/checkbox/#API',
+        'Checkbox.Group': 'https://4x.ant.design/components/checkbox/#Checkbox-Group',
+        Input: 'https://4x.ant.design/components/input/#API',
+        InputNumber: 'https://4x.ant.design/components/input-number/#API',
+        'Input.Password': 'https://4x.ant.design/components/input/#Input.Password',
         FocusEvent: 'https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent',
     };
 

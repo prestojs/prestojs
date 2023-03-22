@@ -16,9 +16,10 @@
 * Removed `DurationField`, `UUIDField`, `IPAddressField` and `SlugField`. You can replace usage of these with `CharField` or a custom field. These were
   removed as Presto provided no extra functionality for these.
 * Removed `DurationWidget`, `UUIDWidget`, `IPAddressWidget`, `URLWidget` and `SlugWidget`. Usages of these can be replaced with `CharWidget` or a custom widget.
-* Removed `CurrencyField`. You can replace usage of this with `DecimalField` or a custom field. This were removed as Presto provided no extra functionality
+* Removed `CurrencyField`. You can replace usage of this with `DecimalField` or a custom field. These were removed as Presto provided no extra functionality
   over the base field.
 * Removed `CurrencyWidget`. Usages of this can be replaced with `DecimalWidget` or a custom widget.
+* Add `JsonFormatter` and use it as default formatter for `JsonField`.
 
 ## [0.0.34] - 2022-10-07
 

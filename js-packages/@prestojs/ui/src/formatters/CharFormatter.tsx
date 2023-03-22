@@ -20,10 +20,10 @@ type CharFormatterProps = {
  * Format a string for display. Returns value directly as is.
  *
  * This is the [default formatter](doc:getFormatterForField) used for [CharField](doc:CharField), [EmailField](doc:EmailField),
- * [TextField](doc:TextField), and [JSONField](doc:JsonField)
+ * [TextField](doc:TextField), and [JsonField](doc:JsonField)
  *
  * <Usage>
- *     Basic usage requires URL to be passed through in the `value` prop
+ *     Basic usage requires the string to be passed through in the `value` prop
  *
  *     ```js
  *     <CharFormatter value="Cheese" />

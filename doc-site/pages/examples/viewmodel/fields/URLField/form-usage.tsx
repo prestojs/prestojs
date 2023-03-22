@@ -4,18 +4,17 @@
  * This example shows the default widget that will be used in a [Form](doc:Form)
  * when using [@prestojs/ui-antd](/docs/ui-antd). See [getWidgetForField](doc:getWidgetForField).
  *
- * The default widget is [EmailWidget](doc:CharWidget)
+ * The default widget is [CharWidget](doc:CharWidget)
  *
- * If `maxLength` is specified the widget will limit the length of entered text.
+ * If `maxLength` is specified the widget will limit the length of entered URL.
  *
- * Any extra widget props can be defined at the field level in the `widgetProps` option (eg.
- * `placeholder` in this example).
+ * Any extra widget props can be defined at the field level in the `widgetProps` option.
  *
  * @wide
  */
 import { Form } from '@prestojs/final-form';
 import { AntdUiProvider, FormItemWrapper, FormWrapper, getWidgetForField } from '@prestojs/ui-antd';
-import { EmailField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
+import { CharField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
 import { Button } from 'antd';
 import 'antd/dist/antd.min.css';
 import React from 'react';
@@ -23,11 +22,8 @@ import React from 'react';
 class ExampleModel extends viewModelFactory(
     {
         id: new IntegerField(),
-        email: new EmailField({
-            helpText: 'Please enter your email address',
-            widgetProps: {
-                placeholder: 'Enter your email address',
-            },
+        url: new CharField({
+            helpText: 'Enter the URL',
         }),
     },
     { pkFieldName: 'id' }
@@ -43,7 +39,7 @@ export default function FormUsage() {
             >
                 <div className="grid grid-cols-1 gap-4 w-full">
                     <Form onSubmit={data => console.log(data)}>
-                        <Form.Item field={ExampleModel.fields.email} />
+                        <Form.Item field={ExampleModel.fields.url} />
                         <Form.Item wrapperCol={{ offset: 6 }}>
                             <Button type="primary" htmlType="submit">
                                 Submit (check console)

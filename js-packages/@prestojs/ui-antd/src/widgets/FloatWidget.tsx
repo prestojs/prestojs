@@ -1,28 +1,38 @@
-import { WidgetProps } from '@prestojs/ui';
-import { InputNumber } from 'antd';
-import { InputNumberProps } from 'antd/lib/input-number';
 import React from 'react';
+import NumberWidget, { NumberWidgetProps } from './NumberWidget';
 
 /**
  * @expand-properties
- * @hide-properties choices asyncChoices
+ * @hide-properties meta
  */
-type FloatWidgetProps = WidgetProps<number, HTMLInputElement> &
-    Omit<InputNumberProps, 'onChange' | 'value'>;
+type FloatWidgetProps = NumberWidgetProps<number>;
 
 /**
- * See [InputNumber](https://ant.design/components/input-number/) for props available
+ * Form widget for string values that renders as a [InputNumber](https://4x.ant.design/components/input-number/).
+ *
+ * This is the [default widget](doc:getWidgetForField) used for [FloatField](doc:FloatField)
+ *
+ * <Usage type="widget" widgetName="FloatWidget">
+ * ```js
+ * function FloatWidgetExample() {
+ * const [value, setValue] = useState(null);
+ *  return <FloatNumberWidget input={{ onChange(nextValue) {
+ *  setValue(nextValue)
+ * }, value}} />
+ * }
+ * ```
+ * </Usage>
  *
  * @extract-docs
  * @menu-group Widgets
  * @forward-ref
+ * @hide-properties meta
  */
 function FloatWidget(
     props: FloatWidgetProps,
     ref: React.RefObject<HTMLInputElement>
 ): React.ReactElement {
-    const { input, meta, ...rest } = props;
-    return <InputNumber ref={ref} {...input} {...rest} />;
+    return <NumberWidget<number> ref={ref} {...props} />;
 }
 
 export default React.forwardRef(FloatWidget);
