@@ -119,8 +119,8 @@ export abstract class BaseRelatedViewModelField<
     _isResolvingDeps: boolean;
 
     /**
-     * Resolves the ViewModel this field links to. This is necessary as the ViewModel might be a dynamic
-     * import that hasn't yet loaded.
+     * Resolves the ViewModel this field links to. This is only necessary when `to` is a function that returns a
+     * Promise (e.g. when using dynamic imports).  This ensures the ViewModel is loaded.
      *
      * This needs to be called manually before `to` can be accessed.
      */
@@ -163,7 +163,7 @@ export abstract class BaseRelatedViewModelField<
     }
 
     /**
-     * Get the [ViewModel](doc:viewModelFactory) this related field is to.
+     * Get the [ViewModel](doc:BaseViewModel) this related field is to.
      *
      * If `to` was defined as a function returning a `Promise` then you must call `resolveViewModel`
      * and wait for the returned `Promise` to resolve before accessing this otherwise an error will be thrown
@@ -205,31 +205,53 @@ export abstract class BaseRelatedViewModelField<
  * 1) The ViewModel to reference
  * 2) The field on the source ViewModel that contains the ID for the relation
  *
+ * If you have multiple values use [ManyRelatedViewModelField](doc:ManyRelatedViewModelField) instead.
+ *
+ * ## Usage
+ *
  * In the following example `User` has a `Group` as a relation. The id for the
  * connected group is stored on the `groupId` field:
  *
  * ```js
  * class Group extends viewModelFactory({
+ *   id: new IntegerField(),
  *   name: new CharField(),
- * }) {}
+ * }, { pkFieldName: 'id' }) {}
  * class User extends viewModelFactory({
+ *   id: new IntegerField(),
  *   name: new CharField(),
  *   groupId: new IntegerField(),
  *   group: new RelatedViewModelField({
  *     to: Group,
  *     sourceFieldName: 'groupId',
  *   }),
- * }) {}
+ * }, { pkFieldName: 'id' }) {}
  * ```
  *
- * You can then fetch the data - including the relations - from the cache:
+ * You can add data to the cache, including nested relations:
  *
  * ```js
- * Group.cache.add({ id: 1, name: 'Staff' });
- * User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
- * User.cache.get(['name', 'group']);
- * // { id: 1, name: 'Bob', groupId: 1, group: { id: 1, name: 'Staff' }}
+ * User.cache.add({ id: 1, name: 'Bob', group: { id: 1, name: 'Staff' } });
  * ```
+ *
+ * The `groupId` on the `User` will automatically set to `group.id`:
+ *
+ * ```js
+ * User.cache.get(1, '*');
+ * // Output: {  id: 1, name: 'Bob', groupId: 1, group: { id: 1, name: 'Staff' }}
+ * ```
+ *
+ * Related data is fetched from the related model cache automatically so is always in sync:
+ *
+ * ```js
+ * // Change the group name
+ * Group.cache.add({ id: 1, name: 'All Staff' });
+ * // It's reflected in the nested Group record returned by the User cache
+ * User.cache.get(1, '*');
+ * // Output: {  id: 1, name: 'Bob', groupId: 1, group: { id: 1, name: 'All Staff' }}
+ * ```
+ *
+ * ### Circular references
  *
  * The `to` field can also be a function to support circular references:
  *
@@ -241,7 +263,7 @@ export abstract class BaseRelatedViewModelField<
  *     to: () => User,
  *     sourceFieldName: 'ownerId',
  *   }),
- * }) {}
+ * }, { pkFieldName: 'id' }) {}
  * class User extends viewModelFactory({
  *   name: new CharField(),
  *   groupId: new IntegerField(),
@@ -249,42 +271,48 @@ export abstract class BaseRelatedViewModelField<
  *     to: Group,
  *     sourceFieldName: 'groupId',
  *   }),
- * }) {}
+ * }, { pkFieldName: 'id' }) {}
  * ```
+ *
+ * > NOTE: If using typescript you will get some type errors with this approach. See the [circular references example](#example-circular-references-typing)
+ * > for an approach to resolve this.
  *
  * You can query the circular relations as deep as you want:
  *
  * ```js
  * Group.cache.add({ id: 1, name: 'Staff', ownerId: 1 });
  * User.cache.add({ id: 1, name: 'Bob', groupId: 1 });
- * User.cache.get(['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']]);
+ * User.cache.get(1, ['name', 'group', ['group', 'owner'], ['group', 'owner', 'group']]);
  * // {
- * //   id: 1,
- * //   name: 'Bob',
  * //   groupId: 1,
+ * //   id: 1,
+ * //   name: "Bob",
  * //   group: {
  * //     id: 1,
- * //     name: 'Staff',
+ * //     name: "Staff",
  * //     ownerId: 1,
  * //     owner: {
- * //       id: 1,
- * //       name: 'Bob',
  * //       groupId: 1,
+ * //       id: 1,
+ * //       name: "Bob",
  * //       group: {
  * //         id: 1,
- * //         name: 'Staff',
- * //         ownerId: 1,
+ * //         name: "Staff",
+ * //         ownerId: 1
  * //       }
- * //     },
- * //   },
+ * //     }
+ * //   }
  * // }
  * ```
+ *
+ * ### Lazy loading
  *
  * `to` can also be a function that returns a Promise. This is useful to
  * lazy load modules:
  *
  * ```js
  * class Subscription extends viewModelFactory({
+ *   id: new IntegerField(),
  *   userId: new IntegerField(),
  *   user: new RelatedViewModelField({
  *       sourceFieldName: 'userId',
@@ -293,7 +321,7 @@ export abstract class BaseRelatedViewModelField<
  *         return User;
  *       }
  *   })
- * }) {}
+ * }, { pkFieldName: 'id' }) {}
  * ```
  *
  * **NOTE:** When you return a promise you have to call `resolveViewModel` on
@@ -304,8 +332,6 @@ export abstract class BaseRelatedViewModelField<
  * ```
  *
  * Failure to do this will result in an error being thrown the first time it's accessed.
- *
- * If you have multiple values use [ManyRelatedViewModelField](doc:ManyRelatedViewModelField) instead.
  *
  * @extract-docs
  * @menu-group Fields
@@ -352,6 +378,91 @@ export class RelatedViewModelField<
  *
  * This behaves the same as [RelatedViewModelField](doc:RelatedViewModelField) but `sourceFieldName`
  * must refer to a [ListField](doc:ListField) and all values are an array instead of a single value.
+ *
+ * ## Usage
+ *
+ * In the following example `User` has a many relation to `Group`. The ids for the
+ * connected groups is stored on the `groupIds` field:
+ *
+ * ```js
+ * class Group extends viewModelFactory(
+ *     {
+ *         id: new IntegerField(),
+ *         name: new CharField(),
+ *     },
+ *     { pkFieldName: 'id' }
+ * ) {}
+ *
+ * class User extends viewModelFactory(
+ *     {
+ *         id: new IntegerField(),
+ *         name: new CharField(),
+ *         groupIds: new ListField({ childField: new IntegerField() }),
+ *         groups: new ManyRelatedViewModelField({
+ *             to: Group,
+ *             sourceFieldName: 'groupIds',
+ *         }),
+ *     },
+ *     { pkFieldName: 'id' }
+ * ) {}
+ * ```
+ *
+ * Data can be added to the cache using the `add` method:
+ *
+ * ```js
+ * Group.cache.add([
+ *     { id: 1, name: 'Admins' },
+ *     { id: 2, name: 'Managers' },
+ *     { id: 3, name: 'Customer Support' },
+ *     { id: 4, name: 'Tech Support' },
+ *     { id: 5, name: 'Sales' },
+ * ]);
+ * User.cache.addList([
+ *     { id: 1, name: 'Dave', groupIds: [1, 4] },
+ *     { id: 2, name: 'Sarah', groupIds: [3, 4, 5] },
+ *     { id: 3, name: 'Jen', groupIds: [1, 2, 3] },
+ * ]);
+ * ```
+ *
+ * Fetching nested records will automatically fetch related records from the corresponding cache:
+ *
+ * ```js
+ * User.cache.get(1, ['name', 'groups']);
+ * // Output:
+ * // {
+ * //   groupIds: [
+ * //     1,
+ * //     4
+ * //   ],
+ * //   id: 1,
+ * //   name: Dave,
+ * //   groups: [
+ * //     {
+ * //       id: 1,
+ * //       name: Admins
+ * //     },
+ * //     {
+ * //       id: 4,
+ * //       name: Tech Support
+ * //     }
+ * //   ]
+ * // }
+ * ```
+ *
+ * You can also add related records by nesting the data. This will automatically fill out the `groupIds` field and add
+ * the related records to the `Group` cache:
+ *
+ * ```js
+ * const user = User.cache.add({
+ *     id: 4,
+ *     name: 'Bob',
+ *     groups: [{ id: 4, name: 'Tech Support', ownerId: 1 }],
+ * });
+ * console.log(user.groupIds)
+ * // Output: [4]
+ * console.log(Group.cache.get(4, ['name', 'ownerId']));
+ * // Output: { id: 4, name: "Tech Support", ownerId: 1 }
+ * ```
  *
  * @extract-docs
  * @menu-group Fields

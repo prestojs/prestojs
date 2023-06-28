@@ -305,10 +305,40 @@ export class MissingFieldsError extends Error {
 }
 
 /**
- * The base class all ViewModel classes will extend.
+ * The base class all ViewModel classes will extend. See [viewModelFactory](doc:viewModelFactory) for how ViewModel
+ * classes are created.
  *
  * If you use the [baseClass](doc:viewModelFactory##method-viewmodel) option the class passed must extend
  * `BaseViewModel`.
+ *
+ * ## PartialViewModel
+ *
+ * This is a type used to represent a ViewModel with some or fields set. It still refers to an instance of `BaseViewModel`,
+ * but also specifies as part of the type which fields are set. If you see this in the documentation know that it is just
+ * an instance of a `ViewModel`.
+ *
+ * You can use it in your own types. For example, this is a function that returns a list of User records, but allows you
+ * to specify which fields to return:
+ *
+ * ```typescript
+ * function getList<T extends PartialViewModel<typeof User>>(
+ *     cache: ViewModelCache<typeof User>,
+ *     result?: T[] | null,
+ *     fieldNames?: (keyof typeof User['fields'])[]
+ * ): T[] => {
+ *     if (!result) {
+ *         return [];
+ *     }
+ *     if (!fieldNames) {
+ *         return cache.getList(result, true);
+ *     }
+ *     return cache.getList(
+ *         result.map(r => r._key),
+ *         fieldNames,
+ *         true
+ *     );
+ * }
+ * ```
  *
  * @extract-docs
  */
@@ -326,6 +356,8 @@ export class BaseViewModel<
 
     /**
      * Return the data for this record as a plain object
+     *
+     * @return-type Record<string, any>
      */
     toJS(): {
         readonly [K in AssignedFieldNames]: FieldMappingType[K]['__fieldValueType'];
@@ -346,6 +378,8 @@ export class BaseViewModel<
      * - If the records were initialised with a different set of fields then they are
      *   considered different even if the common fields are the same and other fields are
      *   all null
+     *
+     *   @param record The record to compare to
      */
     isEqual(record: ViewModelInterface<any, any> | null): boolean {
         if (!record) {
@@ -541,6 +575,17 @@ export class BaseViewModel<
         return this.__recordBoundFields;
     }
 
+    /**
+     * Instantiate the ViewModel with the specified data.
+     *
+     * Data for `RelatedViewModelField` and `ManyRelatedViewModelField` fields will be transformed into the corresponding
+     * ViewModel instances, and the `sourceFieldName` for each will be set to the corresponding id(s)
+     *
+     * @param data The data to assign to the ViewModel. The accepted keys here match the fields the ViewModel was
+     * created with.
+     *
+     * @param-type-name data Record<string, any>
+     */
     constructor(data: {
         [K in AssignedFieldNames]: FieldMappingType[K]['__parsableValueType'];
     }) {
@@ -1115,7 +1160,7 @@ export interface ViewModelConstructor<
      *   email: new EmailField({
      *     label: 'Email',
      *   }),
-     * }) {
+     * }, {pkFieldName: 'id'}) {
      *   static label = 'User';
      *   static labelPlural = 'Users';
      * }
@@ -1289,7 +1334,11 @@ function checkReservedFieldNames(fields): void {
 export class InvalidFieldError extends Error {}
 
 /**
- * Creates a ViewModel class with the specified fields.
+ * Factory for creating ViewModel classes from the specified fields and options.
+ *
+ * > See the [ViewModels guide](/docs/getting-started/viewmodel) getting started guide
+ *
+ * ## Usage overview
  *
  * ```js
  * const fields = {
