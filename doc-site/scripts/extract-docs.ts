@@ -287,7 +287,7 @@ function getDocUrl(declaration: JSONOutput.DeclarationReflection): string | fals
         return `/docs/viewmodel/viewModelFactory`;
     }
     if (declaration.name === 'PartialViewModel') {
-        return `/docs/viewmodel/viewModelFactory`;
+        return `/docs/viewmodel/BaseViewModel#PartialViewModel`;
     }
     if (declaration.comment?.tags?.find(tag => tag.tag === 'extract-docs')) {
         const { fileName = '' } = declaration.sources?.[0] || {};
@@ -1908,10 +1908,8 @@ async function main() {
         const [packageName] = slug.split('/');
         const packageDir = `${docsPath}/${packageName}`;
         const outPath = path.resolve(packageDir, `${slug.split('/').slice(1).join('/')}.json`);
-        const exampleKey = importPath.replace('@prestojs/', '');
-        // Only the default export gets examples
-        const examples: undefined | DocExample[] =
-            docItem.name === importPath.split('/').pop() ? exampleFiles[exampleKey] : undefined;
+        const exampleKey = slug.replace('@prestojs/', '').trim();
+        const examples: undefined | DocExample[] = exampleFiles[exampleKey];
         if (examples) {
             await Promise.all(
                 examples.map(async example => {
