@@ -7,22 +7,19 @@
   },
   "references": [
     {
-      "path": "./js-packages/@prestojs/viewmodel/tsconfig.json"
+      "path": "./js-packages/@prestojs/util/tsconfig.json"
     },
     {
-      "path": "./js-packages/@prestojs/codegen/tsconfig.json"
+      "path": "./js-packages/@prestojs/viewmodel/tsconfig.json"
     },
     {
       "path": "./js-packages/@prestojs/ui/tsconfig.json"
     },
     {
-      "path": "./js-packages/@prestojs/ui-antd/tsconfig.json"
-    },
-    {
       "path": "./js-packages/@prestojs/final-form/tsconfig.json"
     },
     {
-      "path": "./js-packages/@prestojs/util/tsconfig.json"
+      "path": "./js-packages/@prestojs/ui-antd/tsconfig.json"
     },
     {
       "path": "./js-packages/@prestojs/routing/tsconfig.json"
