@@ -89,17 +89,6 @@ function MemberList({ groupId }: { groupId: number }) {
 
 export default function CircularReferences() {
     const groups = useViewModelCache(Group, cache => cache.getAll('*'));
-    console.log(groups);
-    console.log(
-        User.cache
-            .add({
-                id: 4,
-                name: 'Bob',
-                groups: [{ id: 4, name: 'Tech Support', ownerId: 1 }],
-            })
-            .toJS()
-    );
-    console.log(JSON.stringify(Group.cache.get(4, ['name', 'ownerId']).toJS(), null, 2));
 
     return (
         <Table

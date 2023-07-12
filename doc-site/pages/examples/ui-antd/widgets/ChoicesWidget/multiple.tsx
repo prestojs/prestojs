@@ -27,7 +27,7 @@ const longChoices: [string, string][] = [
 ];
 
 export default function MultipleSelectionExample() {
-    const [value, setValues] = useState([]);
+    const [value, setValues] = useState<string[]>([]);
     const [choices, setChoices] = useState(shortChoices);
     const input = {
         value,

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React, { ReactNode } from 'react';
-import { DocType, IndexedAccessType, TupleType } from '../newTypes';
+import { DocType, IndexedAccessType, MethodType, TupleType } from '../newTypes';
 import ClassPageDoc from '../pages/ClassPageDoc';
 import FunctionDocumentation from './FunctionDocumentation';
 import Modal from './Modal';
@@ -46,9 +46,10 @@ function ExpandableDescription({
     );
 }
 
-function FunctionDescription({ signatures }: { signatures }) {
+function MethodDescription({ methodType }: { methodType: MethodType }) {
+    const { signatures, children } = methodType;
     const [showModal, setShowModal] = React.useState(false);
-    if (!signatures?.length) {
+    if (!signatures?.length && !children?.length) {
         return <span className="text-orange-400">Function</span>;
     }
     return (
@@ -61,7 +62,7 @@ function FunctionDescription({ signatures }: { signatures }) {
             </button>
             <Modal isVisible={showModal} onClose={() => setShowModal(false)}>
                 {signatures.map((sig, i) => (
-                    <FunctionDocumentation key={i} signature={sig} />
+                    <FunctionDocumentation key={i} signature={sig} properties={children} />
                 ))}
             </Modal>
         </span>
@@ -98,9 +99,17 @@ export default function Type({ type, mode = 'FULL' }: Props) {
                 </div>
             );
         } else {
+            const children = [
+                ...type.children,
+                ...type.intersections.map(intersection => ({
+                    name: '_ignored_',
+                    type: intersection,
+                    flags: {},
+                })),
+            ];
             el = (
                 <TypeTable
-                    dataSource={type.children}
+                    dataSource={children}
                     title={<strong>An object with these properties:</strong>}
                     indexSignature={type.indexSignature}
                 />
@@ -147,7 +156,7 @@ export default function Type({ type, mode = 'FULL' }: Props) {
         return <TypeParameterDescription typeParameter={type} />;
     }
     if (type.typeName === 'methodType') {
-        return <FunctionDescription signatures={type.signatures} />;
+        return <MethodDescription methodType={type} />;
     }
     if (type.typeName === 'array') {
         return (

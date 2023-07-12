@@ -11,6 +11,8 @@ export {
 export { default as AnchorLink, generateId } from './components/AnchorLink';
 export { CodeExample, default as CodeExamples } from './components/CodeExamples';
 export type {
+    ClassPageHierarchy,
+    SignatureParameter,
     InterfaceType,
     ClassConstructor,
     ClassPage,

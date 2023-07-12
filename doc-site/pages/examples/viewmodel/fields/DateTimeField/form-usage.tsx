@@ -13,7 +13,7 @@
  * This example shows a setup using [dayjs](https://day.js.org/).
  *
  * Note that the output will be based on the date library you are using and so you may need
- * to transform the data to the expected format, eg. to a plain [Date](doc:Date) object:
+ * to transform the data to the expected format, eg. to a plain [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) object:
  *
  * ```js
  * function transformData(data) {

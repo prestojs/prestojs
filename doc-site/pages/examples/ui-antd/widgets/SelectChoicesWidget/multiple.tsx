@@ -19,7 +19,7 @@ const choices: [string, string][] = [
     ['6', 'Six'],
 ];
 export default function MultipleSelectionExample() {
-    const [value, setValues] = useState([]);
+    const [value, setValues] = useState<string[]>([]);
     const input = {
         value,
         onChange: values => setValues(values),

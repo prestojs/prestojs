@@ -34,6 +34,12 @@ export interface PageSection {
     links: PageSectionLink[];
 }
 
+export interface ClassPageHierarchy {
+    parent: UnknownType | ReferenceLinkType | ExternalReferenceType | null;
+    typeArguments?: DocType[];
+    children: (ReferenceLinkType | ExternalReferenceType)[];
+}
+
 export interface ClassPage {
     pageType: 'class';
     pageSections: PageSection[];
@@ -46,11 +52,7 @@ export interface ClassPage {
     staticProperties: VariableNode[];
     sourceLocation?: SourceLocation;
     typeParameters?: TypeParameter[];
-    hierarchy: {
-        parent: ReferenceLinkType | ExternalReferenceType | null;
-        typeArguments?: DocType[];
-        children: (ReferenceLinkType | ExternalReferenceType)[];
-    };
+    hierarchy: ClassPageHierarchy;
     isTypeOnly: boolean;
     hideConstructor: boolean;
 }
@@ -150,6 +152,7 @@ export interface MethodType {
     typeName: 'methodType';
     name: string;
     signatures: Signature[];
+    children?: DocType[];
 }
 
 export interface IndexSignatureType {
@@ -168,6 +171,7 @@ export interface ContainerType {
         type: DocType;
         description?: RichDescription;
     }[];
+    intersections: PropertiesFromReference[];
     indexSignature?: IndexSignatureType;
     signatures?: Signature[];
 }

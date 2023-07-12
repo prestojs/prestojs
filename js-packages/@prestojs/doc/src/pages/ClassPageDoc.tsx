@@ -29,7 +29,7 @@ function SectionHeading({ children, id }: { children: React.ReactNode; id?: stri
     );
 }
 
-function Section({ title, children }) {
+export function Section({ title, children }) {
     if (!children) {
         return null;
     }
