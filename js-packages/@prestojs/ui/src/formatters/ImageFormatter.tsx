@@ -1,9 +1,9 @@
 import React, { ReactNode, useMemo } from 'react';
 
 /**
- * @expand-properties Any additional props are passed through to the `img` tag
+ * @expandproperties Any additional props are passed through to the `img` tag
  */
-type ImageFormatterProps = {
+export type ImageFormatterProps = {
     /**
      * The value to render. Should be a valid URL or a File/Blob.
      */
@@ -36,8 +36,8 @@ type ImageFormatterProps = {
  *
  * </Usage>
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function ImageFormatter(props: ImageFormatterProps): React.ReactElement | null {
     const { value, blankLabel, ...rest } = props;

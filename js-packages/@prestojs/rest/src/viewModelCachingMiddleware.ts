@@ -57,15 +57,52 @@ Data received: `,
     return record as ViewModelInterface<T['fields'], T['pkFieldName']>;
 }
 
-type ViewModelMapping =
+export type ViewModelMapping =
     | ViewModelConstructor<any, any>
     | Record<string, ViewModelConstructor<any, any>>;
-type ViewModelMappingDef = ViewModelMapping | (() => ViewModelMapping | Promise<ViewModelMapping>);
+/**
+ * @expandproperties
+ */
+export type ViewModelMappingDef =
+    | ViewModelMapping
+    | (() => ViewModelMapping | Promise<ViewModelMapping>);
 
 /**
- * @expand-properties
+ * A function with an optional `validateEndpoint` property.
  */
-type ViewModelCachingOptions<T> = {
+export interface GetDeleteId<T> {
+    /**
+     * A function to return the ID to used when a DELETE occurs. This id is used to remove the item with that ID
+     * from the cache.
+     *
+     * Defaults to returning the url argument `id` (eg. from a UrlPattern like `/users/:id`).
+     *
+     * Specify this function if you use a different argument name or the ID is passed some other way (eg. in query string)
+     *
+     * @param context The middleware context.
+     */
+
+    (context: MiddlewareContext<T>): PrimaryKey;
+
+    /**
+     * If specified, this function will be called when the endpoint is created to validate the endpoint.
+     *
+     * You can attach this as a property to the function:
+     *
+     * ```ts
+     * function getDeleteId() { ...}
+     * getDeleteId.validateEndpoint = endpoint => { ... }
+     * ```
+     *
+     * @param endpoint The endpoint to validate
+     */
+    validateEndpoint?: (endpoint: Endpoint) => void;
+}
+
+/**
+ * @expandproperties
+ */
+export type ViewModelCachingOptions<T> = {
     /**
      * A function to return the ID to used when a DELETE occurs. This id is used to remove the item with that ID
      * from the cache.
@@ -80,11 +117,9 @@ type ViewModelCachingOptions<T> = {
      *
      * @param context The middleware context.
      */
-    getDeleteId?: ((context: MiddlewareContext<T>) => PrimaryKey) & {
-        validateEndpoint?: (endpoint: Endpoint) => void;
-    };
+    getDeleteId?: GetDeleteId<T>;
     /**
-     * By default the mapping passed to `viewModelCacheMiddleware` is assumed to be the model to delete. In some
+     * By default, the mapping passed to `viewModelCacheMiddleware` is assumed to be the model to delete. In some
      * cases you may want to return additional data from an endpoint and need to define a more advanced mapping - in
      * these cases you can specify `deleteViewModel` as the model to delete and the mapping will be used to cache
      * the result.
@@ -212,8 +247,8 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
  * `deleteViewModel` is provided then this value is used to cache the response of the delete call.
  * @param options
  *
- * @extract-docs
- * @menu-group Middleware
+ * @extractdocs
+ * @menugroup Middleware
  */
 export default function viewModelCachingMiddleware<ReturnT = any>(
     viewModelMapping: ViewModelMappingDef,

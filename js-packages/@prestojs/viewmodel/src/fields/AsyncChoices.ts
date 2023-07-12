@@ -2,8 +2,6 @@ import { getId, getNodeLabel, isIdentifiable, isLabeled } from '@prestojs/util';
 
 /**
  * A single choice
- *
- * @export-in-docs
  */
 export interface Choice<T> {
     /**
@@ -21,8 +19,6 @@ export interface Choice<T> {
 }
 /**
  * Grouped choices - a label for the grouping and an array of choices for that label
- *
- * @export-in-docs
  */
 export type ChoicesGrouped<T> = [string, Choice<T>[]];
 
@@ -51,8 +47,8 @@ export type ChoicesGrouped<T> = [string, Choice<T>[]];
  * `list` and `retrieve` respectively. The return value from the hook is passed to
  * the corresponding function.
  *
- * @extract-docs
- * @menu-group Async Choices
+ * @extractdocs
+ * @menugroup Async Choices
  * @typeParam ItemType The type of the item(s) return by `list` or `retrieve`.
  * @typeParam ValueType The type of the value that identifies an item (eg. it's id)
  */
@@ -155,8 +151,7 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
 }
 
 /**
- * @expand-properties
- * @export-in-docs
+ * @expandproperties
  */
 export type AsyncChoicesOptions<ItemType, ValueType> = Omit<
     AsyncChoicesInterface<ItemType, ValueType>,
@@ -195,8 +190,8 @@ export type AsyncChoicesOptions<ItemType, ValueType> = Omit<
  * * `getLabel` - this is optional if items returned by `list` and `retrieve` implement [NodeLabeled](doc:NodeLabeled) otherwise it must be provided
  * * `getValue` - this is optional if items returned by `list` and `retrieve` implement [Identifiable](doc:Identifiable) otherwise it must be provided
  *
- * @extract-docs
- * @menu-group Async Choices
+ * @extractdocs
+ * @menugroup Async Choices
  * @typeParam ItemType The type of the item(s) return by `list` or `retrieve`.
  * @typeParam ValueType The type of the value that identifies an item (eg. it's id)
  */

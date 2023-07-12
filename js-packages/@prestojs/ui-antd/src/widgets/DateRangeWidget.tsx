@@ -5,17 +5,6 @@ import React from 'react';
 import { useAntdUiConfig } from '../AntdUiProvider';
 import RangeWidget from './RangeWidget';
 
-/**
- * See [DatePicker](https://ant.design/components/date-picker/) for props available
- *
- * As with all range widgets, ref should be shaped as `{ lowerRef: Ref(), upperRef: Ref() }`
- *
- * You may pass in props to be used for the individual input as lowerInput / upperInput
- *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- */
 function DateRangeWidget(
     props: RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>,
     ref: React.RefObject<DatePickerProps>
@@ -39,7 +28,17 @@ function DateRangeWidget(
     );
 }
 
-export default React.forwardRef<
-    DatePickerProps,
-    RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>
->(DateRangeWidget);
+/**
+ * See [DatePicker](https://ant.design/components/date-picker/) for props available
+ *
+ * As with all range widgets, ref should be shaped as `{ lowerRef: Ref(), upperRef: Ref() }`
+ *
+ * You may pass in props to be used for the individual input as lowerInput / upperInput
+ *
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ */
+export default React.forwardRef(DateRangeWidget) as (
+    props: RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>
+) => React.ReactElement;

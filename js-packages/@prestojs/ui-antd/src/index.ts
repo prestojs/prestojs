@@ -44,4 +44,24 @@ export {
     AntdUiConfig,
 } from './AntdUiProvider';
 
+export type { AntdUiProviderProps } from './AntdUiProvider';
+
+export type { BooleanWidgetProps } from './widgets/BooleanWidget';
+export type { CharWidgetProps } from './widgets/CharWidget';
+export type { ChoicesWidgetProps } from './widgets/ChoicesWidget';
+export type { DateWidgetProps } from './widgets/DateWidget';
+export type { DecimalWidgetProps } from './widgets/DecimalWidget';
+export type { EmailWidgetProps } from './widgets/EmailWidget';
+export type { FloatWidgetProps } from './widgets/FloatWidget';
+export type { IntegerWidgetProps } from './widgets/IntegerWidget';
+export type { JsonWidgetProps } from './widgets/JsonWidget';
+export type { NullableBooleanWidgetProps } from './widgets/NullableBooleanWidget';
+export type { NumberWidgetProps } from './widgets/NumberWidget';
+export type { PasswordWidgetProps } from './widgets/PasswordWidget';
+export type { RadioChoicesWidgetProps } from './widgets/RadioChoicesWidget';
+export type { SelectInputProps, SelectAsyncChoicesProps } from './widgets/SelectAsyncChoicesWidget';
 export type { SelectChoicesProps } from './widgets/SelectChoicesWidget';
+export type { TextWidgetProps } from './widgets/TextWidget';
+export type { TimeWidgetProps } from './widgets/TimeWidget';
+export type { UploadWidgetProps, UseFileListOptions } from './widgets/FileWidget';
+export type { CheckboxChoicesWidgetProps } from './widgets/CheckboxChoicesWidget';

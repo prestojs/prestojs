@@ -1,23 +1,27 @@
 import { WidgetProps } from '@prestojs/ui';
 import { Input, InputProps, InputRef } from 'antd';
-import React from 'react';
+import React, { RefObject } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
+ * @hideproperties meta choices asyncChoices checked
  */
-type EmailWidgetProps = WidgetProps<string, HTMLInputElement> &
-    Omit<InputProps, 'onChange' | 'value'>;
+export type EmailWidgetProps = WidgetProps<string, HTMLInputElement> &
+    Omit<InputProps, 'onChange' | 'value'> & { ref?: RefObject<InputRef> };
 
-/**
- * See [Input](https://ant.design/components/input/) for props available
- *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- */
-function EmailWidget(props: EmailWidgetProps, ref: React.RefObject<InputRef>): React.ReactElement {
+function EmailWidget(
+    props: Omit<EmailWidgetProps, 'ref'>,
+    ref: React.RefObject<InputRef>
+): React.ReactElement {
     const { input, meta, ...rest } = props;
     return <Input type="email" ref={ref} {...input} {...rest} />;
 }
 
-export default React.forwardRef(EmailWidget);
+/**
+ * See [Input](https://ant.design/components/input/) for props available
+ *
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ */
+export default React.forwardRef(EmailWidget) as (props: EmailWidgetProps) => React.ReactElement;

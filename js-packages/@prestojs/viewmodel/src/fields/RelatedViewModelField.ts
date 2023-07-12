@@ -4,20 +4,20 @@ import { FieldDataMappingRaw, isViewModelClass, ViewModelConstructor } from '../
 import Field, { FieldProps } from './Field';
 import ListField from './ListField';
 
-type RelatedViewModelValueType<TargetViewModelT extends ViewModelConstructor<any, any>> =
+export type RelatedViewModelValueType<TargetViewModelT extends ViewModelConstructor<any, any>> =
     InstanceType<TargetViewModelT>;
 
-type BaseRelatedViewModelValueType<T extends ViewModelConstructor<any, any>> =
+export type BaseRelatedViewModelValueType<T extends ViewModelConstructor<any, any>> =
     | RelatedViewModelValueType<T>
     | RelatedViewModelValueType<T>[];
-type RelatedViewModelParsableType<T extends ViewModelConstructor<any, any>> =
+export type RelatedViewModelParsableType<T extends ViewModelConstructor<any, any>> =
     | FieldDataMappingRaw<T['fields']>
     | FieldDataMappingRaw<T['fields']>[];
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type RelatedViewModelFieldProps<
+export type RelatedViewModelFieldProps<
     TargetViewModelT extends ViewModelConstructor<any, any>,
     FieldValueT,
     SourceFieldNameT extends string
@@ -38,6 +38,9 @@ type RelatedViewModelFieldProps<
     cache?: ViewModelCache<TargetViewModelT>;
 };
 
+/**
+ * Thrown when a related view model is accessed but the related view model has not been resolved.
+ */
 export class UnresolvedRelatedViewModelFieldError<
     TargetViewModelT extends ViewModelConstructor<any, any>,
     FieldValueT extends BaseRelatedViewModelValueType<TargetViewModelT>,
@@ -333,8 +336,9 @@ export abstract class BaseRelatedViewModelField<
  *
  * Failure to do this will result in an error being thrown the first time it's accessed.
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
+ * @typeName TargetViewModelT The [ViewModel](doc:BaseViewModel) class this field links to
  */
 export class RelatedViewModelField<
     TargetViewModelT extends ViewModelConstructor<any, any>,
@@ -464,8 +468,9 @@ export class RelatedViewModelField<
  * // Output: { id: 4, name: "Tech Support", ownerId: 1 }
  * ```
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
+ * @typeName TargetViewModelT The [ViewModel](doc:BaseViewModel) class this field links to
  */
 export class ManyRelatedViewModelField<
     TargetViewModelT extends ViewModelConstructor<any, any>,

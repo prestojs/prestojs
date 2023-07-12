@@ -10,15 +10,14 @@ import {
 import { AsyncChoicesInterface } from './fields/AsyncChoices';
 
 /**
- * @expand-properties
- * @export-in-docs
+ * @expandproperties
  */
-type UseAsyncChoicesProps<ItemT, ValueT> = Pick<
+export type UseAsyncChoicesProps<ItemT, ValueT> = Pick<
     UseAsyncListingProps<ItemT[]>,
     'accumulatePages' | 'query' | 'trigger'
 > & {
     /**
-     * See [AsyncChoices](doc:AsyncChoices]
+     * The async choices instance.
      */
     asyncChoices: AsyncChoicesInterface<ItemT, ValueT>;
     /**
@@ -56,10 +55,9 @@ type UseAsyncChoicesProps<ItemT, ValueT> = Pick<
 };
 
 /**
- * @expand-properties
- * @export-in-docs
+ * @expandproperties
  */
-type UseAsyncChoicesReturn<ItemT, ValueT> = {
+export type UseAsyncChoicesReturn<ItemT, ValueT> = {
     /**
      * See [useAsyncListing](doc:useAsyncListing#return-type)
      */
@@ -89,8 +87,8 @@ type UseAsyncChoicesReturn<ItemT, ValueT> = {
  *
  * 5) An object is returned with the available choices in `choices`, the result of 2 in `list` and result of 4 in `selected`
  *
- * @extract-docs
- * @menu-group Async Choices
+ * @extractdocs
+ * @menugroup Async Choices
  */
 export default function useAsyncChoices<ItemT, ValueT>(
     props: UseAsyncChoicesProps<ItemT, ValueT>

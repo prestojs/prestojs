@@ -4,8 +4,8 @@
  *
  * See [isTextLabeled](doc:isTextLabeled) and [getTextLabel](doc:getTextLabel).
  *
- * @extract-docs
- * @menu-group Labeled
+ * @extractdocs
+ * @menugroup Labeled
  */
 export interface TextLabeled {
     /**
@@ -23,8 +23,8 @@ export interface TextLabeled {
  *
  * See [isNodeLabeled](doc:isNodeLabeled) and [getNodeLabel](doc:getNodeLabel).
  *
- * @extract-docs
- * @menu-group Labeled
+ * @extractdocs
+ * @menugroup Labeled
  */
 export interface NodeLabeled {
     /**
@@ -40,7 +40,7 @@ export interface NodeLabeled {
  * Check if an object implements [getLabel](doc:TextLabeled#Method-getLabel)
  *
  * @param item The item to check if implements `getLabel`
- * @menu-group Labeled
+ * @menugroup Labeled
  */
 export function isTextLabeled(item: any): item is TextLabeled {
     if (!item || typeof item !== 'object') {
@@ -53,8 +53,8 @@ export function isTextLabeled(item: any): item is TextLabeled {
  * Check if an object implements [getNodeLabel](doc:NodeLabeled#Method-getNodeLabel)
  *
  * @param item The item to check if implements `getNodeLabel`
- * @extract-docs
- * @menu-group Labeled
+ * @extractdocs
+ * @menugroup Labeled
  */
 export function isNodeLabeled(item: any): item is NodeLabeled {
     if (!item || typeof item !== 'object') {
@@ -68,8 +68,8 @@ export function isNodeLabeled(item: any): item is NodeLabeled {
  *
  * @param item The item to check if implements `getLabel` or `getNodeLabel`
  *
- * @extract-docs
- * @menu-group Labeled
+ * @extractdocs
+ * @menugroup Labeled
  */
 export function isLabeled(item: any): item is TextLabeled | NodeLabeled {
     return isTextLabeled(item) || isNodeLabeled(item);
@@ -92,8 +92,8 @@ export function isLabeled(item: any): item is TextLabeled | NodeLabeled {
  *
  * @param item The item to get the label from
  *
- * @extract-docs
- * @menu-group Labeled
+ * @extractdocs
+ * @menugroup Labeled
  */
 export function getNodeLabel(item: any): React.ReactNode {
     if (isNodeLabeled(item)) {
@@ -120,10 +120,10 @@ export function getNodeLabel(item: any): React.ReactNode {
  *
  * See also [getNodeLabeled](doc:getNodeLabel).
  *
- * @param item THe item to tget the label from
+ * @param item The item to get the label from
  *
- * @extract-docs
- * @menu-group Labeled
+ * @extractdocs
+ * @menugroup Labeled
  */
 export function getTextLabel(item: any): string {
     if (isTextLabeled(item)) {

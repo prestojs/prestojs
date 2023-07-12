@@ -2,9 +2,9 @@ import { ViewModelFieldWidgetProps } from './Field';
 import NumberField, { NumberFieldProps } from './NumberField';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type DecimalFieldProps = NumberFieldProps<string> & {
+export type DecimalFieldProps = NumberFieldProps<string> & {
     /**
      * The number of decimal places that should be accepted
      */
@@ -47,8 +47,8 @@ type DecimalFieldProps = NumberFieldProps<string> & {
  *
  * </Usage>
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  */
 export default class DecimalField extends NumberField<string> {
     static fieldClassName = 'DecimalField';

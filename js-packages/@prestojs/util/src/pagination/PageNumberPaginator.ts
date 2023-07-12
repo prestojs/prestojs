@@ -57,8 +57,8 @@ export type InternalPageNumberPaginationState = {
  *    instead. See the [Use with usePaginator & paginationMiddleware](#example-02-use-paginator) example.
  * </Usage>
  *
- * @menu-group Pagination
- * @extract-docs
+ * @menugroup Pagination
+ * @extractdocs
  */
 export default class PageNumberPaginator extends Paginator<
     PageNumberPaginationState,

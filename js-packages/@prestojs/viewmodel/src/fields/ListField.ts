@@ -30,8 +30,8 @@ import Field, { FieldProps } from './Field';
  * // Output: [1, 2, 3]
  * ```
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  * @typeParam T The value of each element in the list
  * @typeParam ParsableType This the type the field knows how to parse into `ValueType` when constructing a `ViewModel`.
  */

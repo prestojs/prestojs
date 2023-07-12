@@ -2,9 +2,9 @@ import { formatTime, parseTime } from '@prestojs/util/';
 import React, { ReactNode, useMemo } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type TimeFormatterProps = {
+export type TimeFormatterProps = {
     /**
      * What to render when `value` is `null`, `undefined` or the empty string
      *
@@ -64,8 +64,8 @@ type TimeFormatterProps = {
  *
  * See also [parseTime](doc:parseTime) and [formatTime](doc:formatTime)
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function TimeFormatter(props: TimeFormatterProps): React.ReactElement {
     const { blankLabel, invalidValueLabel, value, locales = [], localeOptions } = props;

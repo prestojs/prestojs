@@ -1,9 +1,9 @@
 import React, { ReactElement, ReactNode } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type ChoiceFormatterProps<T> = {
+export type ChoiceFormatterProps<T> = {
     /**
      * The value to format
      */
@@ -35,8 +35,8 @@ type ChoiceFormatterProps<T> = {
  *
  * This is the [default formatter](doc:getFormatterForField) used when a field has choices defined.
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function ChoiceFormatter<T>(props: ChoiceFormatterProps<T>): ReactElement {
     const {

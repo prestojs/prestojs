@@ -18,8 +18,8 @@ import CharField from './CharField';
  *
  * </Usage>
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  */
 export default class EmailField extends CharField {
     static fieldClassName = 'EmailField';

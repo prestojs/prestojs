@@ -17,8 +17,8 @@ import CharField from './CharField';
  *
  * </Usage>
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  */
 export default class URLField extends CharField {
     static fieldClassName = 'URLField';

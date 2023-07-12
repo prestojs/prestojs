@@ -3,11 +3,17 @@ import { Field } from '@prestojs/viewmodel';
 import React from 'react';
 import { Field as FinalFormField, FieldProps } from 'react-final-form';
 
+/**
+ * @expandproperties
+ */
 export type FormFieldPropsWithField<T> = Omit<FieldProps<any, any>, 'name'> & {
     field: Field<T>;
     widgetProps?: Record<any, any>;
 };
 
+/**
+ * @expandproperties
+ */
 export type FormFieldProps<T> = FieldProps<any, any> | FormFieldPropsWithField<T>;
 
 /**
@@ -30,7 +36,7 @@ export type FormFieldProps<T> = FieldProps<any, any> | FormFieldPropsWithField<T
  * @param fieldProps Any other props to pass through to [Field](https://final-form.org/docs/react-final-form/api/Field)
  *
  * @rest-prop-name fieldProps
- * @extract-docs
+ * @extractdocs
  */
 export default function FormField<T>({
     field,

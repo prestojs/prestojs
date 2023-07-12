@@ -74,7 +74,9 @@ const choicesMapping = new Map<string, any>([
  * > this otherwise it is recommended to implement your own version (you can copy [this implementation](https://github.com/prestojs/prestojs/blob/master/js-packages/@prestojs/ui/src/getFormatterForField.ts)
  * > as a starting point).
  *
- * @extract-docs
+ * @param field The field to get the formatter for
+ *
+ * @extractdocs
  */
 export default function getFormatterForField<FieldValue, ParsableValueT, SingleValueT>(
     field: Field<FieldValue, ParsableValueT, SingleValueT>

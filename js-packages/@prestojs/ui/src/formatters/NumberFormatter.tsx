@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type NumberFormatterProps = {
+export type NumberFormatterProps = {
     /**
      * The number to format. If `value` is a `string` then value will be coerced to `Number` and if the result is `NaN` then
      * `invalidValueLabel` will be returned;
@@ -73,8 +73,8 @@ type NumberFormatterProps = {
  *
  * </Usage>
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function NumberFormatter(props: NumberFormatterProps): React.ReactElement {
     const {

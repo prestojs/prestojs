@@ -103,8 +103,8 @@ function splitWidgetAndProps(
  *
  * @param field The field to return the widget for.
  *
- * @menu-group Form
- * @extract-docs
+ * @menugroup Form
+ * @extractdocs
  */
 export default function getWidgetForField<
     FieldValue,

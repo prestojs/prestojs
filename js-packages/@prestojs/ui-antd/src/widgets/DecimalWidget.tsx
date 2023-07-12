@@ -2,11 +2,17 @@ import React from 'react';
 import NumberWidget, { NumberWidgetProps } from './NumberWidget';
 
 /**
- * @expand-properties
- * @hide-properties meta
+ * @expandproperties
+ * @hideproperties meta
  */
-type DecimalWidgetProps = Omit<NumberWidgetProps<string>, 'stringMode'>;
+export type DecimalWidgetProps = Omit<NumberWidgetProps<string>, 'stringMode'>;
 
+function DecimalWidget(
+    props: Omit<DecimalWidgetProps, 'ref'>,
+    ref: React.RefObject<HTMLInputElement>
+): React.ReactElement {
+    return <NumberWidget<string> ref={ref} stringMode {...props} />;
+}
 /**
  * Form widget for string values that renders as a [InputNumber](https://4x.ant.design/components/input-number/) with
  * `stringMode` enabled.
@@ -24,16 +30,9 @@ type DecimalWidgetProps = Omit<NumberWidgetProps<string>, 'stringMode'>;
  * ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- * @hide-properties meta
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ * @hideproperties meta
  */
-function DecimalWidget(
-    props: DecimalWidgetProps,
-    ref: React.RefObject<HTMLInputElement>
-): React.ReactElement {
-    return <NumberWidget<string> ref={ref} stringMode {...props} />;
-}
-
-export default React.forwardRef(DecimalWidget);
+export default React.forwardRef(DecimalWidget) as (props: DecimalWidgetProps) => React.ReactElement;

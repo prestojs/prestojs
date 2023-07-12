@@ -1,24 +1,20 @@
 import { WidgetProps } from '@prestojs/ui';
 import type { DatePickerProps } from 'antd/lib/date-picker';
-import React from 'react';
+import React, { RefObject } from 'react';
 
 import { useAntdUiConfig } from '../AntdUiProvider';
 
 /**
- * @expand-properties
- * @hide-properties choices asyncChoices
+ * @expandproperties
+ * @hideproperties meta choices asyncChoices
  */
-type DateTimeWidgetProps = WidgetProps<Date, HTMLInputElement> & { input: DatePickerProps };
+type DateTimeWidgetProps = WidgetProps<Date, HTMLInputElement> & {
+    input: DatePickerProps;
+    ref?: RefObject<HTMLElement>;
+};
 
-/**
- * See [DatePicker](https://ant.design/components/date-picker/) for props available
- *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- */
 function DateTimeWidget(
-    props: DateTimeWidgetProps,
+    props: Omit<DateTimeWidgetProps, 'ref'>,
     ref: React.RefObject<React.ClassicComponent<DatePickerProps, any>>
 ): React.ReactElement {
     const DatePicker = useAntdUiConfig().getDatePicker();
@@ -31,4 +27,13 @@ function DateTimeWidget(
     return <DatePicker ref={ref} showTime format={format} {...restInput} {...rest} />;
 }
 
-export default React.forwardRef(DateTimeWidget);
+/**
+ * See [DatePicker](https://ant.design/components/date-picker/) for props available
+ *
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ */
+export default React.forwardRef(DateTimeWidget) as (
+    props: DateTimeWidgetProps
+) => React.ReactElement;

@@ -64,8 +64,8 @@ export type InternalCursorPaginatorState = {
  *     instead. See the [Use with usePaginator & paginationMiddleware](#example-02-use-paginator) example.
  * </Usage>
  *
- * @menu-group Pagination
- * @extract-docs
+ * @menugroup Pagination
+ * @extractdocs
  */
 export default class CursorPaginator extends Paginator<
     CursorPaginationState,

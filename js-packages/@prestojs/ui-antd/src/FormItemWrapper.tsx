@@ -8,8 +8,8 @@ import React from 'react';
  * See [UiProvider](/api/@prestojs/ui/UiProvider.html) for how to set this as the default
  * form item component for use with [Form.Item](/api/@prestojs/final-form/FormItem.html).
  *
- * @extract-docs
- * @menu-group Form
+ * @extractdocs
+ * @menugroup Form
  */
 export default function FormItemWrapper({
     // Don't pass this through to the underlying ant Form.Item

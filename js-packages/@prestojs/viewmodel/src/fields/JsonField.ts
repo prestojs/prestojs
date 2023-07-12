@@ -38,8 +38,8 @@ export type JSON<T> = string & { ' __JSON': T };
  * </Usage>
  *
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  */
 export default class JsonField<T> extends Field<T, JSON<T> | T> {
     static fieldClassName = 'JsonField';

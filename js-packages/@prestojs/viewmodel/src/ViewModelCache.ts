@@ -16,10 +16,23 @@ import {
     ViewModelInterface,
 } from './ViewModelFactory';
 
-type ChangeListener<T> = (previous?: T | null, next?: T | null) => void;
-type MultiChangeListener<T> = (previous?: (T | null)[], next?: (T | null)[]) => void;
-type ChangeListenerUnsubscribe = () => void;
-type AllChangesListener = () => void;
+/**
+ * @quickinfo
+ */
+export type ChangeListener<T> = (previous?: T | null, next?: T | null) => void;
+/**
+ * @quickinfo
+ */
+export type MultiChangeListener<T> = (previous?: (T | null)[], next?: (T | null)[]) => void;
+/**
+ * Function that will unsubscribe the listener
+ * @quickinfo
+ */
+export type ChangeListenerUnsubscribe = () => void;
+/**
+ * @quickinfo
+ */
+export type AllChangesListener = () => void;
 
 // Controller for conditionally enabling listeners. We don't want to fire listeners anytime
 // something changes in the cache as there's lots of changes that happen internally for keeping
@@ -692,7 +705,7 @@ const defaultListenerBatcher = {
  *
  * You can listen to changes using `addListener`.
  *
- * > To listen for changes and re-render a component use the [useViewModelCache](doc:useViewModeCache) hook.
+ * > To listen for changes and re-render a component use the [useViewModelCache](doc:useViewModelCache) hook.
  *
  * ```js
  * User.cache.addListener(2, ['id', 'name'], (previous, next) => console.log(previous, 'change to', next));
@@ -767,8 +780,8 @@ const defaultListenerBatcher = {
  * // }
  * ```
  *
- * @extract-docs
- * @menu-group Caching
+ * @extractdocs
+ * @menugroup Caching
  */
 export default class ViewModelCache<ViewModelClassType extends ViewModelConstructor<any, any>> {
     viewModel: ViewModelClassType;
@@ -878,8 +891,6 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      * and returned.
      *
      * @returns The cached record as an instance of the view model.
-     *
-     * @exclude-overload-docs
      */
     add<T extends PartialViewModel<ViewModelClassType>>(recordOrData: T): T;
     add<T extends PartialViewModel<ViewModelClassType>>(recordOrData: T[]): T[];
@@ -942,8 +953,6 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      *
      * @param recordsOrData The records to add. Can either be an array of instances of the ViewModel
      * or an array of data objects (or a mixture of both).
-     *
-     * @exclude-overload-docs
      */
     addList<T extends PartialViewModel<ViewModelClassType>>(recordsOrData: T[]): T[];
     addList<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
@@ -962,6 +971,23 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
         });
     }
 
+    /** @hidden */
+    get<T extends FieldPath<ViewModelClassType>>(
+        pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
+        fieldNames: T[]
+    ): PartialViewModel<ViewModelClassType, T> | null;
+    /** @hidden */
+    get(
+        pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
+        fieldNames: '*'
+    ): PartialViewModel<
+        ViewModelClassType,
+        ExtractStarFieldNames<ViewModelClassType['fields']>
+    > | null;
+    /** @hidden */
+    get<T extends FieldPath<ViewModelClassType>>(
+        record: PartialViewModel<ViewModelClassType, T>
+    ): PartialViewModel<ViewModelClassType, T> | null;
     /**
      * Get a record with the specified `fieldNames` set from the cache.
      *
@@ -983,39 +1009,24 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      * User.cache.get(user);
      * ```
      *
-     * Each typescript overload is documented below.
-     *
-     * @param pk the primary key of the record to get, or an instance of the ViewModel to get.
+     * @param pkOrRecord the primary key of the record to get, or an instance of the ViewModel to get.
      * @param fieldNames the field names to use to look up the cache entry. Use '*' to indicate all fields.
      * See [Field notation](#Field_notation) for supported format.
      *
      * @returns The cached record, or null if none found
      */
-    get<T extends FieldPath<ViewModelClassType>>(
-        pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
-        fieldNames: T[]
-    ): PartialViewModel<ViewModelClassType, T> | null;
-    /**
-     * Convenience overload to get a record with all fields set from the cache.
-     *
-     * @param pk The primary key of the record to get.
-     * @param fieldNames The string `"*"`
-     */
     get(
-        pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
-        fieldNames: '*'
-    ): PartialViewModel<
-        ViewModelClassType,
-        ExtractStarFieldNames<ViewModelClassType['fields']>
-    > | null;
-    /**
-     * Convenience overload to get the latest version of the passed record
-     *
-     * @param record The record to re-fetch from the cache
-     */
-    get<T extends FieldPath<ViewModelClassType>>(
-        record: PartialViewModel<ViewModelClassType, T>
-    ): PartialViewModel<ViewModelClassType, T> | null;
+        pkOrRecord:
+            | ExtractPkFieldParseableValueType<ViewModelClassType>
+            | PartialViewModel<ViewModelClassType>
+            | (
+                  | PartialViewModel<ViewModelClassType>
+                  | ExtractPkFieldParseableValueType<ViewModelClassType>
+              )[],
+        fieldNames?: FieldPath<ViewModelClassType>[] | '*'
+    ): PartialViewModel<ViewModelClassType> | null;
+    // Note the above overload is duplicate of implementation so can be documented once. This is because
+    // typedoc doesn't extract the implementation signature, only overload signatures
     get(
         pkOrRecord:
             | ExtractPkFieldParseableValueType<ViewModelClassType>

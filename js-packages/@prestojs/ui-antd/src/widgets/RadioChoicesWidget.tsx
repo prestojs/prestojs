@@ -4,11 +4,11 @@ import { Radio } from 'antd';
 import React from 'react';
 
 /**
- * @expand-properties
- * @hide-properties asyncChoices
+ * @expandproperties
+ * @hideproperties asyncChoices
  */
-type RadioChoicesWidgetProps<ValueT> = Omit<
-    WidgetProps<ValueT | null, HTMLInputElement>,
+export type RadioChoicesWidgetProps<ValueT> = Omit<
+    WidgetProps<ValueT | null, HTMLDivElement>,
     'choices'
 > &
     RadioGroupProps & {
@@ -28,14 +28,15 @@ type RadioChoicesWidgetProps<ValueT> = Omit<
         choiceProps?: Map<ValueT, Record<string, any>>;
     };
 
+// Note that Radio.Group doesn't support ref so we don't use forwardRef here
 /**
  * See [Radio](https://ant.design/components/radio/) for props available
  *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
  */
-function RadioChoicesWidget<ValueT extends number | string | boolean>(
+export default function RadioChoicesWidget<ValueT extends number | string | boolean>(
     props: RadioChoicesWidgetProps<ValueT>
 ): React.ReactElement {
     const { input, choices, meta, radioComponent, choiceProps, ...rest } = props;
@@ -57,6 +58,3 @@ function RadioChoicesWidget<ValueT extends number | string | boolean>(
 }
 
 RadioChoicesWidget.Button = Radio.Button;
-
-// Note that Radio.Group doesn't support ref so we don't use forwardRef here
-export default RadioChoicesWidget;

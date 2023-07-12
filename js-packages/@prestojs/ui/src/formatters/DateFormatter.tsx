@@ -1,9 +1,9 @@
 import React, { ReactElement, ReactNode } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type DateFormatterProps = {
+export type DateFormatterProps = {
     /**
      * The value to format
      */
@@ -44,8 +44,8 @@ type DateFormatterProps = {
  *
  * This is the [default formatter](doc:getFormatterForField) used for [DateField](doc:DateField)
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function DateFormatter(props: DateFormatterProps): ReactElement | null {
     const {

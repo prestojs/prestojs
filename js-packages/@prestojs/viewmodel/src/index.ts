@@ -26,12 +26,15 @@ export { default as URLField } from './fields/URLField';
 export { default as useViewModelCache } from './useViewModelCache';
 export { default as AsyncChoices } from './fields/AsyncChoices';
 export {
+    UnresolvedRelatedViewModelFieldError,
     RelatedViewModelField,
     ManyRelatedViewModelField,
     BaseRelatedViewModelField,
 } from './fields/RelatedViewModelField';
 export { default as ListField } from './fields/ListField';
 export { default as useAsyncChoices } from './useAsyncChoices';
+
+export { normalizeFields, ViewModelFieldPaths } from './fieldUtils';
 
 export {
     InvalidFieldError,
@@ -40,52 +43,53 @@ export {
     isViewModelClass,
 } from './ViewModelFactory';
 
-import type {
+export type {
     AsyncChoicesInterface,
     AsyncChoicesOptions,
     Choice,
     ChoicesGrouped,
 } from './fields/AsyncChoices';
-import type {
+export type { UseAsyncChoicesProps, UseAsyncChoicesReturn } from './useAsyncChoices';
+export type {
+    CompoundPrimaryKey,
+    ExtractFieldNames,
+    ExtractPkFieldParseableValueType,
+    FieldDataMapping,
+    FieldDataMappingRaw,
+    FieldPath,
+    FieldPaths,
+    FieldsMapping,
+    PartialViewModel,
+    PrimaryKey,
+    SinglePrimaryKey,
+    ViewModelConstructor,
+    ViewModelInterface,
+    ViewModelOptions,
+    ViewModelValues,
+} from './ViewModelFactory';
+
+export type {
+    ChangeListener,
+    AllChangesListener,
+    MultiChangeListener,
+    ChangeListenerUnsubscribe,
+} from './ViewModelCache';
+
+export type {
+    DefaultValueFunction,
     FieldProps,
     RecordBoundField,
     ViewModelFieldFormatterProps,
     ViewModelFieldWidgetProps,
 } from './fields/Field';
-import type {
-    CompoundPrimaryKey,
-    FieldDataMapping,
-    FieldDataMappingRaw,
-    FieldPath,
-    FieldPaths,
-    FieldsMapping,
-    PartialViewModel,
-    PrimaryKey,
-    SinglePrimaryKey,
-    ViewModelConstructor,
-    ViewModelInterface,
-    ViewModelValues,
-} from './ViewModelFactory';
 
+export type { CharFieldProps } from './fields/CharField';
+export type { DecimalFieldProps } from './fields/DecimalField';
+export type { NumberFieldProps } from './fields/NumberField';
+export type { RangeValue, RangeFieldProps } from './fields/RangeField';
 export type {
-    ViewModelFieldWidgetProps,
-    ViewModelFieldFormatterProps,
-    ViewModelInterface,
-    ViewModelConstructor,
-    ViewModelValues,
-    PartialViewModel,
-    FieldProps,
-    FieldsMapping,
-    FieldDataMapping,
-    FieldDataMappingRaw,
-    FieldPath,
-    FieldPaths,
-    RecordBoundField,
-    ChoicesGrouped,
-    AsyncChoicesInterface,
-    AsyncChoicesOptions,
-    Choice,
-    PrimaryKey,
-    CompoundPrimaryKey,
-    SinglePrimaryKey,
-};
+    RelatedViewModelFieldProps,
+    RelatedViewModelValueType,
+    BaseRelatedViewModelValueType,
+    RelatedViewModelParsableType,
+} from './fields/RelatedViewModelField';

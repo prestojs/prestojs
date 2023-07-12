@@ -5,9 +5,9 @@ function DefaultFormatter<T>({ value }: { value: T | null }): React.ReactElement
 }
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-interface RangeValue<T> {
+export interface RangeValue<T> {
     /**
      * The lower value of the range
      */
@@ -19,9 +19,12 @@ interface RangeValue<T> {
 }
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type RangeFormatterProps<T, BoundsFormatter extends React.ComponentType<{ value: T | null }>> = {
+export type RangeFormatterProps<
+    T,
+    BoundsFormatter extends React.ComponentType<{ value: T | null }>
+> = {
     /**
      * The range value. This should be an object with a `lower` and `upper` key representing the lower and upper
      * bounds of the range respectively.
@@ -42,21 +45,21 @@ type RangeFormatterProps<T, BoundsFormatter extends React.ComponentType<{ value:
     /**
      * Any props to pass through to `boundsFormatter`.
      *
-     * @type-name BoundsFormatter Props
+     * @typename BoundsFormatter Props
      */
     boundsFormatterProps?: ComponentProps<BoundsFormatter>;
     /**
      * Any props to pass through to the lower `boundsFormatter`. If `boundsFormatter` is also passed then
      * both will be passed through with `lowerFormatterProps` taking precedence.
      *
-     * @type-name BoundsFormatter Props
+     * @typename BoundsFormatter Props
      */
     lowerFormatterProps?: ComponentProps<BoundsFormatter>;
     /**
      * Any props to pass through to the upper `boundsFormatter`. If `boundsFormatter` is also passed then
      * both will be passed through with `upperFormatterProps` taking precedence.
      *
-     * @type-name BoundsFormatter Props
+     * @typename BoundsFormatter Props
      */
     upperFormatterProps?: ComponentProps<BoundsFormatter>;
     /**
@@ -77,8 +80,8 @@ type RangeFormatterProps<T, BoundsFormatter extends React.ComponentType<{ value:
  * This is the [default formatter](doc:getFormatterForField) used for [DateRangeField](doc:DateRangeField), [DateTimeRangeField](doc:DateTimeRangeField),
  * [FloatRangeField](doc:FloatRangeField) and [IntegerRangeField](doc:IntegerRangeField).
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function RangeFormatter<
     T,

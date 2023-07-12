@@ -7,8 +7,8 @@ import Field from './Field';
  * This field supports either a [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
  * or a string that will be parsed with [Date.parse()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse).
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  */
 export default class DateTimeField extends Field<Date, string | Date> {
     static fieldClassName = 'DateTimeField';

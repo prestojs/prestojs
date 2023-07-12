@@ -1,9 +1,9 @@
 import React, { ReactElement, ReactNode } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type BooleanFormatterProps = {
+export type BooleanFormatterProps = {
     /**
      * The value to format. When `null`, `undefined` or empty string it renders `blankLabel`, when truthy renders `trueLabel`, when falsy renders `falseLabel`
      */
@@ -49,8 +49,8 @@ type BooleanFormatterProps = {
  *    ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function BooleanFormatter(props: BooleanFormatterProps): ReactElement {
     const { value, blankLabel = '', trueLabel = 'Yes', falseLabel = 'No' } = props;

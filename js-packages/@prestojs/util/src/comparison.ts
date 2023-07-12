@@ -29,8 +29,8 @@ function equalityCustomizer(a: any, b: any): boolean | undefined {
  * @param a First value to compare
  * @param b Second value to compare
  *
- * @extract-docs
- * @menu-group Comparison
+ * @extractdocs
+ * @menugroup Comparison
  */
 export function isEqual(a: any, b: any): boolean {
     return shallowequal(a, b, equalityCustomizer);
@@ -43,8 +43,8 @@ export function isEqual(a: any, b: any): boolean {
  * @param a First value to compare
  * @param b Second value to compare
  *
- * @extract-docs
- * @menu-group Comparison
+ * @extractdocs
+ * @menugroup Comparison
  */
 export function isDeepEqual(a: any, b: any): boolean {
     return isEqualWith(a, b, equalityCustomizer);

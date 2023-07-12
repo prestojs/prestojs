@@ -1,9 +1,9 @@
 import React, { ReactElement, ReactNode } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type CharFormatterProps = {
+export type CharFormatterProps = {
     /**
      * What to render when `value` is `null`, `undefined` or an empty string
      *
@@ -38,8 +38,8 @@ type CharFormatterProps = {
  *
  * </Usage>
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function CharFormatter(props: CharFormatterProps): ReactElement {
     const { value, blankLabel = null } = props;

@@ -1,12 +1,12 @@
 import { RangedWidgetProps } from '@prestojs/ui';
 import { Input } from 'antd';
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type RangeWidgetProps<FieldValue, T extends HTMLElement, P> = RangedWidgetProps<
+export type RangeWidgetProps<FieldValue, T extends HTMLElement, P> = RangedWidgetProps<
     FieldValue,
     T,
     P

@@ -58,7 +58,7 @@ export type ComparisonFn = (newInputs: any[], lastInputs: any[]) => boolean;
  *
  * @returns The memoized value
  *
- * @extract-docs
+ * @extractdocs
  */
 export default function useMemoOne<T>(
     // getResult changes on every call,

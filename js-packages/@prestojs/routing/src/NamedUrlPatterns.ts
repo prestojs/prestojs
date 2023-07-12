@@ -40,7 +40,7 @@ export class NamedUrlNotFoundError extends Error {
  * // UrlPattern('/users/')
  * ```
  *
- * @extract-docs
+ * @extractdocs
  * @typeParam Patterns The URL patterns defined as an object where keys are the names and values are a [UrlPattern](doc:UrlPattern)
  */
 export default class NamedUrlPatterns<Patterns extends UrlPatternMapping> {
@@ -48,6 +48,7 @@ export default class NamedUrlPatterns<Patterns extends UrlPatternMapping> {
 
     /**
      * @param urls The patterns defined as an object where keys are the names and values are a [UrlPattern](doc:UrlPattern)
+     * @typeParam Patterns {@inheritTypeParam NamedUrlPatterns}
      */
     constructor(urls: Patterns) {
         const badPatterns = Object.entries(urls).filter(
@@ -66,8 +67,8 @@ export default class NamedUrlPatterns<Patterns extends UrlPatternMapping> {
     /**
      * Get the [UrlPattern](doc:UrlPattern) for the specified name
      *
-     * @param name {string} Name of pattern to retrieve
-     * @param-type-name name string
+     * @param name Name of pattern to retrieve
+     * @paramtypename name string
      */
     get(name: keyof Patterns): UrlPattern {
         const pattern = this.urlPatterns[name];
@@ -86,10 +87,10 @@ export default class NamedUrlPatterns<Patterns extends UrlPatternMapping> {
      * this.get(name).resolve(kwargs, options)
      * ```
      *
-     * @param name string Name of the pattern to resolve
+     * @param name Name of the pattern to resolve
      * @param kwargs Arguments to replace in pattern, if any
      * @param options Extra options to pass through to `UrlPattern.resolve`
-     * @param-type-name name string
+     * @paramtypename name string
      */
     reverse(name: keyof Patterns, kwargs: {} = {}, options: UrlPatternResolveOptions = {}): string {
         const url = this.get(name);

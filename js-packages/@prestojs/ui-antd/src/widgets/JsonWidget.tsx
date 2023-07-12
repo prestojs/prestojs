@@ -1,17 +1,25 @@
 import { WidgetProps } from '@prestojs/ui';
 import { Input } from 'antd';
 import { TextAreaRef } from 'antd/lib/input/TextArea';
-import React, { ComponentProps } from 'react';
+import React, { ComponentProps, RefObject } from 'react';
 
 /**
- * @expand-properties
- * @hide-properties meta
+ * @expandproperties
+ * @hideproperties meta
  */
-type JsonWidgetProps = Omit<
+export type JsonWidgetProps = Omit<
     WidgetProps<string | null, HTMLTextAreaElement>,
     'choices' | 'asyncChoices'
 > &
-    Omit<ComponentProps<typeof Input.TextArea>, 'onChange' | 'value'>;
+    Omit<ComponentProps<typeof Input.TextArea>, 'onChange' | 'value'> & {
+        ref?: RefObject<TextAreaRef>;
+    };
+
+function JsonWidget(props: Omit<JsonWidgetProps, 'ref'>, ref): React.ReactElement {
+    const { input, meta, ...rest } = props;
+    const { value, ...restInput } = input;
+    return <Input.TextArea ref={ref} value={value ?? ''} {...restInput} {...rest} />;
+}
 
 /**
  * Form widget for JSON values that renders as a [Input.TextArea](https://4x.ant.design/components/input/#Input.TextArea).
@@ -29,15 +37,9 @@ type JsonWidgetProps = Omit<
  * ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- * @hide-properties meta
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ * @hideproperties meta
  */
-function JsonWidget(props: JsonWidgetProps, ref): React.ReactElement {
-    const { input, meta, ...rest } = props;
-    const { value, ...restInput } = input;
-    return <Input.TextArea ref={ref} value={value ?? ''} {...restInput} {...rest} />;
-}
-
-export default React.forwardRef<TextAreaRef, WidgetProps<string, HTMLTextAreaElement>>(JsonWidget);
+export default React.forwardRef(JsonWidget) as (props: JsonWidgetProps) => React.ReactElement;

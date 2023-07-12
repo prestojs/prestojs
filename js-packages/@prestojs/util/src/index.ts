@@ -28,6 +28,13 @@ import type {
     PaginatorInterface,
     PaginatorInterfaceClass,
 } from './pagination/Paginator';
+import type {
+    AsyncFunction,
+    UseAsyncOnError,
+    UseAsyncOnSuccess,
+    UseAsyncOptions,
+    UseAsyncReturnObject,
+} from './useAsync';
 import type { UseAsyncListingProps, UseAsyncListingReturn } from './useAsyncListing';
 import type {
     UseAsyncValuePropsMulti,
@@ -36,20 +43,25 @@ import type {
 } from './useAsyncValue';
 
 export type {
-    TextLabeled,
+    AsyncFunction,
+    CursorPaginationState,
+    Id,
+    Identifiable,
+    LimitOffsetPaginationState,
     NodeLabeled,
-    UseAsyncListingProps,
-    UseAsyncListingReturn,
-    UseAsyncValuePropsMulti,
-    UseAsyncValuePropsSingle,
-    UseAsyncValueReturn,
+    PageNumberPaginationState,
     PaginationRequestDetails,
     PaginatorInterface,
     PaginatorInterfaceClass,
-    PageNumberPaginationState,
-    CursorPaginationState,
-    LimitOffsetPaginationState,
     PaginatorState,
-    Identifiable,
-    Id,
+    TextLabeled,
+    UseAsyncListingProps,
+    UseAsyncListingReturn,
+    UseAsyncOnError,
+    UseAsyncOnSuccess,
+    UseAsyncOptions,
+    UseAsyncReturnObject,
+    UseAsyncValuePropsMulti,
+    UseAsyncValuePropsSingle,
+    UseAsyncValueReturn,
 };

@@ -30,9 +30,9 @@ function defaultTest(urlConfig: MiddlewareUrlConfig, requestInit: EndpointReques
 }
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type DedupeOptions = {
+export type DedupeOptions = {
     /**
      * Function to test whether a request is subject to de-duping. The default implementation only
      * de-dupes requests with `method` set to `GET`.
@@ -67,8 +67,8 @@ type DedupeOptions = {
  * </Usage>
  *
  * @returns Middleware function to pass to [Endpoint](doc:Endpoint) or set on [Endpoint.defaultConfig.middleware](doc:Endpoint#Property-defaultConfig)
- * @extract-docs
- * @menu-group Middleware
+ * @extractdocs
+ * @menugroup Middleware
  */
 export default function dedupeInFlightRequestsMiddleware<T>(
     options: DedupeOptions = {}

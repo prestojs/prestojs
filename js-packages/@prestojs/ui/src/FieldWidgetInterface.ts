@@ -10,8 +10,8 @@ import React from 'react';
  * When used with [@prestojs/final-form](/docs/final-form) this will be
  * the props described in the [final-form documentation](https://final-form.org/docs/react-final-form/types/FieldRenderProps).
  *
- * @expand-properties
- * @extract-docs
+ * @expandproperties
+ * @extractdocs
  * @typeParam FieldValueT The type of the value that the widget can accept
  * @typeParam ElementT The HTML element type (where applicable). This is the type
  * used in `FocusEvent` and `ChangeEvent`.
@@ -62,8 +62,8 @@ export interface InputProps<FieldValueT, ElementT extends HTMLElement> {
 }
 
 /**
- * @expand-properties
- * @hide-properties meta choices asyncChoices
+ * @expandproperties
+ * @hideproperties meta choices asyncChoices
  */
 export interface WidgetProps<FieldValue, T extends HTMLElement, SingleValue = FieldValue> {
     /**
@@ -90,7 +90,7 @@ export interface WidgetProps<FieldValue, T extends HTMLElement, SingleValue = Fi
 }
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {
     /**

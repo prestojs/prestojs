@@ -11,12 +11,14 @@ function isPaginatorClassProvider<T extends PaginatorInterface>(
     return item && typeof item.getPaginatorClass === 'function';
 }
 
+/** @hidden */
 export default function usePaginator<PaginatorT extends PaginatorInterface, PaginatorState>(
     paginatorClassOrProvider:
         | PaginatorInterfaceClass<PaginatorT>
         | PaginatorClassProvider<PaginatorT>,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
 ): PaginatorT;
+/** @hidden */
 export default function usePaginator<PaginatorState>(
     paginatorClassOrProvider: null,
     currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
@@ -26,6 +28,7 @@ export default function usePaginator<PaginatorState>(
 // export function ExampleComponent({ endpoint }: { endpoint: Endpoint | null }) {
 //     usePaginator(endpoint && endpoint.getPaginatorClass());
 // }
+/** @hidden */
 export default function usePaginator<PaginatorT extends PaginatorInterface, PaginatorState>(
     paginatorClassOrProvider:
         | PaginatorInterfaceClass<PaginatorT>
@@ -49,10 +52,16 @@ export default function usePaginator<PaginatorT extends PaginatorInterface, Pagi
  *
  * @returns The paginator class instance
  *
- * @menu-group Pagination
- * @extract-docs
- * @exclude-overload-docs
+ * @extractdocs
+ * @menugroup Pagination
  */
+export default function usePaginator<PaginatorT extends PaginatorInterface, PaginatorState>(
+    paginatorClassOrProvider:
+        | PaginatorInterfaceClass<PaginatorT>
+        | PaginatorClassProvider<PaginatorT>
+        | null,
+    currentStatePair?: [PaginatorState | undefined, (value: PaginatorState) => void]
+): PaginatorT | null;
 export default function usePaginator<PaginatorT extends PaginatorInterface, PaginatorState>(
     paginatorClassOrProvider:
         | PaginatorInterfaceClass<PaginatorT>

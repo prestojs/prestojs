@@ -102,8 +102,8 @@ function defaultEquality<T>(currentValue: T, previousValue?: T): boolean {
  *
  * @returns The data as returned by `selector`
  *
- * @extract-docs
- * @menu-group Caching
+ * @extractdocs
+ * @menugroup Caching
  */
 export default function useViewModelCache<
     T extends ViewModelConstructor<any, any>,

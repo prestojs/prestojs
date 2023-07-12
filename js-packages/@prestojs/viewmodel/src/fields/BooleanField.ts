@@ -29,8 +29,8 @@ import Field from './Field';
  * </Usage>
  *
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  */
 export default class BooleanField extends Field<boolean> {
     static fieldClassName = 'BooleanField';

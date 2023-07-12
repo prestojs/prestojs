@@ -22,10 +22,9 @@ type EndpointCall<T> = {
 type BatchKey = any;
 
 /**
- * @expand-properties
- * @export-in-docs
+ * @expandproperties
  */
-type BatchMiddlewareOptions<BatchCallReturn, IndividualResult> = {
+export type BatchMiddlewareOptions<BatchCallReturn, IndividualResult> = {
     /**
      * Get the key for this batch. Return false to exclude this call from being batched.
      *
@@ -301,9 +300,9 @@ class BatchMiddleware<BatchCallReturn, IndividualResult> {
  * > last in the chain (ie. `batchingMiddleware` can only be proceeded by another `batchMiddleware`).
  *
  * @returns Middleware function to pass to [Endpoint](doc:Endpoint) or set on [Endpoint.defaultConfig.middleware](doc:Endpoint#Property-defaultConfig)
- * @extract-docs
- * @menu-group Middleware
- * @return-type-name Middleware function
+ * @extractdocs
+ * @menugroup Middleware
+ * @returntypename Middleware function
  */
 export default function batchMiddleware<BatchCallReturn, IndividualResult>(
     options: BatchMiddlewareOptions<BatchCallReturn, IndividualResult>

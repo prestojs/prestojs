@@ -1,23 +1,26 @@
 import { WidgetProps } from '@prestojs/ui';
 import { Input } from 'antd';
 import { TextAreaRef } from 'antd/lib/input/TextArea';
-import React from 'react';
+import React, { RefObject } from 'react';
 
 /**
- * @expand-properties
- * @hide-properties choices asyncChoices
+ * @expandproperties
+ * @hideproperties choices asyncChoices
  */
-type TextWidgetProps = WidgetProps<string, HTMLTextAreaElement>;
-/**
- * See [Input.TextArea](https://ant.design/components/input/#Input.TextArea) for props available
- *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- */
-function TextWidget(props: TextWidgetProps, ref): React.ReactElement {
+export type TextWidgetProps = WidgetProps<string, HTMLTextAreaElement> & {
+    ref?: RefObject<TextAreaRef>;
+};
+
+function TextWidget(props: Omit<TextWidgetProps, 'ref'>, ref): React.ReactElement {
     const { input, meta, ...rest } = props;
     return <Input.TextArea ref={ref} {...input} {...rest} />;
 }
 
-export default React.forwardRef<TextAreaRef, WidgetProps<string, HTMLTextAreaElement>>(TextWidget);
+/**
+ * See [Input.TextArea](https://ant.design/components/input/#Input.TextArea) for props available
+ *
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ */
+export default React.forwardRef(TextWidget) as (props: TextWidgetProps) => React.ReactElement;

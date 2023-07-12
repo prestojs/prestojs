@@ -2,15 +2,20 @@ import React from 'react';
 import type { UploadWidgetProps } from './FileWidget';
 import FileWidget from './FileWidget';
 
-/**
- * See [FileWidget](doc:FileWidget) for props available
- *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- */
-function ImageWidget(props: UploadWidgetProps<File, HTMLElement>, ref): React.ReactElement {
+function ImageWidget(
+    props: Omit<UploadWidgetProps<File, HTMLElement>, 'ref'>,
+    ref
+): React.ReactElement {
     return <FileWidget ref={ref} listType="picture-card" accept="image/*" {...props} />;
 }
 
-export default React.forwardRef<HTMLElement, UploadWidgetProps<File, HTMLElement>>(ImageWidget);
+/**
+ * See [FileWidget](doc:FileWidget) for props available
+ *
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ */
+export default React.forwardRef(ImageWidget) as (
+    props: UploadWidgetProps<File, HTMLElement>
+) => React.ReactElement;

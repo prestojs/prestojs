@@ -5,11 +5,12 @@ import React, { ComponentProps } from 'react';
 type RawValue = string | number | boolean;
 
 /**
- * @expand-properties
- * @hide-properties meta
+ * @expandproperties
+ * @hideproperties meta asyncChoices
+ * @typeParam ValueT {@inheritTypeParam CheckboxChoicesWidget}
  */
-type CheckboxChoicesWidgetProps<ValueT> = ComponentProps<typeof Checkbox.Group> &
-    Omit<WidgetProps<ValueT[], HTMLInputElement, ValueT>, 'choices' | 'asyncChoices'> & {
+export type CheckboxChoicesWidgetProps<ValueT> = ComponentProps<typeof Checkbox.Group> &
+    Omit<WidgetProps<ValueT[] | null, HTMLInputElement, ValueT>, 'choices' | 'asyncChoices'> & {
         /**
          * The choices to render.
          *
@@ -54,6 +55,7 @@ type CheckboxChoicesWidgetProps<ValueT> = ComponentProps<typeof Checkbox.Group> 
         choiceProps?: Map<ValueT, ComponentProps<typeof Checkbox>>;
     };
 
+// Note that Checkbox.Group doesn't support ref so we don't use forwardRef here
 /**
  * Renders choices as a group of checkboxes using [Checkbox.Group](https://ant.design/components/checkbox/#Checkbox-Group)
  *
@@ -89,11 +91,11 @@ type CheckboxChoicesWidgetProps<ValueT> = ComponentProps<typeof Checkbox.Group> 
  * ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
+ * @extractdocs
+ * @menugroup Widgets
+ * @typeParam ValueT The type of the value. This can be one of `string`, `number` or `boolean`.
  */
-function CheckboxChoicesWidget<ValueT extends RawValue>(
+export default function CheckboxChoicesWidget<ValueT extends RawValue>(
     props: CheckboxChoicesWidgetProps<ValueT>
 ): React.ReactElement {
     const { input, choices, meta, choiceProps, ...rest } = props;
@@ -101,7 +103,7 @@ function CheckboxChoicesWidget<ValueT extends RawValue>(
         throw new Error('choices must be provided');
     }
     return (
-        <Checkbox.Group {...rest} {...input}>
+        <Checkbox.Group {...rest} {...input} value={input.value == null ? [] : input.value}>
             {Array.from(choices, ([value, label]) => (
                 <Checkbox key={value.toString()} value={value} {...(choiceProps?.get(value) || {})}>
                     {label}
@@ -110,6 +112,3 @@ function CheckboxChoicesWidget<ValueT extends RawValue>(
         </Checkbox.Group>
     );
 }
-
-// Note that Checkbox.Group doesn't support ref so we don't use forwardRef here
-export default CheckboxChoicesWidget;

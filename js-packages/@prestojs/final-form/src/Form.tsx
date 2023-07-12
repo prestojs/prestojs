@@ -5,7 +5,7 @@ import FormField from './FormField';
 import FormItem from './FormItem';
 
 /**
- * @expand-properties Any of the final-form [FormProps](https://final-form.org/docs/react-final-form/types/FormProps) and the options shown below
+ * @expandproperties Any of the final-form [FormProps](https://final-form.org/docs/react-final-form/types/FormProps) and the options shown below
  * @typeParam FormValues The type of values the form will submit
  * @typeParam FormComponentProps The type the wrapping form component accepts.
  */
@@ -24,8 +24,45 @@ export type FormProps<
     formProps?: FormComponentProps;
 };
 
+function Form<FormValues = AnyObject, FormComponentProps = Record<string, any>>(
+    props: FormProps<FormValues, FormComponentProps>
+): React.ReactElement {
+    let { children, formProps, ...rest } = props;
+    let { formComponent: FormComponent } = useUi();
+    if (!FormComponent) {
+        FormComponent = 'form';
+    }
+    if (typeof children !== 'function') {
+        const renderableChildren = children;
+        children = ({ handleSubmit }): React.ReactElement => (
+            <FormComponent onSubmit={handleSubmit} {...formProps}>
+                {renderableChildren}
+            </FormComponent>
+        );
+    }
+    return <FinalForm {...rest}>{children}</FinalForm>;
+}
+
+Form.Field = FormField;
+Form.Item = FormItem;
+
+export interface FormComponent {
+    <FormValues = AnyObject, FormComponentProps = Record<string, any>>(
+        props: FormProps<FormValues, FormComponentProps>
+    ): React.ReactElement;
+
+    /**
+     * Convenience alias for [FormField](doc:FormField).
+     */
+    Field: typeof FormField;
+    /**
+     * Convenience alias for [FormItem](doc:FormItem).
+     */
+    Item: typeof FormItem;
+}
+
 /**
- * Wrapper around react-final-form with some extensions
+ * Wrapper around react-final-form with some extensions.
  *
  * final-form expects a function as a child which you then render a `<form>` element with and pass through
  * handleSubmit. Most the time this is the same thing, so you optionally just pass through renderable
@@ -75,26 +112,6 @@ export type FormProps<
  *     </Alert>
  * </Usage>
  *
- * @extract-docs
+ * @extractdocs
  */
-export default function Form<FormValues = AnyObject, FormComponentProps = Record<string, any>>(
-    props: FormProps<FormValues, FormComponentProps>
-): React.ReactElement {
-    let { children, formProps, ...rest } = props;
-    let { formComponent: FormComponent } = useUi();
-    if (!FormComponent) {
-        FormComponent = 'form';
-    }
-    if (typeof children !== 'function') {
-        const renderableChildren = children;
-        children = ({ handleSubmit }): React.ReactElement => (
-            <FormComponent onSubmit={handleSubmit} {...formProps}>
-                {renderableChildren}
-            </FormComponent>
-        );
-    }
-    return <FinalForm {...rest}>{children}</FinalForm>;
-}
-
-Form.Field = FormField;
-Form.Item = FormItem;
+export default Form as FormComponent;

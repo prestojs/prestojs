@@ -4,8 +4,7 @@ import { PaginatorInterface } from './pagination/Paginator';
 import useAsync from './useAsync';
 
 /**
- * @expand-properties
- * @export-in-docs
+ * @expandproperties
  */
 type UseAsyncListingExecuteProps = {
     /**
@@ -19,8 +18,7 @@ type UseAsyncListingExecuteProps = {
 };
 
 /**
- * @expand-properties
- * @export-in-docs
+ * @expandproperties
  */
 export type UseAsyncListingProps<ResultT> = {
     /**
@@ -67,9 +65,6 @@ export type UseAsyncListingProps<ResultT> = {
     execute: (props: UseAsyncListingExecuteProps) => Promise<ResultT>;
 };
 
-/**
- * @export-in-docs
- */
 export type UseAsyncListingReturn<T> = {
     /**
      * True while `execute` call is in progress.
@@ -152,7 +147,7 @@ export type UseAsyncListingReturn<T> = {
  * See [the infinite scroll demo](#example-01-list) for a full working example.
  * </Usage>
  *
- * @extract-docs
+ * @extractdocs
  * @typeParam ResultT The type of the result returned by `execute`.
  */
 export default function useAsyncListing<ResultT extends Array<any>>(
