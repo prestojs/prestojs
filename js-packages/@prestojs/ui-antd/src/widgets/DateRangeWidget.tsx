@@ -1,32 +1,23 @@
-import { RangedWidgetProps } from '@prestojs/ui';
-import { DatePickerProps } from 'antd/lib/date-picker';
 import React from 'react';
+import DateWidget, { DateWidgetProps } from './DateWidget';
+import RangeWidget, { RangeWidgetProps } from './RangeWidget';
 
-import { useAntdUiConfig } from '../AntdUiProvider';
-import RangeWidget from './RangeWidget';
-
-function DateRangeWidget(
-    props: RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>,
-    ref: React.RefObject<DatePickerProps>
-): React.ReactElement {
-    const { lowerInput, upperInput, separator, meta, ...rest } = props;
-    const { format: formatLower = 'MMMM Do YYYY', ...restLower } = lowerInput || {};
-    const { format: formatUpper = 'MMMM Do YYYY', ...restUpper } = upperInput || {};
-    const DatePicker = useAntdUiConfig().getDatePicker();
-    const lower = { ...{ format: formatLower, ...restLower } };
-    const upper = { ...{ format: formatUpper, ...restUpper } };
-
-    return (
-        <RangeWidget
-            ref={ref}
-            lowerInput={lower}
-            upperInput={upper}
-            separator={separator}
-            inputWidget={DatePicker}
-            {...rest}
-        />
-    );
-}
+/**
+ * @expandproperties
+ */
+export type DateRangeWidgetProps = Omit<
+    RangeWidgetProps<Date, HTMLInputElement, Omit<DateWidgetProps, 'input' | 'ref'>>,
+    'inputWidget' | 'lowerInput' | 'upperInput'
+> & {
+    /**
+     * Any props you want to pass to the lower input of the range
+     */
+    lowerInput?: Omit<DateWidgetProps, 'input' | 'ref'>;
+    /**
+     * Any props you want to pass to the upper input of the range
+     */
+    upperInput?: Omit<DateWidgetProps, 'input' | 'ref'>;
+};
 
 /**
  * See [DatePicker](https://ant.design/components/date-picker/) for props available
@@ -37,8 +28,7 @@ function DateRangeWidget(
  *
  * @extractdocs
  * @menugroup Widgets
- * @forwardref
  */
-export default React.forwardRef(DateRangeWidget) as (
-    props: RangedWidgetProps<Date, HTMLInputElement, DatePickerProps>
-) => React.ReactElement;
+export default function DateRangeWidget(props: DateRangeWidgetProps): React.ReactElement {
+    return <RangeWidget {...props} inputWidget={DateWidget} />;
+}

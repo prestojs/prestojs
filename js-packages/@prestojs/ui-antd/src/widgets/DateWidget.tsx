@@ -8,19 +8,18 @@ import { useAntdUiConfig } from '../AntdUiProvider';
  * @expandproperties
  * @hideproperties meta choices asyncChoices
  */
-export type DateWidgetProps = WidgetProps<Date, HTMLInputElement> & {
-    input: DatePickerProps;
-    ref?: RefObject<HTMLElement>;
-};
+export type DateWidgetProps = WidgetProps<Date, HTMLInputElement> &
+    DatePickerProps & {
+        ref?: RefObject<HTMLElement>;
+    };
 
 function DateWidget(
     props: Omit<DateWidgetProps, 'ref'>,
     ref: React.RefObject<React.ClassicComponent<DatePickerProps, any>>
 ): React.ReactElement {
     const DatePicker = useAntdUiConfig().getDatePicker();
-    const { input, meta, ...rest } = props;
-    const { format = 'MMMM Do YYYY', ...restInput } = input;
-    return <DatePicker ref={ref} format={format} {...restInput} {...rest} />;
+    const { input, meta, format = 'MMMM Do YYYY', ...rest } = props;
+    return <DatePicker ref={ref} format={format} {...input} {...rest} />;
 }
 
 /**

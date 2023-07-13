@@ -1,5 +1,6 @@
 import { MDXProvider } from '@mdx-js/react';
 import { mdxComponents } from '@prestojs/doc';
+import '@prestojs/ui-antd/styles.less';
 import type { AppProps } from 'next/app';
 import { Suspense, useEffect } from 'react';
 import Layout from '../components/Layout';

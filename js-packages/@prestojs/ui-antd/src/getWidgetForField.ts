@@ -1,6 +1,6 @@
 import { FieldWidgetType } from '@prestojs/ui';
 import type { ListField } from '@prestojs/viewmodel';
-import { Field } from '@prestojs/viewmodel';
+import { Field, RangeField } from '@prestojs/viewmodel';
 import React from 'react';
 
 // RangeField is not included: its not meant to be used directly - TODO: mark it abstract?
@@ -29,12 +29,13 @@ const mapping = new Map<string, FieldWidgetType<any, any>>([
 
 // choices -> select/radio widgets; only accepting integer(for enum) and char for now - might want to expand to currency type of currency later.
 const choicesMapping = new Map<string, FieldWidgetType<any, any>>([
-    ['CharField', React.lazy(() => import('./widgets/CharChoicesWidget'))],
-    ['IntegerField', React.lazy(() => import('./widgets/IntegerChoicesWidget'))],
+    ['CharField', React.lazy(() => import('./widgets/ChoicesWidget'))],
+    ['IntegerField', React.lazy(() => import('./widgets/ChoicesWidget'))],
 ]);
 
 const LazyBooleanWidget = React.lazy(() => import('./widgets/NullableBooleanWidget'));
 const BooleanWidget = React.lazy(() => import('./widgets/BooleanWidget'));
+const RangeWidget = React.lazy(() => import('./widgets/RangeWidget'));
 
 function splitWidgetAndProps(
     maybeWidgetAndProps:
@@ -156,12 +157,25 @@ export default function getWidgetForField<
         }
         return widget;
     };
-    const [widget, extraProps] = splitWidgetAndProps(getWidget(field));
+    let [widget, extraProps] = splitWidgetAndProps(getWidget(field));
+
+    if (!widget && field instanceof RangeField) {
+        const _boundsWidget = getWidgetForField(field.boundsField);
+        const [boundsWidget, boundsWidgetProps] = Array.isArray(_boundsWidget)
+            ? _boundsWidget
+            : [_boundsWidget, {}];
+        widget = RangeWidget;
+        extraProps = {
+            inputWidget: boundsWidget,
+            lowerInput: boundsWidgetProps,
+            upperInput: boundsWidgetProps,
+        };
+    }
 
     const getReturnWithChoices = (
         _widget: FieldWidgetType<FieldValue, T>,
         _field: Field<FieldValue, ParsableValueT, SingleValueT>,
-        extraProps: Record<string, unknown>
+        _extraProps: Record<string, unknown>
     ):
         | FieldWidgetType<FieldValue, T>
         | [FieldWidgetType<FieldValue, T>, Record<string, unknown>] => {
@@ -171,7 +185,7 @@ export default function getWidgetForField<
             const finalProps = {
                 ..._field.getWidgetProps(),
                 ...props,
-                ...extraProps,
+                ..._extraProps,
             };
             // Only set this when necessary to avoid passing props through
             // with undefined value that may make it's way through to the DOM
@@ -184,10 +198,12 @@ export default function getWidgetForField<
 
             return [finalWidget, finalProps];
         } else {
-            if (widget) {
-                return [_widget, _field.getWidgetProps()];
-            }
-            return _widget;
+            const finalProps = {
+                ..._field.getWidgetProps(),
+                ..._extraProps,
+            };
+            const finalWidget = Array.isArray(_widget) ? _widget[0] : _widget;
+            return [finalWidget, finalProps];
         }
     };
 

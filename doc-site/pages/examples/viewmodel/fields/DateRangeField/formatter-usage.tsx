@@ -1,39 +1,40 @@
 /**
- * Default formatter for JsonField
+ * Default formatter for DateRangeField
  *
  * This example shows the default formatter that will be used with [FieldFormatter](doc:FieldFormatter).
  *
- * This just outputs the string exactly as entered.
- *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
  *
- * The default formatter for `JsonField` is [CharFormatter](doc:CharFormatter).
+ * The default formatter for `DateRangeField` is [DateRangeFormatter](doc:DateRangeFormatter).
  *
- * You can pass options for the formatter via the [Field](doc:Field) under the `formatterProps`
+ * You can pass options for the formatter via the [DateField](doc:DateField) under the `boundsFieldProps.formatterProps`
  * option.
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';
-import { IntegerField, JsonField, viewModelFactory } from '@prestojs/viewmodel';
+import { DateRangeField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
 import React from 'react';
 
 class ExampleModel extends viewModelFactory(
     {
         id: new IntegerField(),
-        data: new JsonField(),
+        dateRange: new DateRangeField(),
     },
     { pkFieldName: 'id' }
 ) {}
 
-export default function FormUsage() {
-    const record = new ExampleModel({ id: 1, data: '{"name": "Jo", "age": 22}' });
+export default function FormatterUsage() {
+    const record = new ExampleModel({
+        id: 1,
+        dateRange: { lower: new Date('2023-05-01'), upper: new Date() },
+    });
     return (
         <React.Suspense fallback="Loading...">
             <UiProvider getFormatterForField={getFormatterForField}>
                 <div className="grid grid-cols-1 gap-4 w-full">
                     <dl>
-                        <dt>{ExampleModel.fields.data.label}</dt>
+                        <dt>{ExampleModel.fields.dateRange.label}</dt>
                         <dd>
-                            <FieldFormatter field={record._f.data} />
+                            <FieldFormatter field={record._f.dateRange} />
                         </dd>
                     </dl>
                 </div>

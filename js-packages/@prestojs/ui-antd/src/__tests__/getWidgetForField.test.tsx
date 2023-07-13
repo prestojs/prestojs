@@ -10,7 +10,6 @@ import {
     DecimalRangeField,
     EmailField,
     Field,
-    FieldProps,
     FileField,
     FloatField,
     FloatRangeField,
@@ -32,9 +31,8 @@ import React from 'react';
 import AntdUiProvider from '../AntdUiProvider';
 import getWidgetForField from '../getWidgetForField';
 import BooleanWidget from '../widgets/BooleanWidget';
-import ChoicesWidget from '../widgets/CharChoicesWidget';
-import CharChoicesWidget from '../widgets/CharChoicesWidget';
 import CharWidget from '../widgets/CharWidget';
+import ChoicesWidget from '../widgets/ChoicesWidget';
 import DateRangeWidget from '../widgets/DateRangeWidget';
 import DateTimeRangeWidget from '../widgets/DateTimeRangeWidget';
 import DateTimeWidget from '../widgets/DateTimeWidget';
@@ -134,25 +132,20 @@ test.each(
                     },
                 }),
             }),
-            CharChoicesWidget,
+            ChoicesWidget,
         ],
-    ].map(([field, widget]) => [
+    ].map(([field, widget]: [any, any]) => [
         // extract names so we can better render test name below... otherwise not needed
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        widget.render.name,
+        widget.render ? widget.render.name : widget.name,
         field instanceof Field ? field.constructor.name : field.name,
         field,
         widget,
     ])
 )(
     'getWidgetForField should select widget %s for field %s',
-    async (
-        fieldName,
-        widgetName,
-        fieldClass: (new (props?: FieldProps<any, any>) => Field<any>) | Field<any>,
-        widgetClass
-    ) => {
+    async (widgetName, fieldName, fieldClass, widgetClass) => {
         let UnknownWidget = getWidgetForField(
             fieldClass instanceof Field ? fieldClass : new fieldClass()
         ) as any;
@@ -171,7 +164,10 @@ test.each(
             </React.Suspense>
         );
         await act(async () => {
-            const result = await UnknownWidget._payload._result;
+            let result = await UnknownWidget._payload._result;
+            if (result.render) {
+                result = result.render;
+            }
             expect(result.default ?? result).toBe(widgetClass);
         });
     }

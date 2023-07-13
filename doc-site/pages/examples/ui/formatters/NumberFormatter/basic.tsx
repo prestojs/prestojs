@@ -12,7 +12,7 @@ export default function Basic() {
             <strong>
                 Specify{' '}
                 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString#using_options">
-                    localOptions
+                    localeOptions
                 </a>{' '}
                 to customise display
             </strong>

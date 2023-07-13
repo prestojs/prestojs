@@ -1,37 +1,41 @@
 /**
- * Default formatter for NumberField
+ * Default formatter for FloatRangeField
  *
  * This example shows the default formatter that will be used with [FieldFormatter](doc:FieldFormatter).
  *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
  *
- * The default formatter for `NumberField` is [NumberFormatter](doc:NumberFormatter).
+ * The default formatter for `FloatRangeField` is [FloatRangeFormatter](doc:FloatRangeFormatter).
  *
- * You can pass options for the formatter via the [Field](doc:Field) under the `formatterProps`
- *  option. These will be passed through to the formatter component (eg. `locales` & `localeOptions`
- *  in this example).
+ * You can pass options for the formatter via the [FloatField](doc:FloatField) under the `boundsFieldProps.formatterProps`
+ * option.
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';
-import { IntegerField, NumberField, viewModelFactory } from '@prestojs/viewmodel';
+import { FloatField, FloatRangeField, viewModelFactory } from '@prestojs/viewmodel';
 import React from 'react';
 
 class ExampleModel extends viewModelFactory(
     {
-        id: new IntegerField(),
-        capacity: new NumberField({
-            formatterProps: {
-                locales: ['en-AU'],
-                localeOptions: { style: 'unit', unit: 'liter' },
+        id: new FloatField(),
+        capacity: new FloatRangeField({
+            boundsFieldProps: {
+                formatterProps: {
+                    locales: ['en-AU'],
+                    localeOptions: {
+                        style: 'unit',
+                        unit: 'liter',
+                    },
+                },
             },
         }),
     },
     { pkFieldName: 'id' }
 ) {}
 
-export default function FormUsage() {
+export default function FormatterUsage() {
     const record = new ExampleModel({
         id: 1,
-        capacity: 50,
+        capacity: { lower: 1.1, upper: 5.4 },
     });
     return (
         <React.Suspense fallback="Loading...">

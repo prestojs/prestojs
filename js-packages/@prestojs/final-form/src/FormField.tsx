@@ -6,15 +6,15 @@ import { Field as FinalFormField, FieldProps } from 'react-final-form';
 /**
  * @expandproperties
  */
-export type FormFieldPropsWithField<T> = Omit<FieldProps<any, any>, 'name'> & {
-    field: Field<T>;
+export type FormFieldPropsWithField = Omit<FieldProps<any, any>, 'name'> & {
+    field: Field<any, any, any>;
     widgetProps?: Record<any, any>;
 };
 
 /**
  * @expandproperties
  */
-export type FormFieldProps<T> = FieldProps<any, any> | FormFieldPropsWithField<T>;
+export type FormFieldProps = FieldProps<any, any> | FormFieldPropsWithField;
 
 /**
  * Wrapper around Field from react-final-form that determines the widget to use based on the field.
@@ -38,12 +38,12 @@ export type FormFieldProps<T> = FieldProps<any, any> | FormFieldPropsWithField<T
  * @rest-prop-name fieldProps
  * @extractdocs
  */
-export default function FormField<T>({
+export default function FormField({
     field,
     widgetProps,
     name,
     ...fieldProps
-}: FormFieldProps<T>): React.ReactElement {
+}: FormFieldProps): React.ReactElement {
     const requireModelWidget = !fieldProps.component && !fieldProps.render && !fieldProps.children;
     if (!requireModelWidget && widgetProps) {
         // eslint-disable-next-line no-console

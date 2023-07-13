@@ -617,7 +617,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      * @param value1 The value to compare
      * @param value2 The other value to compare against `value`
      */
-    public isEqual(value1: ValueT, value2: ValueT): boolean {
+    public isEqual(value1?: ValueT, value2?: ValueT): boolean {
         return value1 === value2;
     }
 

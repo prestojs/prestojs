@@ -1,37 +1,33 @@
-import { RangedWidgetProps } from '@prestojs/ui';
-import { InputNumber } from 'antd';
-import { InputNumberProps } from 'antd/lib/input-number';
 import React from 'react';
-import RangeWidget from './RangeWidget';
-
-function IntegerRangeWidget(
-    props: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
-    ref: React.RefObject<typeof InputNumber>
-): React.ReactElement {
-    const { lowerInput = {}, upperInput = {}, separator, meta, ...rest } = props;
-    return (
-        <RangeWidget
-            ref={ref}
-            lowerInput={lowerInput}
-            upperInput={upperInput}
-            separator={separator}
-            inputWidget={InputNumber}
-            {...rest}
-        />
-    );
-}
+import IntegerWidget, { IntegerWidgetProps } from './IntegerWidget';
+import RangeWidget, { RangeWidgetProps } from './RangeWidget';
 
 /**
- * See [InputNumber](https://ant.design/components/input-number/) for props available
+ * @expandproperties
+ */
+export type IntegerRangeWidgetProps = Omit<
+    RangeWidgetProps<number, HTMLInputElement, Omit<IntegerWidgetProps, 'input' | 'ref'>>,
+    'inputWidget' | 'lowerInput' | 'upperInput'
+> & {
+    /**
+     * Any props you want to pass to the lower input of the range
+     */
+    lowerInput?: Omit<IntegerWidgetProps, 'input' | 'ref'>;
+    /**
+     * Any props you want to pass to the upper input of the range
+     */
+    upperInput?: Omit<IntegerWidgetProps, 'input' | 'ref'>;
+};
+
+/**
+ * A range widget for integer values
  *
- * As with all range widgets, ref should be shaped as `{ lowerRef: Ref(), upperRef: Ref() }`
- *
- * You may pass in props to be used for the individual input as lowerInput / upperInput
+ * You may pass in props to be used for the individual input as lowerInput / upperInput.
+ * See [InputNumber](https://ant.design/components/input-number/) for props available.
  *
  * @extractdocs
  * @menugroup Widgets
- * @forwardref
  */
-export default React.forwardRef(IntegerRangeWidget) as (
-    props: RangedWidgetProps<number, HTMLElement, InputNumberProps>
-) => React.ReactElement;
+export default function IntegerRangeWidget(props: IntegerRangeWidgetProps): React.ReactElement {
+    return <RangeWidget {...props} inputWidget={IntegerWidget} />;
+}

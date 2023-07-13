@@ -8,23 +8,18 @@ import { useAntdUiConfig } from '../AntdUiProvider';
  * @expandproperties
  * @hideproperties meta choices asyncChoices
  */
-type DateTimeWidgetProps = WidgetProps<Date, HTMLInputElement> & {
-    input: DatePickerProps;
-    ref?: RefObject<HTMLElement>;
-};
+export type DateTimeWidgetProps = WidgetProps<Date, HTMLInputElement> &
+    DatePickerProps & {
+        ref?: RefObject<HTMLElement>;
+    };
 
 function DateTimeWidget(
     props: Omit<DateTimeWidgetProps, 'ref'>,
     ref: React.RefObject<React.ClassicComponent<DatePickerProps, any>>
 ): React.ReactElement {
     const DatePicker = useAntdUiConfig().getDatePicker();
-    const { input, meta, ...rest } = props;
-    const { format = 'MMMM Do YYYY, h:mm a', ...restInput } = input;
-    // antd 4.0.0-rc5 has a bug in DatePickerProps in that it does not have showTime taking boolean as type atm (object only)
-    // revisit to see if we still need this ignore once its released
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return <DatePicker ref={ref} showTime format={format} {...restInput} {...rest} />;
+    const { input, meta, format = 'MMMM Do YYYY, h:mm a', ...rest } = props;
+    return <DatePicker ref={ref} showTime format={format} {...input} {...rest} />;
 }
 
 /**

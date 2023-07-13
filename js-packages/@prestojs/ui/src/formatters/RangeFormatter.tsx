@@ -1,6 +1,20 @@
 import React, { ComponentProps, ReactNode } from 'react';
 
-function DefaultFormatter<T>({ value }: { value: T | null }): React.ReactElement {
+function DefaultFormatter<T>({
+    value,
+    blankLabel,
+}: {
+    value: T | null;
+    /**
+     * What to render when `value` is `null` or `undefined`
+     *
+     * Defaults to `null`
+     */
+    blankLabel?: ReactNode;
+}): React.ReactElement {
+    if (!value) {
+        return <>{blankLabel}</>;
+    }
     return <>{value}</>;
 }
 
@@ -69,16 +83,50 @@ export type RangeFormatterProps<
 };
 
 /**
- * Formats a range.
+ * Format a range for display
  *
- * If no value is provided `blankLabel` is returned.
+ * This is the [default formatter](doc:getFormatterForField) used for [RangeField](doc:BooleanField), and any field that
+ * extends `RangeField`. The `boundsFormatter` will be selected based on the `boundsField` specified on `RangeField. For
+ * example, [DateRangeField](doc:DateRangeField) will use [DateFormatter](doc:DateFormatter) for `boundsFormatter`.
  *
- * The `lower` and `upper` values are rendered using `boundsFormatter`. If `boundsFormatter` is not provided then the value
- * will be returned as is. You can pass extra props to the formatters specifically using `boundsFormatterProps` (both upper
- * and lower), `lowerFormatterProps` (lower only) and `upperFormatterProps` (upper only).
+ * <Usage>
+ *     Basic usage just requires passing the value through:
  *
- * This is the [default formatter](doc:getFormatterForField) used for [DateRangeField](doc:DateRangeField), [DateTimeRangeField](doc:DateTimeRangeField),
- * [FloatRangeField](doc:FloatRangeField) and [IntegerRangeField](doc:IntegerRangeField).
+ *    ```js
+ *    <RangeFormatter value={{ lower: 1, upper: 2 }} />
+ *    ```
+ *
+ *    To control how each end of the range is formatted, pass in a formatter to `boundsFormatter`:
+ *
+ *    ```js
+ *    <RangeFormatter value={{ lower: 1, upper: 2 }} boundsFormatter={NumberFormatter} />
+ *    ```
+ *
+ *    If no value is provided `blankLabel` is returned:
+ *
+ *    ```js
+ *    <RangeFormatter value={null} blankLabel={<em>None</em>} />
+ *    ```
+ *
+ *    Or if one of the bounds is not provided, specify `blankLabel` in `boundsFormatterProps`:
+ *
+ *    ```js
+ *    <RangeFormatter
+ *      value={{ lower: 1, upper: null }}
+ *      boundsFormatterProps={{ blankLabel: '∞' }}
+ *    />
+ *    ```
+ *
+ *    Any additional props for the `boundsFormatter` can also be passed there:
+ *
+ *    ```js
+ *    <RangeFormatter
+ *      value={{ lower: 50, upper: 100 }}
+ *      boundsFormatterProps={{ localeOptions: { style: 'currency', currency: 'USD' } }}
+ *      boundsFormatter={NumberFormatter}
+ *    />
+ *    ```
+ * </Usage>
  *
  * @extractdocs
  * @menugroup Formatters

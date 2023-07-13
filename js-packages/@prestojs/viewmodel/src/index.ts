@@ -17,6 +17,7 @@ export { default as FloatRangeField } from './fields/FloatRangeField';
 export { default as ImageField } from './fields/ImageField';
 export { default as IntegerField } from './fields/IntegerField';
 export { default as IntegerRangeField } from './fields/IntegerRangeField';
+export { default as RangeField } from './fields/RangeField';
 export { default as JsonField } from './fields/JsonField';
 export { default as NumberField } from './fields/NumberField';
 export { default as PasswordField } from './fields/PasswordField';
@@ -87,6 +88,11 @@ export type { CharFieldProps } from './fields/CharField';
 export type { DecimalFieldProps } from './fields/DecimalField';
 export type { NumberFieldProps } from './fields/NumberField';
 export type { RangeValue, RangeFieldProps } from './fields/RangeField';
+export type { IntegerRangeFieldProps } from './fields/IntegerRangeField';
+export type { DecimalRangeFieldProps } from './fields/DecimalRangeField';
+export type { FloatRangeFieldProps } from './fields/FloatRangeField';
+export type { DateRangeFieldProps } from './fields/DateRangeField';
+export type { DateTimeRangeFieldProps } from './fields/DateTimeRangeField';
 export type {
     RelatedViewModelFieldProps,
     RelatedViewModelValueType,

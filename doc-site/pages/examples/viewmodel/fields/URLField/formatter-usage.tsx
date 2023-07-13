@@ -7,7 +7,7 @@
  *
  * The default formatter for `URLField` is [LinkFormatter](doc:LinkFormatter).
  *
- * You can pass options for the formatter via the [Field](doc:Field) under the `formatterOptions`
+ * You can pass options for the formatter via the [Field](doc:Field) under the `formatterProps`
  * option. These will be passed through to the formatter component (e.g. `target` & `rel` in this example).
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';

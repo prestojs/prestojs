@@ -1,15 +1,44 @@
 @import (reference) 'antd/lib/style/index.less';
 
-.presto-range-widget-wrapper.@{ant-prefix}-input-group {
+.presto-range-widget-wrapper.@{ant-prefix}-input-group,
+.presto-range-widget-wrapper {
+  &,
+  &.@{ant-prefix}-input-group-compact {
+    display: inline-flex;
+  }
+  .presto-range-widget-upper,
+  .presto-range-widget-lower {
+    &.@{ant-prefix}-select {
+      border-right-width: 0;
+    }
+  }
   .presto-range-widget-upper {
-    border-left-width: 0;
-
-    &:hover,
-    &:focus {
-      border-left-width: 1px;
+    .@{ant-prefix}-select-selector {
+      border-left-width: 0;
+    }
+    &.@{ant-prefix}-select-focused,
+    &:hover {
+      .@{ant-prefix}-select-selector {
+        border-left-width: 1px;
+      }
+    }
+    &.@{ant-prefix}-input-number {
+      border-left-width: 0;
+      padding-left: 1px;
+      &:hover,
+      &.@{ant-prefix}-input-number-focused {
+        border-left-width: 1px;
+        padding-left: 0;
+      }
     }
   }
   .presto-range-widget-separator {
+    display: inline-flex;
+    border-width: 1px 0;
+    border-color: @input-border-color;
+    color: @input-disabled-color;
+    justify-content: center;
+    align-items: center;
     width: 30px;
     border-left: 0;
     border-right: 0;
@@ -18,11 +47,21 @@
   }
 
   .presto-range-widget-lower {
-    border-right-width: 0;
-
-    &:hover,
-    &:focus {
-      border-right-width: 1px;
+    &.@{ant-prefix}-select .@{ant-prefix}-select-selector {
+      border-right-width: 0;
+    }
+    &.@{ant-prefix}-select-focused,
+    &:hover {
+      .@{ant-prefix}-select-selector {
+        border-right-width: 1px;
+      }
+    }
+    &.@{ant-prefix}-input-number {
+      border-right-width: 0;
+      &:hover,
+      &.@{ant-prefix}-input-number-focused {
+        border-right-width: 1px;
+      }
     }
   }
 
