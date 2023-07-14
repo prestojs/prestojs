@@ -6,12 +6,14 @@ import styles from './OnThisPage.module.css';
 import { usePreferences } from './PreferencesProvider';
 
 function OnThisPageLinks({ links, level }: { links: PageSectionLink[]; level: number }) {
+    const { showInherited } = usePreferences();
+    const filteredLinks = links.filter(link => !link.isInherited || showInherited);
     if (links.length === 0) {
         return null;
     }
     return (
         <ul>
-            {links.map(({ title, anchorId, links }, i) => (
+            {filteredLinks.map(({ title, anchorId, links }, i) => (
                 <li
                     className={cx('block py-1 font-medium hover:text-gray-900', {
                         'py-0': level > 1,
