@@ -1,13 +1,37 @@
 import Field from './Field';
 
 /**
+ * Field for Date type values.
+ *
  * A date is stored as javascript [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
  * object. As a `Date` always has a time component the only difference between `DateField` and [DateTimeField](doc:DateTimeField)
  * is how it's handled by formatters or widgets. For example [DateFormatter](doc:DateFormatter) will only
  * display the date component and ignore the time component.
  *
  * This field supports either a [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
- * or a string that will be parsed with [Date.parse()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse).
+ * or a string that will be parsed into a `Date` with [Date.parse()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse).
+ *
+ * <Usage>
+ * Use with [viewModelFactory](doc:viewModelFactory).
+ *
+ * ```js
+ * viewModelFactory({
+ *   id: new Field(),
+ *   activatedOn: new BooleanField(),
+ * }, { pkFieldName: 'id' });
+ * ```
+ *
+ * Optionally provide any options from [Field](doc:Field):
+ *
+ * ```js
+ * viewModelFactory({
+ *   id: new Field(),
+ *   activatedOn: new BooleanField({
+ *     helpText: 'Date user activated their account',
+ *   }),
+ * }, { pkFieldName: 'id' });
+ * ```
+ * </Usage>
  *
  * @extractdocs
  * @menugroup Fields

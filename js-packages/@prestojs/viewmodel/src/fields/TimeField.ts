@@ -1,9 +1,35 @@
 import Field from './Field';
 
 /**
- * Time Field.
+ * Field for time values.
  *
- * String based: Native javascript Date does not have a nice way to describe a time-only object. Make sure any third party library of your choice like MomentJS handles this correctly.
+ * This field expects the value to be a `string`, so if you're using a `Date` or other custom object to represent a
+ * time you'll need to transform it to a string first.
+ *
+ * This class accepts all the props of [Field](doc:Field).
+ *
+ * <Usage>
+ * Use with [viewModelFactory](doc:viewModelFactory).
+ *
+ * ```js
+ * viewModelFactory({
+ *   id: new Field(),
+ *   startTime: new TimeField(),
+ * }, { pkFieldName: 'id' });
+ * ```
+ *
+ * Optionally provide any options from [Field](doc:Field):
+ *
+ * ```js
+ * viewModelFactory({
+ *   id: new Field(),
+ *   startTime: new TimeField({
+ *     label: 'Event start time',
+ *   }),
+ * }, { pkFieldName: 'id' });
+ * ```
+ * </Usage>
+ *
  *
  * @extractdocs
  * @menugroup Fields

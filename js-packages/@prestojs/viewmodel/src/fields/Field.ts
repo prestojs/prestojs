@@ -330,11 +330,11 @@ export interface ViewModelFieldFormatterProps {
 export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleValueT = ValueT> {
     // These are just for internal usage with typescript
     /**
-     * @private
+     * @ignore
      */
     __fieldValueType: ValueT;
     /**
-     * @private
+     * @hidden
      */
     __parsableValueType: ParsableValueT;
 
@@ -467,7 +467,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
     protected formatterProps: Record<string, any>;
 
     /**
-     * @private
+     * @hidden
      */
     protected _defaultValue?: ValueT | null | (() => Promise<ValueT | null> | ValueT | null);
 

@@ -600,7 +600,7 @@ your component always displays the most recent data.
 #### Basic Usage
 
 The `useViewModelCache` hook takes a `ViewModel` class as the first argument and a selector function as the second argument.
-The selector function specifies the data you want from the cache.
+The selector function return the data you want from the cache.
 
 ```typescript
 const user = useViewModelCache(User, cache => cache.get(1, ['name', 'email']));

@@ -1,40 +1,44 @@
 /**
- * Default formatter for DateRangeField
+ * Default formatter for TimeField
  *
  * This example shows the default formatter that will be used with [FieldFormatter](doc:FieldFormatter).
  *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
  *
- * The default formatter for `DateRangeField` is [RangeFormatter](doc:RangeFormatter).
+ * The default formatter for `TimeField` is [TimeFormatter](doc:TimeFormatter).
  *
- * You can pass options for the formatter via the [DateField](doc:DateField) under the `boundsFieldProps.formatterProps`
- * option.
+ * You can pass options for the formatter via the [Field](doc:Field) under the `formatterProps`
+ * option. These will be passed through to the formatter component.
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';
-import { DateRangeField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
+import { IntegerField, TimeField, viewModelFactory } from '@prestojs/viewmodel';
 import React from 'react';
 
 class ExampleModel extends viewModelFactory(
     {
         id: new IntegerField(),
-        dateRange: new DateRangeField(),
+        startTime: new TimeField({
+            formatterProps: {
+                locales: 'en-AU',
+                localeOptions: {
+                    timeStyle: 'medium',
+                },
+            },
+        }),
     },
     { pkFieldName: 'id' }
 ) {}
 
-export default function FormatterUsage() {
-    const record = new ExampleModel({
-        id: 1,
-        dateRange: { lower: new Date('2023-05-01'), upper: new Date() },
-    });
+export default function FormUsage() {
+    const record = new ExampleModel({ id: 1, startTime: '11:30' });
     return (
         <React.Suspense fallback="Loading...">
             <UiProvider getFormatterForField={getFormatterForField}>
                 <div className="grid grid-cols-1 gap-4 w-full">
                     <dl>
-                        <dt>{ExampleModel.fields.dateRange.label}</dt>
+                        <dt>{ExampleModel.fields.startTime.label}</dt>
                         <dd>
-                            <FieldFormatter field={record._f.dateRange} />
+                            <FieldFormatter field={record._f.startTime} />
                         </dd>
                     </dl>
                 </div>

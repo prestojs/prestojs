@@ -153,6 +153,7 @@ export interface MethodType {
     name: string;
     signatures: Signature[];
     children?: DocType[];
+    overloadPreamble?: string;
 }
 
 export interface IndexSignatureType {

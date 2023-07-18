@@ -1,40 +1,37 @@
 /**
- * Default formatter for DateRangeField
+ * Default formatter for FileField
  *
  * This example shows the default formatter that will be used with [FieldFormatter](doc:FieldFormatter).
  *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
  *
- * The default formatter for `DateRangeField` is [RangeFormatter](doc:RangeFormatter).
+ * The default formatter for `FileField` is [LinkFormatter](doc:LinkFormatter).
  *
- * You can pass options for the formatter via the [DateField](doc:DateField) under the `boundsFieldProps.formatterProps`
- * option.
+ * You can pass options for the formatter via the [Field](doc:Field) under the `formatterProps`
+ * option. These will be passed through to the formatter component.
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';
-import { DateRangeField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
+import { FileField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
 import React from 'react';
 
 class ExampleModel extends viewModelFactory(
     {
         id: new IntegerField(),
-        dateRange: new DateRangeField(),
+        document: new FileField(),
     },
     { pkFieldName: 'id' }
 ) {}
 
-export default function FormatterUsage() {
-    const record = new ExampleModel({
-        id: 1,
-        dateRange: { lower: new Date('2023-05-01'), upper: new Date() },
-    });
+export default function FormUsage() {
+    const record = new ExampleModel({ id: 1, document: 'https://example.com/file.tgz' });
     return (
         <React.Suspense fallback="Loading...">
             <UiProvider getFormatterForField={getFormatterForField}>
                 <div className="grid grid-cols-1 gap-4 w-full">
                     <dl>
-                        <dt>{ExampleModel.fields.dateRange.label}</dt>
+                        <dt>{ExampleModel.fields.document.label}</dt>
                         <dd>
-                            <FieldFormatter field={record._f.dateRange} />
+                            <FieldFormatter field={record._f.document} />
                         </dd>
                     </dl>
                 </div>

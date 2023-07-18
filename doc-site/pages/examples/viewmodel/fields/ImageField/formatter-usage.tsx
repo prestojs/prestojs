@@ -1,47 +1,40 @@
 /**
- * Default formatter for DecimalRangeField
+ * Default formatter for ImageField
  *
  * This example shows the default formatter that will be used with [FieldFormatter](doc:FieldFormatter).
  *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
  *
- * The default formatter for `DecimalRangeField` is [RangeFormatter](doc:RangeFormatter).
+ * The default formatter for `ImageField` is [ImageFormatter](doc:ImageFormatter).
  *
- * You can pass options for the formatter via the [DecimalField](doc:DecimalField) under the `boundsFieldProps.formatterProps`
- * option.
+ * You can pass options for the formatter via the [Field](doc:Field) under the `formatterProps`
+ * option. These will be passed through to the formatter component.
  */
 import { FieldFormatter, getFormatterForField, UiProvider } from '@prestojs/ui';
-import { DecimalRangeField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
+import { ImageField, IntegerField, viewModelFactory } from '@prestojs/viewmodel';
 import React from 'react';
 
 class ExampleModel extends viewModelFactory(
     {
         id: new IntegerField(),
-        decimalRange: new DecimalRangeField({
-            boundsFieldProps: {
-                formatterProps: {
-                    locales: ['en-AU'],
-                    localeOptions: { style: 'currency', currency: 'AUD' },
-                },
-            },
-        }),
+        profileImage: new ImageField(),
     },
     { pkFieldName: 'id' }
 ) {}
 
-export default function FormatterUsage() {
+export default function FormUsage() {
     const record = new ExampleModel({
         id: 1,
-        decimalRange: { lower: '100', upper: '999.99' },
+        profileImage: 'https://picsum.photos/id/237/200/300',
     });
     return (
         <React.Suspense fallback="Loading...">
             <UiProvider getFormatterForField={getFormatterForField}>
                 <div className="grid grid-cols-1 gap-4 w-full">
                     <dl>
-                        <dt>{ExampleModel.fields.decimalRange.label}</dt>
+                        <dt>{ExampleModel.fields.profileImage.label}</dt>
                         <dd>
-                            <FieldFormatter field={record._f.decimalRange} />
+                            <FieldFormatter field={record._f.profileImage} />
                         </dd>
                     </dl>
                 </div>

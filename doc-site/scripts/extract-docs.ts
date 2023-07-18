@@ -198,7 +198,8 @@ function orderBy<T>(items: T[], key: string): T[] {
 function getComment(docItem: DeclarationReflection | SignatureReflection | ParameterReflection) {
     let { comment } = docItem;
     if (!comment && 'signatures' in docItem && docItem.signatures) {
-        comment = docItem.signatures.filter(sig => !sig.comment?.getTag('@hidden'))[0]?.comment;
+        comment = docItem.signatures.filter(sig => !sig.comment?.hasModifier('@hidden'))[0]
+            ?.comment;
     }
     return comment;
 }
@@ -809,7 +810,7 @@ class DeclarationReflectionConverter {
     async convertSignatures(signatures: TypeDoc.Models.SignatureReflection[]) {
         const transformed: Signature[] = [];
         for (const signature of signatures) {
-            if (signature.comment?.getTag('@hidden')) {
+            if (signature.comment?.hasModifier('@hidden')) {
                 continue;
             }
             transformed.push(await this.convertSignature(signature));
@@ -819,11 +820,21 @@ class DeclarationReflectionConverter {
 
     private async convertClassMethod(m: DeclarationReflection) {
         const signatures = m.signatures || [];
+        const overloadPreamble = signatures[0]?.comment?.getTag('@overloadpreamble');
         return this.fixUnnamedFunction(
             {
                 typeName: 'methodType',
                 name: m.name,
                 signatures: await this.convertSignatures(signatures),
+                overloadPreamble: overloadPreamble
+                    ? await compileMdx(
+                          overloadPreamble.content
+                              .map(({ text }) => text)
+                              .join('')
+                              .trim(),
+                          this.docLinks
+                      )
+                    : undefined,
             },
             m
         );
@@ -1184,7 +1195,7 @@ class DeclarationReflectionConverter {
                         if (dec.signatures) {
                             if (!comment && dec.signatures) {
                                 comment = dec.signatures.filter(
-                                    sig => !sig.comment?.getTag('@hidden')
+                                    sig => !sig.comment?.hasModifier('@hidden')
                                 )[0]?.comment;
                             }
                         }
@@ -1680,8 +1691,9 @@ class DeclarationReflectionConverter {
     }
 
     private findTypeParameter(
-        name: string,
+        type: ReferenceType | TypeParameterReflection,
         sourceDeclaration:
+            | { parent: SignatureReflection }
             | DeclarationReflection
             | SignatureReflection
             | ParameterReflection
@@ -1694,19 +1706,23 @@ class DeclarationReflectionConverter {
         const parent = sourceDeclaration.parent;
         if (parent && 'typeParameters' in parent && parent.typeParameters) {
             for (const param of parent.typeParameters) {
-                if (param.name === name) {
+                if (param.name === type.name) {
                     return param;
                 }
             }
         }
-        return this.findTypeParameter(name, parent);
+        return this.findTypeParameter(type, parent);
     }
 
     private async convertTypeParameterReference(
         type: ReferenceType | TypeParameterReflection,
         sourceDeclaration?: DeclarationReflection | SignatureReflection | ParameterReflection
     ): Promise<TypeArgumentReference> {
-        const typeParam = this.findTypeParameter(type.name, sourceDeclaration);
+        const isReturnType =
+            sourceDeclaration instanceof SignatureReflection && type === sourceDeclaration.type;
+        const typeParam = isReturnType
+            ? this.findTypeParameter(type, { parent: sourceDeclaration })
+            : this.findTypeParameter(type, sourceDeclaration);
         let comment = typeParam?.comment;
         const inheritFrom = typeParam?.comment?.summary?.find(
             tag => tag.kind === 'inline-tag' && tag.tag === '@inheritTypeParam'
@@ -1739,7 +1755,7 @@ class DeclarationReflectionConverter {
 function getMenuGroup(child: DeclarationReflection) {
     let comment = child.comment;
     if (!child.comment && child.signatures) {
-        comment = child.signatures.filter(sig => !sig.comment?.getTag('@hidden'))[0]?.comment;
+        comment = child.signatures.filter(sig => !sig.comment?.hasModifier('@hidden'))[0]?.comment;
     }
     const tag = comment?.getTag('@menugroup');
     if (tag) {
@@ -1941,7 +1957,7 @@ async function main() {
             path.resolve(__dirname, 'expandTypes.ts'),
             path.resolve(__dirname, 'fixReferenceTypeName.ts'),
         ],
-        modifierTags: ['@extractdocs', '@hideapi'],
+        modifierTags: ['@extractdocs', '@hideapi', '@hidden', '@ignore'],
         inlineTags: ['@inheritTypeParam'],
     });
 

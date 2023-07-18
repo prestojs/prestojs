@@ -96,7 +96,7 @@ export abstract class BaseRelatedViewModelField<
     }
 
     /**
-     * @private
+     * @hidden
      */
     contributeToClass(viewModel: TargetViewModelT): void {
         if (!viewModel.fields[this.sourceFieldName]) {

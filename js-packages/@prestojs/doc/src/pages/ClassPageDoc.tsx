@@ -6,10 +6,11 @@ import Description from '../components/Description';
 import FunctionDocumentation from '../components/FunctionDocumentation';
 import OnThisPage from '../components/OnThisPage';
 import PageHeader from '../components/PageHeader';
+import PrecompiledMarkdown from '../components/PrecompiledMarkdown';
 import { usePreferences } from '../components/PreferencesProvider';
 import Type from '../components/Type';
 import Variable from '../components/Variable';
-import { ClassPage, PageMetaData } from '../newTypes';
+import { ClassPage, MethodType, PageMetaData } from '../newTypes';
 
 type Props = {
     page: ClassPage;
@@ -41,12 +42,32 @@ export function Section({ title, children }) {
     );
 }
 
-function MethodDoc({ method }) {
+function MethodDoc({ method }: { method: MethodType }) {
     return (
         <div className="py-2">
-            {method.signatures.map((sig, i) => (
-                <FunctionDocumentation key={i} signature={sig} />
-            ))}
+            {method.overloadPreamble ? (
+                <>
+                    <div className="flex items-center justify-between mb-5">
+                        <AnchorLink component="div" id={method.signatures[0].anchorId}>
+                            <div className="text-xl text-gray-700 font-semibold">
+                                <span className="font-bold">{method.name}</span>
+                                <span className="text-gray-500">(...)</span>
+                            </div>
+                        </AnchorLink>
+                    </div>
+                    <PrecompiledMarkdown code={method.overloadPreamble} />
+                    <div className="pl-5 border-l">
+                        <p className="mb-5 italic underline text-lg">
+                            Documentation for each typescript overload shown below:
+                        </p>
+                        {method.signatures.map((sig, i) => (
+                            <FunctionDocumentation key={i} signature={sig} />
+                        ))}
+                    </div>
+                </>
+            ) : (
+                method.signatures.map((sig, i) => <FunctionDocumentation key={i} signature={sig} />)
+            )}
         </div>
     );
 }

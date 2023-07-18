@@ -19,8 +19,8 @@ export type RangeFieldProps<T, ParseableValueT> = Omit<
  * A field that represents a range. A range is represented as a `lower` and `upper` value. For example, the below
  * value represents a range from 5 to 10 inclusive:
  *
- * ```js
- * { lower: 5, upper: 10}
+ * ```json
+ * { "lower": 5, "upper": 10}
  * ```
  *
  * > Range values are always assumed to be inclusive of both ends of the range. If your backend returns a range exclusive

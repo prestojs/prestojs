@@ -5,7 +5,7 @@
  *
  * See [getFormatterForField](doc:getFormatterForField) for how a formatter is selected for a field.
  *
- * The default formatter for `FloatRangeField` is [FloatRangeFormatter](doc:FloatRangeFormatter).
+ * The default formatter for `FloatRangeField` is [RangeFormatter](doc:RangeFormatter).
  *
  * You can pass options for the formatter via the [FloatField](doc:FloatField) under the `boundsFieldProps.formatterProps`
  * option.
