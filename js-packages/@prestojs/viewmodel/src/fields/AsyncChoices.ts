@@ -34,18 +34,20 @@ export type ChoicesGrouped<T> = [string, Choice<T>[]];
  *
  * To define async choices two things are required:
  *
- * 1) A function to resolve existing value(s). This is used when viewing existing
- *    value(s) and need label(s) to show (eg. when displaying a choice on a detail
+ * 1) [A function to resolve existing value(s)](#Method-retrieve). This is used when viewing existing
+ *    value(s) and need label(s) to show (e.g. when displaying a choice on a detail
  *    view or rendering the value selected on a select widget).
- * 2) A function to list & filter the available  choices. This is used when selecting
+ * 2) [A function to list & filter the available choices](#Method-list). This is used when selecting
  *    a value (e.g. the options shown in a select widget).
  *
  * Both of these functions may need to store state (eg. pagination for a listing)
  * or access things from context (eg. read values from a cache). This can be done
- * via two hooks - `useListProps` and `useRetrieveProps`. This functions should be
+ * via two hooks - `useListProps` and `useRetrieveProps`. These functions should be
  * called from a component or hook that deals with async choices when calling
  * `list` and `retrieve` respectively. The return value from the hook is passed to
  * the corresponding function.
+ *
+ * See [useAsyncChoices](doc:useAsyncChoices) for a React hook to use async choices.
  *
  * @extractdocs
  * @menugroup Async Choices
@@ -102,16 +104,32 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
      * The first parameter is the value to retrieve (will be an array when `multiple` is true).
      *
      * `deps` is the value returned by `useRetrieveProps`.
+     *
+     * @param value The value(s) to retrieve. If `multiple` is true this will be an array.
      */
-    retrieve(
-        value: ValueType[] | ValueType,
-        deps?: any
-    ): Promise<typeof value extends ValueType[] ? ItemType[] : ItemType>;
+    retrieve(value: ValueType[] | ValueType, deps?: any): Promise<ItemType[] | ItemType>;
 
     /**
      * Generate the list of choices. This can return an array of single choices or grouped choices.
      *
      * A grouped choice is a 2 element Array with a label and a list of choices.
+     *
+     * A single choice looks like:
+     *
+     * ```js
+     * const choice = {
+     *     value: 1,
+     *     label: "Item 1"
+     * }
+     * ```
+     *
+     * Grouped choices are an array of 2-tuples, the group label and choices for that label:
+     *
+     * ```js
+     * const choicesGrouped = [["Group1", [{ value: 1, label: "Item 1"}, { value: 2, label: "Item 2"}]], ["Group 2", [{ value: 3, label: "Item 3"}]]]
+     * ```
+     *
+     * @param items The items to extract choices from
      *
      * @returns Either an array of single choices or grouped choices.
      */
@@ -119,6 +137,8 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
 
     /**
      * Get a label for an item
+     *
+     * @param item The item to get a label for
      */
     getLabel(item: ItemType): React.ReactNode;
 
@@ -126,12 +146,16 @@ export interface AsyncChoicesInterface<ItemType, ValueType> {
      * Return label to use when an item can't be found. This can be used by widgets to control
      * what is rendered when an item for a value cannot be found (eg. when it's deleted or
      * when it's loading). The exact details of how this is used depend on the widget.
+     *
+     * @param value The value to return the missing label for
      */
     getMissingLabel(value: ValueType): React.ReactNode;
 
     /**
      * Get the value to use for an item. The value should be unique and is what's used when a
-     * choice is selected (eg. it's the value that would be saved to a database).
+     * choice is selected (e.g. it's the value that would be saved to a database).
+     *
+     * @param item The item to get the value for
      */
     getValue(item: ItemType): ValueType;
 
@@ -183,12 +207,19 @@ export type AsyncChoicesOptions<ItemType, ValueType> = Omit<
 /**
  * Default implementation for [AsyncChoicesInterface](doc:AsyncChoicesInterface)
  *
- * All options can be customised via `options`.
+ * <Usage>
  *
  * You must provide `list` and `retrieve` - everything else can be optional with the following restrictions:
  *
  * * `getLabel` - this is optional if items returned by `list` and `retrieve` implement [NodeLabeled](doc:NodeLabeled) otherwise it must be provided
  * * `getValue` - this is optional if items returned by `list` and `retrieve` implement [Identifiable](doc:Identifiable) otherwise it must be provided
+ *
+ * For usage with `@prestojs/antd` see the [SelectAsyncChoicesWidget](doc:SelectAsyncChoicesWidget). For other usages
+ * see the [useAsyncChoices](doc:useAsyncChoices) hook.
+ *
+ * See the below for some commented examples.
+ *
+ * </Usage>
  *
  * @extractdocs
  * @menugroup Async Choices
@@ -212,12 +243,11 @@ class AsyncChoices<ItemType, ValueType> implements AsyncChoicesInterface<ItemTyp
     useRetrieveProps(args: any): any {
         return this.options.useRetrieveProps?.call(this, args) || args;
     }
-    retrieve(
-        value: ValueType[] | ValueType,
-        deps?: any
-    ): Promise<typeof value extends ValueType[] ? ItemType[] : ItemType> {
+
+    retrieve(value: ValueType[] | ValueType, deps?: any): Promise<ItemType[] | ItemType> {
         return this.options.retrieve(value, deps);
     }
+
     getChoices(items: ItemType[]): (Choice<ValueType> | ChoicesGrouped<ValueType>)[] {
         if (this.options.getChoices) {
             return this.options.getChoices.call(this, items);
