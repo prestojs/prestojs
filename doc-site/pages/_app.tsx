@@ -4,8 +4,8 @@ import '@prestojs/ui-antd/styles.less';
 import type { AppProps } from 'next/app';
 import { Suspense, useEffect } from 'react';
 import Layout from '../components/Layout';
+import '../globalConfig';
 import '../styles/globals.css';
-import './globalConfig';
 
 function MyApp({ Component, pageProps, router, ...rest }: AppProps) {
     const isExample = router.pathname.startsWith('/examples/');
