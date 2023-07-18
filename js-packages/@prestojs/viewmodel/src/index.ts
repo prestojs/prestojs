@@ -99,3 +99,4 @@ export type {
     BaseRelatedViewModelValueType,
     RelatedViewModelParsableType,
 } from './fields/RelatedViewModelField';
+export type { ViewModelCacheSelector } from './useViewModelCache';

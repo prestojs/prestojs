@@ -11,7 +11,6 @@ import Endpoint, {
     EndpointRequestInit,
     MiddlewareContext,
     MiddlewareNextReturn,
-    MiddlewareObject,
     MiddlewareUrlConfig,
 } from './Endpoint';
 
@@ -151,6 +150,97 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
     }
 };
 
+export class ViewModelCachingMiddleware<ReturnT> {
+    deleteViewModel: ViewModelCachingOptions<ReturnT>['deleteViewModel'];
+    getDeleteId: GetDeleteId<ReturnT>;
+    viewModelMapping: ViewModelMappingDef;
+
+    constructor(
+        viewModelMapping: ViewModelMappingDef,
+        options: ViewModelCachingOptions<ReturnT> = {}
+    ) {
+        const { getDeleteId = defaultGetDeleteId, deleteViewModel } = options;
+        this.getDeleteId = getDeleteId;
+        this.deleteViewModel = deleteViewModel;
+        this.viewModelMapping = viewModelMapping;
+    }
+
+    async cacheAndTransform(data: any): Promise<any> {
+        const _viewModelMapping = await this.resolveViewModelMapping(false);
+
+        if (isViewModelClass(_viewModelMapping)) {
+            return cacheDataForModel(_viewModelMapping, data);
+        }
+        const transformed = cloneDeep(data);
+        Object.entries(_viewModelMapping).forEach(([key, viewModel]) => {
+            const value = get(data, key);
+            if (value !== undefined) {
+                set(transformed, key, cacheDataForModel(viewModel, value));
+            }
+        });
+        return transformed;
+    }
+
+    async resolveViewModelMapping(forDelete: boolean): Promise<ViewModelMapping> {
+        const mapping = (forDelete && this.deleteViewModel) || this.viewModelMapping;
+        return !isViewModelClass(mapping) && typeof mapping === 'function' ? mapping() : mapping;
+    }
+
+    init(endpoint: Endpoint): void {
+        // When using the default implementation we can check things are setup correctly on initialisation and
+        // throw an error. For custom implementations we have to wait until the method is called to do the check.
+        if (endpoint.requestInit.method === 'DELETE') {
+            this.getDeleteId.validateEndpoint?.(endpoint);
+        }
+        const index = endpoint.middleware.indexOf(this);
+        const paginationIndex = endpoint.middleware.findIndex(
+            middleware => middleware instanceof PaginationMiddleware
+        );
+        if (paginationIndex !== -1 && paginationIndex < index) {
+            throw new Error(
+                `'paginationMiddleware' must come after 'viewModelCachingMiddleware', see endpoint ${endpoint.urlPattern.pattern}`
+            );
+        }
+    }
+    async process(
+        next: (
+            urlConfig: MiddlewareUrlConfig,
+            requestInit: RequestInit
+        ) => Promise<MiddlewareNextReturn<ReturnT>>,
+        urlConfig: MiddlewareUrlConfig,
+        requestInit: EndpointRequestInit,
+        context: MiddlewareContext<ReturnT>
+    ): Promise<ReturnT> {
+        const { result } = await next(urlConfig, requestInit);
+        if (context.requestInit.method?.toUpperCase() === 'DELETE') {
+            const _viewModelMapping = await this.resolveViewModelMapping(true);
+            if (!isViewModelClass(_viewModelMapping)) {
+                throw new Error(
+                    'When handling DELETE the view model mapping must be a single ViewModelClass. Use deleteViewModel if you need to update other models.'
+                );
+            }
+            const id = this.getDeleteId(context);
+            if (id == null || id === '') {
+                console.warn(
+                    'Expected `getDeleteId` to return the id to use to remove the deleted item from the cache but nothing was returned.'
+                );
+            } else {
+                if (this.deleteViewModel) {
+                    // Batch so listeners only notified once for all changes
+                    return _viewModelMapping.cache.batch(() => {
+                        const transformed = this.cacheAndTransform(result);
+                        _viewModelMapping.cache.delete(id);
+                        return transformed;
+                    });
+                }
+                _viewModelMapping.cache.delete(id);
+            }
+            return (result || {}) as ReturnT;
+        }
+        return this.cacheAndTransform(result);
+    }
+}
+
 /**
  * Middleware to transform and cache a response
  *
@@ -253,83 +343,6 @@ defaultGetDeleteId.validateEndpoint = (endpoint: Endpoint): void => {
 export default function viewModelCachingMiddleware<ReturnT = any>(
     viewModelMapping: ViewModelMappingDef,
     options: ViewModelCachingOptions<ReturnT> = {}
-): MiddlewareObject<ReturnT> {
-    const { getDeleteId = defaultGetDeleteId, deleteViewModel } = options;
-    const resolveViewModelMapping = async (forDelete: boolean): Promise<ViewModelMapping> => {
-        const mapping = (forDelete && deleteViewModel) || viewModelMapping;
-        return !isViewModelClass(mapping) && typeof mapping === 'function' ? mapping() : mapping;
-    };
-
-    const cacheAndTransform = async (data: any): Promise<any> => {
-        const _viewModelMapping = await resolveViewModelMapping(false);
-
-        if (isViewModelClass(_viewModelMapping)) {
-            return cacheDataForModel(_viewModelMapping, data);
-        }
-        const transformed = cloneDeep(data);
-        Object.entries(_viewModelMapping).forEach(([key, viewModel]) => {
-            const value = get(data, key);
-            if (value !== undefined) {
-                set(transformed, key, cacheDataForModel(viewModel, value));
-            }
-        });
-        return transformed;
-    };
-
-    return {
-        init(endpoint: Endpoint): void {
-            getDeleteId;
-            // When using the default implementation we can check things are setup correctly on initialisation and
-            // throw an error. For custom implementations we have to wait until the method is called to do the check.
-            if (endpoint.requestInit.method === 'DELETE') {
-                getDeleteId.validateEndpoint?.(endpoint);
-            }
-            const index = endpoint.middleware.indexOf(this);
-            const paginationIndex = endpoint.middleware.findIndex(
-                middleware => middleware instanceof PaginationMiddleware
-            );
-            if (paginationIndex !== -1 && paginationIndex < index) {
-                throw new Error(
-                    `'paginationMiddleware' must come after 'viewModelCachingMiddleware', see endpoint ${endpoint.urlPattern.pattern}`
-                );
-            }
-        },
-        process: async (
-            next: (
-                urlConfig: MiddlewareUrlConfig,
-                requestInit: RequestInit
-            ) => Promise<MiddlewareNextReturn<ReturnT>>,
-            urlConfig: MiddlewareUrlConfig,
-            requestInit: EndpointRequestInit,
-            context: MiddlewareContext<ReturnT>
-        ): Promise<ReturnT> => {
-            const { result } = await next(urlConfig, requestInit);
-            if (context.requestInit.method?.toUpperCase() === 'DELETE') {
-                const _viewModelMapping = await resolveViewModelMapping(true);
-                if (!isViewModelClass(_viewModelMapping)) {
-                    throw new Error(
-                        'When handling DELETE the view model mapping must be a single ViewModelClass. Use deleteViewModel if you need to update other models.'
-                    );
-                }
-                const id = getDeleteId(context);
-                if (id == null || id === '') {
-                    console.warn(
-                        'Expected `getDeleteId` to return the id to use to remove the deleted item from the cache but nothing was returned.'
-                    );
-                } else {
-                    if (deleteViewModel) {
-                        // Batch so listeners only notified once for all changes
-                        return _viewModelMapping.cache.batch(() => {
-                            const transformed = cacheAndTransform(result);
-                            _viewModelMapping.cache.delete(id);
-                            return transformed;
-                        });
-                    }
-                    _viewModelMapping.cache.delete(id);
-                }
-                return (result || {}) as ReturnT;
-            }
-            return cacheAndTransform(result);
-        },
-    };
+): ViewModelCachingMiddleware<ReturnT> {
+    return new ViewModelCachingMiddleware<ReturnT>(viewModelMapping, options);
 }
