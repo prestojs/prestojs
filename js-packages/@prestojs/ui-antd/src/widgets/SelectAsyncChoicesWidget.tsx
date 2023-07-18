@@ -394,7 +394,9 @@ function SelectAsyncChoicesWidget<
     // case where `choices` has been filtered by a search and no longer includes the
     // currently selected items.
     flattenedItems.push(...lastValue);
-    const rawValue = asyncChoices.parseValue(input.value);
+    const rawValue = Array.isArray(input.value)
+        ? input.value.map(v => asyncChoices.parseValue(v))
+        : asyncChoices.parseValue(input.value);
     let value;
     // When dealing with multi-select any existing values that are selected
     // but aren't in the returned data (eg. they aren't on the current page)
