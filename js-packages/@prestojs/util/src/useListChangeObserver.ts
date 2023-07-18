@@ -7,7 +7,7 @@ export const UPDATE = 'UPDATE';
 export const DELETE = 'DELETE';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 type ListChangeObserverOptions<T> = ChangeObserverOptions<T> & {
     /**
@@ -111,7 +111,7 @@ type OnChange<T> = (change: Change<T>, lastValue: T, nextValue: T) => void;
  *
  * @return No return value
  *
- * @extract-docs
+ * @extractdocs
  */
 export default function useListChangeObserver<T extends any[]>(
     value: T | false | null | undefined,

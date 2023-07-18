@@ -16,10 +16,23 @@ import {
     ViewModelInterface,
 } from './ViewModelFactory';
 
-type ChangeListener<T> = (previous?: T | null, next?: T | null) => void;
-type MultiChangeListener<T> = (previous?: (T | null)[], next?: (T | null)[]) => void;
-type ChangeListenerUnsubscribe = () => void;
-type AllChangesListener = () => void;
+/**
+ * @quickinfo
+ */
+export type ChangeListener<T> = (previous?: T | null, next?: T | null) => void;
+/**
+ * @quickinfo
+ */
+export type MultiChangeListener<T> = (previous?: (T | null)[], next?: (T | null)[]) => void;
+/**
+ * Function that will unsubscribe the listener
+ * @quickinfo
+ */
+export type ChangeListenerUnsubscribe = () => void;
+/**
+ * @quickinfo
+ */
+export type AllChangesListener = () => void;
 
 // Controller for conditionally enabling listeners. We don't want to fire listeners anytime
 // something changes in the cache as there's lots of changes that happen internally for keeping
@@ -264,7 +277,6 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
     /**
      * Remove specified key from cache, cleanup any relation listeners and trigger
      * listener callbacks if required.
-     * @private
      */
     private cleanupKey(key: ViewModelFieldPaths<ViewModelClassType>): void {
         this.setValueForKey(key, null);
@@ -300,7 +312,6 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
      *
      * @param key The key that contains the relations we need to resolve
      * @param baseRecord The record with the id's of the related records
-     * @private
      */
     private constructWithRelatedRecords(
         key: ViewModelFieldPaths<ViewModelClassType>,
@@ -347,7 +358,6 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
      * @param record The last record that the listener would have been notified about. When the listener is first
      * added this will be the current record in the cache. When the record changes this will be the new record that
      * was just added.
-     * @private
      */
     private setupRelationListeners(
         key: ViewModelFieldPaths<ViewModelClassType>,
@@ -571,38 +581,167 @@ const defaultListenerBatcher = {
 /**
  * Cache for ViewModel instances based on the specified field names set.
  *
- * The key to the cache is the primary key for the record and the field names
- * set on it. For example if you have a record that accepts id, name and email
- * you could have a record cached for id, for name, for email or any
- * combination of the 3 fields. This is to handle the common case of fetching
- * partial data from a backend.
+ * <Alert type="info">See the [ViewModel getting started guide](/docs/getting-started/viewmodel) for an overview of ViewModel's and how caching works</Alert>
  *
- * The cache implementation will update any cache entries that are a subset
- * of a new cache entry. eg. Caching a record with all the possible fields set
- * would result in all the existing partial field cache entries being updated
- * to match the data on the full record for the fields it care about.
+ * Caching is based on the primary key, and the fields that are specified when creating an instance. For example, the
+ * following two instances are cached separately:
  *
- * Usage:
+ * ```typescript
+ * const user1 = User.cache.add({ id: 1, name: 'John' });
+ * const user2 = User.cache.add({ id: 1, email: 'john@example.com' });
+ * ```
+ *
+ * When you read from the cache you specify the fields (or `"*"` for all fields):
+ *
+ * ```typescript
+ * User.cache.get(1, ['name']);
+ * // { id: 1, name: 'John' }
+ * User.cache.get(1, ['email']);
+ * //  id: 1, email: 'john@example.com'
+ * ```
+ *
+ * An update to a superset of fields will update all cached subsets:
+ *
+ * ```typescript
+ * User.cache.add({
+ *     id: 1,
+ *     name: 'Johnny Smith',
+ *     email: 'johnny@test.com',
+ * });
+ * console.log(User.cache.get(1, ['id', 'name']));
+ * // { id: 1, name: 'Johnny Smith' }
+ * console.log(User.cache.get(1, ['id', 'email']));
+ * // { id: 1, email: 'johnny@test.com' }
+ * ```
+ *
+ * The motivation for this behaviour is that it's more desirable for have records be internally consistent than to have each individual
+ * field reflect the latest value. Having partial records is useful for restricting the amount of data that is sent to the
+ * frontend.
+ *
+ * ### Partial Models
+ *
+ * Partial models are instances where not all fields are specified. If a value isn't supplied for a
+ * field, the instance is considered "partial" for that field. Note that a field with a null value is not considered partial -
+ * it's only partial if no value is supplied at all. As described above, the key a record is cached under is based on
+ * the fields it has set.
+ *
+ * To inspect which fields are specified in an instance, you can check the _assignedFields property:
  *
  * ```js
- * // Assume User is a ViewModel already defined
+ * console.log(user._assignedFields); // Output: ['id', 'name']
+ * ```
  *
- * // Add a record
- * User.cache.add(new User({ id: 1, name: 'John' }));
+ * To retrieve that record from the cache, you must specify the same fields:
  *
- * // Retrieve a record
- * const record = User.cache.get(1, ['id', 'name']);
- *
- * // To update a record just add it again
- * User.cache.add(new User({ id: 1, name: 'Johnny' }));
- *
- * // Cache is per unique set of fields but a superset will update a subset
- * User.cache.add(new User({ id: 1, name: 'Johnny Smith', email: 'johnny@test.com' }));
+ * ```js
  * User.cache.get(1, ['id', 'name']);
- * // { id: 1, name: 'Johnny Smith' }
- * User.cache.get(1, ['id', 'name', 'email'])
- * // { id: 1, name: 'Johnny Smith', email: 'johnny@test.com' }
+ * ```
  *
+ * If all fields are set on the record you can use `'*'` to indicate all fields:
+ *
+ * ```js
+ * User.cache.get(1, '*')
+ * ```
+ *
+ * <Usage>
+ *
+ * ## Creating caches
+ *
+ * A cache requires a [ViewModel](doc:viewModelFactory), and every ViewModel has a cache created automatically:
+ *
+ * ```js
+ * class User extends viewModelFactory({
+ *   id: new IntegerField(),
+ *   name: new CharField(),
+ * }, { pkFieldName: 'id' }) {
+ * }
+ * User.cache instanceof ViewModelCache; // true
+ * ```
+ *
+ * You can create a cache manually:
+ *
+ * ```js
+ * const myCache = new ViewModelCache(User);
+ * ```
+ *
+ * But this is uncommon, unless you have custom caching requirements. In those cases it's recommended to override the
+ * default cache:
+ *
+ * ```js
+ * class CustomViewModelCache extends ViewModelCache {}
+ * class User extends viewModelFactory({
+ *   id: new IntegerField(),
+ *   name: new CharField(),
+ * }, { pkFieldName: 'id' }) {
+ *  static cache = new CustomViewModelCache(User);
+ * }
+ * ```
+ *
+ * ### Adding records
+ *
+ * Use [add](#Method-add) to add a single record.
+ *
+ * ```js
+ * User.cache.add(new User({ id: 1, name: 'John' }));
+ * ```
+ *
+ * Using the ViewModel constructor is optional - you can pass the data directly
+ *
+ * ```js
+ * User.cache.add({ id: 1, name: 'John' });
+ * ```
+ *
+ * The primary key is always required, everything else is optional.
+ *
+ * Use [addList](#Method-addList) to add multiple records simultaneously. This is preferred to using `add` multiple times as it avoids
+ * firing multiple change events.
+ *
+ * ```js
+ * User.cache.addList([{ id: 1, name: 'John'} , { id: 2, name: 'Jane' }]);
+ * ```
+ *
+ * ### Updating records
+ *
+ * Updating a record is the same as adding it again:
+ *
+ * ```js
+ * User.cache.add(new User({ id: 1, name: 'John' }));
+ * ```
+ *
+ * ### Retrieving records
+ *
+ * Use [get](#Method-get) to retrieve a single record by from the cache. You must specify the list of fields to include, or `"*"`
+ * for all fields.
+ *
+ * ```js
+ * const record = User.cache.get(1, ['name']);
+ * ```
+ *
+ * Note that the primary key is always included, so explicitly including it in the list of fields is optional.
+ *
+ * If you wish to get the latest version of a record you can pass the ViewModel instance itself instead of the id and fields:
+ *
+ * ```js
+ * const latestRecord = User.cache.get(record);
+ * ```
+ *
+ * Use [getList](#Method-getList) to retrieve multiple records:
+ *
+ * ```js
+ * const records = User.cache.getList([1, 2], ['name']);
+ * ```
+ *
+ * [getAll](#Method-getAll) can be used to retrieve all cached records:
+ *
+ * ```js
+ * const records = User.cache.getAll(['name']);
+ * ```
+ *
+ * ### Deleting records
+ *
+ * Use [delete](#Method-delete) to delete a single record, either for a specific subset of fields or all cached records.
+ *
+ * ```js
  * // Delete a specific cache for a subset of fields
  * User.cache.delete(1, ['id', 'name']);
  * User.cache.get(1, ['id', 'name']);
@@ -614,11 +753,15 @@ const defaultListenerBatcher = {
  * User.cache.delete(1);
  * User.cache.get(1, ['id', 'name', 'email'])
  * // null
+ * ```
  *
- * // You can add multiple values at a time
- * User.cache.addList([johnny, sam]);
+ * ### Listening to changes
  *
- * // You can listen to changes
+ * You can listen to changes using [addListener](#Method-addListener).
+ *
+ * > To listen for changes and re-render a component use the [useViewModelCache](doc:useViewModelCache) hook.
+ *
+ * ```js
  * User.cache.addListener(2, ['id', 'name'], (previous, next) => console.log(previous, 'change to', next));
  * User.cache.add(new User({ id: 2, name: 'Bob' }));
  * // null changed to User({ id: 2, name: 'Bob' })
@@ -626,8 +769,12 @@ const defaultListenerBatcher = {
  * // User({ id: 2, name: 'Bob' }) changed to User({ id: 2, name: 'Bobby' })
  * User.cache.delete(2)
  * // User({ id: 2, name: 'Bobby' }) changed to null
+ * ```
  *
- * // You can listen to multiple changes. If you use this and addList then you only get one
+ * You can listen to changes to multiple records with [addListenerList](#Method-addListenerList). Used with `addList` and you will get one
+ * notification for each batch of changes:
+ *
+ * ```js
  * // call for each change that occurs within addList
  * User.cache.addListenerList(
  *  // Ids to listen for changes to
@@ -637,16 +784,18 @@ const defaultListenerBatcher = {
  *  (previous, next) => console.log(previous, 'change to', next)
  * );
  * User.cache.addList([new User({ id: 3, name: 'Jay' }), new User({ id: 4, name: 'Bee' })]);
- * // [null, null] changed to [new User({ id: 3, name: 'Jay' }), new User({ id: 4, name: 'Bee' })]
+ * // [null, null] changed to [User({ id: 3, name: 'Jay' }), User({ id: 4, name: 'Bee' })]
  * User.cache.addList([new User({ id: 3, name: 'Jayz' }), new User({ id: 4, name: 'Beeb' })]);
- * // [new User({ id: 3, name: 'Jay' }), new User({ id: 4, name: 'Bee' })] changed to [new User({ id: 3, name: 'Jayz' }), new User({ id: 4, name: 'Beeb' })]
+ * // [User({ id: 3, name: 'Jay' }), User({ id: 4, name: 'Bee' })] changed to [new User({ id: 3, name: 'Jayz' }), new User({ id: 4, name: 'Beeb' })]
  * User.cache.delete(3)
- * // [new User({ id: 3, name: 'Jayz' }), new User({ id: 4, name: 'Beeb' })] changed to [null, new User({ id: 4, name: 'Beeb' })]
+ * // [User({ id: 3, name: 'Jayz' }), User({ id: 4, name: 'Beeb' })] changed to [null, User({ id: 4, name: 'Beeb' })]
  * ```
+ *
+ * </Usage>
  *
  * ## Field notation
  *
- * If a model has a [RelatedViewModelField](doc:RelatedViewModelField) the data for a related field
+ * If a model has a [RelatedViewModelField](doc:RelatedViewModelField), the data for a related field
  * can be retrieved using array notation:
  *
  * ```js
@@ -662,19 +811,11 @@ const defaultListenerBatcher = {
  * ['name', ['group', 'label'], ['group', 'ownerId']]
  * ```
  *
- * **NOTE:** Using the shorthand for a relation won't include any nested relation
- *
- * Accessing deeply related records is supported:
+ * Using the shorthand for a relation won't include any nested relation. To fetch deeply related records you must
+ * explicitly opt in:
  *
  * ```js
- * ['name', ['group', 'owner', 'name']]
- * ```
- *
- * You can combine the shorthand with array notation to get all fields and the specified deep relations:
- * ```js
- * ['name', 'group', ['group', 'owner', 'name']]
- * // Equivalent to:
- * ['name', ['group', 'label'], ['group', 'owner', 'name']]
+ * ['name', 'group', ['group', 'owner']]
  * ```
  *
  * **NOTE:** When accessing a relation its `sourceFieldName` is always included regardless
@@ -693,12 +834,19 @@ const defaultListenerBatcher = {
  * // }
  * ```
  *
- * @extract-docs
- * @menu-group Caching
+ * @extractdocs
+ * @menugroup Caching
+ * @typeParam ViewModelClassType The class of the ViewModel this cache is for
  */
 export default class ViewModelCache<ViewModelClassType extends ViewModelConstructor<any, any>> {
+    /**
+     * The ViewModel class this cache is for
+     */
     viewModel: ViewModelClassType;
     private fieldNameCache: Map<string, RecordFieldNameCache<ViewModelClassType>>;
+    /**
+     * @ignore
+     */
     static listenerBatcher = defaultListenerBatcher;
 
     /**
@@ -709,7 +857,7 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
         this.fieldNameCache = new Map();
     }
 
-    get cache(): never {
+    private get cache(): never {
         throw new Error(
             "'cache' property renamed to 'fieldNameCache'. This is a private implementation detail and should not be used."
         );
@@ -738,8 +886,6 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      * Acquire the field name cache specific to a primary key
      *
      * @param pk The primary key to get the cache for
-     *
-     * @private
      */
     private acquireFieldNameCache(
         pk: ExtractPkFieldParseableValueType<ViewModelClassType>
@@ -775,31 +921,63 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      * });
      * // All listeners called once
      * ```
-     * @param run
+     * @param run A function to run. Any changes made to the cache within this function will be batched.
      */
     batch<T>(run: () => T): T {
         return this.cacheClass.listenerBatcher.batch(run);
     }
 
     /**
-     * Add a record or records to the cache. Records are cached based on the fields that are
-     * set (ie. to retrieve the record you would call `get` with the `id` and array of field
-     * names that were set on it).
+     * Add a ViewModel record to the cache. If the record is already cached then it will be updated.
      *
-     * If record A has a superset of fields of record B then when A is cached it
-     * will update the cache for record B. The reverse isn't true so as to maintain consistency
-     * within a record.
+     * @overloadpreamble
+     * Add a record, or records, to the cache.
      *
-     * @param recordOrData The record instance to cache. If a plain object is passed then
-     * an instance of the view model will be created and returned. An array is also supported
-     * in which case each entry in the array will be converted to the view model if required
-     * and returned.
+     * Records are cached based on the fields that are specified on that record. See [Partial Models](#Partial-Models)
+     * for more information on how this works.
+     *
+     * You can pass raw data to this method, and it will be converted to a view model instance:
+     *
+     * ```js
+     * const user = User.cache.add({ id: 1, name: 'Dave' });
+     * user instanceof User; // true
+     * ```
+     *
+     * You can pass an instance directly:
+     *
+     * ```js
+     * User.cache.add(new User({ id: 1, name: 'Dave' }));
+     * ```
+     *
+     * If you pass an array then [addList](#Method-addList) will be called.
+     *
+     * > To add multiple records use [addList](#Method-addList) or pass an array to this method rather than calling
+     * > `add` multiple times. This is more efficient as it will only trigger a single change event.
+     *
+     * @param data The record data to cache. An instance of the view model will be created and returned
+     *
+     * @returns The cached record as an instance of the view model.
+     * @typeParam T The type of the record being added. See [PartialViewModel](BaseViewModel#PartialViewModel)
      */
-    add<T extends PartialViewModel<ViewModelClassType>>(recordOrData: T): T;
-    add<T extends PartialViewModel<ViewModelClassType>>(recordOrData: T[]): T[];
+    add<T extends PartialViewModel<ViewModelClassType>>(data: T): T;
+    /**
+     * @hidden
+     */
+    add<T extends PartialViewModel<ViewModelClassType>>(records: T[]): T[];
+    /**
+     * Add a record from raw data to the cache. If the record is already cached then it will be updated.
+     *
+     * Returns the cached record as an instance of the ViewModel.
+     *
+     * @param data The data to cache as a plain object.
+     * @typeParam FieldNames The type of fields being added.
+     */
     add<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
-        recordOrData: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>
+        data: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>
     ): PartialViewModel<ViewModelClassType, FieldNames>;
+    /**
+     * @hidden
+     */
     add<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
         recordOrData: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>[]
     ): PartialViewModel<ViewModelClassType, FieldNames>[];
@@ -846,17 +1024,41 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     }
 
     /**
-     * Add a list of records. Use this in place of manually calling
-     * add() on each record individually so that listeners only get
-     * notified once of the change to the list rather than for
-     * each record in the list.
+     * Add a list of ViewModel records to the cache. If any of the records are already cached then they will be updated.
      *
-     * @param recordsOrData The records to add. Can either be an array of instances of the ViewModel
-     * or an array of data objects (or a mixture of both).
+     * @overloadpreamble
+     *
+     * Adds a list of records to the cache.
+     *
+     * This method is preferred over manually invoking [add](#Method-add) for each record individually, as it ensures
+     * listeners are only notified once about the changes to the list, rather than receiving a notification for each
+     * individual record.
+     *
+     * You can pass an array of raw data to this method, and it will be converted to a view model instances:
+     *
+     * ```js
+     * const users = User.cache.addList([{ id: 1, name: 'John'} , { id: 2, name: 'Jane' }]);
+     * // users[0] instanceof User; // true
+     * ```
+     *
+     * Alternatively, you can pass an array of instances directly:
+     *
+     * ```js
+     * User.cache.addList([new User({ id: 1, name: 'John'}), new User({ id: 2, name: 'Jane'})]);
+     * ```
+     *
+     * @param records The records to add
+     * @typeParam T The type of the record being added when a ViewModel is passed
      */
-    addList<T extends PartialViewModel<ViewModelClassType>>(recordsOrData: T[]): T[];
+    addList<T extends PartialViewModel<ViewModelClassType>>(records: T[]): T[];
+    /**
+     * Add a list of records from raw data to the cache. If the records are already cached then they will be updated.
+     *
+     * @param records The records to add
+     * @typeParam FieldNames The type of field names being added when raw data is passed
+     */
     addList<FieldNames extends ExtractFieldNames<ViewModelClassType['fields']>>(
-        recordsOrData: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>[]
+        records: FieldDataMappingRaw<Pick<ViewModelClassType['fields'], FieldNames>>[]
     ): PartialViewModel<ViewModelClassType, FieldNames>[];
     addList<
         T extends PartialViewModel<ViewModelClassType>,
@@ -872,18 +1074,45 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     }
 
     /**
-     * Get a record with the specified `fieldNames` set from the cache
+     * Get a record with the specified `pk` and `fieldNames` from the cache.
      *
-     * @param pk the primary key of the record to get
-     * @param fieldNames the field names to use to look up the cache entry. Use '*' to indicate all fields.
+     * @overloadpreamble
+     *
+     * Get a record with the specified `fieldNames` set from the cache.
+     *
+     * ```js
+     * User.cache.get(1, ['name']);
+     * ```
+     *
+     * Note that the primary key is always returned, so you do not need to specify it in `fieldNames`.
+     *
+     * To retrieve all fields use `"*"`. See [Field notation](#Field-notation) for supported format.
+     *
+     * ```js
+     * User.cache.get(1, '*');
+     * ```
+     *
+     * To get the latest version of a record you can pass the record directly and omit the fields:
+     *
+     * ```js
+     * User.cache.get(user);
+     * ```
+     *
+     * See [Partial Models](#Partial-Models) for more details on how records are cached based on the fields they have.
+     *
+     * To get multiple records use [getList](#Method-getList).
+     *
+     * @param pk The primary key of the record to get
+     * @param fieldNames The field names to use to look up the cache entry. Use '*' to indicate all fields.
      * See [Field notation](#Field_notation) for supported format.
      *
-     * @returns The cached record or null if none found
+     * @returns The cached record, or null if none found
      */
     get<T extends FieldPath<ViewModelClassType>>(
         pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
         fieldNames: T[]
     ): PartialViewModel<ViewModelClassType, T> | null;
+    /** @hidden */
     get(
         pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
         fieldNames: '*'
@@ -892,11 +1121,9 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
         ExtractStarFieldNames<ViewModelClassType['fields']>
     > | null;
     /**
-     * Get the currently cached version of the specified version
+     * Get the latest version of a record from the cache.
      *
-     * @param record a current instance of a ViewModel to get the latest cached version of
-     *
-     * @returns The cached record or null if none found
+     * @param record The record to retrieve the latest version of
      */
     get<T extends FieldPath<ViewModelClassType>>(
         record: PartialViewModel<ViewModelClassType, T>
@@ -973,7 +1200,7 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     }
 
     /**
-     * @private
+     * @ignore
      */
     _lastAllRecords: Map<
         ViewModelFieldPaths<ViewModelClassType>,
@@ -981,17 +1208,27 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     > = new Map();
 
     /**
-     * Get all records in the cache for the specified field names. This acts like `getList` but returns
-     * all records not just records with specified primary keys.
+     * Get all full records from the cache
      *
-     * This function guarantees to return the same array (ie. passes strict equality check) if the underlying
-     * records have not changed.
+     * @overloadpreamble
      *
-     * @param fieldNames List of field names to return records for. See [Field notation](#Field_notation) for supported format.
+     * Get all records in the cache for the specified field names. This acts like `getList`, but returns
+     * all records not just the records with the specified primary keys.
+     *
+     * This function guarantees to return the same array (i.e. passes strict equality check) if the underlying
+     * records have not changed between calls.
+     *
+     * @param fieldNames List of field names, or `"*"`, to return records for. See [Field notation](#Field_notation) for the supported format.
      */
     getAll(
         fieldNames: '*'
     ): PartialViewModel<ViewModelClassType, ExtractStarFieldNames<ViewModelClassType['fields']>>[];
+    /**
+     * Get all records with the specified `fieldNames` from the cache
+     *
+     * @param fieldNames The fieldNames to return records for. See [Field notation](#Field_notation) for the supported format.
+     * @typeParam T The type of the field names to return. This is inferred from the `fieldNames` parameter.
+     */
     getAll<T extends FieldPath<ViewModelClassType>>(
         fieldNames: T[]
     ): PartialViewModel<ViewModelClassType, T>[];
@@ -1030,13 +1267,34 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     /**
      * Get a list of records with the specified `fieldNames` set from the cache
      *
-     * Any record that is not found will end up in the array as a null value. If this
-     * isn't desired you must filter them manually.
+     * @overloadpreamble
      *
-     * @param pks An array of primary keys
-     * @param fieldNames the field names to use to look up the cached entries. See [Field notation](#Field_notation) for supported format.
-     * @param removeNulls whether to remove entries that have no record in the cache. Defaults to true.
-     * @returns an array of the cached records. Any records not found will be in the array as a null value if `removeNulls` is false otherwise they will be removed.
+     * Get a list of records with the specified `fieldNames` set from the cache.
+     *
+     * ```js
+     * User.cache.getList([1, 5, 9], ['name']);
+     * ```
+     *
+     * Note that the primary key is always returned, so you do not need to specify it in `fieldNames`.
+     *
+     * To retrieve all fields use `"*"`. See [Field notation](#Field-notation) for supported format.
+     *
+     * ```js
+     * User.cache.getList([1, 5, 9], '*');
+     * ```
+     *
+     * To get the latest version of a record you can pass the record directly and omit the fields:
+     *
+     * ```js
+     * User.cache.getList([user1, user2]);
+     * ```
+     *
+     * See [Partial Models](#Partial-Models) for more details on how records are cached based on the fields they have.
+     *
+     * @param pks The primary keys of the records to return
+     * @param fieldNames The fieldNames to return records for. See [Field notation](#Field_notation) for the supported format.
+     * @param removeNulls If `true` then any records that are not in the cache will be removed from the returned array. If `false`
+     *  then returned array will contain `null` for any records that are not in the cache.
      */
     getList<T extends FieldPath<ViewModelClassType>, RemoveNullsT extends boolean = true>(
         pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
@@ -1045,6 +1303,9 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     ): RemoveNullsT extends true
         ? PartialViewModel<ViewModelClassType, T>[]
         : (PartialViewModel<ViewModelClassType, T> | null)[];
+    /**
+     * @hidden
+     */
     getList<RemoveNullsT extends boolean = true>(
         pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
         fieldNames: '*',
@@ -1059,12 +1320,11 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
               ExtractStarFieldNames<ViewModelClassType['fields']>
           > | null)[];
     /**
-     * Get list of cached records from an existing list of records
+     * Return a list of records from the cache
      *
-     * @param records List of existing ViewModel records to get latest cache version for
-     * @param removeNulls whether to remove entries that have no record in the cache. Defaults to true.
-     * @returns an array of the cached records. Any records not found will be in the array as a null value if `removeNulls` is false otherwise they will be removed.
-     **/
+     * @param records The records to return the latest version for
+     * @param removeNulls If true, any records that are not in the cache will be removed from the returned array.
+     */
     getList<
         T extends ViewModelInterface<
             ViewModelClassType['fields'],
@@ -1072,6 +1332,9 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
         >,
         RemoveNullsT extends boolean = true
     >(records: T[], removeNulls?: RemoveNullsT): RemoveNullsT extends true ? T[] : (T | null)[];
+    /**
+     * @hidden
+     */
     getList<T extends FieldPath<ViewModelClassType>, RemoveNullsT extends boolean = true>(
         records: PartialViewModel<ViewModelClassType, T>[],
         removeNulls?: RemoveNullsT
@@ -1109,7 +1372,7 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     /**
      * Delete a record from the cache, optionally only for the specified `fieldNames`
      *
-     * If `fieldNames` is omitted then the cache for the record is cleared in it's entirety.
+     * If `fieldNames` is omitted then the cache for the record is cleared in its entirety.
      *
      * @param pk The primary key of the record to delete
      * @param fieldNames Optionally only delete the entry with the specified field names. If
@@ -1131,7 +1394,7 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     }
 
     /**
-     * @private
+     * @ignore
      */
     allChangeListeners: (() => void)[] = [];
 
@@ -1142,6 +1405,46 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     /**
      * Add a listener to any changes at all. The detail of the changes are not available.
      *
+     * @overloadpreamble
+     *
+     * Add a listener for any changes, additions or deletions.
+     *
+     * You can pass just a function that will receive no arguments, in which case _all_ changes will trigger a notification:
+     *
+     * ```js
+     * const unsubscribe = cache.addListener(() => {
+     *     console.log("Change occurred!")
+     * });
+     * ```
+     *
+     * The details of the changes are not available in this case.
+     *
+     * Alternatively you can pass either a single primary key or an array of primary keys, and the `fieldNames` to listen
+     * for changes to (or `"*"` for complete records). In this case, the listener will be passed two arguments: the
+     * previous value and next value:
+     *
+     * ```js
+     * const unsubscribe = cache.addListener(1, '*', (prev, next) => {
+     *     console.log(prev, 'changed to', next);
+     * });
+     * ```
+     *
+     * In the case of a creation or deletion the previous or next value will be `null` respectively.
+     *
+     * If you pass an array of primary keys, then the listener will be passed an array with each element corresponding
+     * to the primary key passed in:
+     *
+     * ```js
+     * const unsubscribe = cache.addListener([1, 2], '*', (([prev1, prev2], [next1, next2]) => {
+     *     console.log(prev1, 'changed to', next1);
+     *     console.log(prev2, 'changed to', next2);
+     * }));
+     * ```
+     *
+     * In the case of a creation or deletion the previous or next entry in the array will be `null` respectively.
+     *
+     * All forms return a function that will unsubscribe the listener when called.
+     *
      * @param listener Function to that is called when any change occurs. The function is called with no parameters.
      * @returns A function that removes the listener
      */
@@ -1150,19 +1453,21 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      * Add a listener for any changes, additions or deletions for the record(s) identified by
      * `pkOrPks` for the field names `fieldNames`.
      *
-     * @param pkOrPks Primary key or array of multiple primary keys that identifies the record(s)
-     * to listen to changes/additions/deletions to
+     * @param pk Primary key for the record to listen to changes/additions/deletions to
      * @param fieldNames Field names to listen to changes/additions/deletions to. See [Field notation](#Field_notation) for supported format.
      * @param listener Function to call with any changes
      * @param batch Whether or not to batch this call with other calls (defaults to true). You shouldn't need to change the default.
      * @returns A function that removes the listener
      */
     addListener<T extends FieldPath<ViewModelClassType>>(
-        pkOrPks: ExtractPkFieldParseableValueType<ViewModelClassType>,
+        pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
         fieldNames: T[],
         listener: ChangeListener<PartialViewModel<ViewModelClassType, T>>,
         batch?: boolean
     ): ChangeListenerUnsubscribe;
+    /**
+     * @hidden
+     */
     addListener(
         pkOrPks: ExtractPkFieldParseableValueType<ViewModelClassType>,
         fieldNames: '*',
@@ -1174,12 +1479,25 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
         >,
         batch?: boolean
     ): ChangeListenerUnsubscribe;
+    /**
+     * Add a listener for any changes, additions or deletions for the record(s) identified by
+     * `pkOrPks` for the field names `fieldNames`.
+     *
+     * @param pks The primary keys for the record to listen to changes/additions/deletions to
+     * @param fieldNames Field names to listen to changes/additions/deletions to. See [Field notation](#Field_notation) for supported format.
+     * @param listener Function to call with any changes
+     * @param batch Whether or not to batch this call with other calls (defaults to true). You shouldn't need to change the default.
+     * @returns A function that removes the listener
+     */
     addListener<T extends FieldPath<ViewModelClassType>>(
-        pkOrPks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
+        pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
         fieldNames: T[],
         listener: MultiChangeListener<PartialViewModel<ViewModelClassType, T>>,
         batch?: boolean
     ): ChangeListenerUnsubscribe;
+    /**
+     * @hidden
+     */
     addListener(
         pkOrPksOrListener: ExtractPkFieldParseableValueType<ViewModelClassType>[],
         fieldNames: '*',
@@ -1241,11 +1559,28 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
         });
     }
 
+    /**
+     * Add a listener to any changes at all. The detail of the changes are not available.
+     *
+     * @overloadpreamble
+     *
+     * Add a listener for any changes, additions or deletions to a list of records
+     *
+     * See [addListener](#Method-addListener) for details.
+     *
+     * @param pks The primary keys to listen to changes/additions/deletions to
+     * @param fieldNames The field names to listen to changes/additions/deletions to. See [Field notation](#Field_notation) for supported format.
+     * @param listener The function that will be called when a change occurs.
+     * @returns A function that removes the listener
+     */
     addListenerList<T extends FieldPath<ViewModelClassType>>(
         pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
         fieldNames: T[],
         listener: MultiChangeListener<PartialViewModel<ViewModelClassType, T>>
     ): ChangeListenerUnsubscribe;
+    /**
+     * @hidden
+     */
     addListenerList(
         pks: ExtractPkFieldParseableValueType<ViewModelClassType>[],
         fieldNames: '*',

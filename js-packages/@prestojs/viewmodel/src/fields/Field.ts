@@ -1,9 +1,6 @@
 import { ViewModelConstructor, ViewModelInterface } from '../ViewModelFactory';
 import { AsyncChoicesInterface } from './AsyncChoices';
 
-/**
- * @export-in-docs
- */
 export interface DefaultValueFunction<ValueT> {
     /**
      * A function that returns the default value to use
@@ -21,7 +18,7 @@ export interface DefaultValueFunction<ValueT> {
 }
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 export interface FieldProps<ValueT, SingleValueT = ValueT> {
     /**
@@ -133,7 +130,7 @@ class UnboundFieldError<T, ParsableType, SingleType> extends Error {
 /**
  * Props that are exposed by a specific [Field](doc:Field) for use by widget components
  *
- * @expand-properties
+ * @expandproperties
  */
 export interface ViewModelFieldWidgetProps {
     /**
@@ -145,7 +142,7 @@ export interface ViewModelFieldWidgetProps {
 /**
  * Props that are exposed by a specific [Field](doc:Field) for use by formatter components
  *
- * @expand-properties
+ * @expandproperties
  */
 export interface ViewModelFieldFormatterProps {
     /**
@@ -317,9 +314,15 @@ export interface ViewModelFieldFormatterProps {
  * could be to many records to efficiently load upfront. In these cases [AsyncChoices](doc:AsyncChoices)
  * are a good option but somewhat more complicated.
  *
+ * ### RecordBoundField
  *
- * @extract-docs
- * @menu-group Fields
+ * A `RecordBoundField` is a field that is bound to a specific record and can be used to access the value on the `value`
+ * property. This is used by the [_f](doc:BaseViewModel#Property-_f) property on [BaseViewModel](doc:BaseViewModel). The
+ * `boundRecord` attribute will also point back to the source record.
+ *
+ *
+ * @extractdocs
+ * @menugroup Fields
  * @typeParam ValueT The type of the value this field will take when used on a `ViewModel`.
  * @typeParam ParsableValueT This the type the field knows how to parse into `ValueT` when constructing a `ViewModel`.
  * @typeParam SingleValueT The type of a single value for this field. This is only different from `ValueT` if `ValueT` represents multiple values (eg. an array as in [ListField](doc:ListField)).
@@ -327,11 +330,11 @@ export interface ViewModelFieldFormatterProps {
 export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleValueT = ValueT> {
     // These are just for internal usage with typescript
     /**
-     * @private
+     * @ignore
      */
     __fieldValueType: ValueT;
     /**
-     * @private
+     * @hidden
      */
     __parsableValueType: ParsableValueT;
 
@@ -464,7 +467,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
     protected formatterProps: Record<string, any>;
 
     /**
-     * @private
+     * @hidden
      */
     protected _defaultValue?: ValueT | null | (() => Promise<ValueT | null> | ValueT | null);
 
@@ -582,7 +585,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      * @param value The value to convert
      */
     toJS(value: ValueT): string | number | null | Record<string, any> {
-        return value;
+        return value as any;
     }
 
     /**
@@ -614,7 +617,7 @@ export default class Field<ValueT, ParsableValueT extends any = ValueT, SingleVa
      * @param value1 The value to compare
      * @param value2 The other value to compare against `value`
      */
-    public isEqual(value1: ValueT, value2: ValueT): boolean {
+    public isEqual(value1?: ValueT, value2?: ValueT): boolean {
         return value1 === value2;
     }
 

@@ -2,10 +2,24 @@ import { useDebugValue, useLayoutEffect, useReducer, useRef } from 'react';
 import ViewModelCache from './ViewModelCache';
 import { ViewModelConstructor } from './ViewModelFactory';
 
-type Selector<T extends ViewModelConstructor<any, any>, ResultType, U extends any[]> = (
-    cache: ViewModelCache<T>,
-    ...args: U
-) => ResultType;
+/**
+ * @typeParam ViewModelType {@inheritTypeParam useViewModelCache}
+ * @typeParam ResultType {@inheritTypeParam useViewModelCache}
+ * @typeParam SelectorArgs {@inheritTypeParam useViewModelCache}
+ */
+export interface ViewModelCacheSelector<
+    ViewModelType extends ViewModelConstructor<any, any>,
+    ResultType,
+    SelectorsArgs extends any[]
+> {
+    /**
+     * A function that takes a cache, and any arguments passed to `useViewModelCache`, and returns a value.
+     *
+     * @param cache The cache to get the value from
+     * @param args The arguments that were passed to `useViewModelCache`
+     */
+    (cache: ViewModelCache<ViewModelType>, ...args: SelectorsArgs): ResultType;
+}
 
 function shallowEqual(a?: any[], b?: any[]): boolean {
     if (a === b) {
@@ -30,14 +44,16 @@ function defaultEquality<T>(currentValue: T, previousValue?: T): boolean {
 }
 
 /**
- * Select some data out of the cache for use in a component. Whenever the cache data
- * changes the component will re-render with latest value.
+ * The `useViewModelCache` React hook provides an easy way to interact with your ViewModel cache. This hook triggers a
+ * re-render of your component whenever the associated cache data changes, ensuring your component always displays the
+ * most recent data.
  *
- * See [ViewModelCache](doc:ViewModelCache) for more details on how to read data from the
- * cache. The [Field notation](doc:ViewModelCache#Field_notation) documentation goes over
- * the possible formats for the fields argument.
+ * <Alert type="info">See the [ViewModel getting started guide](/docs/getting-started/viewmodel) for an overview of ViewModel's and how caching works</Alert>
  *
- * Example usage:
+ * <Usage>
+ *
+ *     The `useViewModelCache` hook takes a `ViewModel` class as the first argument and a selector function as the second argument.
+ *     The selector function returns the data you want from the cache and is called whenever the cache changes.
  *
  * ```jsx
  * function UserView({ id }) {
@@ -59,7 +75,7 @@ function defaultEquality<T>(currentValue: T, previousValue?: T): boolean {
  * }
  * ```
  *
- * Selectors can return anything:
+ * Selectors can return anything
  *
  * ```jsx
  * const usersByGroup = cache => cache.getAll(['groupId', 'firstName', 'email']).reduce((acc, record) => {
@@ -89,11 +105,19 @@ function defaultEquality<T>(currentValue: T, previousValue?: T): boolean {
  * }
  * ```
  *
+ * <Alert type="info">
+ *     Note that if the selector returns the same object as the previous call then no re-render will be triggered. If
+ *     you are returning values direct from the cache (e.g. by calling `get` or `getList`) then you don't need to do
+ *     anything special, but if you are transforming the value in any way it's a good idea to ensure the transformed
+ *     objects are only re-created when something changes.
+ * </Alert>
+ *
+ * </Usage>
+ *
  * @param viewModel The ViewModel to use the cache from
- * @param selector A function that gets passed the cache and selects data from it. If your selector
- * is slow consider using a library like [reselect](https://github.com/reduxjs/reselect) to create
- * your selector with. Note that `get`, `getAll` and `getList` on `ViewModelCache` will return the
- * same object across multiple calls if the underlying data has not changed.
+ * @param selector A function that gets passed the cache and selects data from it.  Note that `get`, `getAll` and
+ * `getList` on `ViewModelCache` will return the same object across multiple calls if the underlying data has not
+ * changed.
  * @param args Any extra arguments to pass through to the selector. These will be compared shallowly
  * and any changes will re-run the selector.
  * @param isEquals Optionally control how equality is determined for an object. By default this is
@@ -102,25 +126,28 @@ function defaultEquality<T>(currentValue: T, previousValue?: T): boolean {
  *
  * @returns The data as returned by `selector`
  *
- * @extract-docs
- * @menu-group Caching
+ * @extractdocs
+ * @menugroup Caching
+ * @typeParam ViewModelType The type of the ViewModel to use the cache from
+ * @typeParam ResultType The type of the result returned by the selector
+ * @typeParam SelectorArgs The type of the arguments passed to the selector
  */
 export default function useViewModelCache<
-    T extends ViewModelConstructor<any, any>,
+    ViewModelType extends ViewModelConstructor<any, any>,
     ResultType,
-    U extends any[] = any[]
+    SelectorArgs extends any[] = any[]
 >(
-    viewModel: T,
-    selector: Selector<T, ResultType, U>,
-    args: U = [] as any,
+    viewModel: ViewModelType,
+    selector: ViewModelCacheSelector<ViewModelType, ResultType, SelectorArgs>,
+    args: SelectorArgs = [] as any,
     isEquals: (currentValue: ResultType, previousValue?: ResultType) => boolean = defaultEquality
 ): ResultType {
     // Implementation is based on https://github.com/reduxjs/react-redux/blob/master/src/hooks/useSelector.js
     const [, forceRender] = useReducer<React.Reducer<boolean, {}>>(i => !i, true);
     const latestSubscriptionCallbackError = useRef<Error>();
-    const lastSelector = useRef<Selector<T, ResultType, U>>();
+    const lastSelector = useRef<ViewModelCacheSelector<ViewModelType, ResultType, SelectorArgs>>();
     const lastValue = useRef<ResultType>();
-    const lastArgs = useRef<U>();
+    const lastArgs = useRef<SelectorArgs>();
     let value;
 
     try {

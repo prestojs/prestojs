@@ -1,9 +1,16 @@
 import Field, { FieldProps, ViewModelFieldWidgetProps } from './Field';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type CharFieldProps = FieldProps<string> & { maxLength?: number };
+export type CharFieldProps = FieldProps<string> & {
+    /**
+     * The maximum length of the string that should be accepted.
+     *
+     * This can be used by form widgets to enforce a maximum length.
+     */
+    maxLength?: number;
+};
 
 /**
  * Base class for any string based fields (see above for more specific fields).
@@ -35,8 +42,8 @@ type CharFieldProps = FieldProps<string> & { maxLength?: number };
  * ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  */
 export default class CharField extends Field<string> {
     static fieldClassName = 'CharField';

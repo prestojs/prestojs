@@ -1,6 +1,7 @@
 import nextMdx from '@next/mdx';
 import withPlugins from 'next-compose-plugins';
 import requireTranspileModules from 'next-transpile-modules';
+import withLess from 'next-with-less';
 import { visit } from 'unist-util-visit';
 import { getStaticPaths } from './util.mjs';
 
@@ -75,7 +76,6 @@ const nextConfig = {
     staticPageGenerationTimeout: 180,
     distDir: '../.next',
 };
-// const withLess = require('next-with-less');
 // const withAntdLess = require('next-plugin-antd-less');
 
-export default withPlugins([withTM, /*withLess,*/ withMDX], nextConfig);
+export default withPlugins([withTM, withLess, withMDX], nextConfig);

@@ -2,7 +2,7 @@ const timeRegex =
     /^(([0-1]?[0-9])|2[0-3]):([0-5][0-9])(:([0-5][0-9])(.([0-9]{3})(\+([0-9]{2}):([0-9]{2}))?)?)?$/;
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 type TimeParts = {
     hour: number;
@@ -51,8 +51,8 @@ export class InvalidTimeError extends Error {}
  *
  * @param value The string or `Date` value to parse
  *
- * @extract-docs
- * @menu-group Time
+ * @extractdocs
+ * @menugroup Time
  */
 export function parseTime(value: string | Date): TimeParts {
     if (value instanceof Date) {
@@ -95,7 +95,7 @@ function pad(value: number, l = 2): string {
 }
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 type TimeFormatOptions = {
     /**
@@ -130,8 +130,8 @@ type TimeFormatOptions = {
  *   supplied.
  * </Alert>
  *
- * @extract-docs
- * @menu-group Time
+ * @extractdocs
+ * @menugroup Time
  */
 export function formatTime(parts: TimeParts | Date, options: TimeFormatOptions = {}): string {
     const { locales = [], localeOptions } = options;

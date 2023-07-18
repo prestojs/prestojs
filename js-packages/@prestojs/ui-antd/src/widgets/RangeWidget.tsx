@@ -1,21 +1,25 @@
-import { RangedWidgetProps } from '@prestojs/ui';
+import { RangedWidgetProps, WidgetProps } from '@prestojs/ui';
 import { Input } from 'antd';
-import React from 'react';
 import cx from 'classnames';
+import React, { RefObject } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type RangeWidgetProps<FieldValue, T extends HTMLElement, P> = RangedWidgetProps<
+export type RangeWidgetProps<FieldValue, T extends HTMLElement, P> = RangedWidgetProps<
     FieldValue,
     T,
     P
-> & { inputWidget: any };
+> & {
+    inputWidget: React.ComponentType<
+        WidgetProps<FieldValue, any> & { className: string; ref?: RefObject<T> }
+    >;
+    lowerRef?: RefObject<T>;
+    upperRef?: RefObject<T>;
+};
 
-// it'd appear ant's inconsistent in widget types at this moment (see: inputnumber, datepicker, upload) and they're actively changing/addressing these. we'll say widget's any for now?
-function RangeWidget<FieldValue, T extends HTMLElement, P>(
-    props: RangeWidgetProps<FieldValue, T, P>,
-    ref: any
+export default function RangeWidget<FieldValue, T extends HTMLElement, InputWidgetProps>(
+    props: RangeWidgetProps<FieldValue, T, InputWidgetProps>
 ): React.ReactElement {
     const {
         lowerInput,
@@ -25,29 +29,34 @@ function RangeWidget<FieldValue, T extends HTMLElement, P>(
         input: { value = {} as Record<string, FieldValue>, onChange },
         className,
         meta,
+        lowerRef,
+        upperRef,
     } = props;
-    const { lowerRef, upperRef } = ref || {};
     return (
-        <>
-            <Input.Group compact className={cx('presto-range-widget-wrapper', className)}>
-                <InputWidget
-                    ref={lowerRef}
-                    value={value.lower}
-                    onChange={(v: any): void => onChange({ ...value, lower: v })}
-                    {...lowerInput}
-                    className={cx('presto-range-widget-lower', lowerInput.className)}
-                />
-                <Input className="presto-range-widget-separator" placeholder={separator} disabled />
-                <InputWidget
-                    ref={upperRef}
-                    value={value.upper}
-                    onChange={(v: any): void => onChange({ ...value, upper: v })}
-                    {...upperInput}
-                    className={cx('presto-range-widget-upper', upperInput.className)}
-                />
-            </Input.Group>
-        </>
+        <Input.Group compact className={cx('presto-range-widget-wrapper', className)}>
+            <InputWidget
+                ref={lowerRef}
+                {...lowerInput}
+                input={{
+                    value: value.lower,
+                    onChange(v) {
+                        return onChange({ ...value, lower: v });
+                    },
+                }}
+                className={cx('presto-range-widget-lower', lowerInput?.className)}
+            />
+            <span className="presto-range-widget-separator">{separator}</span>
+            <InputWidget
+                ref={upperRef}
+                {...upperInput}
+                input={{
+                    value: value.upper,
+                    onChange(v) {
+                        return onChange({ ...value, upper: v });
+                    },
+                }}
+                className={cx('presto-range-widget-upper', upperInput?.className)}
+            />
+        </Input.Group>
     );
 }
-
-export default React.forwardRef(RangeWidget);

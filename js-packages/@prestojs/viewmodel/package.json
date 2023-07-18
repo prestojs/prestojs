@@ -26,8 +26,8 @@
     "@prestojs/util": "*",
     "@testing-library/react": "^13.2.0",
     "@testing-library/react-hooks": "^8.0.0",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-test-renderer": "^18.1.0",
     "typescript": "^4.5.4"
   },

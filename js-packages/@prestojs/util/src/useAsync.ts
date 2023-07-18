@@ -74,10 +74,10 @@ const DEEP = 'DEEP';
 // and so wouldn't re-call the function). As such we've decided not to include it.
 
 /**
- * @expand-properties
- * @typeParam ResultT @inherit
- * @typeParam ErrorT @inherit
- * @typeParam ArgsT @inherit
+ * @expandproperties
+ * @typeParam ResultT {@inheritTypeParam useAsync}
+ * @typeParam ErrorT {@inheritTypeParam useAsync}
+ * @typeParam ArgsT {@inheritTypeParam useAsync}
  */
 export interface UseAsyncOptions<ResultT, ErrorT, ArgsT> {
     /**
@@ -112,11 +112,11 @@ export interface UseAsyncOptions<ResultT, ErrorT, ArgsT> {
      * Called when async function resolves successfully. Is passed a single parameter which
      * is the result from the async function `fn`.
      */
-    onSuccess?: OnSuccess<ResultT>;
+    onSuccess?: UseAsyncOnSuccess<ResultT>;
     /**
      * Called when async function errors. It is passed the error returned from the async function `fn.
      */
-    onError?: OnError<ErrorT>;
+    onError?: UseAsyncOnError<ErrorT>;
 }
 
 /**
@@ -136,18 +136,16 @@ export interface UseAsyncOptions<ResultT, ErrorT, ArgsT> {
  * }
  * ```
  *
- * @export-in-docs
- * @typeParam ResultT @inherit
+ * @typeParam ResultT {@inheritTypeParam useAsync}
  */
-interface OnSuccess<ResultT> {
+export interface UseAsyncOnSuccess<ResultT> {
     (result: ResultT): void;
 }
 
 /**
- * @export-in-docs
- * @typeParam ErrorT @inherit
+ * @typeParam ErrorT {@inheritTypeParam useAsync}
  */
-interface OnError<ErrorT> {
+export interface UseAsyncOnError<ErrorT> {
     /**
      * Called when the async function errors
      *
@@ -165,6 +163,7 @@ interface OnError<ErrorT> {
      * ```
      *
      * @param error The error thrown by the async function
+     * @typeParam ErrorT {@inheritTypeParam useAsync}
      */
     (error: ErrorT): void;
 }
@@ -172,8 +171,8 @@ interface OnError<ErrorT> {
 const validOptionKeys = ['trigger', 'args', 'onSuccess', 'onError'];
 
 /**
- * @typeParam ResultT @inherit
- * @typeParam ErrorT @inherit
+ * @typeParam ResultT {@inheritTypeParam useAsync}
+ * @typeParam ErrorT {@inheritTypeParam useAsync}
  */
 export type UseAsyncReturnObject<ResultT, ErrorT> = {
     /**
@@ -215,10 +214,7 @@ export type UseAsyncReturnObject<ResultT, ErrorT> = {
     reset: () => void;
 };
 
-/**
- * @extract-docs
- */
-interface AsyncFunction<ResultT, ArgsT extends any[]> {
+export interface AsyncFunction<ResultT, ArgsT extends any[]> {
     /**
      * The function that `useAsync` will call. It should return a Promise.
      *
@@ -461,7 +457,7 @@ const comparisonByTrigger = {
  * @typeParam ErrorT The type of the error in the case the promise returned by `fn` rejects
  * @typeParam ArgsT The type of the arguments passed to `fn`.
  *
- * @extract-docs
+ * @extractdocs
  */
 function useAsync<ResultT, ErrorT = any, ArgsT extends any[] = any[]>(
     fn: AsyncFunction<ResultT, ArgsT>,

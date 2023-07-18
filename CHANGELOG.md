@@ -20,6 +20,20 @@
   over the base field.
 * Removed `CurrencyWidget`. Usages of this can be replaced with `DecimalWidget` or a custom widget.
 * Add `JsonFormatter` and use it as default formatter for `JsonField`.
+* `DateWidget` and `DateTimeWidget` previously accepted the `format` option under the `input` object. This must now be passed at the top level, e.g. `<DateWidget format="..." />` rather than `<DateWidget input={{ format: '...' }} />`.
+* RangeField changes
+  * `RangeField` no longer accepts `bounds` - ranges are assumed to be inclusive.
+  * `RangeField` now requires a `boundsField` to be specified to be used for the lower & upper bounds of the range.
+  * `DateRangeField`, `DateTimeRangeField`, `IntegerRangeField`, `DecimalRangeField`, `FloatRangeField` now all accept a `boundsFieldProps` prop that will be passed to the `boundsField` used. Each
+    of these fields specifies the appropriate `boundsField` to use.
+  * `getFormatterForField` will set the appropriate `boundsFormatter` based on the `boundsField`
+  * `RangeWidget` no longer accepts `ref`. `lowerRef` and `upperRef` can be passed to attach refs to the lower and upper bound inputs.
+* Types for many widgets in `@prestojs/ui-antd` have been updated. Previously, many of the props were typed as `any`. These have been updated to be more specific.
+* `FormField` and `FormItem`, and their associated types, are no longer generic. Previously, they were generic on the value accepted
+  by the `Field` but this caused problems in various situations and provided little benefit. If you were explicitly using the generic 
+  types you will need to remove them.
+* `SelectAsyncChoicesWidget` will now call `asyncChoices.parseValue` for each value in `value` if `multiple` is `true`. Fixes [#186](https://github.com/prestojs/prestojs/issues/186).
+* `Form` incorrectly had `initialValues` type that claimed it supported a viewmodel. This has been removed. Fixes [#172](https://github.com/prestojs/prestojs/issues/172).
 
 ## [0.0.34] - 2022-10-07
 

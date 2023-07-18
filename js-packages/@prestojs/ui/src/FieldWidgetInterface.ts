@@ -10,8 +10,8 @@ import React from 'react';
  * When used with [@prestojs/final-form](/docs/final-form) this will be
  * the props described in the [final-form documentation](https://final-form.org/docs/react-final-form/types/FieldRenderProps).
  *
- * @expand-properties
- * @extract-docs
+ * @expandproperties
+ * @extractdocs
  * @typeParam FieldValueT The type of the value that the widget can accept
  * @typeParam ElementT The HTML element type (where applicable). This is the type
  * used in `FocusEvent` and `ChangeEvent`.
@@ -62,8 +62,8 @@ export interface InputProps<FieldValueT, ElementT extends HTMLElement> {
 }
 
 /**
- * @expand-properties
- * @hide-properties meta choices asyncChoices
+ * @expandproperties
+ * @hideproperties meta choices asyncChoices
  */
 export interface WidgetProps<FieldValue, T extends HTMLElement, SingleValue = FieldValue> {
     /**
@@ -90,27 +90,27 @@ export interface WidgetProps<FieldValue, T extends HTMLElement, SingleValue = Fi
 }
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 export interface RangedWidgetProps<FieldValue, T extends HTMLElement, P> {
     /**
      * Any props you want to pass to the first ("lower") Input of a range. Props available depends on type of range widget being used.
      */
-    lowerInput: P & { className?: string };
+    lowerInput?: P & { className?: string };
     /**
      * Any props you want to pass to the second ("upper") Input of a range. Props available depends on type of range widget being used.
      */
-    upperInput: P & { className?: string };
+    upperInput?: P & { className?: string };
     /**
      * the input coming from form; `value` and `onChange` of it is used by the RangedWidget.
      */
-    input: InputProps<FieldValue, T> & {
+    input: Omit<InputProps<FieldValue, T>, 'value'> & {
         value?: { lower?: FieldValue; upper?: FieldValue; bound?: string };
     };
     /**
      * Separator between two Input elements; defaults to `-`.
      */
-    separator: string;
+    separator?: string;
     /**
      * Any extra details such as field errors, touched status etc. The values here depend on the form
      * library in use. If using [@prestojs/final-form](/docs/final-form/) see [FieldRenderProps](https://final-form.org/docs/react-final-form/types/FieldRenderProps)

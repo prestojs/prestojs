@@ -11,6 +11,28 @@ type Item = {
     description?: RichDescription;
 };
 
+function expandProperties(type: DocType) {
+    if (type.typeName === 'container') {
+        return [
+            ...type.children,
+            ...type.intersections.map(intersection => ({
+                name: '_ignored_',
+                type: intersection,
+                flags: {},
+            })),
+        ];
+    }
+    if (type.typeName === 'union') {
+        let children = [];
+        for (const t of type.types) {
+            // @ts-ignore
+            children.push(...expandProperties(t));
+        }
+        return children;
+    }
+    return [];
+}
+
 export default function TypeTable({
     dataSource,
     attributeHeader = 'Property',
@@ -26,10 +48,7 @@ export default function TypeTable({
 }): React.ReactElement {
     const parameters: Item[] = [];
     for (const param of dataSource) {
-        const children =
-            param.flags.expandProperties && param.type.typeName === 'container'
-                ? param.type.children
-                : null;
+        const children = param.flags.expandProperties ? expandProperties(param.type) : null;
         if (children) {
             const { hideProperties } = param.flags;
             const filteredChildren = hideProperties
@@ -121,7 +140,11 @@ export default function TypeTable({
                         if (property.type.typeName === 'propertiesFrom') {
                             return <span className="text-purple-400">any</span>;
                         }
-                        return <Type type={property.type} mode="COMPACT" />;
+                        const el = <Type type={property.type} mode="COMPACT" />;
+                        // if (property.flags.isRestArg) {
+                        //     return <>{el}[]</>;
+                        // }
+                        return el;
                         // return (
                         //     <TypeNameProvider mode="COMPACT">
                         //         {type ? (

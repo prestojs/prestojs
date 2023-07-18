@@ -1,7 +1,7 @@
 import Field, { FieldProps, ViewModelFieldWidgetProps } from './Field';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 export interface NumberFieldProps<ValueT> extends FieldProps<ValueT> {
     /**
@@ -45,8 +45,8 @@ export interface NumberFieldProps<ValueT> extends FieldProps<ValueT> {
  * ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  * @typeParam ValueT The type of the numeric value. This could be `number` or `string` or some other object (eg. decimal implementation)
  * @typeParam ParsableValueT This the type the field knows how to parse into `ValueT` when constructing a `ViewModel`.
  */

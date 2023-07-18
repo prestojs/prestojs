@@ -4,11 +4,23 @@ import { AsyncChoicesInterface, Choice, useAsyncChoices } from '@prestojs/viewmo
 import { Button, Select } from 'antd';
 import { SelectProps } from 'antd/lib/select';
 import debounce from 'lodash/debounce';
-import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { BaseSelectRef } from 'rc-select';
+import React, {
+    RefObject,
+    useCallback,
+    useEffect,
+    useMemo,
+    useReducer,
+    useRef,
+    useState,
+} from 'react';
 
 type ValueType<T> = T[] | T | null;
 
-type SelectInputProps<T> = Omit<
+/**
+ * @expandproperties
+ */
+export type SelectInputProps<T> = Omit<
     InputProps<ValueType<T>, HTMLSelectElement>,
     'onBlur' | 'onFocus'
 > & {
@@ -18,10 +30,10 @@ type SelectInputProps<T> = Omit<
 };
 
 /**
- * @expand-properties Most [Select](https://ant.design/components/select/) props in addition to the below. Note the
+ * @expandproperties Most [Select](https://ant.design/components/select/) props in addition to the below. Note the
  * following restrictions: `mode` is set to "multiple" when `asyncChoices.multiple` is `true`, `labelInValue` can't be
  * changed, `notFoundContent` is set to `loadingContent` when choices are resolving otherwise `notFoundContent`
- * @hide-properties meta
+ * @hideproperties meta
  */
 export type SelectAsyncChoicesProps<T> = SelectProps<ValueType<T>> &
     Omit<WidgetProps<ValueType<T>, HTMLSelectElement>, 'input' | 'choices' | 'asyncChoices'> & {
@@ -159,6 +171,7 @@ export type SelectAsyncChoicesProps<T> = SelectProps<ValueType<T>> &
          * This defaults to `true`.
          */
         clearOnOpen?: boolean;
+        ref?: RefObject<BaseSelectRef>;
     };
 
 type LabeledValue<T> = { key: T; label: React.ReactNode; found: boolean; missingLabel: boolean };
@@ -270,17 +283,10 @@ type SelectAsyncChoicesWidgetValue = number | string;
 // fails to stop propagation and prevent an invalid change from occurring
 const NEXT_PAGE_VALUE = '__nextpage';
 
-/**
- * A [Select](https://ant.design/components/select/) widget that handles [async choices](doc:AsyncChoicesInterface)
- *
- * @extract-docs
- * @forward-ref
- * @menu-group Widgets
- */
 function SelectAsyncChoicesWidget<
     T extends SelectAsyncChoicesWidgetValue,
     Multiple extends boolean = T extends Array<any> ? true : false
->(props: SelectAsyncChoicesProps<T>, ref): React.ReactElement {
+>(props: Omit<SelectAsyncChoicesProps<T>, 'ref'>, ref): React.ReactElement {
     const {
         input,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -326,11 +332,11 @@ function SelectAsyncChoicesWidget<
             ((response: T): void => {
                 onRetrieveSuccess(response, { input });
             }),
-        onRetrieveError:
-            onRetrieveError &&
-            ((error: Error): void => {
-                onRetrieveError(error, { input });
-            }),
+        onRetrieveError: onRetrieveError
+            ? (error: Error): void => {
+                  onRetrieveError(error, { input });
+              }
+            : error => console.error('Failed to retrieve choice(s)', error),
         listOptions,
         retrieveOptions,
     });
@@ -388,7 +394,9 @@ function SelectAsyncChoicesWidget<
     // case where `choices` has been filtered by a search and no longer includes the
     // currently selected items.
     flattenedItems.push(...lastValue);
-    const rawValue = asyncChoices.parseValue(input.value);
+    const rawValue = Array.isArray(input.value)
+        ? input.value.map(v => asyncChoices.parseValue(v))
+        : asyncChoices.parseValue(input.value);
     let value;
     // When dealing with multi-select any existing values that are selected
     // but aren't in the returned data (eg. they aren't on the current page)
@@ -532,4 +540,15 @@ function SelectAsyncChoicesWidget<
     );
 }
 
-export default React.forwardRef(SelectAsyncChoicesWidget);
+/**
+ * A [Select](https://ant.design/components/select/) widget that handles [async choices](doc:AsyncChoicesInterface)
+ *
+ * @extractdocs
+ * @forwardref
+ * @menugroup Widgets
+ */
+export default React.forwardRef(SelectAsyncChoicesWidget) as <
+    T extends SelectAsyncChoicesWidgetValue
+>(
+    props: SelectAsyncChoicesProps<T>
+) => React.ReactElement;

@@ -45,6 +45,9 @@ type FieldPathInner<
           }>
       ];
 
+/**
+ * @typename string|string[]
+ */
 export type FieldPath<
     T extends ViewModelConstructor<any, any>,
     R extends ExtractRelatedFields<T> = ExtractRelatedFields<T>
@@ -62,7 +65,7 @@ export type FieldPath<
       }>;
 
 /**
- * @type-name '*'|[string|string[]][]
+ * @typename '*'|[string|string[]][]
  */
 export type FieldPaths<
     T extends ViewModelConstructor<any, any>,
@@ -113,7 +116,7 @@ export type FieldDataMappingRaw<T extends FieldsMapping> = {
 };
 
 /**
- * @type-name string
+ * @typename string
  */
 export type ExtractFieldNames<FieldMappingType extends FieldsMapping> = Extract<
     keyof FieldMappingType,
@@ -180,10 +183,9 @@ export function flattenFieldPath<
 }
 
 /**
- * @expand-properties
- * @export-in-docs
+ * @expandproperties
  */
-interface ViewModelOptions<
+export interface ViewModelOptions<
     T extends FieldsMapping,
     PkFieldNameT extends ExtractFieldNames<T> | ExtractFieldNames<T>[]
 > {
@@ -192,7 +194,7 @@ interface ViewModelOptions<
      *
      * When calling `augment` this is set the augmented class.
      *
-     * @type-name Class
+     * @typename Class
      */
     baseClass?: ViewModelConstructor<any, any>;
     /**
@@ -202,7 +204,7 @@ interface ViewModelOptions<
      * Only `pkFieldName` or `getImplicitPkField` should be provided. If neither are provided then
      * a field called `id` will be used and created if not provided in `fields`.
      *
-     * @type-name string|string[]
+     * @typename string|string[]
      */
     pkFieldName: PkFieldNameT;
 }
@@ -257,8 +259,8 @@ type ViewModelInterfaceInputData<
  * }
  * ```
  *
- * @extract-docs
- * @menu-group Errors
+ * @extractdocs
+ * @menugroup Errors
  */
 export class MissingFieldsError extends Error {
     /**
@@ -305,12 +307,49 @@ export class MissingFieldsError extends Error {
 }
 
 /**
- * The base class all ViewModel classes will extend.
+ * The base class all ViewModel classes will extend. See [viewModelFactory](doc:viewModelFactory) for how ViewModel
+ * classes are created.
  *
  * If you use the [baseClass](doc:viewModelFactory##method-viewmodel) option the class passed must extend
  * `BaseViewModel`.
  *
- * @extract-docs
+ * ## Types
+ *
+ * ### PartialViewModel
+ *
+ * This is a type used to represent a ViewModel with some or fields set. It still refers to an instance of `BaseViewModel`,
+ * but also specifies as part of the type which fields are set. If you see this in the documentation know that it is just
+ * an instance of a `ViewModel`.
+ *
+ * You can use it in your own types. For example, this is a function that returns a list of User records, but allows you
+ * to specify which fields to return:
+ *
+ * ```typescript
+ * function getList<T extends PartialViewModel<typeof User>>(
+ *     cache: ViewModelCache<typeof User>,
+ *     result?: T[] | null,
+ *     fieldNames?: (keyof typeof User['fields'])[]
+ * ): T[] => {
+ *     if (!result) {
+ *         return [];
+ *     }
+ *     if (!fieldNames) {
+ *         return cache.getList(result, true);
+ *     }
+ *     return cache.getList(
+ *         result.map(r => r._key),
+ *         fieldNames,
+ *         true
+ *     );
+ * }
+ * ```
+ *
+ * ### ViewModelConstructor
+ *
+ * This is a type used to represent the class of a ViewModel itself. Where this is used it's expected you pass
+ * it the ViewModel class itself rather than an instance.
+ *
+ * @extractdocs
  */
 export class BaseViewModel<
     FieldMappingType extends FieldsMapping,
@@ -326,6 +365,8 @@ export class BaseViewModel<
 
     /**
      * Return the data for this record as a plain object
+     *
+     * @returntypename Record<string, any>
      */
     toJS(): {
         readonly [K in AssignedFieldNames]: FieldMappingType[K]['__fieldValueType'];
@@ -346,6 +387,8 @@ export class BaseViewModel<
      * - If the records were initialised with a different set of fields then they are
      *   considered different even if the common fields are the same and other fields are
      *   all null
+     *
+     *   @param record The record to compare to
      */
     isEqual(record: ViewModelInterface<any, any> | null): boolean {
         if (!record) {
@@ -370,10 +413,11 @@ export class BaseViewModel<
      * Clone this record, optionally with only a subset of the fields
      *
      * Will throw [MissingFieldsError](doc:MissingFieldsError) if any of the requested
-     * field names are missing.
+     * field names are not set on the record.
      *
      * @param fieldNames The names of fields to clone. Can be specified as an array of flat field names, '*'
      * for all fields or nested notation when dealing with relations eg. `[['relationName', 'relationFieldName']]`
+     * @typeParam CloneFieldNames The names of the fields that are to be cloned.
      */
     clone<CloneFieldNames extends ExtractFieldNames<FieldMappingType>>(
         fieldNames?:
@@ -502,7 +546,7 @@ export class BaseViewModel<
      * // Jon Snow
      * ```
      *
-     * @type-name {[fieldName: string]: Field}
+     * @typename {[fieldName: string]: Field}
      */
     get _f(): {
         readonly [K in AssignedFieldNames]: RecordBoundField<
@@ -541,6 +585,17 @@ export class BaseViewModel<
         return this.__recordBoundFields;
     }
 
+    /**
+     * Instantiate the ViewModel with the specified data.
+     *
+     * Data for `RelatedViewModelField` and `ManyRelatedViewModelField` fields will be transformed into the corresponding
+     * ViewModel instances, and the `sourceFieldName` for each will be set to the corresponding id(s)
+     *
+     * @param data The data to assign to the ViewModel. The accepted keys here match the fields the ViewModel was
+     * created with.
+     *
+     * @paramtypename data Record<string, any>
+     */
     constructor(data: {
         [K in AssignedFieldNames]: FieldMappingType[K]['__parsableValueType'];
     }) {
@@ -820,7 +875,7 @@ export class BaseViewModel<
      * The assigned data for this record. You usually don't need to access this directly; values
      * for a field can be retrieved from the record directly using the field name
      *
-     * @type-name Object
+     * @typename Object
      */
     readonly _data: {
         [k in AssignedFieldNames]: FieldMappingType[k]['__fieldValueType'];
@@ -829,7 +884,7 @@ export class BaseViewModel<
     /**
      * List of field names with data available on this instance.
      *
-     * @type-name string[]
+     * @typename string[]
      */
     readonly _assignedFields: string[];
 
@@ -839,7 +894,7 @@ export class BaseViewModel<
      * A deep field is a field that is a relation to another model and is represented as an array, eg.
      * `['group', 'name']` would be the the `name` field on the `group` relation.
      *
-     * @type-name string[]
+     * @typename string[]
      */
     readonly _assignedFieldsDeep: FieldPath<ViewModelConstructor<FieldMappingType, PkFieldType>>[];
 
@@ -855,7 +910,7 @@ export class BaseViewModel<
      * Returns the primary key value(s) for this instance. This is to conform to the
      * [Identifiable](doc:Identifiable) interface.
      *
-     * @type-name PkFieldType
+     * @typename PkFieldType
      */
     get _key(): PkFieldType extends string
         ? FieldMappingType[PkFieldType]['__fieldValueType']
@@ -903,7 +958,7 @@ export type ViewModelInterface<
  * </Alert>
  *
  * @param object The object to check
- * @extract-docs
+ * @extractdocs
  */
 export function isViewModelInstance<T extends ViewModelInterface<any, any, any>>(
     object: any
@@ -932,16 +987,17 @@ export function isViewModelInstance<T extends ViewModelInterface<any, any, any>>
  *
  * @param cls The class to check
  *
- * @extract-docs
+ * @extractdocs
  */
 export function isViewModelClass<T extends ViewModelConstructor<any, any>>(cls: any): cls is T {
     return !!(cls && cls.prototype instanceof BaseViewModel);
 }
 
 /**
- * @type-name ViewModel Class
+ * @typename ViewModel Class
+ * @typeParam FieldMappingType The fields for the ViewModel as an object mapping field names to field instances
  *
- * @extract-docs
+ * @extractdocs
  */
 export interface ViewModelConstructor<
     FieldMappingType extends FieldsMapping,
@@ -1028,14 +1084,14 @@ export interface ViewModelConstructor<
      * If `options.pkFieldName` is not specified a field will be created from `options.getImplicitPk`
      * if provided otherwise a default field with name 'id' will be created.
      *
-     * @type-name string
+     * @typename string
      */
     readonly pkFieldName: PkFieldType;
 
     /**
      * Shortcut to get pkFieldName as an array always, even for non-compound keys
      *
-     * @type-name string[]
+     * @typename string[]
      */
     readonly pkFieldNames: PkFieldType extends string ? [PkFieldType] : PkFieldType;
 
@@ -1043,18 +1099,22 @@ export interface ViewModelConstructor<
      * Shortcut to get the names of all fields excluding primary keys.
      *
      * If you want all fields including primary key use `allFieldNames`
+     *
+     * @typename string[]
      */
     readonly fieldNames: ExtractFieldNames<FieldMappingType>[];
 
     /**
      * Shortcut to get all field names including primary keys
+     *
+     * @typename string[]
      */
     readonly allFieldNames: ExtractFieldNames<FieldMappingType>[];
 
     /**
      * Shortcut to get the names of all relation fields
      *
-     * @type-name string[]
+     * @typename string[]
      */
     readonly relationFieldNames: Extract<
         keyof ExtractRelatedFields<ViewModelConstructor<FieldMappingType, PkFieldType>>,
@@ -1115,7 +1175,7 @@ export interface ViewModelConstructor<
      *   email: new EmailField({
      *     label: 'Email',
      *   }),
-     * }) {
+     * }, {pkFieldName: 'id'}) {
      *   static label = 'User';
      *   static labelPlural = 'Users';
      * }
@@ -1283,13 +1343,17 @@ function checkReservedFieldNames(fields): void {
 /**
  * Thrown when attempting to access a field that does not exist on a ViewModel
  *
- * @extract-docs
- * @menu-group Errors
+ * @extractdocs
+ * @menugroup Errors
  */
 export class InvalidFieldError extends Error {}
 
 /**
- * Creates a ViewModel class with the specified fields.
+ * Factory for creating ViewModel classes from the specified fields and options.
+ *
+ * > See the [ViewModels guide](/docs/getting-started/viewmodel) getting started guide
+ *
+ * ## Usage overview
  *
  * ```js
  * const fields = {
@@ -1319,9 +1383,11 @@ export class InvalidFieldError extends Error {}
  * ```
  *
  * @param fields A map of field name to an instance of `Field`
- * @extract-docs
+ * @extractdocs
  * @returns A class that extends [BaseViewModel](doc:BaseViewModel)
- * @return-type-name ViewModelClass
+ * @returntypename ViewModelClass
+ * @typeParam FieldMappingType The fields for the ViewModel
+ * @typeParam PkFieldNameT The primary key field name(s)
  */
 export default function viewModelFactory<
     FieldMappingType extends FieldsMapping,
@@ -1622,6 +1688,8 @@ export type PartialViewModel<
 
 /**
  * Extracts the parseable type for primary key on a ViewModel
+ *
+ * @typename PkType
  */
 export type ExtractPkFieldParseableValueType<T extends ViewModelConstructor<any, any>> =
     T['pkFieldName'] extends string

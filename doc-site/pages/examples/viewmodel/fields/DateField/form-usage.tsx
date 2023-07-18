@@ -26,7 +26,7 @@
  * ```
  *
  * @wide
- * @min-height 320
+ * @min-height 321
  */
 import { Form } from '@prestojs/final-form';
 import { AntdUiProvider, FormItemWrapper, FormWrapper, getWidgetForField } from '@prestojs/ui-antd';

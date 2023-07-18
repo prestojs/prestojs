@@ -7,7 +7,7 @@ export default function Basic() {
             <DateFormatter value="2020-01-01" />
             <hr />
             <strong>
-                Use <code>localOptions</code> to control format for outputted date
+                Use <code>localeOptions</code> to control format for outputted date
             </strong>
             <DateFormatter
                 value="2020-01-01"

@@ -5,7 +5,7 @@ import { TopLevelUiContextValue, UiContext } from './UiProvider';
  * Returns getWidgetForField and getFormatterForField methods provided
  * by UiProvider
  *
- * @extract-docs
+ * @extractdocs
  */
 export default function useUi(): TopLevelUiContextValue {
     const context = useContext(UiContext);

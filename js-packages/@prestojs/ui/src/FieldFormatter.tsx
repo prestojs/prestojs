@@ -3,11 +3,11 @@ import React from 'react';
 import useUi from './useUi';
 
 /**
- * @expand-properties Any extra props are passed directly through to the formatter component.
+ * @expandproperties Any extra props are passed directly through to the formatter component.
  */
-type FieldFormatterProps<FieldValueT, ParsableValueT, SingleValueT> = {
+export type FieldFormatterProps<FieldValueT, ParsableValueT, SingleValueT> = {
     /**
-     * The field used to determine the formatter to use. If field is [bound to the record](doc:viewModelFactory#Accessors-_f)
+     * The [Field](doc:Field) used to determine the formatter to use. If field is [bound to the record](doc:viewModelFactory#Accessors-_f)
      * then `value` is not required and will be set to `field.value`.
      */
     field: Field<FieldValueT, ParsableValueT, SingleValueT>;
@@ -79,7 +79,7 @@ type FieldFormatterProps<FieldValueT, ParsableValueT, SingleValueT> = {
  *     Note that it's up to the underlying formatter returned by `getFormatterForField` to support any extra props.
  * </Usage>
  *
- * @extract-docs
+ * @extractdocs
  */
 export default function FieldFormatter<FieldValueT, ParsableValueT, SingleValueT>(
     props: FieldFormatterProps<FieldValueT, ParsableValueT, SingleValueT>

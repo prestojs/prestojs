@@ -12,9 +12,9 @@ type EncodeDecode = [Decode, Encode];
 type ParamsEncodeDecode = Record<string, EncodeDecode | Decode>;
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type Options = {
+export type UseUrlQueryStateOptions = {
     /**
      * An object mapping a key name to either a 2-tuple of a decode & encode function or
      * a single decode function.
@@ -294,11 +294,11 @@ const DEFAULT_PARAMS = {};
  * <ExampleUrlSyncControlled />
  * ```
  *
- * @extract-docs
+ * @extractdocs
  */
 export default function useUrlQueryState(
     initialState: {} = {},
-    options: Options = {}
+    options: UseUrlQueryStateOptions = {}
 ): [
     /**
      * The current query state

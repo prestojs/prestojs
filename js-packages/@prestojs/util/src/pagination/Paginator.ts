@@ -1,7 +1,7 @@
 /**
  * An object containing the below properties in addition to those accepted by [fetch init](https://developer.mozilla.org/en-US/docs/Web/API/fetch#parameters)
  *
- * @expand-properties
+ * @expandproperties
  */
 export type PaginatorRequestOptions = Omit<RequestInit, 'headers'> & {
     /**
@@ -22,7 +22,7 @@ export type PaginatorRequestOptions = Omit<RequestInit, 'headers'> & {
 /**
  * eg. the return value from [Endpoint.execute](doc:Endpoint#method-execute)
  *
- * @expand-properties
+ * @expandproperties
  */
 export type PaginationRequestDetails = {
     /**
@@ -75,8 +75,9 @@ export type PaginationRequestDetails = {
  * See [PageNumberPaginator](doc:PageNumberPaginator), [CursorPaginator](doc:CursorPaginator), [LimitOffsetPaginator](doc:LimitOffsetPaginator),
  * and [InferredPaginator](doc:InferredPaginator) for concrete implementations.
  *
- * @typeParam State Type representing the state of the pagination
+ * @typeParam State Type representing the state of the pagination. This is the state that would be serialized (eg. to the URL) and restored when the paginator is created (contrast this to `InternalState` which isn't).
  * @typeParam InternalState Type representing the internal state of the pagination. Internal state refers to state that does not need to be restored (eg. pagination details from the URL for example)
+ *
  */
 export interface PaginatorInterface<State = {}, InternalState = {}> {
     currentState: State;
@@ -106,6 +107,9 @@ export interface PaginatorInterfaceClass<T extends PaginatorInterface = Paginato
     getPaginationState(requestDetails: PaginationRequestDetails): Record<string, any> | false;
 }
 
+/**
+ * @typeparam State {@inheritTypeParam PaginatorInterface}
+ */
 export type PaginatorStatePair<State> = [
     State,
     (value: State | ((prevState: State) => State)) => void
@@ -156,10 +160,10 @@ export type PaginatorStatePair<State> = [
  *     See [usePaginator](doc:usePaginator) for using a paginator within a React component.
  * </Usage>
  *
- * @menu-group Pagination
- * @extract-docs
- * @typeParam State Type representing the state of the pagination. This is the state that would be serialized (eg. to the URL) and restored when the paginator is created (contrast this to `InternalState` which isn't).
- * @typeParam InternalState Type representing the internal state of the pagination. Internal state refers to state that does not need to be restored (eg. pagination details from the URL for example)
+ * @menugroup Pagination
+ * @extractdocs
+ * @typeParam State  {@inheritTypeParam PaginatorInterface}
+ * @typeParam InternalState {@inheritTypeParam PaginatorInterface}
  */
 export default abstract class Paginator<State extends {}, InternalState extends {}>
     implements PaginatorInterface<State, InternalState>

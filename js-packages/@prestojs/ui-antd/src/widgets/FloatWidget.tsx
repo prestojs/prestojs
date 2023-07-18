@@ -2,11 +2,17 @@ import React from 'react';
 import NumberWidget, { NumberWidgetProps } from './NumberWidget';
 
 /**
- * @expand-properties
- * @hide-properties meta
+ * @expandproperties
+ * @hideproperties meta
  */
-type FloatWidgetProps = NumberWidgetProps<number>;
+export type FloatWidgetProps = NumberWidgetProps<number>;
 
+function FloatWidget(
+    props: Omit<FloatWidgetProps, 'ref'>,
+    ref: React.RefObject<HTMLInputElement>
+): React.ReactElement {
+    return <NumberWidget<number> ref={ref} {...props} />;
+}
 /**
  * Form widget for string values that renders as a [InputNumber](https://4x.ant.design/components/input-number/).
  *
@@ -23,16 +29,9 @@ type FloatWidgetProps = NumberWidgetProps<number>;
  * ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- * @hide-properties meta
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ * @hideproperties meta
  */
-function FloatWidget(
-    props: FloatWidgetProps,
-    ref: React.RefObject<HTMLInputElement>
-): React.ReactElement {
-    return <NumberWidget<number> ref={ref} {...props} />;
-}
-
-export default React.forwardRef(FloatWidget);
+export default React.forwardRef(FloatWidget) as (props: FloatWidgetProps) => React.ReactElement;

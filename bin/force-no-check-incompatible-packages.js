@@ -7,8 +7,8 @@ var semver = require('semver');
 
 const ADDED_STR = '// @ts-nocheck\n\n';
 const FILES = [
-    ['@ant-design/react-slick/types.d.ts', '0.28.4'],
-    ['rc-virtual-list/lib/List.d.ts', '3.4.8'],
+    // ['@ant-design/react-slick/types.d.ts', '0.28.4'],
+    // ['rc-virtual-list/lib/List.d.ts', '3.4.8'],
 ];
 
 async function addTsNoCheck([file, packageVersion]) {

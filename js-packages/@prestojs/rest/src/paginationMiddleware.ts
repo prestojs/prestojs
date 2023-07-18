@@ -25,9 +25,9 @@ type GetPaginationState = (
 ) => Record<string, any> | false;
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type PaginationMiddlewareOptions = {
+export type PaginationMiddlewareOptions = {
     /**
      * Function that returns the state for a paginator based on the response. If not provided
      * uses the static `getPaginationState` method on the `paginatorClass`. You can use this method if your backend needs
@@ -233,8 +233,8 @@ Data received:\n`,
  * @param paginatorClass The pagination class to use. Defaults to [InferredPaginator](doc:InferredPaginator).
  * @returns The middleware object to be passed to the [Endpoint](doc:Endpoint) `middleware` option.
  *
- * @extract-docs
- * @menu-group Middleware
+ * @extractdocs
+ * @menugroup Middleware
  */
 export default function paginationMiddleware<T>(
     paginatorClass: PaginatorInterfaceClass = InferredPaginator,

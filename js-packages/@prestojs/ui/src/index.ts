@@ -30,6 +30,9 @@ import type {
     UiProviderProps,
 } from './UiProvider';
 
+export type { FieldFormatterProps } from './FieldFormatter';
+export type { FieldWidgetProps } from './FieldWidget';
+
 export type {
     WidgetProps,
     RangedWidgetProps,
@@ -42,3 +45,15 @@ export type {
     TopLevelUiContextValue,
     FormatterComponentDefinition,
 };
+
+export type { BooleanFormatterProps } from './formatters/BooleanFormatter';
+export type { CharFormatterProps } from './formatters/CharFormatter';
+export type { ChoiceFormatterProps } from './formatters/ChoiceFormatter';
+export type { DateFormatterProps } from './formatters/DateFormatter';
+export type { DateTimeFormatterProps } from './formatters/DateTimeFormatter';
+export type { ImageFormatterProps } from './formatters/ImageFormatter';
+export type { JsonFormatterProps } from './formatters/JsonFormatter';
+export type { LinkFormatterProps } from './formatters/LinkFormatter';
+export type { NumberFormatterProps } from './formatters/NumberFormatter';
+export type { RangeValue, RangeFormatterProps } from './formatters/RangeFormatter';
+export type { TimeFormatterProps } from './formatters/TimeFormatter';

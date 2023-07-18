@@ -2,7 +2,7 @@ import { compile, Key, PathFunction, pathToRegexp } from 'path-to-regexp';
 import qs from 'query-string';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 export interface UrlPatternResolveOptions {
     /**
@@ -66,7 +66,7 @@ export interface UrlPatternResolveOptions {
  * // /users/5/addresses/
  * ```
  *
- * @extract-docs
+ * @extractdocs
  */
 export default class UrlPattern {
     /**

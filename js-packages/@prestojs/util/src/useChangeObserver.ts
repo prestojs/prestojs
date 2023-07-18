@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef } from 'react';
 import { isEqual as defaultIsEqual } from './comparison';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 export type ChangeObserverOptions<T> = {
     /**
@@ -56,7 +56,7 @@ const NOT_SET = Symbol.for('useChangeObserver/NOT_SET');
  *
  * @return Has no return value
  *
- * @extract-docs
+ * @extractdocs
  */
 export default function useChangeObserver<T>(
     value: T,

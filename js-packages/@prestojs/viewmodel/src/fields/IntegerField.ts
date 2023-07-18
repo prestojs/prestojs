@@ -33,8 +33,8 @@ import NumberField from './NumberField';
  *
  * </Usage>
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  */
 export default class IntegerField extends NumberField<number, string | number> {
     static fieldClassName = 'IntegerField';

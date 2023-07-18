@@ -1,4 +1,4 @@
-import { Field } from '@prestojs/viewmodel';
+import { Field, RangeField } from '@prestojs/viewmodel';
 import React from 'react';
 import type { FormatterComponentDefinition } from './UiProvider';
 
@@ -38,17 +38,13 @@ const mapping = new Map<string, any>([
     ['BooleanField', BooleanFormatter],
     ['CharField', CharFormatter],
     ['DateField', DateFormatter],
-    ['DateRangeField', [RangeFormatter, { baseFormatter: DateFormatter }]],
     ['DateTimeField', DateTimeFormatter],
-    ['DateTimeRangeField', [RangeFormatter, { baseFormatter: DateTimeFormatter }]],
     ['DecimalField', NumberFormatter],
     ['EmailField', CharFormatter],
     ['FileField', LinkFormatter],
     ['FloatField', NumberFormatter],
-    ['FloatRangeField', [RangeFormatter, { baseFormatter: NumberFormatter }]],
     ['ImageField', ImageFormatter],
     ['IntegerField', NumberFormatter],
-    ['IntegerRangeField', [RangeFormatter, { baseFormatter: NumberFormatter }]],
     ['JsonField', JsonFormatter],
     ['NumberField', NumberFormatter],
     ['TextField', CharFormatter],
@@ -74,15 +70,25 @@ const choicesMapping = new Map<string, any>([
  * > this otherwise it is recommended to implement your own version (you can copy [this implementation](https://github.com/prestojs/prestojs/blob/master/js-packages/@prestojs/ui/src/getFormatterForField.ts)
  * > as a starting point).
  *
- * @extract-docs
+ * @param field The field to get the formatter for
+ *
+ * @extractdocs
  */
 export default function getFormatterForField<FieldValue, ParsableValueT, SingleValueT>(
     field: Field<FieldValue, ParsableValueT, SingleValueT>
 ): FormatterComponentDefinition<FieldValue> | null {
     const { fieldClassName } = Object.getPrototypeOf(field).constructor;
-    const formatter: React.FunctionComponent | string | null | undefined = field.choices
+    let formatter: React.FunctionComponent | string | null | undefined = field.choices
         ? choicesMapping.get(fieldClassName) || mapping.get(fieldClassName)
         : mapping.get(fieldClassName);
+    if (!formatter && field instanceof RangeField) {
+        const _boundsFieldFormatter = getFormatterForField(field.boundsField);
+        const [boundsFormatter, boundsFormatterProps] = Array.isArray(_boundsFieldFormatter)
+            ? _boundsFieldFormatter
+            : [_boundsFieldFormatter, {}];
+        // @ts-ignore
+        formatter = [RangeFormatter, { boundsFormatter, boundsFormatterProps }];
+    }
 
     const getReturnWithChoices = (
         w: FormatterComponentDefinition<FieldValue>,

@@ -3,12 +3,18 @@ import { Field } from '@prestojs/viewmodel';
 import React from 'react';
 import { Field as FinalFormField, FieldProps } from 'react-final-form';
 
-export type FormFieldPropsWithField<T> = Omit<FieldProps<any, any>, 'name'> & {
-    field: Field<T>;
+/**
+ * @expandproperties
+ */
+export type FormFieldPropsWithField = Omit<FieldProps<any, any>, 'name'> & {
+    field: Field<any, any, any>;
     widgetProps?: Record<any, any>;
 };
 
-export type FormFieldProps<T> = FieldProps<any, any> | FormFieldPropsWithField<T>;
+/**
+ * @expandproperties
+ */
+export type FormFieldProps = FieldProps<any, any> | FormFieldPropsWithField;
 
 /**
  * Wrapper around Field from react-final-form that determines the widget to use based on the field.
@@ -30,14 +36,14 @@ export type FormFieldProps<T> = FieldProps<any, any> | FormFieldPropsWithField<T
  * @param fieldProps Any other props to pass through to [Field](https://final-form.org/docs/react-final-form/api/Field)
  *
  * @rest-prop-name fieldProps
- * @extract-docs
+ * @extractdocs
  */
-export default function FormField<T>({
+export default function FormField({
     field,
     widgetProps,
     name,
     ...fieldProps
-}: FormFieldProps<T>): React.ReactElement {
+}: FormFieldProps): React.ReactElement {
     const requireModelWidget = !fieldProps.component && !fieldProps.render && !fieldProps.children;
     if (!requireModelWidget && widgetProps) {
         // eslint-disable-next-line no-console

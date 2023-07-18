@@ -6,7 +6,7 @@
  * ```
  *
  * @param value The value to check if appears to be a promise
- * @extract-docs
+ * @extractdocs
  */
 export function isPromise(value: any): value is Promise<any> {
     return Boolean(

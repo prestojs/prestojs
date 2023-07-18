@@ -25,32 +25,4 @@ yarn add @prestojs/util @prestojs/viewmodel
 
 ## Usage
 
-Create a `ViewModel` using [viewModelFactory](doc:viewModelFactory), for example:
-
-```js
-import { BooleanField, CharField, EmailField, viewModelFactory } from '@prestojs/viewmodel';
-
-export class User extends viewModelFactory(
-    {
-        id: new NumberField(),
-        firstName: new CharField(),
-        lastName: new CharField(),
-        email: new EmailField(),
-        isActive: new BooleanField({ label: 'Active?' }),
-        contactType: new CharField({
-            defaultValue: 'lead',
-            choices: [
-                ['lead', 'Lead'],
-                ['contact', 'Contact'],
-            ],
-        }),
-    },
-    { pkFieldName: 'id' }
-) {
-    static label = 'User';
-    static labelPlural = 'Users';
-}
-```
-
-You can cache instances with [ViewModelCache](doc:ViewModelCache) and read from the cache in
-components using [useViewModelCache](doc:useViewModelCache).
+See the [ViewModel getting started guide](/docs/getting-started/viewmodel).

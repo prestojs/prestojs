@@ -32,8 +32,8 @@ import NumberField from './NumberField';
  * </Alert>
  * </Usage>
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  */
 export default class FloatField extends NumberField<number, string | number> {
     static fieldClassName = 'FloatField';

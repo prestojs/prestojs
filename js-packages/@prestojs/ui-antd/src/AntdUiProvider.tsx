@@ -28,7 +28,7 @@ export type TimePickerComponent<T> =
     | LazyExoticComponent<_TimePickerComponent<T>>;
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 interface AntdUiConfigComponents {
     /**
@@ -50,9 +50,9 @@ interface AntdUiConfigComponents {
  *
  * To get the current config use [useAntdUiConfig](doc:useAntdUiConfig).
  *
- * @extract-docs
- * @menu-group Configuration
- * @hide-constructor
+ * @extractdocs
+ * @menugroup Configuration
+ * @hideconstructor
  */
 export class AntdUiConfig {
     private components: AntdUiConfigComponents;
@@ -73,7 +73,7 @@ export class AntdUiConfig {
      * }
      * ```
      *
-     * @return-type-name DatePickerComponent
+     * @returntypename DatePickerComponent
      * @returns {DatePickerComponent} This returns the `datePickerComponent` passed to [AntdUiProvider](doc:AntdUiProvider) or throws an error if no `datePickerComponent` has been defined.
      */
     getDatePicker<T>(): DatePickerComponent<T> {
@@ -106,7 +106,7 @@ consider using one of the suggested alternatives instead.
      * }
      * ```
      *
-     * @return-type-name DatePickerComponent
+     * @returntypename DatePickerComponent
      * @returns {DatePickerComponent} This returns the `timePickerComponent` passed to [AntdUiProvider](doc:AntdUiProvider) or throws an error if no `timePickerComponent` has been defined.
      */
     getTimePicker<T>(): TimePickerComponent<T> {
@@ -144,8 +144,8 @@ export const AntdUiContext = React.createContext<AntdUiConfig | null>(null);
  * ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Configuration
+ * @extractdocs
+ * @menugroup Configuration
  */
 export function useAntdUiConfig(): AntdUiConfig {
     const context = useContext(AntdUiContext);
@@ -158,7 +158,7 @@ export function useAntdUiConfig(): AntdUiConfig {
 }
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 export type AntdUiProviderProps = {
     /**
@@ -260,8 +260,8 @@ export type AntdUiProviderProps = {
  * > this otherwise it is recommended to implement your own version of [getWidgetForField](doc:getWidgetForField) and
  * > [getFormatterForField](doc:getFormatterForField).
  *
- * @extract-docs
- * @menu-group Configuration
+ * @extractdocs
+ * @menugroup Configuration
  */
 export default function AntdUiProvider(props: AntdUiProviderProps): React.ReactElement {
     const { datePickerComponent, timePickerComponent, ...rest } = props;

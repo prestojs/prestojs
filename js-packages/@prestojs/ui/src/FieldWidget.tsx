@@ -4,9 +4,19 @@ import { RangedWidgetProps, WidgetProps } from './FieldWidgetInterface';
 import useUi from './useUi';
 
 /**
+ * @expandproperties
+ */
+export type FieldWidgetProps<FieldValue, ParsableValueT, SingleValueT, T extends HTMLElement> = (
+    | RangedWidgetProps<FieldValue, T, any>
+    | WidgetProps<FieldValue, T>
+) & {
+    field: Field<FieldValue, ParsableValueT, SingleValueT>;
+};
+
+/**
  * Wraps around getWidgetForField to always return ReactElement; Applies default props from getWidgetForField if any.
  *
- * @extract-docs
+ * @extractdocs
  */
 export default function FieldWidget<
     FieldValue,
@@ -16,9 +26,7 @@ export default function FieldWidget<
 >({
     field,
     ...rest
-}: (RangedWidgetProps<FieldValue, T, any> | WidgetProps<FieldValue, T>) & {
-    field: Field<FieldValue, ParsableValueT, SingleValueT>;
-}): React.ReactElement | null {
+}: FieldWidgetProps<FieldValue, ParsableValueT, SingleValueT, T>): React.ReactElement | null {
     const { getWidgetForField } = useUi();
 
     const Widget = useMemo(() => getWidgetForField(field), [field, getWidgetForField]);

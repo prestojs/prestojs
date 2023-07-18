@@ -34,9 +34,9 @@ import { EndpointRequestInit, MiddlewareReturn, MiddlewareUrlConfig } from './En
  * ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Middleware
- * @hide-api
+ * @extractdocs
+ * @menugroup Middleware
+ * @hideapi
  */
 export default function requestDefaultsMiddleware<T>(
     next: (urlConfig: MiddlewareUrlConfig, requestInit: RequestInit) => Promise<T>,

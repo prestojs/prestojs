@@ -15,8 +15,8 @@ function identifiableGetId(item: Identifiable | any, fallbackGetId?: (item: any)
 }
 
 /**
- * @typeParam ItemType @inherit
- * @typeParam IdType @inherit
+ * @typeParam ItemType {@inheritTypeParam useAsyncValue}
+ * @typeParam IdType {@inheritTypeParam useAsyncValue}
  */
 export type UseAsyncValueCommonProps<ItemType, IdType extends Id> = {
     /**
@@ -71,9 +71,9 @@ export type UseAsyncValueCommonProps<ItemType, IdType extends Id> = {
 };
 
 /**
- * @expand-properties
- * @typeParam ItemType @inherit
- * @typeParam IdType @inherit
+ * @expandproperties
+ * @typeParam ItemType {@inheritTypeParam useAsyncValue}
+ * @typeParam IdType {@inheritTypeParam useAsyncValue}
  */
 export interface UseAsyncValuePropsSingle<ItemType, IdType extends Id>
     extends UseAsyncValueCommonProps<ItemType, IdType> {
@@ -96,9 +96,9 @@ export interface UseAsyncValuePropsSingle<ItemType, IdType extends Id>
 }
 
 /**
- * @expand-properties
- * @typeParam ItemType @inherit
- * @typeParam IdType @inherit
+ * @expandproperties
+ * @typeParam ItemType {@inheritTypeParam useAsyncValue}
+ * @typeParam IdType {@inheritTypeParam useAsyncValue}
  */
 export interface UseAsyncValuePropsMulti<ItemType, IdType extends Id>
     extends UseAsyncValueCommonProps<ItemType, IdType> {
@@ -179,7 +179,7 @@ export type UseAsyncValueReturn<ReturnItemType> = {
  *
  * For multiple values see documentation below.
  *
- * @extract-docs
+ * @extractdocs
  * @typeParam ItemType The type of the item that matches the id
  * @typeParam IdType The type of the ID (e.g. `number`)
  */

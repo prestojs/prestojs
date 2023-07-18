@@ -23,8 +23,8 @@ export type PaginatorState =
  * * If response contains `limit` then paginator is set to  [LimitOffsetPaginator](LimitOffsetPaginator)
  * * If response contains `total` then paginator is set to [PageNumberPaginator](doc:PageNumberPaginator)
  *
- * @menu-group Pagination
- * @extract-docs
+ * @menugroup Pagination
+ * @extractdocs
  */
 export default class InferredPaginator<
     InferredPaginatorT extends CursorPaginator | PageNumberPaginator | LimitOffsetPaginator =

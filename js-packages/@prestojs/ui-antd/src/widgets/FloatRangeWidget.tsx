@@ -1,8 +1,23 @@
-import { RangedWidgetProps } from '@prestojs/ui';
-import { InputNumber } from 'antd';
-import { InputNumberProps } from 'antd/lib/input-number';
 import React from 'react';
-import RangeWidget from './RangeWidget';
+import FloatWidget, { FloatWidgetProps } from './FloatWidget';
+import RangeWidget, { RangeWidgetProps } from './RangeWidget';
+
+/**
+ * @expandproperties
+ */
+export type FloatRangeWidgetProps = Omit<
+    RangeWidgetProps<number, HTMLInputElement, Omit<FloatWidgetProps, 'input' | 'ref'>>,
+    'inputWidget' | 'lowerInput' | 'upperInput'
+> & {
+    /**
+     * Any props you want to pass to the lower input of the range
+     */
+    lowerInput?: Omit<FloatWidgetProps, 'input' | 'ref'>;
+    /**
+     * Any props you want to pass to the upper input of the range
+     */
+    upperInput?: Omit<FloatWidgetProps, 'input' | 'ref'>;
+};
 
 /**
  * See [InputNumber](https://ant.design/components/input-number/) for props available
@@ -11,25 +26,9 @@ import RangeWidget from './RangeWidget';
  *
  * You may pass in props to be used for the individual input as lowerInput / upperInput
  *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
+ * @extractdocs
+ * @menugroup Widgets
  */
-function FloatRangeWidget(
-    props: RangedWidgetProps<number, HTMLElement, InputNumberProps>,
-    ref: React.RefObject<typeof InputNumber>
-): React.ReactElement {
-    const { lowerInput = {}, upperInput = {}, separator, meta, ...rest } = props;
-    return (
-        <RangeWidget
-            ref={ref}
-            lowerInput={lowerInput}
-            upperInput={upperInput}
-            separator={separator}
-            inputWidget={InputNumber}
-            {...rest}
-        />
-    );
+export default function FloatRangeWidget(props: FloatRangeWidgetProps): React.ReactElement {
+    return <RangeWidget {...props} inputWidget={FloatWidget} />;
 }
-
-export default React.forwardRef(FloatRangeWidget);

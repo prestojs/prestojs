@@ -1,5 +1,6 @@
 import React from 'react';
-import { Signature } from '../newTypes';
+import { DocType, Signature } from '../newTypes';
+import { Section } from '../pages/ClassPageDoc';
 import AnchorLink from './AnchorLink';
 import Description from './Description';
 import FunctionSignature from './FunctionSignature';
@@ -15,10 +16,12 @@ type Props = {
     hideReturnType?: boolean;
     hideParameters?: boolean;
     prologue?: React.ReactNode;
+    properties?: DocType[];
 };
 
 export default function FunctionDocumentation({
     signature,
+    properties,
     excludeParameterNames = [],
     hideTypeParameters,
     hideReturnType,
@@ -42,7 +45,7 @@ export default function FunctionDocumentation({
                 </AnchorLink>
                 <SourceLink sourceLocation={signature.sourceLocation} />
             </div>
-            <Description description={signature.description} />
+            <Description description={signature.description} flags={signature.flags} />
             {prologue}
             {!hideParameters && parameters.length > 0 && (
                 <div className="my-5 overflow-x-auto">
@@ -69,6 +72,23 @@ export default function FunctionDocumentation({
                         </div>
                     )}
                 </div>
+            )}
+            {properties && properties.length > 0 && (
+                <Section title="Properties">
+                    {properties.map((prop, i) => {
+                        if (prop.typeName === 'methodType') {
+                            return (
+                                <div className="py-2" key={prop.name}>
+                                    {prop.signatures.map((sig, i) => (
+                                        <FunctionDocumentation key={i} signature={sig} />
+                                    ))}
+                                </div>
+                            );
+                            console.log('Unhandled prop type', prop);
+                            return null;
+                        }
+                    })}
+                </Section>
             )}
         </>
     );

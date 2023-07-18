@@ -31,8 +31,8 @@ export type Id = SingleId | CompoundId;
  * Implementing this can save you having to pass explicit functions to identify an item in other parts of the system
  * (eg. for [AsyncChoices](doc:AsyncChoices) or [useAsyncValue](doc:useAsyncValue))
  *
- * @extract-docs
- * @menu-group Identifiable
+ * @extractdocs
+ * @menugroup Identifiable
  */
 export interface Identifiable {
     /**
@@ -53,8 +53,8 @@ export interface Identifiable {
  * ```
  *
  * @param item The value to check whether conforms to [Identifiable](doc:Identifiable)
- * @extract-docs
- * @menu-group Identifiable
+ * @extractdocs
+ * @menugroup Identifiable
  */
 export function isIdentifiable(item: any): item is Identifiable {
     if (!item || typeof item !== 'object') {
@@ -79,8 +79,8 @@ export function isIdentifiable(item: any): item is Identifiable {
  * @param fallbackGetId Function to return id for `item` if it doesn't implement Identifiable
  * @returns Either a single id as a number or a string, or a compound id as an object indexed by field name.
  *
- * @extract-docs
- * @menu-group Identifiable
+ * @extractdocs
+ * @menugroup Identifiable
  */
 export function getId(item: Identifiable | any, fallbackGetId?: (item: any) => Id): Id {
     if (isIdentifiable(item)) {
@@ -109,8 +109,8 @@ export function getId(item: Identifiable | any, fallbackGetId?: (item: any) => I
  * // true
  * ```
  *
- * @extract-docs
- * @menu-group Identifiable
+ * @extractdocs
+ * @menugroup Identifiable
  */
 export function hashId(id: string | number | Record<string, any>): string {
     if (id == null) {
@@ -144,8 +144,8 @@ export function hashId(id: string | number | Record<string, any>): string {
  * @param item1 First item to compare
  * @param item2 Second item to compare
  * @param fallbackGetId Function to return id for `item` if it doesn't implement Identifiable
- * @extract-docs
- * @menu-group Identifiable
+ * @extractdocs
+ * @menugroup Identifiable
  */
 export function isSameById(
     item1: Identifiable | any,

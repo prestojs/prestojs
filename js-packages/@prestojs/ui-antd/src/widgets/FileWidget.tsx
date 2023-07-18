@@ -4,7 +4,7 @@ import { isPromise } from '@prestojs/util';
 import { Button, Upload } from 'antd';
 import type { RcFile, UploadFile, UploadFileStatus, UploadProps } from 'antd/es/upload/interface';
 import { file2Obj } from 'antd/lib/upload/utils';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 
 type UploadWidgetInputType = Omit<
     InputProps<File | string | (File | string)[], HTMLElement>,
@@ -14,7 +14,7 @@ type UploadWidgetInputType = Omit<
 };
 
 /**
- * @expand-properties The props from [Upload](https://ant.design/components/upload/#API). Note that `data`, `method`, `headers` and `withCredentials` are ignored as this component doesn't upload immediately.
+ * @expandproperties The props from [Upload](https://ant.design/components/upload/#API). Note that `data`, `method`, `headers` and `withCredentials` are ignored as this component doesn't upload immediately.
  */
 export type UploadWidgetProps<FieldValue, T extends HTMLElement> = Omit<
     WidgetProps<FieldValue, T>,
@@ -56,6 +56,7 @@ export type UploadWidgetProps<FieldValue, T extends HTMLElement> = Omit<
          * Contents to render (eg. upload button etc). If not provided renders default Icon or Button depending on `listType`
          */
         children: React.ReactNode;
+        ref?: RefObject<HTMLElement>;
     };
 
 type FileLike = Blob | File | RcFile | string;
@@ -117,9 +118,9 @@ type UseFileListReturn = {
 };
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type UseFileListOptions = {
+export type UseFileListOptions = {
     /**
      * If true the `thumbUrl` property will be set for each `UploadFile`
      */
@@ -145,8 +146,8 @@ type UseFileListOptions = {
  * @param value The value to convert. This would typically come from the form state.
  * @param options
  *
- * @extract-docs
- * @menu-group Widget Hooks
+ * @extractdocs
+ * @menugroup Widget Hooks
  */
 export function useFileList(
     value: FileLike | FileLike[] | null | undefined,
@@ -289,28 +290,10 @@ export function useFileList(
     return { fileList, updateFileStatus };
 }
 
-/**
- * File upload widget that wraps the antd [Upload](https://ant.design/components/upload/#API) component. Unlike
- * that component this one never uploads immediately - the raw [File](https://developer.mozilla.org/en-US/docs/Web/API/File)
- * object will be passed to `onChange` and it's expected the upload will happen externally (eg. on a form submit).
- *
- * If `multiple` is true then the value passed to `onChange` will be an array of `File` objects or an empty array when clearing the value.
- *
- * If `multiple` is false then the value passed to `onChange` will be a `File` object or `null` when clearing the value.
- *
- * For very custom requirements consider using the [useFileList](doc:useFileList) in a custom component.
- *
- * // TODO: Example: limit
- * // TODO: Example: multiple
- * // TODO: Example: custom children
- * // TODO: Example: drag and drop
- * // TODO: beforeUpload
- *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- */
-function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): React.ReactElement {
+function FileWidget(
+    props: Omit<UploadWidgetProps<File, HTMLInputElement>, 'ref'>,
+    ref
+): React.ReactElement {
     let {
         input,
         children,
@@ -441,4 +424,28 @@ function FileWidget(props: UploadWidgetProps<File, HTMLInputElement>, ref): Reac
         </Upload>
     );
 }
-export default React.forwardRef(FileWidget);
+
+/**
+ * File upload widget that wraps the antd [Upload](https://ant.design/components/upload/#API) component. Unlike
+ * that component this one never uploads immediately - the raw [File](https://developer.mozilla.org/en-US/docs/Web/API/File)
+ * object will be passed to `onChange` and it's expected the upload will happen externally (eg. on a form submit).
+ *
+ * If `multiple` is true then the value passed to `onChange` will be an array of `File` objects or an empty array when clearing the value.
+ *
+ * If `multiple` is false then the value passed to `onChange` will be a `File` object or `null` when clearing the value.
+ *
+ * For very custom requirements consider using the [useFileList](doc:useFileList) in a custom component.
+ *
+ * // TODO: Example: limit
+ * // TODO: Example: multiple
+ * // TODO: Example: custom children
+ * // TODO: Example: drag and drop
+ * // TODO: beforeUpload
+ *
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ */
+export default React.forwardRef(FileWidget) as (
+    props: UploadWidgetProps<File, HTMLInputElement>
+) => React.ReactElement;

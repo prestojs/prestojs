@@ -35,6 +35,9 @@ type GetFormatterForFieldWithNull = <FieldValueT, ParsableValueT, SingleValueT>(
     field: Field<FieldValueT, ParsableValueT, SingleValueT>
 ) => FormatterComponentDefinition | null;
 
+/**
+ * @expandproperties
+ */
 export interface FormItemProps {
     children: React.ReactNode;
     required: boolean;
@@ -74,7 +77,7 @@ export interface TopLevelUiContextValue {
 export const UiContext = React.createContext<UiContextValue | null>(null);
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 export type UiProviderProps = {
     /**
@@ -181,7 +184,7 @@ export type UiProviderProps = {
  * }
  * ```
  *
- * @extract-docs
+ * @extractdocs
  */
 export default function UiProvider(props: UiProviderProps): React.ReactElement {
     const {

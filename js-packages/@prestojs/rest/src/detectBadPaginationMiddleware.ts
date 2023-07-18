@@ -103,8 +103,8 @@ function defaultIsPaginated<T>(
  * `InferredPaginator.getPaginationState` to determine this. If you use custom pagination class(es) you
  * should provide this function.
  *
- * @extract-docs
- * @menu-group Middleware
+ * @extractdocs
+ * @menugroup Middleware
  */
 export default function detectBadPaginationMiddleware<T>(
     isPaginated: IsPaginated<T> = defaultIsPaginated

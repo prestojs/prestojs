@@ -63,6 +63,7 @@ html {
 }
 
 .type-table-type .type-union {
+   align-items: flex-start;
    display: flex;
    flex-direction: column;
 }

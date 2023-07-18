@@ -7,7 +7,7 @@
  *
  * The default formatter for `BooleanField` is [BooleanFormatter](doc:BooleanFormatter).
  *
- * You can pass options for the formatter via the [Field](doc:Field) under the `formatterOptions`
+ * You can pass options for the formatter via the [Field](doc:Field) under the `formatterProps`
  * option. These will be passed through to the formatter component (eg. `trueLabel` & `falseLabel` in
  * this example).
  */

@@ -1,3 +1,8 @@
+/**
+ * Basic usage
+ *
+ * @wide
+ */
 import { NumberFormatter, RangeFormatter } from '@prestojs/ui';
 import React from 'react';
 

@@ -1,18 +1,28 @@
 import { WidgetProps } from '@prestojs/ui';
 import { InputNumber } from 'antd';
-import React, { ComponentProps } from 'react';
+import React, { ComponentProps, RefObject } from 'react';
 
 type ValueType = string | number;
 
 /**
- * @expand-properties
- * @hide-properties meta
+ * @expandproperties
+ * @hideproperties meta
  */
 export type NumberWidgetProps<T extends ValueType = ValueType> = Omit<
     WidgetProps<T | null, HTMLInputElement>,
     'choices' | 'asyncChoices'
 > &
-    Omit<ComponentProps<typeof InputNumber>, 'onChange' | 'value'>;
+    Omit<ComponentProps<typeof InputNumber>, 'onChange' | 'value'> & {
+        ref?: RefObject<HTMLInputElement>;
+    };
+
+function NumberWidget<T extends ValueType = number>(
+    props: Omit<NumberWidgetProps<T>, 'ref'>,
+    ref: React.RefObject<HTMLInputElement>
+): React.ReactElement {
+    const { input, meta, ...rest } = props;
+    return <InputNumber ref={ref} {...input} {...rest} />;
+}
 
 /**
  * Form widget for string values that renders as a [InputNumber](https://4x.ant.design/components/input-number/).
@@ -30,20 +40,11 @@ export type NumberWidgetProps<T extends ValueType = ValueType> = Omit<
  * ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- * @hide-properties meta
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ * @hideproperties meta
  */
-function NumberWidget<T extends ValueType = number>(
-    props: NumberWidgetProps<T>,
-    ref: React.RefObject<HTMLInputElement>
-): React.ReactElement {
-    const { input, meta, ...rest } = props;
-    return <InputNumber ref={ref} {...input} {...rest} />;
-}
-
 export default React.forwardRef(NumberWidget) as <T extends ValueType = number>(
-    props: NumberWidgetProps<T>,
-    ref: React.RefObject<HTMLInputElement>
+    props: NumberWidgetProps<T>
 ) => React.ReactElement;

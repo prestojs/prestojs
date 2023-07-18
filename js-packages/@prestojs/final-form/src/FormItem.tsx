@@ -4,28 +4,74 @@ import React from 'react';
 import { FieldProps } from 'react-final-form';
 import FormField from './FormField';
 
-type CommonProps = {
+/**
+ * @expandproperties
+ */
+export type FormItemCommonProps = {
+    /**
+     * Any help text to display below the field.
+     *
+     * This will be inferred from the [Field](doc:Field) if not specified.
+     *
+     * This can be any React node.
+     */
     help?: React.ReactNode;
+    /**
+     * The label for the field.
+     *
+     * This will be inferred from the [Field](doc:Field) if not specified.
+     */
     label?: React.ReactNode;
+    /**
+     * Whether the field is required or not.
+     *
+     * This will be inferred from the [Field](doc:Field) if not specified.
+     */
     required?: boolean;
 };
 
+/**
+ * @expandproperties
+ * @hideproperties field widgetProps fieldProps
+ */
 export type FormItemPropsNoField = {
     field?: undefined;
     fieldProps?: undefined;
     widgetProps?: undefined;
+    /**
+     * If specified, this will be rendered in place of any inferred widget.
+     */
     children: React.ReactNode;
-} & CommonProps;
+} & FormItemCommonProps;
 
-export type FormItemPropsWithField<T> = {
+/**
+ * @expandproperties
+ * @hideproperties name
+ */
+export type FormItemPropsWithField = {
     name?: undefined;
-    field: Field<T>;
+    /**
+     * The ViewModel [Field](doc:Field) that defaults can be inferred from. Passing this allows
+     * the widget, help text, required state and label to be inferred from the field.
+     */
+    field: Field<any, any, any>;
+    /**
+     * Any props to pass through to the [FormField](doc:FormField) component.
+     *
+     * @typename FieldProps
+     */
     fieldProps?: Omit<FieldProps<any, any>, 'name'>;
+    /**
+     * Any props to pass through to the underlying field widget itself
+     */
     widgetProps?: Record<any, any>;
     children?: React.ReactNode;
-} & CommonProps;
+} & FormItemCommonProps;
 
-export type FormItemProps<T> = (FormItemPropsNoField | FormItemPropsWithField<T>) & {
+/**
+ * @expandproperties
+ */
+export type FormItemProps = (FormItemPropsNoField | FormItemPropsWithField) & {
     [formItemProp: string]: any;
 };
 
@@ -71,9 +117,9 @@ export type FormItemProps<T> = (FormItemPropsNoField | FormItemPropsWithField<T>
  * </Form.Item>
  * ```
  *
- * @extract-docs
+ * @extractdocs
  */
-export default function FormItem<T>(props: FormItemProps<T>): React.ReactElement {
+export default function FormItem(props: FormItemProps): React.ReactElement {
     const { formItemComponent: InnerFormItem } = useUi();
     if (!InnerFormItem) {
         throw new Error(

@@ -7,8 +7,8 @@ import React, { ComponentProps } from 'react';
  * See [UiProvider](/api/@prestojs/ui/UiProvider.html) for how to set this as the default
  * form component for use with [Form](/api/@prestojs/final-form/Form.html).
  *
- * @extract-docs
- * @menu-group Form
+ * @extractdocs
+ * @menugroup Form
  */
 export default function FormWrapper(
     props: ComponentProps<typeof Form> & {

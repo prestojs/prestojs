@@ -3,10 +3,10 @@ import React from 'react';
 import SelectChoicesWidget, { SelectChoicesProps } from './SelectChoicesWidget';
 
 /**
- * @expand-properties
- * @hide-properties asyncChoices
+ * @expandproperties
+ * @hideproperties asyncChoices
  */
-type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElement> & {
+export type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElement> & {
     /**
      * Label to use to represent the blank (null) value.
      *
@@ -15,14 +15,10 @@ type NullableBooleanWidgetProps = WidgetProps<boolean | string, HTMLSelectElemen
     blankLabel: string;
 } & Omit<SelectChoicesProps<boolean | string>, 'choices'>;
 
-/**
- * See [Select](https://ant.design/components/select/) for Select props available
- *
- * @extract-docs
- * @menu-group Widgets
- * @forward-ref
- */
-function NullableBooleanWidget(props: NullableBooleanWidgetProps, ref): React.ReactElement {
+function NullableBooleanWidget(
+    props: Omit<NullableBooleanWidgetProps, 'ref'>,
+    ref
+): React.ReactElement {
     const { choices, blankLabel = 'Undecided', meta, input, ...rest } = props;
     const defaultChoices =
         choices ||
@@ -42,13 +38,20 @@ function NullableBooleanWidget(props: NullableBooleanWidgetProps, ref): React.Re
     return (
         <SelectChoicesWidget
             ref={ref}
+            // @ts-ignore
             choices={newChoices}
             input={{ ...input, onChange }}
             {...rest}
         />
     );
 }
-
-export default React.forwardRef<HTMLSelectElement, NullableBooleanWidgetProps>(
-    NullableBooleanWidget
-);
+/**
+ * See [Select](https://ant.design/components/select/) for Select props available
+ *
+ * @extractdocs
+ * @menugroup Widgets
+ * @forwardref
+ */
+export default React.forwardRef(NullableBooleanWidget) as (
+    props: NullableBooleanWidgetProps
+) => React.ReactElement;

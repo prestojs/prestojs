@@ -12,7 +12,9 @@ export default function Description({ description, flags, shortOnly }: Props) {
     if (!flags?.isDeprecated && (!description || (!description.short && !description.long))) {
         return null;
     }
-
+    if (!description?.short) {
+        shortOnly = false;
+    }
     return (
         <>
             {description?.short && <PrecompiledMarkdown code={description.short} />}

@@ -7,7 +7,7 @@
  *
  * The default formatter for `NumberField` is [NumberFormatter](doc:NumberFormatter).
  *
- * You can pass options for the formatter via the [Field](doc:Field) under the `formatterOptions`
+ * You can pass options for the formatter via the [Field](doc:Field) under the `formatterProps`
  *  option. These will be passed through to the formatter component (eg. `locales` & `localeOptions`
  *  in this example).
  */

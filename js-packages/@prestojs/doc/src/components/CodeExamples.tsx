@@ -103,6 +103,7 @@ export default function CodeExamples({ examples }: { examples: DocExample[] }) {
             if (example.header.tags.wide) {
                 if (acc.currentRow.length > 0) {
                     acc.rows.push(acc.currentRow);
+                    acc.currentRow = [];
                 }
                 acc.rows.push([example]);
             } else {

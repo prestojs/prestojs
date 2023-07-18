@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type DateTimeFormatterProps = {
+export type DateTimeFormatterProps = {
     /**
      * The value to format
      */
@@ -45,8 +45,8 @@ type DateTimeFormatterProps = {
  *
  * This is the [default formatter](doc:getFormatterForField) used for [DateTimeField](doc:DateTimeField)
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function DateTimeFormatter(
     props: DateTimeFormatterProps

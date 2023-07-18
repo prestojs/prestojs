@@ -7,17 +7,31 @@ import Field, { FieldProps } from './Field';
  * list. `ListField` will call `format`, `parse`, and `normalize` on this field for
  * each value in the list.
  *
- * By default `defaultValue` will be set to an empty array unless `blankAsNull` is
- * `true` in which case it will be set to `null`. `normalize` and `parse` also behave
+ * By default, `defaultValue` will be set to an empty array unless `blankAsNull` is
+ * `true`, in which case it will be set to `null`. `normalize` and `parse` also behave
  * in the same way (a falsy value passed to these will either return an empty array
  * when `blankAsNull` is false or null when it is true).
  *
+ * ## Usage
+ *
  * ```js
- * const listOfInts = new ListField({ childField: new IntegerField() });
+ * import { CharField, IntegerField, ListField, viewModelFactory } from '@prestojs/viewmodel';
+ *
+ * class User extends viewModelFactory({
+ *   id: new IntegerField(),
+ *   name: new CharField(),
+ *   groupIds: new ListField({ childField: new IntegerField() }),
+ * }, { pkFieldName: 'id' }) {
+ *
+ * }
+ * // The groupIds go through normal IntegerField parsing so are converted to numbers
+ * const user = new User({ id: 1, name: 'John', groupIds: ["1", "2", "3"] });
+ * console.log(user.groupIds)
+ * // Output: [1, 2, 3]
  * ```
  *
- * @extract-docs
- * @menu-group Fields
+ * @extractdocs
+ * @menugroup Fields
  * @typeParam T The value of each element in the list
  * @typeParam ParsableType This the type the field knows how to parse into `ValueType` when constructing a `ViewModel`.
  */

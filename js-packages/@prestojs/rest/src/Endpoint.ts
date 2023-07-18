@@ -5,9 +5,9 @@ import isEqual from 'lodash/isEqual';
 import requestDefaultsMiddleware from './requestDefaultsMiddleware';
 
 /**
- * @export-in-docs
+ * @expandproperties
  */
-type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
+export type ExecuteInitOptions = Omit<RequestInit, 'headers'> & {
     /**
      * Any headers to add to the request. You can unset default headers that might be specified in the default
      * [Endpoint.defaultConfig.requestInit](#Property-defaultConfig) by setting the value to `undefined`.
@@ -36,7 +36,7 @@ interface QueryStringParams {
 }
 
 /**
- * @expand-properties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
+ * @expandproperties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
  */
 export type EndpointOptions<ReturnT> = ExecuteInitOptions & {
     /**
@@ -131,7 +131,7 @@ export type EndpointOptions<ReturnT> = ExecuteInitOptions & {
 };
 
 /**
- * @export-in-docs
+ * @expandproperties
  */
 interface UrlResolveOptions {
     /**
@@ -145,7 +145,7 @@ interface UrlResolveOptions {
 }
 
 /**
- * @expand-properties
+ * @expandproperties
  */
 export type ExecuteReturnVal<T> = {
     /**
@@ -179,7 +179,7 @@ export type ExecuteReturnVal<T> = {
 };
 
 /**
- * @expand-properties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
+ * @expandproperties Any options accepted by [fetch](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters) in addition to those described below
  */
 export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
 
@@ -206,8 +206,8 @@ export type EndpointExecuteOptions = ExecuteInitOptions & UrlResolveOptions;
  * Note that this completely bypasses any subsequent middleware in the chain (including response handling) so any
  * security-related middleware should come before this.
  *
- * @extract-docs
- * @menu-group Endpoint
+ * @extractdocs
+ * @menugroup Endpoint
  */
 export class SkipToResponse {
     promise: Promise<Response>;
@@ -226,8 +226,8 @@ const DECODED_BODY = Symbol.for('@prestojs/Endpoint.DECODED_BODY');
 
 /**
  * An instance of this is passed as the fourth parameter to middleware functions.
- * @extract-docs
- * @menu-group Endpoint
+ * @extractdocs
+ * @menugroup Endpoint
  */
 export class MiddlewareContext<T> {
     /**
@@ -365,19 +365,17 @@ export type MiddlewareUrlConfig = {
     baseUrl: string;
 };
 
-/**
- * Middleware process function
- *
- * @param next The next function in the middleware chain. Must be passed the `url` and `requestInit` objects. Alternatively
- * you can pass an instance of [SkipToResponse](doc:SkipToResponse) instead of `url` and `requestInit`.
- * @param urlConfig The URL config
- * @param requestInit See [fetch parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
- * @param context The context for the current execute. This gives you access to the original options and a function to re-execute the command.
- * @returns Returns the value from `fetch` after it has been transformed by each middleware further down the chain
- *
- * @extract-docs
- */
 export interface MiddlewareFunction<T> {
+    /**
+     * Middleware process function
+     *
+     * @param next The next function in the middleware chain. Must be passed the `url` and `requestInit` objects. Alternatively
+     * you can pass an instance of [SkipToResponse](doc:SkipToResponse) instead of `url` and `requestInit`.
+     * @param urlConfig The URL config
+     * @param requestInit See [fetch parameters](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
+     * @param context The context for the current execute. This gives you access to the original options and a function to re-execute the command.
+     * @returns Returns the value from `fetch` after it has been transformed by each middleware further down the chain
+     */
     (
         next: MiddlewareNextFunction<T>,
         urlConfig: MiddlewareUrlConfig,
@@ -386,10 +384,7 @@ export interface MiddlewareFunction<T> {
     ): MiddlewareReturn<T>;
 }
 
-/**
- * @extract-docs
- */
-interface MiddlewareNextFunction<T> {
+export interface MiddlewareNextFunction<T> {
     /**
      * Middleware functions should call this to allow processing to continue to the next middleware in the chain. Must
      * be passed the `url` and `requestInit` objects. Alternatively you can pass an instance of [SkipToResponse](doc:SkipToResponse)
@@ -432,9 +427,9 @@ export interface MiddlewareObject<T> {
 export type Middleware<T> = MiddlewareFunction<T> | MiddlewareObject<T>;
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type DefaultConfig<ReturnT = any> = {
+export type DefaultConfig<ReturnT = any> = {
     /**
      * Default options used to execute the endpoint with
      */
@@ -494,8 +489,8 @@ function mergeHeaders(headers1: Headers, headers2: Headers): Headers {
  * ```
  *
  * @param args The objects to merge
- * @extract-docs
- * @menu-group Endpoint
+ * @extractdocs
+ * @menugroup Endpoint
  */
 export function mergeRequestInit(
     ...args: (ExecuteInitOptions | EndpointRequestInit)[]
@@ -534,9 +529,9 @@ export function mergeRequestInit(
 }
 
 /**
- * @extract-docs
+ * @expandproperties
  */
-type PreparedEndpoint<ReturnT> = {
+export type PreparedEndpoint<ReturnT> = {
     /**
      * Executes the endpoint. If `options` is provided they will override the options
      * used in the call to [Endpoint.prepare](doc:Endpoint#Method-prepare)
@@ -596,8 +591,8 @@ function prepareEndpoint<ReturnT>(
 /**
  * Indicates a response outside the 200 range. This is thrown by [Endpoint.execute](doc:Endpoint#Method-execute).
  *
- * @menu-group Endpoint
- * @extract-docs
+ * @menugroup Endpoint
+ * @extractdocs
  */
 export class ApiError extends Error {
     /**
@@ -1049,8 +1044,8 @@ function isEqualPrepareKey(a: ExecuteInitOptions, b: ExecuteInitOptions): boolea
  * </Usage>
  *
  *
- * @menu-group Endpoint
- * @extract-docs
+ * @menugroup Endpoint
+ * @extractdocs
  * @typeParam ReturnT The type of the result returned by the endpoint.
  */
 export default class Endpoint<ReturnT = any> {
@@ -1087,7 +1082,9 @@ export default class Endpoint<ReturnT = any> {
     public requestInit: ExecuteInitOptions;
     private urlCache: Map<string, Map<{}, PreparedEndpoint<ReturnT>>>;
     /**
-     * @private
+     * Decodes the body and returns the content based on Content-Type
+     *
+     * You can customise the behaviour by passing the `decodeBody` option.
      */
     public decodeBody: (res: Response) => any;
 
@@ -1102,8 +1099,6 @@ export default class Endpoint<ReturnT = any> {
      *
      *
      * This is set to the `resolveUrl` passed in the constructor
-     *
-     * @private
      */
     public resolveUrl: (
         urlPattern: UrlPattern,
@@ -1374,7 +1369,7 @@ export default class Endpoint<ReturnT = any> {
                     }
                 }
                 if (result === lastMiddlewareReturn) {
-                    return result;
+                    return result as MiddlewareNextReturn<ReturnT>;
                 }
                 lastMiddlewareReturn = {
                     result: result as ReturnT,

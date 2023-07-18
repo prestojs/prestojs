@@ -1,10 +1,10 @@
 import React, { ReactNode } from 'react';
 
 /**
- * @expand-properties Any extra props are passed directly through to `linkComponent`
- * @typeParam LinkComponentT @inherit
+ * @expandproperties Any extra props are passed directly through to `linkComponent`
+ * @typeParam LinkComponentT {@inheritTypeParam LinkFormatter}
  */
-type LinkFormatterProps<LinkComponentT extends React.ComponentType | 'a' = 'a'> = {
+export type LinkFormatterProps<LinkComponentT extends React.ComponentType | 'a' = 'a'> = {
     /**
      * What to render when `value` is `null`, `undefined` or an empty string
      *
@@ -57,8 +57,8 @@ type LinkFormatterProps<LinkComponentT extends React.ComponentType | 'a' = 'a'> 
  *     ```
  * </Usage>
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  * @typeParam LinkComponentT The type of React component used. Defaults to `a`.
  */
 export default function LinkFormatter<LinkComponentT extends React.ComponentType | 'a' = 'a'>(

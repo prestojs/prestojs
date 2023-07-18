@@ -1,9 +1,9 @@
 import React, { ComponentProps, ReactElement } from 'react';
 
 /**
- * @expand-properties
+ * @expandproperties
  */
-type JsonFormatterProps = {
+export type JsonFormatterProps = {
     /**
      * The `space` option passed to [JSON.stringify](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#space)
      *
@@ -34,8 +34,8 @@ type JsonFormatterProps = {
  *     The output is wrapped in a `pre` tag. Any additional props will be passed directly through to this tag.
  * </Usage>
  *
- * @extract-docs
- * @menu-group Formatters
+ * @extractdocs
+ * @menugroup Formatters
  */
 export default function JsonFormatter(props: JsonFormatterProps): ReactElement {
     const { value, space = 2, ...rest } = props;
