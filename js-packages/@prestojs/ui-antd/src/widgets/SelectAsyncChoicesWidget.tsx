@@ -332,11 +332,11 @@ function SelectAsyncChoicesWidget<
             ((response: T): void => {
                 onRetrieveSuccess(response, { input });
             }),
-        onRetrieveError:
-            onRetrieveError &&
-            ((error: Error): void => {
-                onRetrieveError(error, { input });
-            }),
+        onRetrieveError: onRetrieveError
+            ? (error: Error): void => {
+                  onRetrieveError(error, { input });
+              }
+            : error => console.error('Failed to retrieve choice(s)', error),
         listOptions,
         retrieveOptions,
     });
