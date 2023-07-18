@@ -32,6 +32,8 @@
 * `FormField` and `FormItem`, and their associated types, are no longer generic. Previously, they were generic on the value accepted
   by the `Field` but this caused problems in various situations and provided little benefit. If you were explicitly using the generic 
   types you will need to remove them.
+* `SelectAsyncChoicesWidget` will now call `asyncChoices.parseValue` for each value in `value` if `multiple` is `true`. Fixes [#186](https://github.com/prestojs/prestojs/issues/186).
+* `Form` incorrectly had `initialValues` type that claimed it supported a viewmodel. This has been removed. Fixes [#172](https://github.com/prestojs/prestojs/issues/172).
 
 ## [0.0.34] - 2022-10-07
 
