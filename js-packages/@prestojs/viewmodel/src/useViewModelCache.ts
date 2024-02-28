@@ -1,4 +1,6 @@
-import { useDebugValue, useLayoutEffect, useReducer, useRef } from 'react';
+import { useMemoOne } from '@prestojs/util';
+import { useCallback, useDebugValue, useRef } from 'react';
+import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/with-selector';
 import ViewModelCache from './ViewModelCache';
 import { ViewModelConstructor } from './ViewModelFactory';
 
@@ -19,24 +21,6 @@ export interface ViewModelCacheSelector<
      * @param args The arguments that were passed to `useViewModelCache`
      */
     (cache: ViewModelCache<ViewModelType>, ...args: SelectorsArgs): ResultType;
-}
-
-function shallowEqual(a?: any[], b?: any[]): boolean {
-    if (a === b) {
-        return true;
-    }
-    if (!a || !b) {
-        return false;
-    }
-    if (a.length !== b.length) {
-        return false;
-    }
-    for (let i = 0; i < a.length; i++) {
-        if (a[i] !== b[i]) {
-            return false;
-        }
-    }
-    return true;
 }
 
 function defaultEquality<T>(currentValue: T, previousValue?: T): boolean {
@@ -142,75 +126,34 @@ export default function useViewModelCache<
     args: SelectorArgs = [] as any,
     isEquals: (currentValue: ResultType, previousValue?: ResultType) => boolean = defaultEquality
 ): ResultType {
-    // Implementation is based on https://github.com/reduxjs/react-redux/blob/master/src/hooks/useSelector.js
-    const [, forceRender] = useReducer<React.Reducer<boolean, {}>>(i => !i, true);
-    const latestSubscriptionCallbackError = useRef<Error>();
-    const lastSelector = useRef<ViewModelCacheSelector<ViewModelType, ResultType, SelectorArgs>>();
-    const lastValue = useRef<ResultType>();
-    const lastArgs = useRef<SelectorArgs>();
-    let value;
+    // ViewModelCache internally is mutable, but the data returned for each record is immutable. This means there's
+    // no one thing we can return from the cache that indicates something has changed. Instead, we use this ref to
+    // track "new" version of cache which we can pass to `getSnapshot` below. We update this ref whenever the
+    // cache changes.
+    const latest = useRef({ cache: viewModel.cache });
+    const wrappedSelector = useMemoOne(
+        () =>
+            ({ cache }: { cache: ViewModelCache<ViewModelType> }) =>
+                selector(cache, ...args),
+        [selector, args]
+    );
+    const selectedState = useSyncExternalStoreWithSelector(
+        useCallback(
+            callback => {
+                return viewModel.cache.addListener(() => {
+                    latest.current = { cache: viewModel.cache };
+                    callback();
+                });
+            },
+            [viewModel.cache]
+        ),
+        () => latest.current,
+        () => latest.current,
+        wrappedSelector,
+        isEquals
+    );
 
-    try {
-        if (args == null) {
-            args = [] as any;
-        }
-        if (
-            lastSelector.current !== selector ||
-            latestSubscriptionCallbackError.current ||
-            !shallowEqual(lastArgs.current, args)
-        ) {
-            value = selector(viewModel.cache, ...args);
-        } else {
-            value = lastValue.current;
-        }
-    } catch (err) {
-        if (latestSubscriptionCallbackError.current) {
-            err.message += `\nThe error may be correlated with this previous error:\n${latestSubscriptionCallbackError.current.stack}\n\n`;
-        }
+    useDebugValue(selectedState);
 
-        throw err;
-    }
-
-    useLayoutEffect(() => {
-        lastSelector.current = selector;
-        lastValue.current = value;
-        lastArgs.current = args;
-    });
-
-    useLayoutEffect(() => {
-        let current = true;
-        function checkForUpdates(): void {
-            try {
-                // lastSelector.current is always set... ignore typescript
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                const nextValue = lastSelector.current(viewModel.cache, ...lastArgs.current);
-                if (isEquals(nextValue, lastValue.current)) {
-                    return;
-                }
-
-                lastValue.current = nextValue;
-            } catch (err) {
-                latestSubscriptionCallbackError.current = err;
-            }
-            if (current) {
-                forceRender({});
-            }
-        }
-
-        // This catches any changes to cache that occur between initial render
-        // and when the subscription is added here
-        // See "should handle updates between first render and subscription" test case
-        checkForUpdates();
-
-        const unsub = viewModel.cache.addListener(checkForUpdates);
-        return (): void => {
-            current = false;
-            unsub();
-        };
-    }, [isEquals, viewModel.cache]);
-
-    useDebugValue(value);
-
-    return value;
+    return selectedState;
 }

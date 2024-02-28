@@ -1,5 +1,5 @@
 import deepEqual from 'lodash/isEqual';
-import { act, render, renderHook } from 'presto-testing-library';
+import { act, render, renderHook, renderNoStrictMode } from 'presto-testing-library';
 import React from 'react';
 
 import { recordEqualTo } from '../../../../../js-testing/matchers';
@@ -37,11 +37,11 @@ test('should unsubscribe on unmount', () => {
     const selector = jest.fn(cache => cache.getAll(['firstName', 'lastName', 'email']));
 
     const { result, unmount } = renderHook(() => useViewModelCache(Test1, selector));
-    expect(selector).toHaveBeenCalledTimes(4);
+    expect(selector).toHaveBeenCalledTimes(2);
     expect(result.current).toEqual([recordEqualTo(data1)]);
     unmount();
     Test1.cache.add({ ...data1, email: 'e@f.com' });
-    expect(selector).toHaveBeenCalledTimes(4);
+    expect(selector).toHaveBeenCalledTimes(2);
 });
 
 test('should handle updates between first render and subscription', () => {
@@ -71,22 +71,32 @@ test('should rerender with new results on change', () => {
     const data1 = { id: 1, firstName: 'Bob', lastName: 'Jack', email: 'a@b.com' };
     const data2 = { id: 2, firstName: 'Sam', lastName: 'Jack', email: 'b@c.com' };
     Test1.cache.add(data1);
-    const selector = jest.fn(cache => cache.getAll(['firstName', 'lastName', 'email']));
+    const selector = cache => cache.getAll(['firstName', 'lastName', 'email']);
 
-    const { result } = renderHook(() => useViewModelCache(Test1, selector));
-    // It is called twice upfront: once as soon as the hook is called and once
-    // as soon as the subscription is added in the layout effect. StrictMode causes
-    // this to happen twice.
-    let calledCount = 4;
-    expect(selector).toHaveBeenCalledTimes(calledCount);
+    let lastRenderData;
+    let renderCount = 0;
 
-    expect(result.current).toEqual([recordEqualTo(data1)]);
+    // Just using a wrapper component to render and then track last data + render count. I prefer this to rendering
+    // the hook directly as it's more similar to how it would be used in a real app.
+    function Wrapper() {
+        lastRenderData = useViewModelCache(Test1, selector);
+        renderCount += 1;
+
+        return null;
+    }
+
+    // Render without strict mode so we don't get extra renders from react
+    renderNoStrictMode(<Wrapper />);
+
+    let calledCount = 1;
+    expect(renderCount).toBe(calledCount);
+
+    expect(lastRenderData).toEqual([recordEqualTo(data1)]);
     act(() => {
         Test1.cache.add(data2);
     });
-
-    expect(result.current).toEqual([recordEqualTo(data1), recordEqualTo(data2)]);
-    expect(selector).toHaveBeenCalledTimes(++calledCount);
+    expect(lastRenderData).toEqual([recordEqualTo(data1), recordEqualTo(data2)]);
+    expect(renderCount).toBe(++calledCount);
 
     act(() => {
         Test1.cache.add(data1);
@@ -94,26 +104,24 @@ test('should rerender with new results on change', () => {
     });
 
     // No changes, should not have been called again
-    expect(selector).toHaveBeenCalledTimes(calledCount);
+    expect(renderCount).toBe(calledCount);
 
-    const lastResult = result.current;
+    const lastResult = lastRenderData;
 
     act(() => {
         Test1.cache.add({ id: 1, firstName: 'Bobby' });
     });
 
-    // Selector will have been called but should return same result as cached value
-    // is for subset of fields
-    expect(selector).toHaveBeenCalledTimes(++calledCount);
-    expect(result.current).toBe(lastResult);
+    // Should return same result as cached value is for subset of fields
+    expect(renderCount).toBe(calledCount);
+    expect(lastRenderData).toBe(lastResult);
 
     const data3 = { id: 1, firstName: 'Bobby', lastName: 'Jack', email: 'b@b.com' };
     act(() => {
         Test1.cache.add(data3);
     });
-
-    expect(selector).toHaveBeenCalledTimes(++calledCount);
-    expect(result.current).toEqual([recordEqualTo(data3), recordEqualTo(data2)]);
+    expect(renderCount).toBe(++calledCount);
+    expect(lastRenderData).toEqual([recordEqualTo(data3), recordEqualTo(data2)]);
 });
 
 test('should handle selector changes', () => {
@@ -155,7 +163,10 @@ test('should accept extra args', () => {
     expect(result.current).toEqual([recordEqualTo({ id: 1, firstName: 'Bob', email: 'a@b.com' })]);
 
     rerender({ fieldNames: ['email'] });
+    const last = result.current;
     expect(result.current).toEqual([recordEqualTo({ id: 1, email: 'a@b.com' })]);
+    rerender({ fieldNames: ['email'] });
+    expect(result.current).toBe(last);
 });
 
 test('should allow custom equality checks', () => {
@@ -191,4 +202,42 @@ test('should allow custom equality checks', () => {
         Bob: [1, 2, 4],
         Sam: [3],
     });
+});
+
+test('should pick up changes from deleteAll', () => {
+    const Test1 = createModel();
+    // Cache by field individully, so there's no complete record
+    Test1.cache.add([
+        { id: 1, firstName: 'Bob' },
+        { id: 2, firstName: 'Sam' },
+        { id: 1, email: 'bob@example.com' },
+        { id: 2, email: 'sam@example.com' },
+    ]);
+
+    function Comp({ fieldName }: { fieldName: 'email' | 'firstName' }): React.ReactElement {
+        const records = useViewModelCache(Test1, cache => cache.getAll([fieldName]));
+
+        return <div>{records.map(r => r[fieldName]).join(', ') || '<none>'}</div>;
+    }
+
+    expect(render(<Comp fieldName="firstName" />).container.textContent).toBe('Bob, Sam');
+
+    expect(render(<Comp fieldName="email" />).container.textContent).toBe(
+        'bob@example.com, sam@example.com'
+    );
+    act(() => {
+        Test1.cache.deleteAll(['firstName']);
+    });
+
+    expect(render(<Comp fieldName="firstName" />).container.textContent).toBe('<none>');
+
+    expect(render(<Comp fieldName="email" />).container.textContent).toBe(
+        'bob@example.com, sam@example.com'
+    );
+
+    act(() => {
+        Test1.cache.deleteAll();
+    });
+
+    expect(render(<Comp fieldName="email" />).container.textContent).toBe('<none>');
 });

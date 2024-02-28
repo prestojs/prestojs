@@ -21,3 +21,4 @@ export * from '@testing-library/react';
 
 export { customRender as render };
 export { customRenderHook as renderHook };
+export { render as renderNoStrictMode };
