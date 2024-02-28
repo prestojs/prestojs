@@ -137,7 +137,10 @@ export default function useViewModelCache<
                 selector(cache, ...args),
         [selector, args]
     );
-    const selectedState = useSyncExternalStoreWithSelector(
+    const selectedState = useSyncExternalStoreWithSelector<
+        { cache: ViewModelCache<ViewModelType> },
+        ResultType
+    >(
         useCallback(
             callback => {
                 return viewModel.cache.addListener(() => {
