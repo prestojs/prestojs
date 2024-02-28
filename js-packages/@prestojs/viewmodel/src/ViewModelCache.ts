@@ -1614,4 +1614,28 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
             unsubscribes.forEach(cb => cb());
         };
     }
+
+    /**
+     * Deletes all records from the cache, optionally limiting to a subset of fields.
+     *
+     * @param fieldNames Optionally only delete the entries with the specified field names. If
+     * this is not set then all data for every record is removed. See [Field notation](#Field_notation) for supported format.
+     *
+     * **NOTE:** When deleting a subset of fields be aware that if a superset of those fields exist in the
+     * cache then the records with partial fields will be recreated next time they are accessed.
+     */
+    deleteAll(fieldNames?: FieldPaths<ViewModelClassType>) {
+        withEnableListeners(() => {
+            this.batch(() => {
+                for (const pk of this.fieldNameCache.keys()) {
+                    this.acquireFieldNameCache(pk);
+                    const pkKey = this.getPkCacheKey(pk);
+                    const recordCache = this.fieldNameCache.get(pkKey);
+                    if (recordCache) {
+                        recordCache.delete(fieldNames);
+                    }
+                }
+            });
+        });
+    }
 }

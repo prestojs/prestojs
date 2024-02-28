@@ -4304,3 +4304,49 @@ test('nested empty many related fields should match *', () => {
         ],
     });
 });
+
+test('should support removing all records from cache', () => {
+    class Test1 extends viewModelFactory(
+        {
+            id: new Field(),
+            firstName: new Field(),
+            email: new Field(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    Test1.cache.add(new Test1({ id: 2, firstName: 'Bob' }));
+    Test1.cache.add(new Test1({ id: 2, email: 'bob@b.com' }));
+    Test1.cache.add(new Test1({ id: 3, firstName: 'Jack' }));
+    expect(Test1.cache.get(2, ['id', 'firstName'])).toBeEqualToRecord(
+        new Test1({ id: 2, firstName: 'Bob' })
+    );
+
+    const firstNameListener = jest.fn();
+    Test1.cache.addListener(2, ['firstName'], firstNameListener);
+    const allListener = jest.fn();
+    Test1.cache.addListener(allListener);
+
+    Test1.cache.deleteAll(['firstName']);
+
+    expect(firstNameListener).toHaveBeenCalledTimes(1);
+    expect(firstNameListener).toHaveBeenLastCalledWith(
+        recordEqualTo({
+            id: 2,
+            firstName: 'Bob',
+        }),
+        null
+    );
+
+    expect(allListener).toHaveBeenCalledTimes(1);
+
+    expect(Test1.cache.get(2, ['id', 'firstName'])).toBeNull();
+    expect(Test1.cache.get(3, ['id', 'firstName'])).toBeNull();
+    expect(Test1.cache.get(2, ['id', 'email'])).toBeEqualToRecord(
+        new Test1({ id: 2, email: 'bob@b.com' })
+    );
+    Test1.cache.deleteAll();
+    expect(allListener).toHaveBeenCalledTimes(2);
+    expect(Test1.cache.get(2, ['id', 'email'])).toBeNull();
+    expect(Test1.cache.get(3, ['id', 'email'])).toBeNull();
+    expect(Test1.cache.getAll(['id'])).toHaveLength(0);
+});
