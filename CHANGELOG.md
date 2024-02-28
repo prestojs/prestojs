@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+* `ViewModelCache` now has a `deleteAll` method to clear the cache
+
+### Changed
+
+* `useViewModelCache` now longer relies on `useLayoutEffect` and so works better with server-side rendering.
+
 ## [0.0.35] - 2023-02-13
 
 ### Added
