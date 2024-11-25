@@ -1974,11 +1974,21 @@ test('should notify listener own change to deeply nested record', async () => {
             {
                 id: 1,
                 name: 'A',
-                sections: [{ id: 1, name: 'Test', owner: { id: 1, name: 'Owner' } }],
+                sections: [{ id: 1, name: 'Section A', owner: { id: 1, name: 'Owner' } }],
             },
         ],
     });
-    const cb = jest.fn();
+    User.cache.add({
+        id: 2,
+        groups: [
+            {
+                id: 2,
+                name: 'B',
+                sections: [{ id: 2, name: 'Section B', owner: { id: 2, name: 'Owner 2' } }],
+            },
+        ],
+    });
+    const cb1 = jest.fn();
     User.cache.addListener(
         1,
         [
@@ -1987,10 +1997,27 @@ test('should notify listener own change to deeply nested record', async () => {
             ['groups', 'sections', 'name'],
             ['groups', 'sections', 'owner', 'name'],
         ],
-        cb
+        cb1
+    );
+    const cb2 = jest.fn();
+    User.cache.addListener(
+        2,
+        [
+            'id',
+            ['groups', 'name'],
+            ['groups', 'sections', 'name'],
+            ['groups', 'sections', 'owner', 'name'],
+        ],
+        cb2
     );
     Owner.cache.add({ id: 1, name: 'New Owner' });
-    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb2).not.toHaveBeenCalled();
+    cb1.mockReset();
+
+    Owner.cache.add({ id: 2, name: 'Owner Two' });
+    expect(cb2).toHaveBeenCalledTimes(1);
+    expect(cb1).not.toHaveBeenCalled();
 });
 
 test('getting a subset of keys should not trigger listeners', async () => {
