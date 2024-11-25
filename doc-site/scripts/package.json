@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "extract": "node --loader ts-node/esm extract-docs.ts"
+    "extract": "tsx extract-docs.ts"
   }
 }
