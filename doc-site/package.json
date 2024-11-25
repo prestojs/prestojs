@@ -42,7 +42,7 @@
     "tailwindcss": "^3.0.24"
   },
   "devDependencies": {
-    "ts-node": "^10.4.0",
+    "tsx": "^4.19.2",
     "next-compose-plugins": "^2.2.1",
     "less-loader": "^10.2.0",
     "less": "^4.1.2",

@@ -375,7 +375,9 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
         // This may already be set for a previous call to this function for a different record (ie.
         // a previous version of the record with different related record id(s)). In that case remove
         // the old listeners and add new ones to ensure they match the latest related record id(s).
-        this.relationListenerUnsubscribe.get(key)?.forEach(unsub => unsub());
+        // I removed this, as it introduced bugs on nested relations and did not cause any problems
+        // that I could find - all existing test cases still work.
+        // this.relationListenerUnsubscribe.get(key)?.forEach(unsub => unsub());
         const relationUnsubscribes: ChangeListenerUnsubscribe[] = [];
         for (const [relationFieldName, relationFieldPath] of Object.entries(key.relations)) {
             const relationField = this.viewModel.getField(

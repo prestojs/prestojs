@@ -1921,6 +1921,105 @@ test('listeners should work across deeply nested related models', async () => {
     expect(userListenerAll).not.toHaveBeenCalled();
 });
 
+test('should notify listener own change to deeply nested record', async () => {
+    /**
+     * This was introduced as multiple level relations were not calling listeners at the root
+     * level on change
+     */
+    class Owner extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Section extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            ownerId: new Field(),
+            owner: new RelatedViewModelField({
+                to: Owner,
+                sourceFieldName: 'ownerId',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class Group extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            name: new Field<string>(),
+            sectionIds: new ListField({ childField: new Field() }),
+            sections: new ManyRelatedViewModelField({
+                to: Section,
+                sourceFieldName: 'sectionIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    class User extends viewModelFactory(
+        {
+            id: new Field<number>(),
+            groupIds: new ListField({ childField: new Field<number | null>() }),
+            groups: new ManyRelatedViewModelField({
+                to: Group,
+                sourceFieldName: 'groupIds',
+            }),
+        },
+        { pkFieldName: 'id' }
+    ) {}
+    User.cache.add({
+        id: 1,
+        groups: [
+            {
+                id: 1,
+                name: 'A',
+                sections: [{ id: 1, name: 'Section A', owner: { id: 1, name: 'Owner' } }],
+            },
+        ],
+    });
+    User.cache.add({
+        id: 2,
+        groups: [
+            {
+                id: 2,
+                name: 'B',
+                sections: [{ id: 2, name: 'Section B', owner: { id: 2, name: 'Owner 2' } }],
+            },
+        ],
+    });
+    const cb1 = jest.fn();
+    User.cache.addListener(
+        1,
+        [
+            'id',
+            ['groups', 'name'],
+            ['groups', 'sections', 'name'],
+            ['groups', 'sections', 'owner', 'name'],
+        ],
+        cb1
+    );
+    const cb2 = jest.fn();
+    User.cache.addListener(
+        2,
+        [
+            'id',
+            ['groups', 'name'],
+            ['groups', 'sections', 'name'],
+            ['groups', 'sections', 'owner', 'name'],
+        ],
+        cb2
+    );
+    Owner.cache.add({ id: 1, name: 'New Owner' });
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb2).not.toHaveBeenCalled();
+    cb1.mockReset();
+
+    Owner.cache.add({ id: 2, name: 'Owner Two' });
+    expect(cb2).toHaveBeenCalledTimes(1);
+    expect(cb1).not.toHaveBeenCalled();
+});
+
 test('getting a subset of keys should not trigger listeners', async () => {
     const { User, Subscription } = createTestModels(true);
     await Subscription.fields.user.resolveViewModel();
