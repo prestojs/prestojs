@@ -1,5 +1,13 @@
 # Changelog
 
+
+## [0.0.37] - 2024-11-25
+
+### Fixed
+
+* Fix bug in `ViewModelCache` listeners when dealing with when deeply nested relations. Previously, there would be times
+  when changing a record would not trigger a listener call to an ancestor.
+
 ## [0.0.36] - 2024-03-07
 
 ### Added
