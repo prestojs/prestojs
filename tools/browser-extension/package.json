@@ -1,0 +1,26 @@
+{
+  "name": "prestojs-browser-extension",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "jest --config ./jest.config.cjs --runInBand"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.1.0-beta.30",
+    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/react": "^16.1.0",
+    "@types/chrome": "^0.0.307",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.10"
+  }
+}

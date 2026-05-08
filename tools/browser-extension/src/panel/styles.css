@@ -1,0 +1,275 @@
+:root {
+    --bg-top: #fff7e8;
+    --bg-bottom: #eef6f3;
+    --panel-bg: #ffffff;
+    --panel-border: #d3dfd8;
+    --text: #1d2a24;
+    --muted: #50635a;
+    --badge-bg: #14382b;
+    --badge-text: #f5fffa;
+    --accent: #b26b2a;
+    --danger: #8f2b2b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+    color: var(--text);
+    background: linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+}
+
+.app-shell {
+    min-height: 100vh;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.toolbar h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.toolbar p {
+    margin: 4px 0 0;
+    color: var(--muted);
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 8px;
+}
+
+button,
+select {
+    border: 1px solid #c2d2c8;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    padding: 8px 10px;
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:hover {
+    border-color: var(--accent);
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filters label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.poll-status {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.status {
+    padding: 8px 10px;
+    border: 1px solid var(--panel-border);
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.status code {
+    background: #f4f4ef;
+    border-radius: 4px;
+    padding: 2px 4px;
+    white-space: pre-wrap;
+}
+
+.status-unsupported {
+    border-color: #e4b5b5;
+    background: #fff5f5;
+    color: #652222;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    min-height: 0;
+    flex: 1;
+}
+
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 10px;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel h2 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #30493d;
+}
+
+.empty {
+    color: var(--muted);
+}
+
+.event-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: auto;
+}
+
+.event {
+    border: 1px solid #d6e1db;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fbfdfb;
+}
+
+.event-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.event-head time {
+    margin-left: auto;
+}
+
+.badge {
+    background: var(--badge-bg);
+    color: var(--badge-text);
+    border-radius: 999px;
+    padding: 2px 8px;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+}
+
+.event p {
+    margin: 8px 0 0;
+}
+
+.event-inspector,
+.snapshot-inspector {
+    margin: 8px 0 0;
+    padding: 8px;
+    background: #f7f8f5;
+    border: 1px solid #dee4de;
+    border-radius: 8px;
+    overflow: auto;
+}
+
+.event-disclosure {
+    margin-top: 8px;
+}
+
+.event-disclosure > summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 12px;
+    user-select: none;
+}
+
+.event-disclosure[open] > summary {
+    margin-bottom: 6px;
+}
+
+.event-json,
+.snapshot-json {
+    margin: 0;
+    font-family: 'IBM Plex Mono', 'SFMono-Regular', Menlo, monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.object-node {
+    font-family: 'IBM Plex Mono', 'SFMono-Regular', Menlo, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.object-node summary {
+    cursor: pointer;
+    user-select: none;
+}
+
+.object-children {
+    border-left: 1px dashed #ced8d1;
+    margin-left: 10px;
+    padding-left: 10px;
+}
+
+.object-key {
+    color: #204036;
+    font-weight: 600;
+}
+
+.object-type {
+    color: #6c7f75;
+}
+
+.object-value {
+    color: #263f35;
+}
+
+.object-empty {
+    color: #6c7f75;
+    font-style: italic;
+}
+
+.event-miss {
+    border-color: #e9d8ba;
+    background: #fff9ef;
+}
+
+.event-delete,
+.event-deleteAll {
+    border-color: #e7c8c8;
+    background: #fff6f6;
+}
+
+@media (max-width: 900px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}

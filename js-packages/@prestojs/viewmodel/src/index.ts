@@ -34,6 +34,7 @@ export {
 } from './fields/RelatedViewModelField';
 export { default as ListField } from './fields/ListField';
 export { default as useAsyncChoices } from './useAsyncChoices';
+export { __experimentalViewModelCacheDevtools } from './devtools';
 
 export { normalizeFields, ViewModelFieldPaths } from './fieldUtils';
 
@@ -75,6 +76,24 @@ export type {
     MultiChangeListener,
     ChangeListenerUnsubscribe,
 } from './ViewModelCache';
+export type {
+    DevtoolsDomain,
+    DevtoolsFieldPath,
+    ExperimentalViewModelCacheDevtools,
+    PullEventsResult,
+    ViewModelCacheModelSnapshot,
+    ViewModelCacheMissReason,
+    ViewModelCacheRecordSnapshot,
+    ViewModelCacheSnapshot,
+    ViewModelCacheSnapshotEntry,
+    ViewModelDeleteAllEvent,
+    ViewModelDeleteEvent,
+    ViewModelDevtoolsEvent,
+    ViewModelDevtoolsOptions,
+    ViewModelMissEvent,
+    ViewModelWriteSource,
+    ViewModelWriteEvent,
+} from './devtools';
 
 export type {
     DefaultValueFunction,

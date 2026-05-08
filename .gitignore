@@ -41,3 +41,4 @@ django-root/temp/*
 .yarn/build-state.yml
 .pnp.*
 ___temp*
+tools/browser-extension/dist

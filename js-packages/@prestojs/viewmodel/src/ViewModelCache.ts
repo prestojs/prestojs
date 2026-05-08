@@ -1,5 +1,18 @@
 import { isEqual as isShallowEqual } from '@prestojs/util';
 import pick from 'lodash/pick';
+import {
+    __emitViewModelDevtoolsEvent,
+    __registerViewModelCacheDevtoolsAdapter,
+    __experimentalViewModelCacheDevtools,
+} from './devtools';
+import type {
+    DevtoolsFieldPath,
+    ViewModelCacheModelSnapshot,
+    ViewModelCacheMissReason,
+    ViewModelCacheRecordSnapshot,
+    ViewModelCacheSnapshotEntry,
+    ViewModelWriteSource,
+} from './devtools';
 import { BaseRelatedViewModelField } from './fields/RelatedViewModelField';
 import { CACHE_KEY_FIELD_SEPARATOR, normalizeFields, ViewModelFieldPaths } from './fieldUtils';
 import { isDev } from './util';
@@ -57,6 +70,37 @@ function withEnableListeners<T>(run: () => T): T {
     }
 }
 
+function serializeFieldPath(path: FieldPath<any>): DevtoolsFieldPath {
+    if (Array.isArray(path)) {
+        return [...path];
+    }
+    return path;
+}
+
+function serializeFieldPaths(paths: FieldPath<any>[]): DevtoolsFieldPath[] {
+    return paths.map(path => serializeFieldPath(path));
+}
+
+function serializeRecordValue(value: unknown): unknown {
+    if (value && typeof value === 'object' && typeof (value as any).toJS === 'function') {
+        return (value as any).toJS();
+    }
+    return value;
+}
+
+interface RecordFieldNameCacheGetResult<ViewModelClassType extends ViewModelConstructor<any, any>> {
+    record: PartialViewModel<ViewModelClassType> | null;
+    missingRelationPaths: string[];
+}
+
+interface RecordFieldNameCacheWriteInput<
+    ViewModelClassType extends ViewModelConstructor<any, any>
+> {
+    key: ViewModelFieldPaths<ViewModelClassType>;
+    record: PartialViewModel<ViewModelClassType>;
+    source: ViewModelWriteSource;
+}
+
 /**
  * Caches record instances based on the assigned fields
  */
@@ -92,6 +136,7 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
     recordPk: ExtractPkFieldParseableValueType<ViewModelClassType>;
     viewModel: ViewModelClassType;
     onAnyChange: () => void;
+    onWrite: (write: RecordFieldNameCacheWriteInput<ViewModelClassType>) => void;
     /**
      * Contains all keys in `cache` in descending order of last insert/update
      *
@@ -117,7 +162,8 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
     constructor(
         viewModel: ViewModelClassType,
         pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
-        onAnyChange: () => void
+        onAnyChange: () => void,
+        onWrite: (write: RecordFieldNameCacheWriteInput<ViewModelClassType>) => void
     ) {
         this.cacheListeners = new Map();
         this.relationListenerUnsubscribe = new Map();
@@ -125,6 +171,7 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
         this.cache = new Map();
         this.recordPk = pk;
         this.onAnyChange = onAnyChange;
+        this.onWrite = onWrite;
     }
 
     /**
@@ -134,7 +181,8 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
      */
     private setValueForKey(
         key: ViewModelFieldPaths<ViewModelClassType>,
-        value: PartialViewModel<ViewModelClassType> | null
+        value: PartialViewModel<ViewModelClassType> | null,
+        writeSource?: ViewModelWriteSource
     ): void {
         const index = this.lastUpdatedKeys.indexOf(key);
         if (index !== -1) {
@@ -158,6 +206,13 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
         }
         if (listenersEnabled) {
             this.onAnyChange();
+        }
+        if (value && writeSource) {
+            this.onWrite({
+                key,
+                record: value,
+                source: writeSource,
+            });
         }
     }
 
@@ -190,13 +245,13 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
             if (record._assignedFieldPaths.isSubset(cacheKey as ViewModelFieldPaths<any>, true)) {
                 const recordWithRelations = this.constructWithRelatedRecords(cacheKey, record);
                 if (recordWithRelations) {
-                    this.setValueForKey(cacheKey, recordWithRelations);
+                    this.setValueForKey(cacheKey, recordWithRelations, 'subset_fanout');
                 }
             }
         }
         const key =
             record._assignedFieldPaths as unknown as ViewModelFieldPaths<ViewModelClassType>;
-        this.setValueForKey(key, record);
+        this.setValueForKey(key, record, 'add');
 
         if (record) {
             this.setupRelationListeners(key, record);
@@ -208,11 +263,14 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
      * another record in the cache (ie. one with a superset of the fields set) then this will be done
      * automatically.
      */
-    get(key: ViewModelFieldPaths<ViewModelClassType>): PartialViewModel<ViewModelClassType> | null {
+    getWithMetadata(
+        key: ViewModelFieldPaths<ViewModelClassType>
+    ): RecordFieldNameCacheGetResult<ViewModelClassType> {
         const record = this.cache.get(key);
         if (record) {
-            return record;
+            return { record, missingRelationPaths: [] };
         }
+        const missingRelationPaths = new Set<string>();
         // record doesn't already exist for key - see if it's a subkey of existing entries
         for (const cacheKey of this.lastUpdatedKeys) {
             const record = this.cache.get(cacheKey);
@@ -230,6 +288,10 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                         relationFieldName
                     ) as BaseRelatedViewModelField<any, any, any>;
                     const idOrIds = record[relationField.sourceFieldName];
+                    const relationPathStrings = relationFieldPaths.map(path => {
+                        const nestedPath = Array.isArray(path) ? path.join('.') : path;
+                        return `${relationFieldName}.${nestedPath}`;
+                    });
                     // If the id is null (or empty array for many-to-many) then there is nothing to resolve - set to null/[]
                     if (idOrIds == null || (Array.isArray(idOrIds) && idOrIds.length === 0)) {
                         data[relationFieldName] = relationField.many ? [] : null;
@@ -242,6 +304,7 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                             );
                             // If there are any records missing we consider the relation unfulfilled
                             if (records.length !== idOrIds.length) {
+                                relationPathStrings.forEach(path => missingRelationPaths.add(path));
                                 relationsMissing = true;
                                 break;
                             }
@@ -252,6 +315,7 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                                 relationFieldPaths
                             );
                             if (!relatedRecord) {
+                                relationPathStrings.forEach(path => missingRelationPaths.add(path));
                                 relationsMissing = true;
                                 break;
                             }
@@ -264,14 +328,40 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                     continue;
                 }
                 const r = new this.viewModel(data) as PartialViewModel<ViewModelClassType>;
-                this.setValueForKey(key, r);
+                this.setValueForKey(key, r, 'derived_get');
                 if (r) {
                     this.setupRelationListeners(key, r);
                 }
-                return r;
+                return { record: r, missingRelationPaths: [] };
             }
         }
-        return null;
+        return { record: null, missingRelationPaths: [...missingRelationPaths] };
+    }
+
+    get(key: ViewModelFieldPaths<ViewModelClassType>): PartialViewModel<ViewModelClassType> | null {
+        return this.getWithMetadata(key).record;
+    }
+
+    getAvailableFieldSetKeys(): string[] {
+        return this.lastUpdatedKeys.filter(key => Boolean(this.cache.get(key))).map(key => key.key);
+    }
+
+    getSnapshotFieldSets(requiredNonRelationFieldNames: string[]): ViewModelCacheSnapshotEntry[] {
+        return this.lastUpdatedKeys.reduce((acc, key) => {
+            const record = this.cache.get(key);
+            if (!record) {
+                return acc;
+            }
+            acc.push({
+                fieldSetKey: key.key,
+                isAllFields: requiredNonRelationFieldNames.every(fieldName =>
+                    key.nonRelationFieldNames.includes(fieldName)
+                ),
+                normalizedFieldPaths: serializeFieldPaths(key.fieldPaths),
+                value: serializeRecordValue(record),
+            });
+            return acc;
+        }, [] as ViewModelCacheSnapshotEntry[]);
     }
 
     /**
@@ -402,7 +492,7 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                                     key,
                                     record
                                 );
-                                this.setValueForKey(key, recordWithRelations);
+                                this.setValueForKey(key, recordWithRelations, 'relation_sync');
                             }
                         },
                         false
@@ -453,7 +543,7 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                                 key,
                                 after
                             );
-                            this.setValueForKey(key, recordWithRelations);
+                            this.setValueForKey(key, recordWithRelations, 'relation_sync');
                         }
                     }
                 )
@@ -470,7 +560,7 @@ class RecordFieldNameCache<ViewModelClassType extends ViewModelConstructor<any, 
                 this.setupRelationListeners(key, record);
                 const recordWithRelations = this.constructWithRelatedRecords(key, record);
                 // Note that this won't fire any listeners as listenersEnabled will be false
-                this.setValueForKey(key, recordWithRelations);
+                this.setValueForKey(key, recordWithRelations, 'relation_sync');
             }
             return (): void => {
                 unsubs.forEach(fn => fn());
@@ -846,6 +936,7 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      */
     viewModel: ViewModelClassType;
     private fieldNameCache: Map<string, RecordFieldNameCache<ViewModelClassType>>;
+    private allNonRelationFieldNames: string[];
     /**
      * @ignore
      */
@@ -857,6 +948,10 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     constructor(viewModel: ViewModelClassType) {
         this.viewModel = viewModel;
         this.fieldNameCache = new Map();
+        this.allNonRelationFieldNames = this.viewModel.allFieldNames.filter(
+            fieldName => !this.viewModel.relationFieldNames.includes(fieldName)
+        );
+        __registerViewModelCacheDevtoolsAdapter(this);
     }
 
     private get cache(): never {
@@ -895,7 +990,12 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
         const pkKey = this.getPkCacheKey(pk);
         let recordCache = this.fieldNameCache.get(pkKey);
         if (!recordCache) {
-            recordCache = new RecordFieldNameCache(this.viewModel, pk, this.onAnyChange.bind(this));
+            recordCache = new RecordFieldNameCache(
+                this.viewModel,
+                pk,
+                this.onAnyChange.bind(this),
+                write => this.emitWriteDevtoolsEvent(write.record, write.key, write.source)
+            );
             this.fieldNameCache.set(pkKey, recordCache);
         }
 
@@ -905,6 +1005,96 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     private get cacheClass() {
         return Object.getPrototypeOf(this).constructor;
+    }
+
+    private isAllFieldsPath(fieldPaths: ViewModelFieldPaths<ViewModelClassType>): boolean {
+        return this.allNonRelationFieldNames.every(fieldName =>
+            fieldPaths.nonRelationFieldNames.includes(fieldName)
+        );
+    }
+
+    /**
+     * @ignore
+     */
+    __experimentalDevtoolsGetSnapshot(): ViewModelCacheModelSnapshot {
+        const records = [...this.fieldNameCache.values()].reduce((acc, recordCache) => {
+            const fieldSets = recordCache.getSnapshotFieldSets(this.allNonRelationFieldNames);
+            if (fieldSets.length === 0) {
+                return acc;
+            }
+            const recordSnapshot: ViewModelCacheRecordSnapshot = {
+                pk: recordCache.recordPk,
+                fieldSets,
+            };
+            acc.push(recordSnapshot);
+            return acc;
+        }, [] as ViewModelCacheRecordSnapshot[]);
+        return {
+            modelName: this.viewModel.name,
+            recordCount: records.length,
+            records,
+        };
+    }
+
+    private emitWriteDevtoolsEvent(
+        record: PartialViewModel<ViewModelClassType>,
+        assignedFieldPaths: ViewModelFieldPaths<ViewModelClassType>,
+        source: ViewModelWriteSource
+    ): void {
+        if (!__experimentalViewModelCacheDevtools.isEnabled()) {
+            return;
+        }
+        const presentNonRelationFieldNames = this.allNonRelationFieldNames.filter(fieldName =>
+            assignedFieldPaths.nonRelationFieldNames.includes(fieldName)
+        );
+        const missingNonRelationFieldNames = this.allNonRelationFieldNames.filter(
+            fieldName => !presentNonRelationFieldNames.includes(fieldName)
+        );
+        __emitViewModelDevtoolsEvent({
+            modelName: this.viewModel.name,
+            op: 'write',
+            pk: record._key,
+            source,
+            fieldSetKey: assignedFieldPaths.key,
+            isAllFields: this.isAllFieldsPath(assignedFieldPaths),
+            presentNonRelationFieldNames,
+            missingNonRelationFieldNames,
+            normalizedFieldPaths: serializeFieldPaths(assignedFieldPaths.fieldPaths),
+            value: serializeRecordValue(record),
+        });
+    }
+
+    private emitMissDevtoolsEvent(
+        pk: ExtractPkFieldParseableValueType<ViewModelClassType>,
+        requestedFieldNames: FieldPath<ViewModelClassType>[] | '*',
+        normalizedFields: ViewModelFieldPaths<ViewModelClassType>,
+        fieldNameCache: RecordFieldNameCache<ViewModelClassType>,
+        missingRelationPaths: string[]
+    ): void {
+        if (!__experimentalViewModelCacheDevtools.isEnabled()) {
+            return;
+        }
+        const availableFieldSetKeys = fieldNameCache.getAvailableFieldSetKeys();
+        const reason: ViewModelCacheMissReason =
+            availableFieldSetKeys.length === 0
+                ? 'pk_not_cached'
+                : missingRelationPaths.length > 0
+                ? 'related_records_missing'
+                : 'fields_not_cached_for_pk';
+        __emitViewModelDevtoolsEvent({
+            modelName: this.viewModel.name,
+            op: 'miss',
+            pk,
+            reason,
+            requestedFieldNames:
+                requestedFieldNames === '*'
+                    ? '*'
+                    : serializeFieldPaths(requestedFieldNames as FieldPath<any>[]),
+            normalizedFieldPaths: serializeFieldPaths(normalizedFields.fieldPaths),
+            availableFieldSetKeys,
+            missingRelationPaths:
+                missingRelationPaths.length > 0 ? [...new Set(missingRelationPaths)] : undefined,
+        });
     }
 
     /**
@@ -1192,12 +1382,23 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
                 fieldNames as FieldPaths<ViewModelClassType>
             );
         }
+        const requestedFieldNames =
+            fieldNames == null
+                ? (normalizedFields.fieldPaths as FieldPath<ViewModelClassType>[])
+                : fieldNames;
         const fieldNameCache = this.acquireFieldNameCache(pk);
         // If record exists under fieldNames key already then return it
-        let record = fieldNameCache.get(normalizedFields);
+        const { record, missingRelationPaths } = fieldNameCache.getWithMetadata(normalizedFields);
         if (record) {
             return record;
         }
+        this.emitMissDevtoolsEvent(
+            pk,
+            requestedFieldNames,
+            normalizedFields,
+            fieldNameCache,
+            missingRelationPaths
+        );
         return null;
     }
 
@@ -1392,7 +1593,25 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
         if (!recordCache) {
             return false;
         }
-        return withEnableListeners(() => this.batch(() => recordCache.delete(fieldNames)));
+        const normalizedFields = fieldNames ? normalizeFields(this.viewModel, fieldNames) : null;
+        const deleted = withEnableListeners(() => this.batch(() => recordCache.delete(fieldNames)));
+        if (deleted && __experimentalViewModelCacheDevtools.isEnabled()) {
+            __emitViewModelDevtoolsEvent({
+                modelName: this.viewModel.name,
+                op: 'delete',
+                pk,
+                requestedFieldNames:
+                    fieldNames == null
+                        ? undefined
+                        : fieldNames === '*'
+                        ? '*'
+                        : serializeFieldPaths(fieldNames as FieldPath<any>[]),
+                normalizedFieldPaths: normalizedFields
+                    ? serializeFieldPaths(normalizedFields.fieldPaths)
+                    : undefined,
+            });
+        }
+        return deleted;
     }
 
     /**
@@ -1627,6 +1846,7 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
      * cache then the records with partial fields will be recreated next time they are accessed.
      */
     deleteAll(fieldNames?: FieldPaths<ViewModelClassType>) {
+        const normalizedFields = fieldNames ? normalizeFields(this.viewModel, fieldNames) : null;
         withEnableListeners(() => {
             this.batch(() => {
                 for (const pk of this.fieldNameCache.keys()) {
@@ -1639,5 +1859,20 @@ export default class ViewModelCache<ViewModelClassType extends ViewModelConstruc
                 }
             });
         });
+        if (__experimentalViewModelCacheDevtools.isEnabled()) {
+            __emitViewModelDevtoolsEvent({
+                modelName: this.viewModel.name,
+                op: 'deleteAll',
+                requestedFieldNames:
+                    fieldNames == null
+                        ? undefined
+                        : fieldNames === '*'
+                        ? '*'
+                        : serializeFieldPaths(fieldNames as FieldPath<any>[]),
+                normalizedFieldPaths: normalizedFields
+                    ? serializeFieldPaths(normalizedFields.fieldPaths)
+                    : undefined,
+            });
+        }
     }
 }
