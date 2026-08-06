@@ -1,5 +1,8 @@
 # React Final Form Integration
 
+> **⚠️ Legacy package** — `@prestojs/final-form` is maintained for existing projects but should not be used for new projects. New projects should use [@alliancesoftware/ui](https://ui.alliance.software/) instead — see the [Form & FormField documentation](https://ui.alliance.software/?path=/docs/form-formfield--docs).
+
+
 Integration with [react-final-form](https://github.com/final-form/react-final-form) that fills out
 the widget to use based on a ViewModel field.
 

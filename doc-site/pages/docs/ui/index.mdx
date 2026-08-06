@@ -1,9 +1,11 @@
-import { CodeExample } from '@prestojs/doc';
+import { CodeExample, LegacyPackageBanner } from '@prestojs/doc';
 import MdxPage from '../../../components/MdxPage';
 
 export default ({ children, ...rest }) => <MdxPage>{children}</MdxPage>;
 
 # UI
+
+<LegacyPackageBanner packageName="ui" />
 
 This package is concerned with providing high level components and a standard interface for specifying how to render
 UI elements for [ViewModel](/docs/viewmodel) [Field's](doc:Field). For example, creating a form to collect data for
