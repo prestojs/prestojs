@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Page, PageMetaData } from '../newTypes';
+import LegacyPackageBanner from './LegacyPackageBanner';
 import SourceLink from './SourceLink';
 import Tooltip from './Tooltip';
 import TypeParameters from './TypeParameters';
@@ -73,6 +74,7 @@ export default function PageHeader({ page, meta }: { page: Page; meta: PageMetaD
     } } from \"@prestojs/${meta.packageName}\";`;
     return (
         <>
+            <LegacyPackageBanner packageName={meta.packageName} />
             <header className="flex justify-between items-center">
                 <h1 className="text-3xl flex justify-between items-center relative" id={page.name}>
                     {page.name}

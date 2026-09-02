@@ -9,6 +9,7 @@ export {
     Alert,
 } from './components/PrecompiledMarkdown';
 export { default as AnchorLink, generateId } from './components/AnchorLink';
+export { default as LegacyPackageBanner } from './components/LegacyPackageBanner';
 export { CodeExample, default as CodeExamples } from './components/CodeExamples';
 export type {
     ClassPageHierarchy,

@@ -1,5 +1,8 @@
 # UI
 
+> **⚠️ Legacy package** — `@prestojs/ui` is maintained for existing projects but should not be used for new projects. New projects should use [@alliancesoftware/ui](https://ui.alliance.software/) instead. For formatting values (previously handled by formatters) see the [formatting values guide](https://ui.alliance.software/?path=/docs/formatting-values--docs).
+
+
 Base types and components for UI integration with prestojs.
 
 To use wrap your app with the `UiProvider`:
